@@ -1,0 +1,16 @@
+# 문서 조판 QA용 중간 산출물 (PNG 48장 + PDF, 약 18MB)
+# .work/build_doc.py 와 raster_qa.py 로 언제든 다시 만들 수 있다.
+.work/render/
+
+# Python 캐시
+__pycache__/
+*.py[cod]
+
+# 이전 버전 docx (최종본은 저장소 루트에 있다)
+.work/PRD_SRS_v1.0.docx
+
+# OS·편집기 부산물
+Thumbs.db
+desktop.ini
+.DS_Store
+*.swp
