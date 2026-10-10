@@ -67,25 +67,26 @@ window.DATA = {
       ['공방','gongbang','Craft workshop','A small studio where things are made and sold.'],
       ['찻집','chatjip','Tea house','집 at the end means house or shop.']
     ]},
-    {id:'tower',label:'Observation tower & landmark',koLabel:'전망대·랜드마크',color:'#2f7f94',signs:[
+    {id:'landmark',label:'Landmark & plaza',koLabel:'랜드마크·광장',color:'#3d6f8f',signs:[
+      ['안내도','annaedo','Area map','The board showing where everything is. 도 means map or drawing.'],
+      ['포토존','potojon','Photo spot','A Konglish loanword — marks the spot with the best view.']
+    ]},
+    {id:'tower',label:'Observation tower',koLabel:'전망대',color:'#2f7f94',signs:[
       ['전망대','jeonmangdae','Observation deck','The reason you queued for the lift.'],
       ['기념품','ginyeompum','Souvenirs','기념 means commemoration.']
     ]},
     {id:'station',label:'Station & terminal',koLabel:'역·터미널',color:'#1f6f78',signs:[
-      ['대합실','daehapsil','Waiting room','Where you wait for a train or bus.'],
-      ['안내소','annaeso','Information desk','소 at the end marks a place or office.']
+      ['교통카드 충전','gyotongkadeu chungjeon','Transit card top-up','Machines that reload T-money cards.'],
+      ['고객안내센터','gogaek annae senteo','Customer service center','Ask here for route help or lost items.']
     ]},
     {id:'park',label:'Park & riverside',koLabel:'공원·한강',color:'#6b8e3d',signs:[
       ['산책로','sanchaengno','Walking path','로 at the end means road or path.'],
-      ['매점','maejeom','Kiosk / snack shop','Where you buy drinks inside a park.'],
-      ['자전거 대여','jajeongeo daeyeo','Bicycle rental','Common along the Han River parks.']
+      ['쉼터','swimteo','Rest area','Benches and shade. 쉼 means rest.']
     ]},
-    {id:'pharmacy',label:'Pharmacy & clinic',koLabel:'약국·병원',color:'#3a7d44',signs:[
+    {id:'services',label:'Pharmacy, clinic & bank',koLabel:'약국·병원·은행',color:'#3a7d44',signs:[
       ['약국','yakguk','Pharmacy','Usually with a green cross outside.'],
-      ['병원','byeongwon','Clinic / hospital','치과 is dental, 내과 is internal medicine.']
-    ]},
-    {id:'bank',label:'Bank & money',koLabel:'은행·환전',color:'#5b6b8a',signs:[
-      ['은행','eunhaeng','Bank','On every branch sign in the country.'],
+      ['병원','byeongwon','Clinic / hospital','치과 is dental, 내과 is internal medicine.'],
+      ['은행','eunhaeng','Bank','ATMs are labelled ATM or 현금인출기.'],
       ['환전','hwanjeon','Currency exchange','Useful near markets and tourist streets.']
     ]}
   ],
@@ -104,22 +105,22 @@ window.DATA = {
     {id:'samcheong',areaId:'gyeongbokgung',type:'cafe',name:'Samcheong-dong Street',koName:'삼청동길',address:'Samcheong-dong, Jongno-gu, Seoul',lat:37.5840,lng:126.9820},
     {id:'tongin',areaId:'gyeongbokgung',type:'market',name:'Tongin Market',koName:'통인시장',address:'18 Jahamun-ro 15-gil, Jongno-gu, Seoul',lat:37.5800,lng:126.9700},
     {id:'insadong',areaId:'gyeongbokgung',type:'hanok',name:'Insadong Street',koName:'인사동',address:'Insadong-gil, Jongno-gu, Seoul',lat:37.5740,lng:126.9850},
-    {id:'gwanghwamun',areaId:'gyeongbokgung',type:'tower',name:'Gwanghwamun Square',koName:'광화문광장',address:'172 Sejong-daero, Jongno-gu, Seoul',lat:37.5720,lng:126.9769},
-    {id:'seochon-ph',areaId:'gyeongbokgung',type:'pharmacy',name:'Example pharmacy · Seochon',koName:'서촌 약국',address:'Example place near Gyeongbokgung',lat:37.5790,lng:126.9700,example:true},
+    {id:'gwanghwamun',areaId:'gyeongbokgung',type:'landmark',name:'Gwanghwamun Square',koName:'광화문광장',address:'172 Sejong-daero, Jongno-gu, Seoul',lat:37.5720,lng:126.9769},
+    {id:'seochon-ph',areaId:'gyeongbokgung',type:'services',name:'Example pharmacy · Seochon',koName:'서촌 약국',address:'Example place near Gyeongbokgung',lat:37.5790,lng:126.9700,example:true},
 
     // 명동·남대문
-    {id:'myeongdong-cathedral',areaId:'myeongdong',type:'tower',name:'Myeongdong Cathedral',koName:'명동성당',address:'74 Myeongdong-gil, Jung-gu, Seoul',lat:37.5633,lng:126.9872},
+    {id:'myeongdong-cathedral',areaId:'myeongdong',type:'landmark',name:'Myeongdong Cathedral',koName:'명동성당',address:'74 Myeongdong-gil, Jung-gu, Seoul',lat:37.5633,lng:126.9872},
     {id:'namdaemun',areaId:'myeongdong',type:'market',name:'Namdaemun Market',koName:'남대문시장',address:'21 Namdaemunsijang 4-gil, Jung-gu, Seoul',lat:37.5591,lng:126.9772},
     {id:'shinsegae',areaId:'myeongdong',type:'shopping',name:'Shinsegae Department Store Main',koName:'신세계백화점 본점',address:'63 Sogong-ro, Jung-gu, Seoul',lat:37.5610,lng:126.9810},
     {id:'lotte-main',areaId:'myeongdong',type:'shopping',name:'Lotte Department Store Main',koName:'롯데백화점 본점',address:'81 Namdaemun-ro, Jung-gu, Seoul',lat:37.5650,lng:126.9820},
     {id:'deoksugung',areaId:'myeongdong',type:'palace',name:'Deoksugung Palace',koName:'덕수궁',address:'99 Sejong-daero, Jung-gu, Seoul',lat:37.5658,lng:126.9751},
     {id:'seoulstation',areaId:'myeongdong',type:'station',name:'Seoul Station',koName:'서울역',address:'405 Hangang-daero, Jung-gu, Seoul',lat:37.5547,lng:126.9707},
     {id:'namsan-tower',areaId:'myeongdong',type:'tower',name:'N Seoul Tower',koName:'남산서울타워',address:'105 Namsangongwon-gil, Yongsan-gu, Seoul',lat:37.5512,lng:126.9882},
-    {id:'myeongdong-bank',areaId:'myeongdong',type:'bank',name:'Example exchange booth · Myeongdong',koName:'명동 환전소',address:'Example place in Myeongdong',lat:37.5640,lng:126.9860,example:true},
+    {id:'myeongdong-bank',areaId:'myeongdong',type:'services',name:'Example exchange booth · Myeongdong',koName:'명동 환전소',address:'Example place in Myeongdong',lat:37.5640,lng:126.9860,example:true},
     {id:'myeongdong-food',areaId:'myeongdong',type:'street',name:'Myeongdong Street Food Alley',koName:'명동 먹자골목',address:'Myeongdong-gil, Jung-gu, Seoul',lat:37.5636,lng:126.9850},
 
     // 동대문·을지로
-    {id:'ddp',areaId:'ddp',type:'tower',name:'Dongdaemun Design Plaza',koName:'동대문디자인플라자',address:'281 Eulji-ro, Jung-gu, Seoul',lat:37.5669,lng:127.0094},
+    {id:'ddp',areaId:'ddp',type:'landmark',name:'Dongdaemun Design Plaza',koName:'동대문디자인플라자',address:'281 Eulji-ro, Jung-gu, Seoul',lat:37.5669,lng:127.0094},
     {id:'gwangjang',areaId:'ddp',type:'market',name:'Gwangjang Market',koName:'광장시장',address:'88 Changgyeonggung-ro, Jongno-gu, Seoul',lat:37.5701,lng:126.9996},
     {id:'cheonggyecheon',areaId:'ddp',type:'park',name:'Cheonggyecheon Stream',koName:'청계천',address:'Cheonggyecheon-ro, Jung-gu, Seoul',lat:37.5692,lng:126.9784},
     {id:'euljiro',areaId:'ddp',type:'street',name:'Euljiro Printing Alleys',koName:'을지로 인쇄골목',address:'Euljiro 3-ga, Jung-gu, Seoul',lat:37.5660,lng:126.9910},
@@ -130,7 +131,7 @@ window.DATA = {
     // 성수·서울숲
     {id:'seoulforest',areaId:'seongsu',type:'park',name:'Seoul Forest',koName:'서울숲',address:'273 Ttukseom-ro, Seongdong-gu, Seoul',lat:37.5444,lng:127.0374},
     {id:'seongsu-cafe',areaId:'seongsu',type:'cafe',name:'Seongsu Café Street',koName:'성수동 카페거리',address:'Seongsui-ro, Seongdong-gu, Seoul',lat:37.5445,lng:127.0557},
-    {id:'seongsu-ph',areaId:'seongsu',type:'pharmacy',name:'Example clinic · Seongsu',koName:'성수 병원',address:'Example place near Seoul Forest',lat:37.5450,lng:127.0500,example:true},
+    {id:'seongsu-ph',areaId:'seongsu',type:'services',name:'Example clinic · Seongsu',koName:'성수 병원',address:'Example place near Seoul Forest',lat:37.5450,lng:127.0500,example:true},
     {id:'ttukseom',areaId:'seongsu',type:'station',name:'Ttukseom Station',koName:'뚝섬역',address:'Seongsui-ro, Seongdong-gu, Seoul',lat:37.5471,lng:127.0474},
 
     // 홍대·연남
@@ -145,12 +146,11 @@ window.DATA = {
     {id:'warmemorial',areaId:'yongsan',type:'museum',name:'War Memorial of Korea',koName:'전쟁기념관',address:'29 Itaewon-ro, Yongsan-gu, Seoul',lat:37.5365,lng:126.9770},
     {id:'itaewon',areaId:'yongsan',type:'street',name:'Itaewon Street',koName:'이태원 거리',address:'Itaewon-ro, Yongsan-gu, Seoul',lat:37.5345,lng:126.9946},
     {id:'namsan-park',areaId:'yongsan',type:'park',name:'Namsan Park',koName:'남산공원',address:'Samil-daero, Jung-gu, Seoul',lat:37.5512,lng:126.9910},
-    {id:'itaewon-bank',areaId:'yongsan',type:'bank',name:'Example bank branch · Itaewon',koName:'이태원 은행',address:'Example place in Itaewon',lat:37.5340,lng:126.9950,example:true},
+    {id:'itaewon-bank',areaId:'yongsan',type:'services',name:'Example bank branch · Itaewon',koName:'이태원 은행',address:'Example place in Itaewon',lat:37.5340,lng:126.9950,example:true},
 
     // 여의도·한강
     {id:'yeouido-park',areaId:'yeouido',type:'park',name:'Yeouido Hangang Park',koName:'여의도한강공원',address:'330 Yeouidong-ro, Yeongdeungpo-gu, Seoul',lat:37.5285,lng:126.9340},
     {id:'thehyundai',areaId:'yeouido',type:'shopping',name:'The Hyundai Seoul',koName:'더현대 서울',address:'108 Yeoui-daero, Yeongdeungpo-gu, Seoul',lat:37.5259,lng:126.9285},
-    {id:'noryangjin',areaId:'yeouido',type:'market',name:'Noryangjin Fish Market',koName:'노량진수산시장',address:'674 Nodeul-ro, Dongjak-gu, Seoul',lat:37.5133,lng:126.9540},
     {id:'yeouinaru',areaId:'yeouido',type:'station',name:'Yeouinaru Station',koName:'여의나루역',address:'Yeouidong-ro, Yeongdeungpo-gu, Seoul',lat:37.5270,lng:126.9325},
 
     // 강남·잠실
