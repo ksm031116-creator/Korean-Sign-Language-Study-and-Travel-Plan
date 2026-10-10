@@ -54,8 +54,8 @@ window.DATA = {
     ]},
     {id:'street',label:'Food street & shops',koLabel:'먹자골목·상점가',color:'#a8492f',signs:[
       ['식당','sikdang','Restaurant','The plain, general word for an eating place.'],
-      ['영업중','yeongeopjung','Open for business','Hung on the door while the shop is serving.'],
-      ['24시간','isipsa sigan','Open 24 hours','On convenience stores and late-night restaurants.']
+      ['분식','bunsik','Snack food','Cheap, quick Korean snacks — kimbap, ramyeon, fried bites.'],
+      ['호프','hopeu','Beer pub','From the German Hof. Usually paired with 치킨 on the same sign.']
     ]},
     {id:'shopping',label:'Department store & mall',koLabel:'백화점·쇼핑몰',color:'#9c5a9e',signs:[
       ['백화점','baekhwajeom','Department store','점 at the end means shop.'],
@@ -204,9 +204,9 @@ window.DATA = {
     ['transit','계단','gyedan','Stairs','Paired with 엘리베이터 and 에스컬레이터 on station signs.'],
     ['transit','엘리베이터','ellibeiteo','Elevator','A loanword — read it aloud and you will hear it.'],
     ['service','편의점','pyeonuijeom','Convenience store','편의 means convenience, 점 means shop.'],
-    ['service','약국','yakguk','Pharmacy','Usually with a green cross outside.'],
-    ['service','병원','byeongwon','Clinic / hospital','치과 is a dental clinic, 내과 is internal medicine.'],
-    ['service','은행','eunhaeng','Bank','ATM machines are labelled ATM or 현금인출기.'],
+    ['service','현금인출기','hyeongeum inchulgi','Cash machine (ATM)','Often labelled ATM as well.'],
+    ['service','와이파이','waipai','Wi-Fi','무료 와이파이 means free Wi-Fi.'],
+    ['service','분실물 센터','bunsilmul senteo','Lost and found','In stations, malls and museums.'],
     ['service','우체국','ucheguk','Post office','Red and white branding across the country.']
   ],
 
