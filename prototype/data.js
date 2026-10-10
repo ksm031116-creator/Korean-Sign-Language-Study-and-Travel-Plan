@@ -5,8 +5,9 @@
  *  - places     : 여행 계획의 목적지. 실존 공공·관광시설 위주 (좌표는 근사치)
  *  - placeTypes : 장소 유형. 유형마다 그 자리에서 보이는 간판 단어를 갖는다
  *  - cards      : 단어 1개 = 카드 1장. 장소마다 복제하지 않는다.
- *                 카드 → 장소는 typeId로 1:N 연결되며, 아래로 스와이프하면
- *                 그 간판을 볼 수 있는 장소 목록이 나온다 (FR09).
+ *                 카드 → 장소는 typeId로 1:N 연결되며, 장소에 signWords가 있으면
+ *                 그 단어에만 연결한다. 아래로 스와이프하면 그 간판을 볼 수 있는
+ *                 장소 목록이 나온다 (FR09).
  *
  * 사진: 간판 사진은 이용권 확보 전이라 프로토타입에서는 앱이 SVG 판으로 그린다.
  *       실제 사진은 공공누리(한국관광공사·서울시) / Unsplash·Pexels / Wikimedia에서
@@ -106,7 +107,7 @@ window.DATA = {
     {id:'tongin',areaId:'gyeongbokgung',type:'market',name:'Tongin Market',koName:'통인시장',address:'18 Jahamun-ro 15-gil, Jongno-gu, Seoul',lat:37.5800,lng:126.9700},
     {id:'insadong',areaId:'gyeongbokgung',type:'hanok',name:'Insadong Street',koName:'인사동',address:'Insadong-gil, Jongno-gu, Seoul',lat:37.5740,lng:126.9850},
     {id:'gwanghwamun',areaId:'gyeongbokgung',type:'landmark',name:'Gwanghwamun Square',koName:'광화문광장',address:'172 Sejong-daero, Jongno-gu, Seoul',lat:37.5720,lng:126.9769},
-    {id:'seochon-ph',areaId:'gyeongbokgung',type:'services',name:'Example pharmacy · Seochon',koName:'서촌 약국',address:'Example place near Gyeongbokgung',lat:37.5790,lng:126.9700,example:true},
+    {id:'seochon-ph',areaId:'gyeongbokgung',type:'services',signWords:['약국'],name:'Example pharmacy · Seochon',koName:'서촌 약국',address:'Example place near Gyeongbokgung',lat:37.5790,lng:126.9700,example:true},
 
     // 명동·남대문
     {id:'myeongdong-cathedral',areaId:'myeongdong',type:'landmark',name:'Myeongdong Cathedral',koName:'명동성당',address:'74 Myeongdong-gil, Jung-gu, Seoul',lat:37.5633,lng:126.9872},
@@ -116,7 +117,7 @@ window.DATA = {
     {id:'deoksugung',areaId:'myeongdong',type:'palace',name:'Deoksugung Palace',koName:'덕수궁',address:'99 Sejong-daero, Jung-gu, Seoul',lat:37.5658,lng:126.9751},
     {id:'seoulstation',areaId:'myeongdong',type:'station',name:'Seoul Station',koName:'서울역',address:'405 Hangang-daero, Jung-gu, Seoul',lat:37.5547,lng:126.9707},
     {id:'namsan-tower',areaId:'myeongdong',type:'tower',name:'N Seoul Tower',koName:'남산서울타워',address:'105 Namsangongwon-gil, Yongsan-gu, Seoul',lat:37.5512,lng:126.9882},
-    {id:'myeongdong-bank',areaId:'myeongdong',type:'services',name:'Example exchange booth · Myeongdong',koName:'명동 환전소',address:'Example place in Myeongdong',lat:37.5640,lng:126.9860,example:true},
+    {id:'myeongdong-bank',areaId:'myeongdong',type:'services',signWords:['환전'],name:'Example exchange booth · Myeongdong',koName:'명동 환전소',address:'Example place in Myeongdong',lat:37.5640,lng:126.9860,example:true},
     {id:'myeongdong-food',areaId:'myeongdong',type:'street',name:'Myeongdong Street Food Alley',koName:'명동 먹자골목',address:'Myeongdong-gil, Jung-gu, Seoul',lat:37.5636,lng:126.9850},
 
     // 동대문·을지로
@@ -131,7 +132,7 @@ window.DATA = {
     // 성수·서울숲
     {id:'seoulforest',areaId:'seongsu',type:'park',name:'Seoul Forest',koName:'서울숲',address:'273 Ttukseom-ro, Seongdong-gu, Seoul',lat:37.5444,lng:127.0374},
     {id:'seongsu-cafe',areaId:'seongsu',type:'cafe',name:'Seongsu Café Street',koName:'성수동 카페거리',address:'Seongsui-ro, Seongdong-gu, Seoul',lat:37.5445,lng:127.0557},
-    {id:'seongsu-ph',areaId:'seongsu',type:'services',name:'Example clinic · Seongsu',koName:'성수 병원',address:'Example place near Seoul Forest',lat:37.5450,lng:127.0500,example:true},
+    {id:'seongsu-ph',areaId:'seongsu',type:'services',signWords:['병원'],name:'Example clinic · Seongsu',koName:'성수 병원',address:'Example place near Seoul Forest',lat:37.5450,lng:127.0500,example:true},
     {id:'ttukseom',areaId:'seongsu',type:'station',name:'Ttukseom Station',koName:'뚝섬역',address:'Seongsui-ro, Seongdong-gu, Seoul',lat:37.5471,lng:127.0474},
 
     // 홍대·연남
@@ -146,7 +147,7 @@ window.DATA = {
     {id:'warmemorial',areaId:'yongsan',type:'museum',name:'War Memorial of Korea',koName:'전쟁기념관',address:'29 Itaewon-ro, Yongsan-gu, Seoul',lat:37.5365,lng:126.9770},
     {id:'itaewon',areaId:'yongsan',type:'street',name:'Itaewon Street',koName:'이태원 거리',address:'Itaewon-ro, Yongsan-gu, Seoul',lat:37.5345,lng:126.9946},
     {id:'namsan-park',areaId:'yongsan',type:'park',name:'Namsan Park',koName:'남산공원',address:'Samil-daero, Jung-gu, Seoul',lat:37.5512,lng:126.9910},
-    {id:'itaewon-bank',areaId:'yongsan',type:'services',name:'Example bank branch · Itaewon',koName:'이태원 은행',address:'Example place in Itaewon',lat:37.5340,lng:126.9950,example:true},
+    {id:'itaewon-bank',areaId:'yongsan',type:'services',signWords:['은행','환전'],name:'Example bank branch · Itaewon',koName:'이태원 은행',address:'Example place in Itaewon',lat:37.5340,lng:126.9950,example:true},
 
     // 여의도·한강
     {id:'yeouido-park',areaId:'yeouido',type:'park',name:'Yeouido Hangang Park',koName:'여의도한강공원',address:'330 Yeouidong-ro, Yeongdeungpo-gu, Seoul',lat:37.5285,lng:126.9340},
@@ -271,8 +272,10 @@ DATA.basicSigns.forEach((s,i) => {
 });
 
 // 조회 도우미
-DATA.placesForCard = card => card.typeId ? DATA.places.filter(p => p.type === card.typeId) : [];
-DATA.cardsForPlace = place => DATA.cards.filter(c => c.typeId === place.type);
+// signWords가 있는 장소는 그 단어의 카드에만 연결한다 (유형 전체를 주장하지 않는다)
+const showsSign = (p, c) => p.type === c.typeId && (!p.signWords || p.signWords.includes(c.word));
+DATA.placesForCard = card => card.typeId ? DATA.places.filter(p => showsSign(p, card)) : [];
+DATA.cardsForPlace = place => DATA.cards.filter(c => showsSign(place, c));
 DATA.cardsForArea  = areaId => {
   const types = [...new Set(DATA.places.filter(p => p.areaId === areaId).map(p => p.type))];
   return DATA.cards.filter(c => types.includes(c.typeId));

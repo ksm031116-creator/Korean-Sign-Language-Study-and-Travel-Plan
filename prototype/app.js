@@ -27,15 +27,15 @@
   const place = id => D.places.find(x=>x.id===id);
   // 지역(area)은 둘러보기 묶음일 뿐 일정의 목적지가 아니다. 목적지는 등록 장소와 출발지점이다.
   const destination = id => place(id)||(D.originPoints||[]).find(x=>x.id===id);
-  const placesForCard = c => c?.typeId ? D.places.filter(p=>p.type===c.typeId) : [];
+  const placesForCard = c => c ? D.placesForCard(c) : [];
   const typeOf = id => D.placeTypes.find(t=>t.id===id);
   const status = id => state.progress[id]||'new';
   // 카드는 단어 1개 = 1장이고 장소마다 복제하지 않는다.
   // 지역 → 그 지역 장소들의 유형 카드 / 장소 → 그 장소 유형의 카드 / Basics → 기초 카드
   function targetCards(id){
     if(id===D.basics.id) return D.cards.filter(c=>c.collectionId==='basics');
-    const a=area(id); if(a){ const types=[...new Set(D.places.filter(p=>p.areaId===id).map(p=>p.type))]; return D.cards.filter(c=>types.includes(c.typeId)); }
-    const p=place(id); if(p) return D.cards.filter(c=>c.typeId===p.type);
+    const a=area(id); if(a){ const ids=new Set(D.places.filter(p=>p.areaId===id).flatMap(p=>D.cardsForPlace(p).map(c=>c.id))); return D.cards.filter(c=>ids.has(c.id)); }
+    const p=place(id); if(p) return D.cardsForPlace(p);
     const c=card(id); return c?[c]:[];
   }
   // Basics는 장소가 없는 공공 표지판 묶음이다 (FR30). 지도·일정의 destination 후보가 아니다.
