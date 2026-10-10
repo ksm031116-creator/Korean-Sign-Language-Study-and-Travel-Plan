@@ -13,13 +13,20 @@
  *       실제 사진은 공공누리(한국관광공사·서울시) / Unsplash·Pexels / Wikimedia에서
  *       확보하며 문서 단계 1의 의존성이다.
  */
+// 사진 경로는 한 곳에서만 정의한다. 단일 파일 번들이 같은 사진을 두 번 내장하지 않도록.
+const PHOTO = {
+  gyeongbokgung:'assets/gyeongbokgung.jpg',
+  myeongdong:'assets/myeongdong.jpg',
+  ddp:'assets/ddp.jpg'
+};
+
 window.DATA = {
 
   // ---------- 지역 묶음 ----------
   areas: [
-    {id:'gyeongbokgung',name:'Gyeongbokgung & Seochon',koName:'경복궁·서촌',tag:'History & quiet lanes',color:'#2f6f5e',image:'assets/gyeongbokgung.jpg',description:'Palace courtyards, museum halls and the slow lanes of Seochon and Samcheong-dong.'},
-    {id:'myeongdong',name:'Myeongdong & Namdaemun',koName:'명동·남대문',tag:'Food & shopping',color:'#b8554a',image:'assets/myeongdong.jpg',description:'A dense grid of shops, street food and the oldest market in the city.'},
-    {id:'ddp',name:'Dongdaemun & Euljiro',koName:'동대문·을지로',tag:'Design & night walks',color:'#4a5b8c',image:'assets/ddp.jpg',description:'Curved architecture, fabric markets and the printing alleys of Euljiro.'},
+    {id:'gyeongbokgung',name:'Gyeongbokgung & Seochon',koName:'경복궁·서촌',tag:'History & quiet lanes',color:'#2f6f5e',image:PHOTO.gyeongbokgung,description:'Palace courtyards, museum halls and the slow lanes of Seochon and Samcheong-dong.'},
+    {id:'myeongdong',name:'Myeongdong & Namdaemun',koName:'명동·남대문',tag:'Food & shopping',color:'#b8554a',image:PHOTO.myeongdong,description:'A dense grid of shops, street food and the oldest market in the city.'},
+    {id:'ddp',name:'Dongdaemun & Euljiro',koName:'동대문·을지로',tag:'Design & night walks',color:'#4a5b8c',image:PHOTO.ddp,description:'Curved architecture, fabric markets and the printing alleys of Euljiro.'},
     {id:'seongsu',name:'Seongsu & Seoul Forest',koName:'성수·서울숲',tag:'Cafés & parks',color:'#6b8e3d',image:null,description:'Converted factories, a long green park and the city’s busiest café street.'},
     {id:'hongdae',name:'Hongdae & Yeonnam',koName:'홍대·연남',tag:'Youth & late nights',color:'#9c5a9e',image:null,description:'Music venues, student streets and a converted railway park.'},
     {id:'yongsan',name:'Yongsan & Itaewon',koName:'용산·이태원',tag:'Museums & global food',color:'#c07a2c',image:null,description:'The national museum, a war memorial, and the most international street in Seoul.'},
@@ -97,7 +104,7 @@ window.DATA = {
   // example:true 는 개별 상점을 대신하는 예시 장소로, 실제 상호가 아니다.
   places: [
     // 경복궁·서촌
-    {id:'gyeongbokgung',areaId:'gyeongbokgung',type:'palace',photo:'assets/gyeongbokgung.jpg',name:'Gyeongbokgung Palace',koName:'경복궁',address:'161 Sajik-ro, Jongno-gu, Seoul',lat:37.5796,lng:126.9770},
+    {id:'gyeongbokgung',areaId:'gyeongbokgung',type:'palace',photo:PHOTO.gyeongbokgung,name:'Gyeongbokgung Palace',koName:'경복궁',address:'161 Sajik-ro, Jongno-gu, Seoul',lat:37.5796,lng:126.9770},
     {id:'changdeokgung',areaId:'gyeongbokgung',type:'palace',name:'Changdeokgung Palace',koName:'창덕궁',address:'99 Yulgok-ro, Jongno-gu, Seoul',lat:37.5794,lng:126.9910},
     {id:'jongmyo',areaId:'gyeongbokgung',type:'palace',name:'Jongmyo Shrine',koName:'종묘',address:'157 Jong-ro, Jongno-gu, Seoul',lat:37.5745,lng:126.9940},
     {id:'folkmuseum',areaId:'gyeongbokgung',type:'museum',name:'National Folk Museum of Korea',koName:'국립민속박물관',address:'37 Samcheong-ro, Jongno-gu, Seoul',lat:37.5814,lng:126.9793},
@@ -110,7 +117,7 @@ window.DATA = {
     {id:'seochon-ph',areaId:'gyeongbokgung',type:'services',signWords:['약국'],name:'Example pharmacy · Seochon',koName:'서촌 약국',address:'Example place near Gyeongbokgung',lat:37.5790,lng:126.9700,example:true},
 
     // 명동·남대문
-    {id:'myeongdong-cathedral',areaId:'myeongdong',type:'landmark',photo:'assets/myeongdong.jpg',name:'Myeongdong Cathedral',koName:'명동성당',address:'74 Myeongdong-gil, Jung-gu, Seoul',lat:37.5633,lng:126.9872},
+    {id:'myeongdong-cathedral',areaId:'myeongdong',type:'landmark',photo:PHOTO.myeongdong,name:'Myeongdong Cathedral',koName:'명동성당',address:'74 Myeongdong-gil, Jung-gu, Seoul',lat:37.5633,lng:126.9872},
     {id:'namdaemun',areaId:'myeongdong',type:'market',name:'Namdaemun Market',koName:'남대문시장',address:'21 Namdaemunsijang 4-gil, Jung-gu, Seoul',lat:37.5591,lng:126.9772},
     {id:'shinsegae',areaId:'myeongdong',type:'shopping',name:'Shinsegae Department Store Main',koName:'신세계백화점 본점',address:'63 Sogong-ro, Jung-gu, Seoul',lat:37.5610,lng:126.9810},
     {id:'lotte-main',areaId:'myeongdong',type:'shopping',name:'Lotte Department Store Main',koName:'롯데백화점 본점',address:'81 Namdaemun-ro, Jung-gu, Seoul',lat:37.5650,lng:126.9820},
@@ -121,7 +128,7 @@ window.DATA = {
     {id:'myeongdong-food',areaId:'myeongdong',type:'street',name:'Myeongdong Street Food Alley',koName:'명동 먹자골목',address:'Myeongdong-gil, Jung-gu, Seoul',lat:37.5636,lng:126.9850},
 
     // 동대문·을지로
-    {id:'ddp',areaId:'ddp',type:'landmark',photo:'assets/ddp.jpg',name:'Dongdaemun Design Plaza',koName:'동대문디자인플라자',address:'281 Eulji-ro, Jung-gu, Seoul',lat:37.5669,lng:127.0094},
+    {id:'ddp',areaId:'ddp',type:'landmark',photo:PHOTO.ddp,name:'Dongdaemun Design Plaza',koName:'동대문디자인플라자',address:'281 Eulji-ro, Jung-gu, Seoul',lat:37.5669,lng:127.0094},
     {id:'gwangjang',areaId:'ddp',type:'market',name:'Gwangjang Market',koName:'광장시장',address:'88 Changgyeonggung-ro, Jongno-gu, Seoul',lat:37.5701,lng:126.9996},
     {id:'cheonggyecheon',areaId:'ddp',type:'park',name:'Cheonggyecheon Stream',koName:'청계천',address:'Cheonggyecheon-ro, Jung-gu, Seoul',lat:37.5692,lng:126.9784},
     {id:'euljiro',areaId:'ddp',type:'street',name:'Euljiro Printing Alleys',koName:'을지로 인쇄골목',address:'Euljiro 3-ga, Jung-gu, Seoul',lat:37.5660,lng:126.9910},
