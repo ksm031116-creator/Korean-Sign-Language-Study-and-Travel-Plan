@@ -96,3 +96,21 @@
 .sign-strip strong{display:block;font-size:1.3rem}
 .sign-strip small{display:block;color:var(--muted);font-size:.8rem}
 .sign-strip .speak-btn{margin-left:auto}
+
+/* ===== v2.1: SC08 가게 정보 카드 (간판 → 가게 사진·리뷰·위치) ===== */
+.spot-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:1rem;margin-bottom:1.4rem}
+.spot-card{display:flex;flex-direction:column;background:var(--surface);border:1px solid var(--line);border-radius:18px;overflow:hidden}
+.spot-photo{position:relative;display:block;width:100%;aspect-ratio:16/10;padding:0;border:0;border-radius:0;background:var(--sage);cursor:pointer}
+.spot-photo .spot-img{width:100%;height:100%;object-fit:cover;display:block}
+.spot-photo .spot-tint{width:100%;height:100%}
+.photo-pending{position:absolute;left:.6rem;bottom:.5rem;padding:.15rem .5rem;border-radius:999px;background:rgba(0,0,0,.45);color:#fff;font-size:.68rem;letter-spacing:.02em}
+.spot-body{display:flex;flex-direction:column;gap:.35rem;padding:.9rem 1rem 1rem}
+.spot-body h3{margin:0;font-size:1.02rem;line-height:1.3}
+.link-btn{padding:0;border:0;background:none;font:inherit;color:inherit;text-align:left;cursor:pointer}
+.link-btn:hover{text-decoration:underline}
+.spot-rating{margin:.1rem 0 0;font-size:.9rem}
+.spot-snippet{margin:0;font-size:.86rem;color:var(--ink);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.spot-address{display:flex;gap:.35rem;align-items:flex-start;margin:.15rem 0 0}
+.spot-address svg{flex:none;width:16px;height:16px;margin-top:.1rem}
+.spot-actions{margin-top:auto;padding-top:.5rem;gap:.3rem;flex-wrap:wrap}
+.spot-actions .btn{min-height:44px;padding:.35rem .6rem;font-size:.82rem}

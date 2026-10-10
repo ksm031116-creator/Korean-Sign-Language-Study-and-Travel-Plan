@@ -7,7 +7,7 @@
  *  - cards      : 단어 1개 = 카드 1장. 장소마다 복제하지 않는다.
  *                 카드 → 장소는 typeId로 1:N 연결되며, 장소에 signWords가 있으면
  *                 그 단어에만 연결한다. 아래로 스와이프하면 그 간판을 볼 수 있는
- *                 장소 목록이 나온다 (FR09).
+ *                 장소 목록이 가게 사진·리뷰·위치와 함께 나온다 (FR09).
  *
  * 사진: 간판 사진은 이용권 확보 전이라 프로토타입에서는 앱이 SVG 판으로 그린다.
  *       실제 사진은 공공누리(한국관광공사·서울시) / Unsplash·Pexels / Wikimedia에서
@@ -97,7 +97,7 @@ window.DATA = {
   // example:true 는 개별 상점을 대신하는 예시 장소로, 실제 상호가 아니다.
   places: [
     // 경복궁·서촌
-    {id:'gyeongbokgung',areaId:'gyeongbokgung',type:'palace',name:'Gyeongbokgung Palace',koName:'경복궁',address:'161 Sajik-ro, Jongno-gu, Seoul',lat:37.5796,lng:126.9770},
+    {id:'gyeongbokgung',areaId:'gyeongbokgung',type:'palace',photo:'assets/gyeongbokgung.jpg',name:'Gyeongbokgung Palace',koName:'경복궁',address:'161 Sajik-ro, Jongno-gu, Seoul',lat:37.5796,lng:126.9770},
     {id:'changdeokgung',areaId:'gyeongbokgung',type:'palace',name:'Changdeokgung Palace',koName:'창덕궁',address:'99 Yulgok-ro, Jongno-gu, Seoul',lat:37.5794,lng:126.9910},
     {id:'jongmyo',areaId:'gyeongbokgung',type:'palace',name:'Jongmyo Shrine',koName:'종묘',address:'157 Jong-ro, Jongno-gu, Seoul',lat:37.5745,lng:126.9940},
     {id:'folkmuseum',areaId:'gyeongbokgung',type:'museum',name:'National Folk Museum of Korea',koName:'국립민속박물관',address:'37 Samcheong-ro, Jongno-gu, Seoul',lat:37.5814,lng:126.9793},
@@ -110,7 +110,7 @@ window.DATA = {
     {id:'seochon-ph',areaId:'gyeongbokgung',type:'services',signWords:['약국'],name:'Example pharmacy · Seochon',koName:'서촌 약국',address:'Example place near Gyeongbokgung',lat:37.5790,lng:126.9700,example:true},
 
     // 명동·남대문
-    {id:'myeongdong-cathedral',areaId:'myeongdong',type:'landmark',name:'Myeongdong Cathedral',koName:'명동성당',address:'74 Myeongdong-gil, Jung-gu, Seoul',lat:37.5633,lng:126.9872},
+    {id:'myeongdong-cathedral',areaId:'myeongdong',type:'landmark',photo:'assets/myeongdong.jpg',name:'Myeongdong Cathedral',koName:'명동성당',address:'74 Myeongdong-gil, Jung-gu, Seoul',lat:37.5633,lng:126.9872},
     {id:'namdaemun',areaId:'myeongdong',type:'market',name:'Namdaemun Market',koName:'남대문시장',address:'21 Namdaemunsijang 4-gil, Jung-gu, Seoul',lat:37.5591,lng:126.9772},
     {id:'shinsegae',areaId:'myeongdong',type:'shopping',name:'Shinsegae Department Store Main',koName:'신세계백화점 본점',address:'63 Sogong-ro, Jung-gu, Seoul',lat:37.5610,lng:126.9810},
     {id:'lotte-main',areaId:'myeongdong',type:'shopping',name:'Lotte Department Store Main',koName:'롯데백화점 본점',address:'81 Namdaemun-ro, Jung-gu, Seoul',lat:37.5650,lng:126.9820},
@@ -121,7 +121,7 @@ window.DATA = {
     {id:'myeongdong-food',areaId:'myeongdong',type:'street',name:'Myeongdong Street Food Alley',koName:'명동 먹자골목',address:'Myeongdong-gil, Jung-gu, Seoul',lat:37.5636,lng:126.9850},
 
     // 동대문·을지로
-    {id:'ddp',areaId:'ddp',type:'landmark',name:'Dongdaemun Design Plaza',koName:'동대문디자인플라자',address:'281 Eulji-ro, Jung-gu, Seoul',lat:37.5669,lng:127.0094},
+    {id:'ddp',areaId:'ddp',type:'landmark',photo:'assets/ddp.jpg',name:'Dongdaemun Design Plaza',koName:'동대문디자인플라자',address:'281 Eulji-ro, Jung-gu, Seoul',lat:37.5669,lng:127.0094},
     {id:'gwangjang',areaId:'ddp',type:'market',name:'Gwangjang Market',koName:'광장시장',address:'88 Changgyeonggung-ro, Jongno-gu, Seoul',lat:37.5701,lng:126.9996},
     {id:'cheonggyecheon',areaId:'ddp',type:'park',name:'Cheonggyecheon Stream',koName:'청계천',address:'Cheonggyecheon-ro, Jung-gu, Seoul',lat:37.5692,lng:126.9784},
     {id:'euljiro',areaId:'ddp',type:'street',name:'Euljiro Printing Alleys',koName:'을지로 인쇄골목',address:'Euljiro 3-ga, Jung-gu, Seoul',lat:37.5660,lng:126.9910},
