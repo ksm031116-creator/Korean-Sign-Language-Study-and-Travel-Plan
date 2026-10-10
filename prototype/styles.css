@@ -159,3 +159,28 @@
 @media (prefers-reduced-motion:reduce){.card-inner,.deck-card.ghost,.deck-card.top.springing,.deck-card.top.flying{transition:none}}
 /* 끌거나 날아가는 카드가 페이지 가로 스크롤을 만들지 않게 학습 화면에서만 가로를 잘라낸다 */
 .workspace-learning{overflow-x:clip}
+
+/* ===== v2.2: 스와이프 방향 안내 (범례 · 첫 실행 시연) ===== */
+.swipe-legend{display:flex;justify-content:space-between;align-items:center;gap:8px;max-width:380px;margin:14px auto 0;padding:0 4px;font-size:.8rem;font-weight:700;color:var(--muted)}
+.swipe-legend>span{display:flex;align-items:center;gap:6px}
+.swipe-legend>span>span{display:flex;flex-direction:column;line-height:1.15}
+.swipe-legend small{font-weight:500;font-size:.72rem}
+.swipe-legend b{font-size:1.15rem}
+.swipe-legend .lg-left{color:var(--coral)}
+.swipe-legend .lg-right{color:#2e8b57;text-align:right}
+.swipe-legend .lg-down{color:#2f6fb0;text-align:center}
+.coach{position:fixed;inset:0;z-index:130;display:grid;place-items:center;padding:20px;background:rgba(25,35,30,.62)}
+.coach-card{width:100%;max-width:360px;max-height:calc(100vh - 40px);max-height:calc(100dvh - 40px);overflow:auto;padding:22px 20px 18px;border-radius:24px;background:var(--surface);box-shadow:0 18px 48px rgba(0,0,0,.28);text-align:center}
+.coach-demo{position:relative;height:130px;margin:6px 0 14px;display:grid;place-items:center}
+.coach-mini{display:grid;place-items:center;width:88px;height:112px;border-radius:14px;background:#b8554a;color:#fff;font-size:1.5rem;font-weight:800;box-shadow:0 8px 18px rgba(36,47,43,.2);animation:coach-move 8s ease-in-out infinite}
+.coach-list{list-style:none;margin:0 0 10px;padding:0;display:grid;gap:6px;text-align:left}
+.coach-list li{display:flex;align-items:center;gap:12px;padding:8px 12px;border-radius:12px;border:1px solid var(--line);animation:coach-glow 8s infinite}
+.coach-list b{width:28px;text-align:center;font-size:1.25rem}
+.coach-list strong{display:block;font-size:.88rem}
+.coach-list span{font-size:.82rem;color:var(--muted)}
+.coach-list .c-right b{color:#2e8b57}.coach-list .c-left b{color:var(--coral)}.coach-list .c-down b{color:#2f6fb0}.coach-list .c-tap b{color:var(--forest)}
+.coach-list .c-right{animation-delay:0s}.coach-list .c-left{animation-delay:-6s}.coach-list .c-down{animation-delay:-4s}.coach-list .c-tap{animation-delay:-2s}
+.coach .btn{width:100%;margin-top:6px}
+@keyframes coach-move{0%,6%{transform:none}14%,20%{transform:translateX(70px) rotate(14deg)}25%,31%{transform:none}39%,45%{transform:translateX(-70px) rotate(-14deg)}50%,56%{transform:none}64%,70%{transform:translateY(34px)}75%,81%{transform:none}86%{transform:rotateY(90deg)}90%{transform:rotateY(0)}100%{transform:none}}
+@keyframes coach-glow{0%,25%{background:var(--sage);border-color:var(--forest)}26%,100%{background:transparent;border-color:var(--line)}}
+@media (prefers-reduced-motion:reduce){.coach-mini,.coach-list li{animation:none}}
