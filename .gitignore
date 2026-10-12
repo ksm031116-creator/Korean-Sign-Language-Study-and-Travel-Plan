@@ -14,3 +14,8 @@ Thumbs.db
 desktop.ini
 .DS_Store
 *.swp
+
+# API 인증키 (절대 커밋하지 않는다)
+.env
+*.env
+*.env.txt
