@@ -65,7 +65,8 @@
   const photoFigure = (p,cls) => { const ph=placePhoto(p); return ph ? `${image(ph.src,p.name,cls+(ph.intact?' photo-intact':''))}<span class="photo-credit">Photo: ${esc(ph.credit)}</span>` : ''; };
   // 기초 표지판은 사진이 아니라 앱이 그리는 표지판 판으로 보여준다.
   const signPlate = (c,cls='',roman=true) => `<div class="${cls} sign-plate" role="img" aria-label="${esc(c.alt||c.word)}" style="--plate:${esc(c.color||'#2f6fb0')}"><span class="plate-group">${esc(c.groupLabel||'STREET SIGN')}</span><span class="plate-word" lang="ko">${esc(c.word)}</span>${roman?`<span class="plate-roman">${esc(c.roman||'')}</span>`:''}</div>`;
-  const cardVisual = (c,cls='') => c && isBasic(c) ? signPlate(c,cls) : image(c?.image,c?.alt||c?.word,cls);
+  // 장소 유형 카드도 v2.1부터 사진이 없다(image:null). 사진이 없으면 표지판 판으로 그린다.
+  const cardVisual = (c,cls='') => c && (isBasic(c)||!c.image) ? signPlate(c,cls) : image(c?.image,c?.alt||c?.word,cls);
   // FR29 발음 재생. 출시 버전은 사전 생성 TTS 파일을 번들하며, 이 프로토타입은 브라우저 음성합성으로 대신한다.
   const speakBtn = word => `<button type="button" class="btn btn-ghost speak-btn" data-action="speak:${esc(word)}" aria-label="Play pronunciation of ${esc(word)}">🔊 <span>Listen</span></button>`;
   function speak(text){
