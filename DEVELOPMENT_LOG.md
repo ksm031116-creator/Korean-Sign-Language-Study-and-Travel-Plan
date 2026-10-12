@@ -21,11 +21,12 @@
 
 | 구분 | 수치 |
 |---|---|
-| 커밋 | 22개 (refactor 2 · feat 4 · fix 5 · docs 6 · chore 5) |
+| 커밋 | 29개 (refactor 2 · feat 6 · fix 7 · docs 7 · chore 7) |
 | 요구사항 | FR 31 · NFR 10 · AT 18 · 화면 SC 20 · 화면 시나리오 UI 8 · 공통 규칙 UX 12 |
 | 등록 장소 | 49곳 (실존 공공·관광시설 45 + Example 4), 지역 8개, 장소 유형 12종 |
 | 학습 카드 | 65장 (장소 유형 간판 35 + 기초 표지판 30) |
-| 버그 기록 | 커밋에 남은 버그 5건 · 커밋 전에 잡은 문제 5건 · 앱 버그 아님 판정 1건 |
+| 장소 사진 | TourAPI 25곳 + Wikimedia 3곳 (실존 45곳 중 28곳) |
+| 버그 기록 | 커밋에 남은 버그 6건 · 커밋 전에 잡은 문제 5건 · 앱 버그 아님 판정 1건 |
 
 ---
 
@@ -151,6 +152,27 @@ PRD를 v2.2로 올렸다. 방향 언급 13곳을 모두 바꿨고, UX11(방향 �
 
 ---
 
+### 3.9 TourAPI 장소 사진 연동 — 10월 12일
+
+공공데이터포털에서 「한국관광공사_국문 관광정보 서비스_GW」 개발계정 키를 발급받아(사용자) 장소 사진을 연결했다.
+
+**키를 앱에 넣지 않았다.** 앱이 실행 중에 API를 부르면 키가 `app.js`에 들어가 GitHub에 공개된다. 그래서 수집 스크립트(`.work/fetch_tourapi.py`)가 `.env`의 키로 한 번 조회해 **사진 주소와 라이선스만** `prototype/tour_photos.js`에 저장하고, 앱은 그 파일을 읽는다. `.env`는 커밋 전에 `.gitignore`로 막았다.
+
+**검색 결과를 그대로 믿지 않았다.** 처음 돌렸을 때 종묘가 행사 '종묘대제'에 연결됐고, 그걸 고치자 서울역 → '롯데아울렛 서울역점', 남산서울타워 → 'GS25 남산서울타워점'처럼 **장소 이름이 들어간 다른 가게**가 7곳 연결됐다. 카드→장소 연결이 사실 주장이었던 것처럼(BUG-02) 사진→장소 연결도 사실 주장이라, 채택 기준을 다섯 가지로 좁혔다: 장소 이름으로 시작 / '~점' 지점 제외 / 관광지·문화시설·쇼핑 유형만 / 등록 좌표 1.5km 이내 / 공공누리 제1·3유형만. 이 과정에서 '종묘 [유네스코 세계유산]'처럼 대괄호 설명 때문에 정답이 빠지던 문제도 고쳤다.
+
+| 결과 | 곳 |
+|---|---|
+| TourAPI 사진 연결 | 25 (제1유형 14, 제3유형 11) |
+| 기존 Wikimedia 사진 유지 | 3 |
+| 맞는 결과 없음 | 17 — 거리·골목 7, 지하철역 5, 쇼핑몰 2, 경의선숲길, 남산서울타워(항목은 있으나 사진 없음), 청계천(좌표 2.4km 차이) |
+| 예시 장소 (조회 안 함) | 4 |
+
+**화면** — SC08 장소 카드와 장소 상세 상단에 사진을 넣고, 모든 사진에 출처(`한국관광공사 · KOGL Type 1/3`)를 표시했다. 제3유형은 변경 금지라 `object-fit: contain`으로 자르지 않는다.
+
+**이 단계에서 잡은 문제** — 스크립트가 배열의 마지막 장소(가로수길)를 빠뜨리는 파서 버그(`3114047`), 그리고 장소 상세·저장 목록의 깨진 간판 이미지(BUG-06, `f354a18`). 후자는 v2.1부터 있던 버그로, 사진을 붙인 화면을 스크린샷으로 확인하다 발견했다.
+
+---
+
 ## 4. 결정 기록
 
 | # | 결정 | 이유 | 버전 | 구분 |
@@ -180,6 +202,7 @@ PRD를 v2.2로 올렸다. 방향 언급 13곳을 모두 바꿨고, UX11(방향 �
 | **v2.0 첫 커밋** (10-07) | `8c7d926` chore: ignore generated render output<br>`ef58475` docs: add Sign Korean PRD/SRS v2.0<br>`f986517` feat(prototype): add interactive design prototype<br>`8823384` chore(tools): add document and bundle build scripts |
 | **v2.1 구조 개편과 버그 수정** (10-10) | `110ab22` refactor(prototype): link one card per sign word to places by type<br>`ae5b815` fix(data): remove sign words duplicated across basics and place types<br>`c1055cc` fix(data): stop linking signs to places that do not show them<br>`5ba6a1f` fix(data): limit merged service places to the signs they show<br>`8d6cf8d` feat(sc08): show photo, rating, review and address for each place<br>`fdd82f1` fix(gesture): restore swipe down to the places list<br>`f67499b` chore(assets): remove unused AI-generated sign photos<br>`fe595b0` chore: rebuild single-file bundle<br>`33f1f9c` fix(bundle): embed each photo only once |
 | **v2.1 문서** (10-10) | `2ed72b9` docs: add bug fix log for the v2.1 restructure<br>`e0e0216` docs(prd): put trip planning first and move photos from signs to places |
+| **TourAPI 장소 사진** (10-12) | `73d377f` chore: ignore API key files<br>`16cab17` feat(tools): fetch place photos from TourAPI<br>`3114047` fix(tools): include the last place when reading data.js<br>`1ade628` feat(sc08): show TourAPI place photos with credits<br>`f354a18` fix(cards): draw sign plates for cards without a photo<br>`523eb2c` chore: rebuild single-file bundle<br>docs: record TourAPI place photo integration (PRD v2.3) — 이 문서를 갱신한 커밋 |
 | **v2.2 Tinder식 카드** (10-10) | `992bd89` refactor(learn): remove sign zoom screen (SC05)<br>`186a21e` feat(learn): tinder-style swipe card, right for "I know"<br>`c5107db` feat(learn): show what each swipe direction means<br>`e660080` docs(prd): tinder-style card, right for "I know" (v2.2)<br>`bf6ad6c` docs(bugfix-log): add issues caught while building the v2.2 card<br>`9b2f2c1` chore: rebuild single-file bundle |
 
 모든 커밋 메시지는 `<유형>(<범위>): <요약>` 형식을 따른다. `fix:` 커밋 본문에는 증상·원인·수정·검증을 적었다.
@@ -205,7 +228,7 @@ PRD를 v2.2로 올렸다. 방향 언급 13곳을 모두 바꿨고, UX11(방향 �
 | 과제 | 상태 | 필요한 것 |
 |---|---|---|
 | 수익 모델 경계선 | 열린 결정 | 무료에 "여행 1개·하루 3곳"을 여는 안(A), 유료화 제거(B), 현행 유지(C) 중 선택 |
-| 장소 사진 연동 | 미연결 ("Photo via TourAPI at launch" 표시) | 공공데이터포털 TourAPI 서비스키 발급, 이미지별 공공누리 유형 확인 |
+| 장소 사진 연동 | 28 / 45곳 (TourAPI 25 + Wikimedia 3) | 지하철역·거리 17곳은 TourAPI에 맞는 항목이 없음 → Wikimedia·Unsplash 보충. 운영 단계 심의승인 신청 |
 | 기초 표지판 확충 | 30 / 100장 | 6분류별 단어 선정과 검수 |
 | 장소 유형 간판 | 35장 (목표 35~50) | 콘텐츠 조사 |
 | 장소 데이터 | 좌표는 근사치, Example 4곳 | 좌표 실측, 개별 상점의 실제 상호 |
