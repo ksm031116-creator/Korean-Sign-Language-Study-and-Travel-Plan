@@ -4,12 +4,12 @@
 
 | 항목 | 내용 |
 |---|---|
-| 기간 | 2026-10-07 ~ 2026-10-10 |
+| 기간 | 2026-10-07 ~ 2026-10-12 |
 | 저장소 | https://github.com/ksm031116-creator/Korean-Sign-Language-Study-and-Travel-Plan |
-| 현재 버전 | PRD/SRS **v2.2**, 인터랙티브 프로토타입 |
-| 관련 문서 | [PRD_SRS.md](PRD_SRS.md) 요구사항 명세 · [BUGFIX_LOG.md](BUGFIX_LOG.md) 버그 수정 기록 |
+| 현재 버전 | PRD/SRS **v2.3**, 인터랙티브 프로토타입 |
+| 관련 문서 | [README.md](README.md) 저장소 안내 · [PRD_SRS.md](PRD_SRS.md) 요구사항 명세 · [BUGFIX_LOG.md](BUGFIX_LOG.md) 버그 수정 기록 |
 
-이 문서는 기획 문서 분석부터 요구사항 재정의, 프로토타입 구현, 버그 수정, 학습 카드 재설계까지 **무엇을 왜 그렇게 결정했는지**를 순서대로 기록한다.
+이 문서는 기획 문서 분석부터 요구사항 재정의, 프로토타입 구현, 버그 수정, 학습 카드 재설계, 장소 사진 연동까지 **무엇을 왜 그렇게 결정했는지**를 순서대로 기록한다.
 
 ---
 
@@ -21,7 +21,7 @@
 
 | 구분 | 수치 |
 |---|---|
-| 커밋 | 29개 (refactor 2 · feat 6 · fix 7 · docs 7 · chore 7) |
+| 커밋 | 31개 (refactor 2 · feat 6 · fix 7 · docs 9 · chore 7) |
 | 요구사항 | FR 31 · NFR 10 · AT 18 · 화면 SC 20 · 화면 시나리오 UI 8 · 공통 규칙 UX 12 |
 | 등록 장소 | 49곳 (실존 공공·관광시설 45 + Example 4), 지역 8개, 장소 유형 12종 |
 | 학습 카드 | 65장 (장소 유형 간판 35 + 기초 표지판 30) |
@@ -34,13 +34,14 @@
 
 | 파일 | 내용 |
 |---|---|
-| `PRD_SRS.md` | 요구사항 명세 v2.2. 제품 범위, 수익 모델, FR·NFR, 데이터 모델, 사진 권리 원칙, 검수 시나리오, 화면 목록, 변경 이력 |
+| `README.md` | 저장소 첫 화면. 앱 소개, 실행 방법, 문서 안내, 사진 출처 |
+| `PRD_SRS.md` | 요구사항 명세 v2.3. 제품 범위, 수익 모델, FR·NFR, 데이터 모델, 사진 권리 원칙, 검수 시나리오, 화면 목록, 변경 이력 |
 | `BUGFIX_LOG.md` | 버그마다 증상·재현·원인·수정·검증과 관련 커밋, 단계별 검증표, 재발 방지 체크리스트 |
 | `DEVELOPMENT_LOG.md` | 이 문서. 진행 과정과 결정 기록 |
-| `prototype/` | 인터랙티브 프로토타입 (`index.html`, `app.js`, `data.js`, `styles.css`, `assets/`) |
+| `prototype/` | 인터랙티브 프로토타입 (`index.html`, `app.js`, `data.js`, `styles.css`, `tour_photos.js`, `assets/`) |
 | `Sign_Korean_인터랙티브_디자인.html` | 프로토타입을 파일 하나로 묶은 배포본. 더블클릭으로 바로 열린다 |
 | `랜드마크_간판_한국어앱_PRD_SRS.docx` | 출발점이 된 v1.1 Word 문서 (원본 보존) |
-| `.work/` | Word 문서 생성·번들 패키징·조판 검수 스크립트 |
+| `.work/` | Word 문서 생성·번들 패키징·조판 검수·TourAPI 사진 수집 스크립트 |
 
 ---
 
@@ -202,7 +203,8 @@ PRD를 v2.2로 올렸다. 방향 언급 13곳을 모두 바꿨고, UX11(방향 �
 | **v2.0 첫 커밋** (10-07) | `8c7d926` chore: ignore generated render output<br>`ef58475` docs: add Sign Korean PRD/SRS v2.0<br>`f986517` feat(prototype): add interactive design prototype<br>`8823384` chore(tools): add document and bundle build scripts |
 | **v2.1 구조 개편과 버그 수정** (10-10) | `110ab22` refactor(prototype): link one card per sign word to places by type<br>`ae5b815` fix(data): remove sign words duplicated across basics and place types<br>`c1055cc` fix(data): stop linking signs to places that do not show them<br>`5ba6a1f` fix(data): limit merged service places to the signs they show<br>`8d6cf8d` feat(sc08): show photo, rating, review and address for each place<br>`fdd82f1` fix(gesture): restore swipe down to the places list<br>`f67499b` chore(assets): remove unused AI-generated sign photos<br>`fe595b0` chore: rebuild single-file bundle<br>`33f1f9c` fix(bundle): embed each photo only once |
 | **v2.1 문서** (10-10) | `2ed72b9` docs: add bug fix log for the v2.1 restructure<br>`e0e0216` docs(prd): put trip planning first and move photos from signs to places |
-| **TourAPI 장소 사진** (10-12) | `73d377f` chore: ignore API key files<br>`16cab17` feat(tools): fetch place photos from TourAPI<br>`3114047` fix(tools): include the last place when reading data.js<br>`1ade628` feat(sc08): show TourAPI place photos with credits<br>`f354a18` fix(cards): draw sign plates for cards without a photo<br>`523eb2c` chore: rebuild single-file bundle<br>docs: record TourAPI place photo integration (PRD v2.3) — 이 문서를 갱신한 커밋 |
+| **TourAPI 장소 사진** (10-12) | `73d377f` chore: ignore API key files<br>`16cab17` feat(tools): fetch place photos from TourAPI<br>`3114047` fix(tools): include the last place when reading data.js<br>`1ade628` feat(sc08): show TourAPI place photos with credits<br>`f354a18` fix(cards): draw sign plates for cards without a photo<br>`523eb2c` chore: rebuild single-file bundle<br>`83d0315` docs: record TourAPI place photo integration (PRD v2.3) |
+| **README** (10-12) | `63421a7` docs: add README<br>docs(dev-log): link README and refresh versions — 이 문서를 갱신한 커밋 |
 | **v2.2 Tinder식 카드** (10-10) | `992bd89` refactor(learn): remove sign zoom screen (SC05)<br>`186a21e` feat(learn): tinder-style swipe card, right for "I know"<br>`c5107db` feat(learn): show what each swipe direction means<br>`e660080` docs(prd): tinder-style card, right for "I know" (v2.2)<br>`bf6ad6c` docs(bugfix-log): add issues caught while building the v2.2 card<br>`9b2f2c1` chore: rebuild single-file bundle |
 
 모든 커밋 메시지는 `<유형>(<범위>): <요약>` 형식을 따른다. `fix:` 커밋 본문에는 증상·원인·수정·검증을 적었다.
@@ -234,19 +236,18 @@ PRD를 v2.2로 올렸다. 방향 언급 13곳을 모두 바꿨고, UX11(방향 �
 | 장소 데이터 | 좌표는 근사치, Example 4곳 | 좌표 실측, 개별 상점의 실제 상호 |
 | 발음 음성 | 브라우저 음성합성으로 대체 | TTS 공급자 선정, 생성 음성의 재배포 권리 확인 |
 | 리뷰·지도 | 샘플 리뷰, 개략 지도 | 리뷰·경로 공급자 실제 연동 (문서 단계 3) |
-| README | 없음 | 저장소 첫 화면용 소개·실행 방법 |
 | 저장소 이름 | "Korean Sign Language"(=한국수어) | 필요하면 GitHub 설정에서 이름 변경 |
 
 ---
 
 ## 8. 실행 방법
 
-- **가장 쉬운 방법** — `Sign_Korean_인터랙티브_디자인.html`을 더블클릭한다. 사진까지 파일 하나에 들어 있다.
+- **가장 쉬운 방법** — `Sign_Korean_인터랙티브_디자인.html`을 더블클릭한다. 내장 사진 3장은 파일 안에 들어 있고, TourAPI 장소 사진은 인터넷에서 불러온다.
 - **소스로 실행** — `prototype/index.html`을 브라우저로 연다.
 - **번들 다시 만들기** — 프로토타입을 고친 뒤 아래 명령을 실행한다.
 
   ```bash
-  python .work/package_html.py
+  py -X utf8 .work/package_html.py
   ```
 
 처음 학습 화면에 들어가면 스와이프 시연이 나온다. 설정의 "Show the swipe guide again"으로 다시 볼 수 있다. 결제는 시뮬레이션이라 실제로 과금되지 않으며, 설정에서 잠금을 다시 걸 수 있다.
