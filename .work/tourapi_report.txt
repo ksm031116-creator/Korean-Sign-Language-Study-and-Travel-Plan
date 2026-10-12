@@ -1,0 +1,48 @@
+KEEP  gyeongbokgung          기존 Wikimedia 사진 유지 (assets/credits.json)
+OK    changdeokgung          창덕궁 → 창덕궁 인정문 (0.07km, Type3)
+OK    jongmyo                종묘 → 종묘 [유네스코 세계유산] (0.40km, Type1)
+OK    folkmuseum             국립민속박물관 → 국립민속박물관과 국립민속박물관 어린이박물관 (0.05km, Type3)
+OK    mmca                   국립현대미술관 서울 → 국립현대미술관 서울 (0.02km, Type3)
+OK    bukchon                북촌한옥마을 → 북촌한옥마을 (0.51km, Type3)
+NONE  samcheong              삼청동길 — 이름이 맞는 결과 없음
+OK    tongin                 통인시장 → 통인시장 (0.09km, Type1)
+OK    insadong               인사동 → 인사동 (0.21km, Type3)
+OK    gwanghwamun            광화문광장 → 광화문광장 (0.07km, Type1)
+SKIP  seochon-ph             예시 장소 (실제 상호 아님)
+KEEP  myeongdong-cathedral   기존 Wikimedia 사진 유지 (assets/credits.json)
+OK    namdaemun              남대문시장 → 남대문시장 (0.05km, Type3)
+NONE  shinsegae              신세계백화점 본점 — 이름이 맞는 결과 없음
+OK    lotte-main             롯데백화점 본점 → 롯데백화점 본점 (0.04km, Type3)
+OK    deoksugung             덕수궁 → 덕수궁 (0.15km, Type1)
+NONE  seoulstation           서울역 — 이름이 맞는 결과 없음
+NONE  namsan-tower           남산서울타워 — 남산서울타워 사진 없음
+SKIP  myeongdong-bank        예시 장소 (실제 상호 아님)
+NONE  myeongdong-food        명동 먹자골목 — 이름이 맞는 결과 없음
+KEEP  ddp                    기존 Wikimedia 사진 유지 (assets/credits.json)
+OK    gwangjang              광장시장 → 광장시장 (0.01km, Type3)
+NONE  cheonggyecheon         청계천 — 청계천 2.4km 떨어짐; 청계천박물관 5.0km 떨어짐
+NONE  euljiro                을지로 인쇄골목 — 이름이 맞는 결과 없음
+OK    ikseon                 익선동 → 익선동 한옥거리 (0.03km, Type1)
+OK    changgyeonggung        창경궁 → 창경궁 (0.14km, Type1)
+OK    seoulmuseum            서울역사박물관 → 서울역사박물관 (0.09km, Type3)
+OK    seoulforest            서울숲 → 서울숲 (0.41km, Type1)
+OK    seongsu-cafe           성수동 카페거리 → 성수동 카페거리 (0.16km, Type1)
+SKIP  seongsu-ph             예시 장소 (실제 상호 아님)
+NONE  ttukseom               뚝섬역 — 이름이 맞는 결과 없음
+NONE  hongdae-station        홍대입구역 — 이름이 맞는 결과 없음
+NONE  yeonnam                연남동 카페거리 — 이름이 맞는 결과 없음
+NONE  gyeongui-park          경의선숲길 — 이름이 맞는 결과 없음
+OK    mangwon                망원시장 → 망원시장 (0.13km, Type1)
+NONE  hongdae-street         홍대 걷고싶은거리 — 이름이 맞는 결과 없음
+OK    nmk                    국립중앙박물관 → 국립중앙박물관 (0.34km, Type1)
+OK    warmemorial            전쟁기념관 → 전쟁기념관 (0.16km, Type3)
+NONE  itaewon                이태원 거리 — 이름이 맞는 결과 없음
+OK    namsan-park            남산공원 → 남산공원(서울) (0.50km, Type1)
+SKIP  itaewon-bank           예시 장소 (실제 상호 아님)
+OK    yeouido-park           여의도한강공원 → 여의도한강공원 (0.24km, Type1)
+OK    thehyundai             더현대 서울 → 더현대 서울 (0.17km, Type3)
+NONE  yeouinaru              여의나루역 — 이름이 맞는 결과 없음
+NONE  coex                   코엑스몰 — 이름이 맞는 결과 없음
+OK    lotteworldtower        롯데월드타워 → 롯데월드타워 서울스카이 (0.02km, Type1)
+OK    olympicpark            올림픽공원 → 올림픽공원 (0.58km, Type1)
+NONE  gangnam-station        강남역 — 이름이 맞는 결과 없음
