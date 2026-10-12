@@ -46,3 +46,4 @@ NONE  coex                   코엑스몰 — 이름이 맞는 결과 없음
 OK    lotteworldtower        롯데월드타워 → 롯데월드타워 서울스카이 (0.02km, Type1)
 OK    olympicpark            올림픽공원 → 올림픽공원 (0.58km, Type1)
 NONE  gangnam-station        강남역 — 이름이 맞는 결과 없음
+NONE  garosugil              가로수길 — 이름이 맞는 결과 없음

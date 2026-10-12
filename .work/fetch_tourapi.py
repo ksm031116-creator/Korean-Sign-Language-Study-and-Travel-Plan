@@ -33,7 +33,7 @@ def load_places():
     start = src.index('places: [')
     block = src[start:src.index('\n  ],', start)]  # signWords:[...], 안의 '],' 와 구분
     places = []
-    for row in re.findall(r'\{id:.*?\}(?=,?\s*\n)', block):
+    for row in re.findall(r'\{id:.*?\}(?=,?\s*(?:\n|$))', block):  # 마지막 장소 뒤에는 줄바꿈이 없다
         get = lambda k: (re.search(k + r":'([^']*)'", row) or [None, None])[1]
         num = lambda k: float(re.search(k + r':([\d.]+)', row)[1])
         places.append({'id': get('id'), 'koName': get('koName'), 'lat': num('lat'), 'lng': num('lng'),
