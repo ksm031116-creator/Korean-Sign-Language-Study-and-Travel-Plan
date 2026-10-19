@@ -105,6 +105,7 @@
   // SC03 Basics 모드 — 장소가 없으므로 Reviews·Map·Add to plan 진입점을 그리지 않는다 (FR31/UX09).
   function basicsPage(){
     const b=D.basics,cs=targetCards(b.id),n=countStatus(cs.map(c=>c.id));
+    const planned=D.basicGroups.reduce((n,g)=>n+g.target,0);
     const groups=D.basicGroups.map(g=>({...g,cards:cs.filter(c=>c.groupId===g.id)})).filter(g=>g.cards.length);
     return `<div class="detail-hero basics-hero">${signPlate(cs[0],'hero-plate')}${badge('EVERYDAY SIGNS')}</div>`
       +header(b.name,b.koName,'NO PLACE NEEDED')
@@ -113,9 +114,9 @@
       <div class="chips">${button('All cards','mode:all','chip '+(route.mode!=='review'?'active':''))}${button('Review','mode:review','chip '+(route.mode==='review'?'active':''),!n[1])}</div>
       ${button('Start practice '+icon('arrow'),'start-basics','btn-primary',!cs.length)}
       <div class="notice"><strong>These signs belong to the street, not to a shop.</strong><p>That is why there are no reviews, routes or trip buttons here. Bookmarks and pronunciation work just like everywhere else.</p></div>
-      <div class="section-head"><h2>What you will learn</h2><span>${cs.length} of 100 planned</span></div>
-      <div class="group-list">${groups.map(g=>`<article class="group-row" style="--plate:${esc(g.color)}"><div class="group-bar"></div><div><strong>${esc(g.label)}</strong><small>${g.cards.length} in this prototype · ${g.target} planned</small><div class="group-words">${g.cards.map(c=>`<button class="word-chip" data-action="start-card:${c.id}" lang="ko">${esc(c.word)}</button>`).join('')}</div></div></article>`).join('')}</div>
-      <p class="muted small">Prototype sample. The specification plans 100 everyday signs across these six groups.</p>`;
+      <div class="section-head"><h2>What you will learn</h2><span>${cs.length===planned?`${cs.length} signs`:`${cs.length} of ${planned} planned`}</span></div>
+      <div class="group-list">${groups.map(g=>`<article class="group-row" style="--plate:${esc(g.color)}"><div class="group-bar"></div><div><strong>${esc(g.label)}</strong><small>${g.cards.length===g.target?`${g.cards.length} signs`:`${g.cards.length} in this prototype · ${g.target} planned`}</small><div class="group-words">${g.cards.map(c=>`<button class="word-chip" data-action="start-card:${c.id}" lang="ko">${esc(c.word)}</button>`).join('')}</div></div></article>`).join('')}</div>${cs.length<planned?`
+      <p class="muted small">Prototype sample. The specification plans ${planned} everyday signs across these six groups.</p>`:''}`;
   }
   function placeRow(p,action,trailing=''){const t=typeOf(p.type),n=targetCards(p.id).length;return `<div class="place-row"><button class="place-row-main" data-action="${esc(action)}"><span class="type-dot" style="--plate:${esc(t?.color||'#2f6f5e')}" aria-hidden="true"></span><span><strong>${esc(p.name)}${p.example?' '+badge('Example'):''}</strong><small lang="ko">${esc(p.koName||'')}</small><small>${esc(t?.label||'')} · ${n} signs</small></span></button>${trailing||icon('arrow')}</div>`;}
   function begin(ids,source,returnRoute,mode='all'){const eligible=[...new Set(ids)].filter(id=>card(id)&&(mode!=='review'||status(id)==='learning'));if(!eligible.length){notify('No cards to review yet.');return;}const run=()=>{if(commit(s=>{s.session={ids:[...new Set(ids)],queue:eligible.map(id=>({id,ready:0})),decisions:[],source,returnRoute:clone(returnRoute),mode,meaning:false,undo:null,finished:false};}))navigate('learn');};if(state.session&&!state.session.finished)confirm('Start new practice?','You have an unfinished session. Its learning progress will stay, but the remaining queue will be replaced.',run,'Start new');else run();}
