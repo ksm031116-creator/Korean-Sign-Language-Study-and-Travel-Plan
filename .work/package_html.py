@@ -5,7 +5,7 @@ src=ROOT/'prototype'
 html=(src/'index.html').read_text(encoding='utf-8')
 css=(src/'styles.css').read_text(encoding='utf-8')
 html=re.sub(r'<link[^>]+href=["\']styles.css["\'][^>]*>',lambda m:'<style>'+css+'</style>',html)
-for name in ['data.js','tour_photos.js','app.js']:
+for name in ['data.js','tour_photos.js','commons_photos.js','app.js']:
     js=(src/name).read_text(encoding='utf-8').replace('</script','<\\/script')
     html=re.sub(r'<script[^>]+src=["\']'+re.escape(name)+r'["\'][^>]*>\s*</script>',lambda m:'<script>'+js+'</script>',html)
 for image in (src/'assets').glob('*.jpg'):

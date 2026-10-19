@@ -54,13 +54,16 @@
   };
   const button = (text, action, cls='btn-secondary', disabled=false) => `<button type="button" class="btn ${cls}" data-action="${esc(action)}" ${disabled?'disabled':''}>${text}</button>`;
   const image = (src,alt,cls='') => `<img class="${cls}" src="${esc(src)}" alt="${esc(alt)}" loading="lazy">`;
-  // 장소 사진: 앱에 내장한 Wikimedia 사진이 우선이고, 없으면 TourAPI(한국관광공사) 사진을 불러온다.
+  // 장소 사진: 앱에 내장한 Wikimedia 사진 → TourAPI(한국관광공사) → Commons 보충 사진 순서로 쓴다.
   // 공공누리는 출처 표시가 조건이고, 제3유형은 변경 금지라 자르지 않고 원본 비율 그대로 보여준다.
-  const TOUR = window.TOUR_PHOTOS || {};
+  const TOUR = window.TOUR_PHOTOS || {}, COMMONS = window.COMMONS_PHOTOS || {};
   const placePhoto = p => {
     if(p.photo) return {src:p.photo,credit:'Wikimedia Commons',intact:false};
     const t=TOUR[p.id];
-    return t ? {src:t.image,credit:`한국관광공사 · KOGL ${t.license==='Type3'?'Type 3':'Type 1'}`,intact:t.license==='Type3'} : null;
+    if(t) return {src:t.image,credit:`한국관광공사 · KOGL ${t.license==='Type3'?'Type 3':'Type 1'}`,intact:t.license==='Type3'};
+    // CC BY 는 저작자와 라이선스를 함께 표시해야 한다.
+    const c=COMMONS[p.id];
+    return c ? {src:c.image,credit:`${c.author} · ${c.license} · Wikimedia Commons`,intact:false} : null;
   };
   const photoFigure = (p,cls) => { const ph=placePhoto(p); return ph ? `${image(ph.src,p.name,cls+(ph.intact?' photo-intact':''))}<span class="photo-credit">Photo: ${esc(ph.credit)}</span>` : ''; };
   // 기초 표지판은 사진이 아니라 앱이 그리는 표지판 판으로 보여준다.
