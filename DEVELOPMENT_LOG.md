@@ -4,9 +4,9 @@
 
 | 항목 | 내용 |
 |---|---|
-| 기간 | 2026-10-07 ~ 2026-10-12 |
+| 기간 | 2026-10-07 ~ 2026-10-19 |
 | 저장소 | https://github.com/ksm031116-creator/Korean-Sign-Language-Study-and-Travel-Plan |
-| 현재 버전 | PRD/SRS **v2.3**, 인터랙티브 프로토타입 |
+| 현재 버전 | PRD/SRS **v2.4**, 인터랙티브 프로토타입 |
 | 관련 문서 | [README.md](README.md) 저장소 안내 · [PRD_SRS.md](PRD_SRS.md) 요구사항 명세 · [BUGFIX_LOG.md](BUGFIX_LOG.md) 버그 수정 기록 |
 
 이 문서는 기획 문서 분석부터 요구사항 재정의, 프로토타입 구현, 버그 수정, 학습 카드 재설계, 장소 사진 연동까지 **무엇을 왜 그렇게 결정했는지**를 순서대로 기록한다.
@@ -21,11 +21,11 @@
 
 | 구분 | 수치 |
 |---|---|
-| 커밋 | 31개 (refactor 2 · feat 6 · fix 7 · docs 9 · chore 7) |
+| 커밋 | 38개 (refactor 2 · feat 9 · fix 7 · docs 12 · chore 8) |
 | 요구사항 | FR 31 · NFR 10 · AT 18 · 화면 SC 20 · 화면 시나리오 UI 8 · 공통 규칙 UX 12 |
 | 등록 장소 | 49곳 (실존 공공·관광시설 45 + Example 4), 지역 8개, 장소 유형 12종 |
 | 학습 카드 | 135장 (장소 유형 간판 35 + 기초 표지판 100) |
-| 장소 사진 | TourAPI 25곳 + Wikimedia 3곳 (실존 45곳 중 28곳) |
+| 장소 사진 | TourAPI 25곳 + Wikimedia 18곳 (실존 45곳 중 43곳) |
 | 버그 기록 | 커밋에 남은 버그 6건 · 커밋 전에 잡은 문제 5건 · 앱 버그 아님 판정 1건 |
 
 ---
@@ -35,7 +35,7 @@
 | 파일 | 내용 |
 |---|---|
 | `README.md` | 저장소 첫 화면. 앱 소개, 실행 방법, 문서 안내, 사진 출처 |
-| `PRD_SRS.md` | 요구사항 명세 v2.3. 제품 범위, 수익 모델, FR·NFR, 데이터 모델, 사진 권리 원칙, 검수 시나리오, 화면 목록, 변경 이력 |
+| `PRD_SRS.md` | 요구사항 명세 v2.4. 제품 범위, 수익 모델, FR·NFR, 데이터 모델, 사진 권리 원칙, 검수 시나리오, 화면 목록, 변경 이력 |
 | `BUGFIX_LOG.md` | 버그마다 증상·재현·원인·수정·검증과 관련 커밋, 단계별 검증표, 재발 방지 체크리스트 |
 | `DEVELOPMENT_LOG.md` | 이 문서. 진행 과정과 결정 기록 |
 | `prototype/` | 인터랙티브 프로토타입 (`index.html`, `app.js`, `data.js`, `styles.css`, `tour_photos.js`, `assets/`) |
@@ -174,6 +174,25 @@ PRD를 v2.2로 올렸다. 방향 언급 13곳을 모두 바꿨고, UX11(방향 �
 
 ---
 
+### 3.10 수익 모델 확정, 기초 표지판 100장, 사진 보충 — 10월 19일
+
+**수익 모델은 현행 유지(C)로 확정했다(사용자 결정).** 여행 계획 전체를 유료로 둔다. 장소 탐색까지는 무료라 방문 동기는 무료 구간에서 생기고, 잠긴 계획 기능도 자물쇠와 함께 보여 준다. 대신 무료 사용자가 1순위 기능을 직접 써 보지 못하는 위험을 문서에 적고, 파일럿 전환율이 낮으면 A안을 다시 검토한다는 조건을 달았다.
+
+**기초 표지판을 30장에서 100장으로 채웠다.** 6개 분류의 목표 수량(15·20·15·15·20·15)을 그대로 맞췄다. 카드 ID가 배열 순서(`b01`~)로 매겨지기 때문에 새 70장은 기존 30장 **뒤에만** 붙여 기존 카드의 학습 기록과 북마크가 유지되게 했다. 로마자는 국립국어원 표기법의 발음 변화(닫힘 *dachim*, 음식물 *eumsingmul*, 반려 *ballyeo*)를 따랐고, 장소 유형 간판과 겹치는 단어는 넣지 않았다. Basics 화면의 "30 of 100 planned" 같은 표본 안내는 목표를 채우면 자동으로 사라지게 바꿨다.
+
+**TourAPI에 없던 17곳 중 15곳을 Wikimedia Commons로 보충했다.** TourAPI 때와 같은 원칙으로, 검색 결과를 자동으로 고르지 않았다. 좌표 400m 이내와 이름 검색으로 후보를 모으고 허용 라이선스만 남긴 뒤 사진을 한 장씩 보고 골랐다. 버린 사례가 판단 기준을 보여 준다.
+
+| 버린 후보 | 이유 |
+|---|---|
+| 'Ttukseom Resort Station', 뚝섬한강공원 | 뚝섬역(2호선)이 아니라 뚝섬유원지역(7호선)과 그 공원 |
+| Apple 가로수길 매장 내부 | 가로수길 거리가 아니라 매장 하나 |
+| 경의선숲길 사진을 연남동 카페거리에 | 근처지만 다른 장소. 연남동 카페거리는 사진 없이 둠 |
+| 남산서울타워 근처 좌표의 panoramio 연작 12장 | 좌표는 남산 근처로 기록됐지만 사진은 롯데월드·해변·한옥 등 다른 곳. 좌표만 믿으면 안 되는 사례 |
+
+Commons 요청이 한도에 걸려(HTTP 429) 수집 스크립트에 재시도 대기를 넣었다. CC BY 사진은 저작자 표시가 조건이라 출처 문구에 저작자와 라이선스를 함께 넣었다.
+
+---
+
 ## 4. 결정 기록
 
 | # | 결정 | 이유 | 버전 | 구분 |
@@ -205,7 +224,8 @@ PRD를 v2.2로 올렸다. 방향 언급 13곳을 모두 바꿨고, UX11(방향 �
 | **v2.1 구조 개편과 버그 수정** (10-10) | `110ab22` refactor(prototype): link one card per sign word to places by type<br>`ae5b815` fix(data): remove sign words duplicated across basics and place types<br>`c1055cc` fix(data): stop linking signs to places that do not show them<br>`5ba6a1f` fix(data): limit merged service places to the signs they show<br>`8d6cf8d` feat(sc08): show photo, rating, review and address for each place<br>`fdd82f1` fix(gesture): restore swipe down to the places list<br>`f67499b` chore(assets): remove unused AI-generated sign photos<br>`fe595b0` chore: rebuild single-file bundle<br>`33f1f9c` fix(bundle): embed each photo only once |
 | **v2.1 문서** (10-10) | `2ed72b9` docs: add bug fix log for the v2.1 restructure<br>`e0e0216` docs(prd): put trip planning first and move photos from signs to places |
 | **TourAPI 장소 사진** (10-12) | `73d377f` chore: ignore API key files<br>`16cab17` feat(tools): fetch place photos from TourAPI<br>`3114047` fix(tools): include the last place when reading data.js<br>`1ade628` feat(sc08): show TourAPI place photos with credits<br>`f354a18` fix(cards): draw sign plates for cards without a photo<br>`523eb2c` chore: rebuild single-file bundle<br>`83d0315` docs: record TourAPI place photo integration (PRD v2.3) |
-| **README** (10-12) | `63421a7` docs: add README<br>docs(dev-log): link README and refresh versions — 이 문서를 갱신한 커밋 |
+| **README** (10-12) | `63421a7` docs: add README<br>`7e02644` docs(dev-log): link README and refresh versions |
+| **v2.4** (10-19) | `2fe4e1b` docs(prd): keep trip planning fully paid (revenue option C, v2.4)<br>`93c1077` feat(content): expand everyday street signs from 30 to 100<br>`1202449` docs: update sign counts after expanding basics to 100<br>`661c797` feat(tools): add Wikimedia Commons photos for places TourAPI lacks<br>`015fa9f` feat(places): show Commons photos with author and license<br>`a1af6d8` chore: rebuild single-file bundle<br>docs: record Commons photos and v2.4 in PRD, dev log and README — 이 문서를 갱신한 커밋 |
 | **v2.2 Tinder식 카드** (10-10) | `992bd89` refactor(learn): remove sign zoom screen (SC05)<br>`186a21e` feat(learn): tinder-style swipe card, right for "I know"<br>`c5107db` feat(learn): show what each swipe direction means<br>`e660080` docs(prd): tinder-style card, right for "I know" (v2.2)<br>`bf6ad6c` docs(bugfix-log): add issues caught while building the v2.2 card<br>`9b2f2c1` chore: rebuild single-file bundle |
 
 모든 커밋 메시지는 `<유형>(<범위>): <요약>` 형식을 따른다. `fix:` 커밋 본문에는 증상·원인·수정·검증을 적었다.
@@ -230,7 +250,7 @@ PRD를 v2.2로 올렸다. 방향 언급 13곳을 모두 바꿨고, UX11(방향 �
 
 | 과제 | 상태 | 필요한 것 |
 |---|---|---|
-| 장소 사진 연동 | 28 / 45곳 (TourAPI 25 + Wikimedia 3) | 지하철역·거리 17곳은 TourAPI에 맞는 항목이 없음 → Wikimedia·Unsplash 보충. 운영 단계 심의승인 신청 |
+| 장소 사진 | 43 / 45곳 (TourAPI 25 + Wikimedia 18) | 을지로 인쇄골목·연남동 카페거리는 허용 라이선스 사진 없음 → 직접 촬영 사진 또는 공공누리 신규 자료. TourAPI 운영 단계 심의승인 신청 |
 | 장소 유형 간판 | 35장 (목표 35~50) | 콘텐츠 조사 |
 | 장소 데이터 | 좌표는 근사치, Example 4곳 | 좌표 실측, 개별 상점의 실제 상호 |
 | 발음 음성 | 브라우저 음성합성으로 대체 | TTS 공급자 선정, 생성 음성의 재배포 권리 확인 |
