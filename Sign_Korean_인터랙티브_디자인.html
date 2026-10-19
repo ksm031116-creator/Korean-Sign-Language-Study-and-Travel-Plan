@@ -193,7 +193,7 @@
 @media (prefers-reduced-motion:reduce){.coach-mini,.coach-list li{animation:none}}
 
 /* 장소 사진 출처 표기 (공공누리 출처표시 조건). 제3유형은 변경 금지라 자르지 않는다. */
-.photo-credit{position:absolute;right:.5rem;bottom:.45rem;padding:.12rem .45rem;border-radius:6px;background:rgba(0,0,0,.5);color:#fff;font-size:.62rem;line-height:1.4;pointer-events:none}
+.photo-credit{position:absolute;right:.5rem;bottom:.45rem;max-width:calc(100% - 1rem);text-align:right;padding:.12rem .45rem;border-radius:6px;background:rgba(0,0,0,.5);color:#fff;font-size:.62rem;line-height:1.4;pointer-events:none}
 .spot-photo .spot-img.photo-intact,.place-hero-img.photo-intact{object-fit:contain;background:#1f2a26}
 .place-hero{position:relative;margin-bottom:18px;border-radius:24px;overflow:hidden;aspect-ratio:16/9;background:var(--sage)}
 .place-hero-img{width:100%;height:100%;object-fit:cover;display:block}
@@ -418,7 +418,78 @@ window.DATA = {
     ['service','현금인출기','hyeongeum inchulgi','Cash machine (ATM)','Often labelled ATM as well.'],
     ['service','와이파이','waipai','Wi-Fi','무료 와이파이 means free Wi-Fi.'],
     ['service','분실물 센터','bunsilmul senteo','Lost and found','In stations, malls and museums.'],
-    ['service','우체국','ucheguk','Post office','Red and white branding across the country.']
+    ['service','우체국','ucheguk','Post office','Red and white branding across the country.'],
+    // ---- v2.4 확충 (31~100). 카드 ID가 배열 순서로 매겨지므로 기존 30장 뒤에만 붙인다. ----
+    ['restroom','공중 화장실','gongjung hwajangsil','Public restroom','Free to use. Parks, stations and tourist streets point to the nearest one.'],
+    ['restroom','사용중','sayongjung','Occupied','On restroom and fitting-room doors. 중 means in the middle of.'],
+    ['restroom','휴지통','hyujitong','Waste bin','In many restrooms the sign asks you to put paper in the bin, not the toilet.'],
+    ['restroom','기저귀 교환대','gijeogwi gyohwandae','Baby changing table','Found in both men’s and women’s restrooms in newer buildings.'],
+    ['restroom','비데','bide','Bidet','Most Korean toilets have one. The buttons are labelled in Korean too.'],
+    ['restroom','흡연실','heubyeonsil','Smoking room','Smoking is only allowed in these rooms or marked zones.'],
+    ['restroom','탈의실','taruisil','Changing room','In shops, gyms and swimming pools. 실 at the end means room.'],
+    ['restroom','음수대','eumsudae','Drinking fountain','Free drinking water in parks and public buildings.'],
+    ['restroom','남녀 공용','namnyeo gongyong','Unisex','One restroom shared by men and women, common in small cafés.'],
+    ['restroom','손 세정제','son sejeongje','Hand sanitizer','By lifts, entrances and counters.'],
+    ['door','자동문','jadongmun','Automatic door','Wait for it to open. 문 means door.'],
+    ['door','열림','yeollim','Open (button)','On lift buttons, next to 닫힘.'],
+    ['door','닫힘','dachim','Close (button)','The other lift button. Press 열림 if someone is still coming.'],
+    ['door','정문','jeongmun','Main gate','The front entrance of a palace, school or park.'],
+    ['door','후문','humun','Back gate','Often closer to the subway than the main gate.'],
+    ['door','좌측 통행','jwacheuk tonghaeng','Keep left','On some stairs and corridors. 좌 is left.'],
+    ['door','우측 통행','ucheuk tonghaeng','Keep right','The usual rule in stations. 우 is right.'],
+    ['door','직진','jikjin','Go straight','On arrows in stations and malls.'],
+    ['door','우회','uhoe','Detour','The usual way is blocked. Follow the arrow around.'],
+    ['door','회전문','hoejeonmun','Revolving door','Hotels and department stores. A side door is usually next to it.'],
+    ['door','비상계단','bisang gyedan','Emergency stairs','비상 means emergency, the same word as in 비상구.'],
+    ['door','옥상','oksang','Rooftop','On lift buttons and stairwell signs. Some rooftops are cafés or gardens.'],
+    ['door','지하 1층','jiha il-cheung','Basement level 1','층 means floor. Lifts show it as B1.'],
+    ['door','문 닫아 주세요','mun dada juseyo','Please close the door','On doors that let the heating or cooling out.'],
+    ['door','안내','annae','Information','A desk or board where you can ask the way.'],
+    ['hours','영업시간','yeongeop sigan','Business hours','Followed by the times, for example 11:00~21:00.'],
+    ['hours','브레이크 타임','beureikeu taim','Break time','Many restaurants close between lunch and dinner, often 15:00~17:00.'],
+    ['hours','정기 휴무','jeonggi hyumu','Regular closing day','매주 월요일 정기 휴무 means closed every Monday.'],
+    ['hours','연중무휴','yeonjung muhyu','Open every day of the year','No day off at all.'],
+    ['hours','오픈','opeun','Open','A loanword used on new shops, often with a date: 10월 오픈.'],
+    ['hours','마감','magam','Closing / last entry','입장 마감 means last admission.'],
+    ['hours','라스트 오더','raseuteu odeo','Last order','The kitchen stops taking orders after this time.'],
+    ['hours','점심시간','jeomsim sigan','Lunch break','Banks, post offices and clinics may pause service.'],
+    ['hours','매진','maejin','Sold out','On ticket windows and food stalls.'],
+    ['hours','임시 휴업','imsi hyueop','Temporarily closed','The shop is closed for a while, not for good.'],
+    ['hours','평일','pyeongil','Weekdays','Opposite of 주말 (weekend). Hours often differ between them.'],
+    ['warning','위험','wiheom','Danger','Usually on a red or yellow sign. Stay back.'],
+    ['warning','주차 금지','jucha geumji','No parking','금지 again — anything followed by it is forbidden.'],
+    ['warning','음식물 반입 금지','eumsingmul banip geumji','No food or drink inside','반입 means bringing in. Common at museums and theatres.'],
+    ['warning','손대지 마세요','sondaeji maseyo','Do not touch','On exhibits and shop displays.'],
+    ['warning','발밑 조심','balmit josim','Watch your step','발밑 is under your feet. Gaps, steps and uneven floors.'],
+    ['warning','공사중','gongsajung','Under construction','Expect detours or closed exits.'],
+    ['warning','반려동물 동반 금지','ballyeodongmul dongban geumji','No pets','반려동물 is a companion animal.'],
+    ['warning','소화기','sohwagi','Fire extinguisher','Red cabinets in stations and corridors.'],
+    ['warning','고장','gojang','Out of order','On lifts, ticket machines and vending machines.'],
+    ['warning','화기 엄금','hwagi eomgeum','No open flames','A stronger form of no fire, near fuel or gas.'],
+    ['transit','에스컬레이터','eseukeolleiteo','Escalator','A loanword. Stand still or walk carefully.'],
+    ['transit','택시 타는 곳','taeksi taneun got','Taxi stand','타는 곳 means where you board.'],
+    ['transit','내리는 문','naerineun mun','Exit doors (this side)','The subway screen shows which side the doors will open.'],
+    ['transit','노약자석','noyakjaseok','Priority seating','For older people, pregnant women and people with disabilities.'],
+    ['transit','임산부 배려석','imsanbu baeryeoseok','Seat for pregnant women','Pink seats on Seoul subways. Leave them empty.'],
+    ['transit','첫차','cheotcha','First train / bus','차 means vehicle.'],
+    ['transit','막차','makcha','Last train / bus','Check it before a late night out.'],
+    ['transit','급행','geupaeng','Express','Stops at fewer stations. Some lines run both.'],
+    ['transit','종점','jongjeom','Last stop','Everyone gets off here.'],
+    ['transit','방면','bangmyeon','Bound for','시청 방면 means toward City Hall. Pick the platform by it.'],
+    ['transit','횡단보도','hoengdan bodo','Pedestrian crossing','Painted stripes on the road.'],
+    ['transit','주차장','juchajang','Car park','장 at the end means place.'],
+    ['transit','공항','gonghang','Airport','On airport railroad and bus signs.'],
+    ['transit','하차','hacha','Get off','Bus card readers at the back door say 하차. Tap again when you get off.'],
+    ['service','무료','muryo','Free of charge','무 means without. 무료 입장 is free entry.'],
+    ['service','셀프','selpeu','Self-service','Water, side dishes or returning trays are up to you.'],
+    ['service','계산대','gyesandae','Checkout','Where you pay. 계산 means paying the bill.'],
+    ['service','영수증','yeongsujeung','Receipt','Machines ask if you want one printed.'],
+    ['service','휴대폰 충전','hyudaepon chungjeon','Phone charging','Charging stations in cafés, stations and malls.'],
+    ['service','빨래방','ppallaebang','Laundromat','Coin-operated, often open 24 hours.'],
+    ['service','미용실','miyongsil','Hair salon','You will see one on almost every block.'],
+    ['service','경찰서','gyeongchalseo','Police station','Smaller local posts are called 파출소 or 지구대.'],
+    ['service','관광안내소','gwangwang annaeso','Tourist information','Maps and help in English. Look for the i sign.'],
+    ['service','분리수거','bullisugeo','Recycling','Bins are split by type: 일반 (general), 플라스틱, 캔, 종이.']
   ],
 
   cards: [],
@@ -673,6 +744,133 @@ window.TOUR_PHOTOS = {
  }
 };
 </script>
+  <script>/* 자동 생성 파일 — .work/fetch_commons.py 로 다시 만든다. 직접 고치지 않는다.
+ * 출처: Wikimedia Commons · 생성일 2026-10-19
+ * 허용 라이선스: CC0 · Public domain · CC BY (저작자·라이선스 표시)
+ */
+window.COMMONS_PHOTOS = {
+ "samcheong": {
+  "file": "Seoul-Samcheong.dong-01.jpg",
+  "image": "https://upload.wikimedia.org/wikipedia/commons/7/79/Seoul-Samcheong.dong-01.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled",
+  "source": "https://commons.wikimedia.org/wiki/File:Seoul-Samcheong.dong-01.jpg",
+  "author": "alice park",
+  "license": "CC BY 2.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by/2.0"
+ },
+ "shinsegae": {
+  "file": "新世界百貨店 - panoramio.jpg",
+  "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b9/%E6%96%B0%E4%B8%96%E7%95%8C%E7%99%BE%E8%B2%A8%E5%BA%97_-_panoramio.jpg/1280px-%E6%96%B0%E4%B8%96%E7%95%8C%E7%99%BE%E8%B2%A8%E5%BA%97_-_panoramio.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+  "source": "https://commons.wikimedia.org/wiki/File:%E6%96%B0%E4%B8%96%E7%95%8C%E7%99%BE%E8%B2%A8%E5%BA%97_-_panoramio.jpg",
+  "author": "米田賢一",
+  "license": "CC BY 3.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by/3.0"
+ },
+ "seoulstation": {
+  "file": "Seoul Station (145738821).jpeg",
+  "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f2/Seoul_Station_%28145738821%29.jpeg/1280px-Seoul_Station_%28145738821%29.jpeg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+  "source": "https://commons.wikimedia.org/wiki/File:Seoul_Station_(145738821).jpeg",
+  "author": "Dongil Kim",
+  "license": "CC BY 3.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by/3.0"
+ },
+ "namsan-tower": {
+  "file": "N Seoul Tower (13952097192).jpg",
+  "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/cc/N_Seoul_Tower_%2813952097192%29.jpg/1280px-N_Seoul_Tower_%2813952097192%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+  "source": "https://commons.wikimedia.org/wiki/File:N_Seoul_Tower_(13952097192).jpg",
+  "author": "Eugene Lim from Hong Kong",
+  "license": "CC BY 2.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by/2.0"
+ },
+ "myeongdong-food": {
+  "file": "Seoul-Myeongdong-03.jpg",
+  "image": "https://upload.wikimedia.org/wikipedia/commons/7/73/Seoul-Myeongdong-03.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled",
+  "source": "https://commons.wikimedia.org/wiki/File:Seoul-Myeongdong-03.jpg",
+  "author": "by thelearnr",
+  "license": "CC BY 2.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by/2.0"
+ },
+ "cheonggyecheon": {
+  "file": "Seoul (53853383087).jpg",
+  "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/41/Seoul_%2853853383087%29.jpg/1280px-Seoul_%2853853383087%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+  "source": "https://commons.wikimedia.org/wiki/File:Seoul_(53853383087).jpg",
+  "author": "David Lee from Redmond, WA, USA",
+  "license": "CC BY 2.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by/2.0"
+ },
+ "ttukseom": {
+  "file": "20260501 뚝섬역 역명판.jpg",
+  "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/04/20260501_%EB%9A%9D%EC%84%AC%EC%97%AD_%EC%97%AD%EB%AA%85%ED%8C%90.jpg/1280px-20260501_%EB%9A%9D%EC%84%AC%EC%97%AD_%EC%97%AD%EB%AA%85%ED%8C%90.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+  "source": "https://commons.wikimedia.org/wiki/File:20260501_%EB%9A%9D%EC%84%AC%EC%97%AD_%EC%97%AD%EB%AA%85%ED%8C%90.jpg",
+  "author": "Striker9498",
+  "license": "CC0",
+  "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en"
+ },
+ "hongdae-station": {
+  "file": "20250510 홍대입구역 3번출구.jpg",
+  "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/ac/20250510_%ED%99%8D%EB%8C%80%EC%9E%85%EA%B5%AC%EC%97%AD_3%EB%B2%88%EC%B6%9C%EA%B5%AC.jpg/1280px-20250510_%ED%99%8D%EB%8C%80%EC%9E%85%EA%B5%AC%EC%97%AD_3%EB%B2%88%EC%B6%9C%EA%B5%AC.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+  "source": "https://commons.wikimedia.org/wiki/File:20250510_%ED%99%8D%EB%8C%80%EC%9E%85%EA%B5%AC%EC%97%AD_3%EB%B2%88%EC%B6%9C%EA%B5%AC.jpg",
+  "author": "Striker9498",
+  "license": "CC0",
+  "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en"
+ },
+ "gyeongui-park": {
+  "file": "20250510 경의선숲길 1.jpg",
+  "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5c/20250510_%EA%B2%BD%EC%9D%98%EC%84%A0%EC%88%B2%EA%B8%B8_1.jpg/1280px-20250510_%EA%B2%BD%EC%9D%98%EC%84%A0%EC%88%B2%EA%B8%B8_1.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+  "source": "https://commons.wikimedia.org/wiki/File:20250510_%EA%B2%BD%EC%9D%98%EC%84%A0%EC%88%B2%EA%B8%B8_1.jpg",
+  "author": "Striker9498",
+  "license": "CC0",
+  "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en"
+ },
+ "hongdae-street": {
+  "file": "Hongdae, Seoul- Part II - Hongdae2237.jpg",
+  "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5e/Hongdae%2C_Seoul-_Part_II_-_Hongdae2237.jpg/1280px-Hongdae%2C_Seoul-_Part_II_-_Hongdae2237.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+  "source": "https://commons.wikimedia.org/wiki/File:Hongdae,_Seoul-_Part_II_-_Hongdae2237.jpg",
+  "author": "lumoplank",
+  "license": "CC0",
+  "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en"
+ },
+ "itaewon": {
+  "file": "Itaewon Street (230036983).jpeg",
+  "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/31/Itaewon_Street_%28230036983%29.jpeg/1280px-Itaewon_Street_%28230036983%29.jpeg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+  "source": "https://commons.wikimedia.org/wiki/File:Itaewon_Street_(230036983).jpeg",
+  "author": "Jongsu Pyeon",
+  "license": "CC BY 3.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by/3.0"
+ },
+ "yeouinaru": {
+  "file": "20250727 여의나루역 1번출구.jpg",
+  "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/13/20250727_%EC%97%AC%EC%9D%98%EB%82%98%EB%A3%A8%EC%97%AD_1%EB%B2%88%EC%B6%9C%EA%B5%AC.jpg/1280px-20250727_%EC%97%AC%EC%9D%98%EB%82%98%EB%A3%A8%EC%97%AD_1%EB%B2%88%EC%B6%9C%EA%B5%AC.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+  "source": "https://commons.wikimedia.org/wiki/File:20250727_%EC%97%AC%EC%9D%98%EB%82%98%EB%A3%A8%EC%97%AD_1%EB%B2%88%EC%B6%9C%EA%B5%AC.jpg",
+  "author": "Striker9498",
+  "license": "CC0",
+  "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en"
+ },
+ "coex": {
+  "file": "Starfield Library COEX 20240218.jpg",
+  "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/fe/Starfield_Library_COEX_20240218.jpg/1280px-Starfield_Library_COEX_20240218.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+  "source": "https://commons.wikimedia.org/wiki/File:Starfield_Library_COEX_20240218.jpg",
+  "author": "Sean Young (@assanges)",
+  "license": "CC BY 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by/4.0"
+ },
+ "gangnam-station": {
+  "file": "Gangnam Station sign.jpg",
+  "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e0/Gangnam_Station_sign.jpg/1280px-Gangnam_Station_sign.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+  "source": "https://commons.wikimedia.org/wiki/File:Gangnam_Station_sign.jpg",
+  "author": "Aspere",
+  "license": "CC0",
+  "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en"
+ },
+ "garosugil": {
+  "file": "Garosu-gil at night.jpg",
+  "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4b/Garosu-gil_at_night.jpg/1280px-Garosu-gil_at_night.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+  "source": "https://commons.wikimedia.org/wiki/File:Garosu-gil_at_night.jpg",
+  "author": "sellyourseoul",
+  "license": "CC BY 2.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by/2.0"
+ }
+};
+</script>
   <script>/* Sign Korean: an offline, local-only interactive design prototype. */
 (() => {
   'use strict';
@@ -729,13 +927,16 @@ window.TOUR_PHOTOS = {
   };
   const button = (text, action, cls='btn-secondary', disabled=false) => `<button type="button" class="btn ${cls}" data-action="${esc(action)}" ${disabled?'disabled':''}>${text}</button>`;
   const image = (src,alt,cls='') => `<img class="${cls}" src="${esc(src)}" alt="${esc(alt)}" loading="lazy">`;
-  // 장소 사진: 앱에 내장한 Wikimedia 사진이 우선이고, 없으면 TourAPI(한국관광공사) 사진을 불러온다.
+  // 장소 사진: 앱에 내장한 Wikimedia 사진 → TourAPI(한국관광공사) → Commons 보충 사진 순서로 쓴다.
   // 공공누리는 출처 표시가 조건이고, 제3유형은 변경 금지라 자르지 않고 원본 비율 그대로 보여준다.
-  const TOUR = window.TOUR_PHOTOS || {};
+  const TOUR = window.TOUR_PHOTOS || {}, COMMONS = window.COMMONS_PHOTOS || {};
   const placePhoto = p => {
     if(p.photo) return {src:p.photo,credit:'Wikimedia Commons',intact:false};
     const t=TOUR[p.id];
-    return t ? {src:t.image,credit:`한국관광공사 · KOGL ${t.license==='Type3'?'Type 3':'Type 1'}`,intact:t.license==='Type3'} : null;
+    if(t) return {src:t.image,credit:`한국관광공사 · KOGL ${t.license==='Type3'?'Type 3':'Type 1'}`,intact:t.license==='Type3'};
+    // CC BY 는 저작자와 라이선스를 함께 표시해야 한다.
+    const c=COMMONS[p.id];
+    return c ? {src:c.image,credit:`${c.author} · ${c.license} · Wikimedia Commons`,intact:false} : null;
   };
   const photoFigure = (p,cls) => { const ph=placePhoto(p); return ph ? `${image(ph.src,p.name,cls+(ph.intact?' photo-intact':''))}<span class="photo-credit">Photo: ${esc(ph.credit)}</span>` : ''; };
   // 기초 표지판은 사진이 아니라 앱이 그리는 표지판 판으로 보여준다.
@@ -780,6 +981,7 @@ window.TOUR_PHOTOS = {
   // SC03 Basics 모드 — 장소가 없으므로 Reviews·Map·Add to plan 진입점을 그리지 않는다 (FR31/UX09).
   function basicsPage(){
     const b=D.basics,cs=targetCards(b.id),n=countStatus(cs.map(c=>c.id));
+    const planned=D.basicGroups.reduce((n,g)=>n+g.target,0);
     const groups=D.basicGroups.map(g=>({...g,cards:cs.filter(c=>c.groupId===g.id)})).filter(g=>g.cards.length);
     return `<div class="detail-hero basics-hero">${signPlate(cs[0],'hero-plate')}${badge('EVERYDAY SIGNS')}</div>`
       +header(b.name,b.koName,'NO PLACE NEEDED')
@@ -788,9 +990,9 @@ window.TOUR_PHOTOS = {
       <div class="chips">${button('All cards','mode:all','chip '+(route.mode!=='review'?'active':''))}${button('Review','mode:review','chip '+(route.mode==='review'?'active':''),!n[1])}</div>
       ${button('Start practice '+icon('arrow'),'start-basics','btn-primary',!cs.length)}
       <div class="notice"><strong>These signs belong to the street, not to a shop.</strong><p>That is why there are no reviews, routes or trip buttons here. Bookmarks and pronunciation work just like everywhere else.</p></div>
-      <div class="section-head"><h2>What you will learn</h2><span>${cs.length} of 100 planned</span></div>
-      <div class="group-list">${groups.map(g=>`<article class="group-row" style="--plate:${esc(g.color)}"><div class="group-bar"></div><div><strong>${esc(g.label)}</strong><small>${g.cards.length} in this prototype · ${g.target} planned</small><div class="group-words">${g.cards.map(c=>`<button class="word-chip" data-action="start-card:${c.id}" lang="ko">${esc(c.word)}</button>`).join('')}</div></div></article>`).join('')}</div>
-      <p class="muted small">Prototype sample. The specification plans 100 everyday signs across these six groups.</p>`;
+      <div class="section-head"><h2>What you will learn</h2><span>${cs.length===planned?`${cs.length} signs`:`${cs.length} of ${planned} planned`}</span></div>
+      <div class="group-list">${groups.map(g=>`<article class="group-row" style="--plate:${esc(g.color)}"><div class="group-bar"></div><div><strong>${esc(g.label)}</strong><small>${g.cards.length===g.target?`${g.cards.length} signs`:`${g.cards.length} in this prototype · ${g.target} planned`}</small><div class="group-words">${g.cards.map(c=>`<button class="word-chip" data-action="start-card:${c.id}" lang="ko">${esc(c.word)}</button>`).join('')}</div></div></article>`).join('')}</div>${cs.length<planned?`
+      <p class="muted small">Prototype sample. The specification plans ${planned} everyday signs across these six groups.</p>`:''}`;
   }
   function placeRow(p,action,trailing=''){const t=typeOf(p.type),n=targetCards(p.id).length;return `<div class="place-row"><button class="place-row-main" data-action="${esc(action)}"><span class="type-dot" style="--plate:${esc(t?.color||'#2f6f5e')}" aria-hidden="true"></span><span><strong>${esc(p.name)}${p.example?' '+badge('Example'):''}</strong><small lang="ko">${esc(p.koName||'')}</small><small>${esc(t?.label||'')} · ${n} signs</small></span></button>${trailing||icon('arrow')}</div>`;}
   function begin(ids,source,returnRoute,mode='all'){const eligible=[...new Set(ids)].filter(id=>card(id)&&(mode!=='review'||status(id)==='learning'));if(!eligible.length){notify('No cards to review yet.');return;}const run=()=>{if(commit(s=>{s.session={ids:[...new Set(ids)],queue:eligible.map(id=>({id,ready:0})),decisions:[],source,returnRoute:clone(returnRoute),mode,meaning:false,undo:null,finished:false};}))navigate('learn');};if(state.session&&!state.session.finished)confirm('Start new practice?','You have an unfinished session. Its learning progress will stay, but the remaining queue will be replaced.',run,'Start new');else run();}
