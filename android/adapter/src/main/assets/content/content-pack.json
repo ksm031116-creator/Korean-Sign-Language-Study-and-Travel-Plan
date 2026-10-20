@@ -1,0 +1,3667 @@
+{
+ "schemaVersion": 1,
+ "version": "f697ba499549",
+ "areas": [
+  {
+   "id": "gyeongbokgung",
+   "koName": "경복궁·서촌",
+   "name": {
+    "en": "Gyeongbokgung & Seochon"
+   },
+   "active": true
+  },
+  {
+   "id": "myeongdong",
+   "koName": "명동·남대문",
+   "name": {
+    "en": "Myeongdong & Namdaemun"
+   },
+   "active": true
+  },
+  {
+   "id": "ddp",
+   "koName": "동대문·을지로",
+   "name": {
+    "en": "Dongdaemun & Euljiro"
+   },
+   "active": true
+  },
+  {
+   "id": "seongsu",
+   "koName": "성수·서울숲",
+   "name": {
+    "en": "Seongsu & Seoul Forest"
+   },
+   "active": true
+  },
+  {
+   "id": "hongdae",
+   "koName": "홍대·연남",
+   "name": {
+    "en": "Hongdae & Yeonnam"
+   },
+   "active": true
+  },
+  {
+   "id": "yongsan",
+   "koName": "용산·이태원",
+   "name": {
+    "en": "Yongsan & Itaewon"
+   },
+   "active": true
+  },
+  {
+   "id": "yeouido",
+   "koName": "여의도·한강",
+   "name": {
+    "en": "Yeouido & the Han River"
+   },
+   "active": true
+  },
+  {
+   "id": "gangnam",
+   "koName": "강남·잠실",
+   "name": {
+    "en": "Gangnam & Jamsil"
+   },
+   "active": true
+  }
+ ],
+ "cards": [
+  {
+   "id": "t-palace-1",
+   "kind": "place",
+   "group": "palace",
+   "koText": "매표소",
+   "romanization": "mapyoso",
+   "reading": {},
+   "meaning": {
+    "en": "Ticket office"
+   },
+   "note": {
+    "en": "Where you buy the entry ticket. The same word appears at towers and terminals."
+   },
+   "pictogram": null,
+   "plateColor": "#2f6f5e",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "t-palace-2",
+   "kind": "place",
+   "group": "palace",
+   "koText": "입장료",
+   "romanization": "ipjangnyo",
+   "reading": {},
+   "meaning": {
+    "en": "Admission fee"
+   },
+   "note": {
+    "en": "무료 next to it means free entry."
+   },
+   "pictogram": null,
+   "plateColor": "#2f6f5e",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "t-palace-3",
+   "kind": "place",
+   "group": "palace",
+   "koText": "관람 시간",
+   "romanization": "gwallam sigan",
+   "reading": {},
+   "meaning": {
+    "en": "Opening hours"
+   },
+   "note": {
+    "en": "관람 is viewing. You will see it at museums too."
+   },
+   "pictogram": null,
+   "plateColor": "#2f6f5e",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "t-museum-1",
+   "kind": "place",
+   "group": "museum",
+   "koText": "박물관",
+   "romanization": "bangmulgwan",
+   "reading": {},
+   "meaning": {
+    "en": "Museum"
+   },
+   "note": {
+    "en": "관 at the end means a public hall or building."
+   },
+   "pictogram": null,
+   "plateColor": "#4a5b8c",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "t-museum-2",
+   "kind": "place",
+   "group": "museum",
+   "koText": "전시",
+   "romanization": "jeonsi",
+   "reading": {},
+   "meaning": {
+    "en": "Exhibition"
+   },
+   "note": {
+    "en": "기획 전시 is a special exhibition."
+   },
+   "pictogram": null,
+   "plateColor": "#4a5b8c",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "t-museum-3",
+   "kind": "place",
+   "group": "museum",
+   "koText": "보관함",
+   "romanization": "bogwamham",
+   "reading": {},
+   "meaning": {
+    "en": "Lockers"
+   },
+   "note": {
+    "en": "Leave your bag before going in."
+   },
+   "pictogram": null,
+   "plateColor": "#4a5b8c",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "t-market-1",
+   "kind": "place",
+   "group": "market",
+   "koText": "국밥",
+   "romanization": "gukbap",
+   "reading": {},
+   "meaning": {
+    "en": "Rice and soup"
+   },
+   "note": {
+    "en": "A cheap, filling market meal. The word is on dozens of stalls."
+   },
+   "pictogram": null,
+   "plateColor": "#b8554a",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "t-market-2",
+   "kind": "place",
+   "group": "market",
+   "koText": "만두",
+   "romanization": "mandu",
+   "reading": {},
+   "meaning": {
+    "en": "Dumplings"
+   },
+   "note": {
+    "en": "Steamed or fried, sold by the plate."
+   },
+   "pictogram": null,
+   "plateColor": "#b8554a",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "t-market-3",
+   "kind": "place",
+   "group": "market",
+   "koText": "칼국수",
+   "romanization": "kalguksu",
+   "reading": {},
+   "meaning": {
+    "en": "Knife-cut noodles"
+   },
+   "note": {
+    "en": "A hand-cut noodle soup, common in market alleys."
+   },
+   "pictogram": null,
+   "plateColor": "#b8554a",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "t-market-4",
+   "kind": "place",
+   "group": "market",
+   "koText": "떡볶이",
+   "romanization": "tteokbokki",
+   "reading": {},
+   "meaning": {
+    "en": "Spicy rice cakes"
+   },
+   "note": {
+    "en": "The most common street food sign in the country."
+   },
+   "pictogram": null,
+   "plateColor": "#b8554a",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "t-market-5",
+   "kind": "place",
+   "group": "market",
+   "koText": "순대",
+   "romanization": "sundae",
+   "reading": {},
+   "meaning": {
+    "en": "Blood sausage"
+   },
+   "note": {
+    "en": "Often sold at the same stall as 떡볶이."
+   },
+   "pictogram": null,
+   "plateColor": "#b8554a",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "t-cafe-1",
+   "kind": "place",
+   "group": "cafe",
+   "koText": "카페",
+   "romanization": "kape",
+   "reading": {},
+   "meaning": {
+    "en": "Café"
+   },
+   "note": {
+    "en": "A loanword — read it aloud and you will hear it."
+   },
+   "pictogram": null,
+   "plateColor": "#8c6239",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "t-cafe-2",
+   "kind": "place",
+   "group": "cafe",
+   "koText": "커피",
+   "romanization": "keopi",
+   "reading": {},
+   "meaning": {
+    "en": "Coffee"
+   },
+   "note": {
+    "en": "Another loanword you can decode on sight."
+   },
+   "pictogram": null,
+   "plateColor": "#8c6239",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "t-cafe-3",
+   "kind": "place",
+   "group": "cafe",
+   "koText": "포장",
+   "romanization": "pojang",
+   "reading": {},
+   "meaning": {
+    "en": "Takeout"
+   },
+   "note": {
+    "en": "Also used at restaurants for food to go."
+   },
+   "pictogram": null,
+   "plateColor": "#8c6239",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "t-street-1",
+   "kind": "place",
+   "group": "street",
+   "koText": "식당",
+   "romanization": "sikdang",
+   "reading": {},
+   "meaning": {
+    "en": "Restaurant"
+   },
+   "note": {
+    "en": "The plain, general word for an eating place."
+   },
+   "pictogram": null,
+   "plateColor": "#a8492f",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "t-street-2",
+   "kind": "place",
+   "group": "street",
+   "koText": "분식",
+   "romanization": "bunsik",
+   "reading": {},
+   "meaning": {
+    "en": "Snack food"
+   },
+   "note": {
+    "en": "Cheap, quick Korean snacks — kimbap, ramyeon, fried bites."
+   },
+   "pictogram": null,
+   "plateColor": "#a8492f",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "t-street-3",
+   "kind": "place",
+   "group": "street",
+   "koText": "호프",
+   "romanization": "hopeu",
+   "reading": {},
+   "meaning": {
+    "en": "Beer pub"
+   },
+   "note": {
+    "en": "From the German Hof. Usually paired with 치킨 on the same sign."
+   },
+   "pictogram": null,
+   "plateColor": "#a8492f",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "t-shopping-1",
+   "kind": "place",
+   "group": "shopping",
+   "koText": "백화점",
+   "romanization": "baekhwajeom",
+   "reading": {},
+   "meaning": {
+    "en": "Department store"
+   },
+   "note": {
+    "en": "점 at the end means shop."
+   },
+   "pictogram": null,
+   "plateColor": "#9c5a9e",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "t-shopping-2",
+   "kind": "place",
+   "group": "shopping",
+   "koText": "면세점",
+   "romanization": "myeonsejeom",
+   "reading": {},
+   "meaning": {
+    "en": "Duty free"
+   },
+   "note": {
+    "en": "면세 means tax exempt."
+   },
+   "pictogram": null,
+   "plateColor": "#9c5a9e",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "t-shopping-3",
+   "kind": "place",
+   "group": "shopping",
+   "koText": "할인",
+   "romanization": "harin",
+   "reading": {},
+   "meaning": {
+    "en": "Discount"
+   },
+   "note": {
+    "en": "세일 is also used on the same signs."
+   },
+   "pictogram": null,
+   "plateColor": "#9c5a9e",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "t-hanok-1",
+   "kind": "place",
+   "group": "hanok",
+   "koText": "한복 대여",
+   "romanization": "hanbok daeyeo",
+   "reading": {},
+   "meaning": {
+    "en": "Hanbok rental"
+   },
+   "note": {
+    "en": "대여 means rental. Wearing hanbok gets you free palace entry."
+   },
+   "pictogram": null,
+   "plateColor": "#7a6a3a",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "t-hanok-2",
+   "kind": "place",
+   "group": "hanok",
+   "koText": "공방",
+   "romanization": "gongbang",
+   "reading": {},
+   "meaning": {
+    "en": "Craft workshop"
+   },
+   "note": {
+    "en": "A small studio where things are made and sold."
+   },
+   "pictogram": null,
+   "plateColor": "#7a6a3a",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "t-hanok-3",
+   "kind": "place",
+   "group": "hanok",
+   "koText": "찻집",
+   "romanization": "chatjip",
+   "reading": {},
+   "meaning": {
+    "en": "Tea house"
+   },
+   "note": {
+    "en": "집 at the end means house or shop."
+   },
+   "pictogram": null,
+   "plateColor": "#7a6a3a",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "t-landmark-1",
+   "kind": "place",
+   "group": "landmark",
+   "koText": "안내도",
+   "romanization": "annaedo",
+   "reading": {},
+   "meaning": {
+    "en": "Area map"
+   },
+   "note": {
+    "en": "The board showing where everything is. 도 means map or drawing."
+   },
+   "pictogram": null,
+   "plateColor": "#3d6f8f",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "t-landmark-2",
+   "kind": "place",
+   "group": "landmark",
+   "koText": "포토존",
+   "romanization": "potojon",
+   "reading": {},
+   "meaning": {
+    "en": "Photo spot"
+   },
+   "note": {
+    "en": "A Konglish loanword — marks the spot with the best view."
+   },
+   "pictogram": null,
+   "plateColor": "#3d6f8f",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "t-tower-1",
+   "kind": "place",
+   "group": "tower",
+   "koText": "전망대",
+   "romanization": "jeonmangdae",
+   "reading": {},
+   "meaning": {
+    "en": "Observation deck"
+   },
+   "note": {
+    "en": "The reason you queued for the lift."
+   },
+   "pictogram": null,
+   "plateColor": "#2f7f94",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "t-tower-2",
+   "kind": "place",
+   "group": "tower",
+   "koText": "기념품",
+   "romanization": "ginyeompum",
+   "reading": {},
+   "meaning": {
+    "en": "Souvenirs"
+   },
+   "note": {
+    "en": "기념 means commemoration."
+   },
+   "pictogram": null,
+   "plateColor": "#2f7f94",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "t-station-1",
+   "kind": "place",
+   "group": "station",
+   "koText": "교통카드 충전",
+   "romanization": "gyotongkadeu chungjeon",
+   "reading": {},
+   "meaning": {
+    "en": "Transit card top-up"
+   },
+   "note": {
+    "en": "Machines that reload T-money cards."
+   },
+   "pictogram": null,
+   "plateColor": "#1f6f78",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "t-station-2",
+   "kind": "place",
+   "group": "station",
+   "koText": "고객안내센터",
+   "romanization": "gogaek annae senteo",
+   "reading": {},
+   "meaning": {
+    "en": "Customer service center"
+   },
+   "note": {
+    "en": "Ask here for route help or lost items."
+   },
+   "pictogram": null,
+   "plateColor": "#1f6f78",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "t-park-1",
+   "kind": "place",
+   "group": "park",
+   "koText": "산책로",
+   "romanization": "sanchaengno",
+   "reading": {},
+   "meaning": {
+    "en": "Walking path"
+   },
+   "note": {
+    "en": "로 at the end means road or path."
+   },
+   "pictogram": null,
+   "plateColor": "#6b8e3d",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "t-park-2",
+   "kind": "place",
+   "group": "park",
+   "koText": "쉼터",
+   "romanization": "swimteo",
+   "reading": {},
+   "meaning": {
+    "en": "Rest area"
+   },
+   "note": {
+    "en": "Benches and shade. 쉼 means rest."
+   },
+   "pictogram": null,
+   "plateColor": "#6b8e3d",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "t-services-1",
+   "kind": "place",
+   "group": "services",
+   "koText": "약국",
+   "romanization": "yakguk",
+   "reading": {},
+   "meaning": {
+    "en": "Pharmacy"
+   },
+   "note": {
+    "en": "Usually with a green cross outside."
+   },
+   "pictogram": "pharmacy",
+   "plateColor": "#3a7d44",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "t-services-2",
+   "kind": "place",
+   "group": "services",
+   "koText": "병원",
+   "romanization": "byeongwon",
+   "reading": {},
+   "meaning": {
+    "en": "Clinic / hospital"
+   },
+   "note": {
+    "en": "치과 is dental, 내과 is internal medicine."
+   },
+   "pictogram": null,
+   "plateColor": "#3a7d44",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "t-services-3",
+   "kind": "place",
+   "group": "services",
+   "koText": "은행",
+   "romanization": "eunhaeng",
+   "reading": {},
+   "meaning": {
+    "en": "Bank"
+   },
+   "note": {
+    "en": "ATMs are labelled ATM or 현금인출기."
+   },
+   "pictogram": null,
+   "plateColor": "#3a7d44",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "t-services-4",
+   "kind": "place",
+   "group": "services",
+   "koText": "환전",
+   "romanization": "hwanjeon",
+   "reading": {},
+   "meaning": {
+    "en": "Currency exchange"
+   },
+   "note": {
+    "en": "Useful near markets and tourist streets."
+   },
+   "pictogram": null,
+   "plateColor": "#3a7d44",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "b01",
+   "kind": "basic",
+   "group": "restroom",
+   "koText": "화장실",
+   "romanization": "hwajangsil",
+   "reading": {},
+   "meaning": {
+    "en": "Restroom"
+   },
+   "note": {
+    "en": "The word itself. Everything else on a restroom door is a variation of this."
+   },
+   "pictogram": "restroom",
+   "plateColor": "#2f6fb0",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "b02",
+   "kind": "basic",
+   "group": "restroom",
+   "koText": "남자 화장실",
+   "romanization": "namja hwajangsil",
+   "reading": {},
+   "meaning": {
+    "en": "Men’s restroom"
+   },
+   "note": {
+    "en": "남자 means man. Often shown with a blue plate or figure."
+   },
+   "pictogram": "men",
+   "plateColor": "#2f6fb0",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "b03",
+   "kind": "basic",
+   "group": "restroom",
+   "koText": "여자 화장실",
+   "romanization": "yeoja hwajangsil",
+   "reading": {},
+   "meaning": {
+    "en": "Women’s restroom"
+   },
+   "note": {
+    "en": "여자 means woman. Often shown with a red plate or figure."
+   },
+   "pictogram": "women",
+   "plateColor": "#2f6fb0",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "b04",
+   "kind": "basic",
+   "group": "restroom",
+   "koText": "장애인 화장실",
+   "romanization": "jangaein hwajangsil",
+   "reading": {},
+   "meaning": {
+    "en": "Accessible restroom"
+   },
+   "note": {
+    "en": "Marked separately in stations, museums and larger cafés."
+   },
+   "pictogram": "accessible",
+   "plateColor": "#2f6fb0",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "b05",
+   "kind": "basic",
+   "group": "restroom",
+   "koText": "수유실",
+   "romanization": "suyusil",
+   "reading": {},
+   "meaning": {
+    "en": "Nursing room"
+   },
+   "note": {
+    "en": "Common in department stores and large stations."
+   },
+   "pictogram": null,
+   "plateColor": "#2f6fb0",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "b06",
+   "kind": "basic",
+   "group": "door",
+   "koText": "미세요",
+   "romanization": "miseyo",
+   "reading": {},
+   "meaning": {
+    "en": "Push"
+   },
+   "note": {
+    "en": "On the door you are about to walk into. Push, don’t pull."
+   },
+   "pictogram": null,
+   "plateColor": "#3a7d44",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "b07",
+   "kind": "basic",
+   "group": "door",
+   "koText": "당기세요",
+   "romanization": "danggiseyo",
+   "reading": {},
+   "meaning": {
+    "en": "Pull"
+   },
+   "note": {
+    "en": "The other half of every Korean door."
+   },
+   "pictogram": null,
+   "plateColor": "#3a7d44",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "b08",
+   "kind": "basic",
+   "group": "door",
+   "koText": "입구",
+   "romanization": "ipgu",
+   "reading": {},
+   "meaning": {
+    "en": "Entrance"
+   },
+   "note": {
+    "en": "입 is enter, 구 is opening. The pair shows up on buildings and stations."
+   },
+   "pictogram": null,
+   "plateColor": "#3a7d44",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "b09",
+   "kind": "basic",
+   "group": "door",
+   "koText": "출구",
+   "romanization": "chulgu",
+   "reading": {},
+   "meaning": {
+    "en": "Exit"
+   },
+   "note": {
+    "en": "Subway exits are numbered: 3번 출구 is Exit 3."
+   },
+   "pictogram": "exit",
+   "plateColor": "#3a7d44",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "b10",
+   "kind": "basic",
+   "group": "door",
+   "koText": "비상구",
+   "romanization": "bisanggu",
+   "reading": {},
+   "meaning": {
+    "en": "Emergency exit"
+   },
+   "note": {
+    "en": "Always on the green running-figure sign."
+   },
+   "pictogram": "exit",
+   "plateColor": "#3a7d44",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "b11",
+   "kind": "basic",
+   "group": "hours",
+   "koText": "영업중",
+   "romanization": "yeongeopjung",
+   "reading": {},
+   "meaning": {
+    "en": "Open for business"
+   },
+   "note": {
+    "en": "Hung on the door while the shop is serving."
+   },
+   "pictogram": null,
+   "plateColor": "#b9772a",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "b12",
+   "kind": "basic",
+   "group": "hours",
+   "koText": "준비중",
+   "romanization": "junbijung",
+   "reading": {},
+   "meaning": {
+    "en": "Preparing / not open yet"
+   },
+   "note": {
+    "en": "The shop exists and is staffed — it just isn’t serving you yet."
+   },
+   "pictogram": null,
+   "plateColor": "#b9772a",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "b13",
+   "kind": "basic",
+   "group": "hours",
+   "koText": "휴무",
+   "romanization": "hyumu",
+   "reading": {},
+   "meaning": {
+    "en": "Closed (day off)"
+   },
+   "note": {
+    "en": "금일 휴무 means closed today."
+   },
+   "pictogram": null,
+   "plateColor": "#b9772a",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "b14",
+   "kind": "basic",
+   "group": "hours",
+   "koText": "24시간",
+   "romanization": "isipsa sigan",
+   "reading": {},
+   "meaning": {
+    "en": "Open 24 hours"
+   },
+   "note": {
+    "en": "Convenience stores, saunas and some cafés."
+   },
+   "pictogram": null,
+   "plateColor": "#b9772a",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "b15",
+   "kind": "basic",
+   "group": "warning",
+   "koText": "금연",
+   "romanization": "geumyeon",
+   "reading": {},
+   "meaning": {
+    "en": "No smoking"
+   },
+   "note": {
+    "en": "금 is to forbid. You will see it on 금지 signs too."
+   },
+   "pictogram": "noSmoking",
+   "plateColor": "#c0392b",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "b16",
+   "kind": "basic",
+   "group": "warning",
+   "koText": "촬영 금지",
+   "romanization": "chwaryeong geumji",
+   "reading": {},
+   "meaning": {
+    "en": "No photography"
+   },
+   "note": {
+    "en": "Museums, some shops, and parts of palaces."
+   },
+   "pictogram": "noPhoto",
+   "plateColor": "#c0392b",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "b17",
+   "kind": "basic",
+   "group": "warning",
+   "koText": "출입 금지",
+   "romanization": "churip geumji",
+   "reading": {},
+   "meaning": {
+    "en": "No entry"
+   },
+   "note": {
+    "en": "Staff-only doors and closed-off areas."
+   },
+   "pictogram": null,
+   "plateColor": "#c0392b",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "b18",
+   "kind": "basic",
+   "group": "warning",
+   "koText": "미끄럼 주의",
+   "romanization": "mikkeureom juui",
+   "reading": {},
+   "meaning": {
+    "en": "Caution: slippery"
+   },
+   "note": {
+    "en": "주의 means caution. It pairs with many other words."
+   },
+   "pictogram": null,
+   "plateColor": "#c0392b",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "b19",
+   "kind": "basic",
+   "group": "warning",
+   "koText": "머리 조심",
+   "romanization": "meori josim",
+   "reading": {},
+   "meaning": {
+    "en": "Mind your head"
+   },
+   "note": {
+    "en": "Low doorways in older buildings and markets."
+   },
+   "pictogram": null,
+   "plateColor": "#c0392b",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "b20",
+   "kind": "basic",
+   "group": "transit",
+   "koText": "지하철",
+   "romanization": "jihacheol",
+   "reading": {},
+   "meaning": {
+    "en": "Subway"
+   },
+   "note": {
+    "en": "지하 is underground, 철 is rail."
+   },
+   "pictogram": "subway",
+   "plateColor": "#1f6f78",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "b21",
+   "kind": "basic",
+   "group": "transit",
+   "koText": "버스 정류장",
+   "romanization": "beoseu jeongnyujang",
+   "reading": {},
+   "meaning": {
+    "en": "Bus stop"
+   },
+   "note": {
+    "en": "정류장 is the stop itself."
+   },
+   "pictogram": "bus",
+   "plateColor": "#1f6f78",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "b22",
+   "kind": "basic",
+   "group": "transit",
+   "koText": "환승",
+   "romanization": "hwanseung",
+   "reading": {},
+   "meaning": {
+    "en": "Transfer"
+   },
+   "note": {
+    "en": "On subway platforms where lines meet."
+   },
+   "pictogram": null,
+   "plateColor": "#1f6f78",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "b23",
+   "kind": "basic",
+   "group": "transit",
+   "koText": "승강장",
+   "romanization": "seunggangjang",
+   "reading": {},
+   "meaning": {
+    "en": "Platform"
+   },
+   "note": {
+    "en": "Follow it to reach the train."
+   },
+   "pictogram": null,
+   "plateColor": "#1f6f78",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "b24",
+   "kind": "basic",
+   "group": "transit",
+   "koText": "계단",
+   "romanization": "gyedan",
+   "reading": {},
+   "meaning": {
+    "en": "Stairs"
+   },
+   "note": {
+    "en": "Paired with 엘리베이터 and 에스컬레이터 on station signs."
+   },
+   "pictogram": "stairs",
+   "plateColor": "#1f6f78",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "b25",
+   "kind": "basic",
+   "group": "transit",
+   "koText": "엘리베이터",
+   "romanization": "ellibeiteo",
+   "reading": {},
+   "meaning": {
+    "en": "Elevator"
+   },
+   "note": {
+    "en": "A loanword — read it aloud and you will hear it."
+   },
+   "pictogram": "elevator",
+   "plateColor": "#1f6f78",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "b26",
+   "kind": "basic",
+   "group": "service",
+   "koText": "편의점",
+   "romanization": "pyeonuijeom",
+   "reading": {},
+   "meaning": {
+    "en": "Convenience store"
+   },
+   "note": {
+    "en": "편의 means convenience, 점 means shop."
+   },
+   "pictogram": null,
+   "plateColor": "#5b4b8a",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "b27",
+   "kind": "basic",
+   "group": "service",
+   "koText": "현금인출기",
+   "romanization": "hyeongeum inchulgi",
+   "reading": {},
+   "meaning": {
+    "en": "Cash machine (ATM)"
+   },
+   "note": {
+    "en": "Often labelled ATM as well."
+   },
+   "pictogram": null,
+   "plateColor": "#5b4b8a",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "b28",
+   "kind": "basic",
+   "group": "service",
+   "koText": "와이파이",
+   "romanization": "waipai",
+   "reading": {},
+   "meaning": {
+    "en": "Wi-Fi"
+   },
+   "note": {
+    "en": "무료 와이파이 means free Wi-Fi."
+   },
+   "pictogram": "wifi",
+   "plateColor": "#5b4b8a",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "b29",
+   "kind": "basic",
+   "group": "service",
+   "koText": "분실물 센터",
+   "romanization": "bunsilmul senteo",
+   "reading": {},
+   "meaning": {
+    "en": "Lost and found"
+   },
+   "note": {
+    "en": "In stations, malls and museums."
+   },
+   "pictogram": null,
+   "plateColor": "#5b4b8a",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "b30",
+   "kind": "basic",
+   "group": "service",
+   "koText": "우체국",
+   "romanization": "ucheguk",
+   "reading": {},
+   "meaning": {
+    "en": "Post office"
+   },
+   "note": {
+    "en": "Red and white branding across the country."
+   },
+   "pictogram": null,
+   "plateColor": "#5b4b8a",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "b31",
+   "kind": "basic",
+   "group": "restroom",
+   "koText": "공중 화장실",
+   "romanization": "gongjung hwajangsil",
+   "reading": {},
+   "meaning": {
+    "en": "Public restroom"
+   },
+   "note": {
+    "en": "Free to use. Parks, stations and tourist streets point to the nearest one."
+   },
+   "pictogram": "restroom",
+   "plateColor": "#2f6fb0",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "b32",
+   "kind": "basic",
+   "group": "restroom",
+   "koText": "사용중",
+   "romanization": "sayongjung",
+   "reading": {},
+   "meaning": {
+    "en": "Occupied"
+   },
+   "note": {
+    "en": "On restroom and fitting-room doors. 중 means in the middle of."
+   },
+   "pictogram": null,
+   "plateColor": "#2f6fb0",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "b33",
+   "kind": "basic",
+   "group": "restroom",
+   "koText": "휴지통",
+   "romanization": "hyujitong",
+   "reading": {},
+   "meaning": {
+    "en": "Waste bin"
+   },
+   "note": {
+    "en": "In many restrooms the sign asks you to put paper in the bin, not the toilet."
+   },
+   "pictogram": null,
+   "plateColor": "#2f6fb0",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "b34",
+   "kind": "basic",
+   "group": "restroom",
+   "koText": "기저귀 교환대",
+   "romanization": "gijeogwi gyohwandae",
+   "reading": {},
+   "meaning": {
+    "en": "Baby changing table"
+   },
+   "note": {
+    "en": "Found in both men’s and women’s restrooms in newer buildings."
+   },
+   "pictogram": null,
+   "plateColor": "#2f6fb0",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "b35",
+   "kind": "basic",
+   "group": "restroom",
+   "koText": "비데",
+   "romanization": "bide",
+   "reading": {},
+   "meaning": {
+    "en": "Bidet"
+   },
+   "note": {
+    "en": "Most Korean toilets have one. The buttons are labelled in Korean too."
+   },
+   "pictogram": null,
+   "plateColor": "#2f6fb0",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "b36",
+   "kind": "basic",
+   "group": "restroom",
+   "koText": "흡연실",
+   "romanization": "heubyeonsil",
+   "reading": {},
+   "meaning": {
+    "en": "Smoking room"
+   },
+   "note": {
+    "en": "Smoking is only allowed in these rooms or marked zones."
+   },
+   "pictogram": null,
+   "plateColor": "#2f6fb0",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "b37",
+   "kind": "basic",
+   "group": "restroom",
+   "koText": "탈의실",
+   "romanization": "taruisil",
+   "reading": {},
+   "meaning": {
+    "en": "Changing room"
+   },
+   "note": {
+    "en": "In shops, gyms and swimming pools. 실 at the end means room."
+   },
+   "pictogram": null,
+   "plateColor": "#2f6fb0",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "b38",
+   "kind": "basic",
+   "group": "restroom",
+   "koText": "음수대",
+   "romanization": "eumsudae",
+   "reading": {},
+   "meaning": {
+    "en": "Drinking fountain"
+   },
+   "note": {
+    "en": "Free drinking water in parks and public buildings."
+   },
+   "pictogram": null,
+   "plateColor": "#2f6fb0",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "b39",
+   "kind": "basic",
+   "group": "restroom",
+   "koText": "남녀 공용",
+   "romanization": "namnyeo gongyong",
+   "reading": {},
+   "meaning": {
+    "en": "Unisex"
+   },
+   "note": {
+    "en": "One restroom shared by men and women, common in small cafés."
+   },
+   "pictogram": null,
+   "plateColor": "#2f6fb0",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "b40",
+   "kind": "basic",
+   "group": "restroom",
+   "koText": "손 세정제",
+   "romanization": "son sejeongje",
+   "reading": {},
+   "meaning": {
+    "en": "Hand sanitizer"
+   },
+   "note": {
+    "en": "By lifts, entrances and counters."
+   },
+   "pictogram": null,
+   "plateColor": "#2f6fb0",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "b41",
+   "kind": "basic",
+   "group": "door",
+   "koText": "자동문",
+   "romanization": "jadongmun",
+   "reading": {},
+   "meaning": {
+    "en": "Automatic door"
+   },
+   "note": {
+    "en": "Wait for it to open. 문 means door."
+   },
+   "pictogram": null,
+   "plateColor": "#3a7d44",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "b42",
+   "kind": "basic",
+   "group": "door",
+   "koText": "열림",
+   "romanization": "yeollim",
+   "reading": {},
+   "meaning": {
+    "en": "Open (button)"
+   },
+   "note": {
+    "en": "On lift buttons, next to 닫힘."
+   },
+   "pictogram": null,
+   "plateColor": "#3a7d44",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "b43",
+   "kind": "basic",
+   "group": "door",
+   "koText": "닫힘",
+   "romanization": "dachim",
+   "reading": {},
+   "meaning": {
+    "en": "Close (button)"
+   },
+   "note": {
+    "en": "The other lift button. Press 열림 if someone is still coming."
+   },
+   "pictogram": null,
+   "plateColor": "#3a7d44",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "b44",
+   "kind": "basic",
+   "group": "door",
+   "koText": "정문",
+   "romanization": "jeongmun",
+   "reading": {},
+   "meaning": {
+    "en": "Main gate"
+   },
+   "note": {
+    "en": "The front entrance of a palace, school or park."
+   },
+   "pictogram": null,
+   "plateColor": "#3a7d44",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "b45",
+   "kind": "basic",
+   "group": "door",
+   "koText": "후문",
+   "romanization": "humun",
+   "reading": {},
+   "meaning": {
+    "en": "Back gate"
+   },
+   "note": {
+    "en": "Often closer to the subway than the main gate."
+   },
+   "pictogram": null,
+   "plateColor": "#3a7d44",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "b46",
+   "kind": "basic",
+   "group": "door",
+   "koText": "좌측 통행",
+   "romanization": "jwacheuk tonghaeng",
+   "reading": {},
+   "meaning": {
+    "en": "Keep left"
+   },
+   "note": {
+    "en": "On some stairs and corridors. 좌 is left."
+   },
+   "pictogram": null,
+   "plateColor": "#3a7d44",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "b47",
+   "kind": "basic",
+   "group": "door",
+   "koText": "우측 통행",
+   "romanization": "ucheuk tonghaeng",
+   "reading": {},
+   "meaning": {
+    "en": "Keep right"
+   },
+   "note": {
+    "en": "The usual rule in stations. 우 is right."
+   },
+   "pictogram": null,
+   "plateColor": "#3a7d44",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "b48",
+   "kind": "basic",
+   "group": "door",
+   "koText": "직진",
+   "romanization": "jikjin",
+   "reading": {},
+   "meaning": {
+    "en": "Go straight"
+   },
+   "note": {
+    "en": "On arrows in stations and malls."
+   },
+   "pictogram": null,
+   "plateColor": "#3a7d44",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "b49",
+   "kind": "basic",
+   "group": "door",
+   "koText": "우회",
+   "romanization": "uhoe",
+   "reading": {},
+   "meaning": {
+    "en": "Detour"
+   },
+   "note": {
+    "en": "The usual way is blocked. Follow the arrow around."
+   },
+   "pictogram": null,
+   "plateColor": "#3a7d44",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "b50",
+   "kind": "basic",
+   "group": "door",
+   "koText": "회전문",
+   "romanization": "hoejeonmun",
+   "reading": {},
+   "meaning": {
+    "en": "Revolving door"
+   },
+   "note": {
+    "en": "Hotels and department stores. A side door is usually next to it."
+   },
+   "pictogram": null,
+   "plateColor": "#3a7d44",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "b51",
+   "kind": "basic",
+   "group": "door",
+   "koText": "비상계단",
+   "romanization": "bisang gyedan",
+   "reading": {},
+   "meaning": {
+    "en": "Emergency stairs"
+   },
+   "note": {
+    "en": "비상 means emergency, the same word as in 비상구."
+   },
+   "pictogram": "stairs",
+   "plateColor": "#3a7d44",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "b52",
+   "kind": "basic",
+   "group": "door",
+   "koText": "옥상",
+   "romanization": "oksang",
+   "reading": {},
+   "meaning": {
+    "en": "Rooftop"
+   },
+   "note": {
+    "en": "On lift buttons and stairwell signs. Some rooftops are cafés or gardens."
+   },
+   "pictogram": null,
+   "plateColor": "#3a7d44",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "b53",
+   "kind": "basic",
+   "group": "door",
+   "koText": "지하 1층",
+   "romanization": "jiha il-cheung",
+   "reading": {},
+   "meaning": {
+    "en": "Basement level 1"
+   },
+   "note": {
+    "en": "층 means floor. Lifts show it as B1."
+   },
+   "pictogram": null,
+   "plateColor": "#3a7d44",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "b54",
+   "kind": "basic",
+   "group": "door",
+   "koText": "문 닫아 주세요",
+   "romanization": "mun dada juseyo",
+   "reading": {},
+   "meaning": {
+    "en": "Please close the door"
+   },
+   "note": {
+    "en": "On doors that let the heating or cooling out."
+   },
+   "pictogram": null,
+   "plateColor": "#3a7d44",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "b55",
+   "kind": "basic",
+   "group": "door",
+   "koText": "안내",
+   "romanization": "annae",
+   "reading": {},
+   "meaning": {
+    "en": "Information"
+   },
+   "note": {
+    "en": "A desk or board where you can ask the way."
+   },
+   "pictogram": null,
+   "plateColor": "#3a7d44",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "b56",
+   "kind": "basic",
+   "group": "hours",
+   "koText": "영업시간",
+   "romanization": "yeongeop sigan",
+   "reading": {},
+   "meaning": {
+    "en": "Business hours"
+   },
+   "note": {
+    "en": "Followed by the times, for example 11:00~21:00."
+   },
+   "pictogram": null,
+   "plateColor": "#b9772a",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "b57",
+   "kind": "basic",
+   "group": "hours",
+   "koText": "브레이크 타임",
+   "romanization": "beureikeu taim",
+   "reading": {},
+   "meaning": {
+    "en": "Break time"
+   },
+   "note": {
+    "en": "Many restaurants close between lunch and dinner, often 15:00~17:00."
+   },
+   "pictogram": null,
+   "plateColor": "#b9772a",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "b58",
+   "kind": "basic",
+   "group": "hours",
+   "koText": "정기 휴무",
+   "romanization": "jeonggi hyumu",
+   "reading": {},
+   "meaning": {
+    "en": "Regular closing day"
+   },
+   "note": {
+    "en": "매주 월요일 정기 휴무 means closed every Monday."
+   },
+   "pictogram": null,
+   "plateColor": "#b9772a",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "b59",
+   "kind": "basic",
+   "group": "hours",
+   "koText": "연중무휴",
+   "romanization": "yeonjung muhyu",
+   "reading": {},
+   "meaning": {
+    "en": "Open every day of the year"
+   },
+   "note": {
+    "en": "No day off at all."
+   },
+   "pictogram": null,
+   "plateColor": "#b9772a",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "b60",
+   "kind": "basic",
+   "group": "hours",
+   "koText": "오픈",
+   "romanization": "opeun",
+   "reading": {},
+   "meaning": {
+    "en": "Open"
+   },
+   "note": {
+    "en": "A loanword used on new shops, often with a date: 10월 오픈."
+   },
+   "pictogram": null,
+   "plateColor": "#b9772a",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "b61",
+   "kind": "basic",
+   "group": "hours",
+   "koText": "마감",
+   "romanization": "magam",
+   "reading": {},
+   "meaning": {
+    "en": "Closing / last entry"
+   },
+   "note": {
+    "en": "입장 마감 means last admission."
+   },
+   "pictogram": null,
+   "plateColor": "#b9772a",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "b62",
+   "kind": "basic",
+   "group": "hours",
+   "koText": "라스트 오더",
+   "romanization": "raseuteu odeo",
+   "reading": {},
+   "meaning": {
+    "en": "Last order"
+   },
+   "note": {
+    "en": "The kitchen stops taking orders after this time."
+   },
+   "pictogram": null,
+   "plateColor": "#b9772a",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "b63",
+   "kind": "basic",
+   "group": "hours",
+   "koText": "점심시간",
+   "romanization": "jeomsim sigan",
+   "reading": {},
+   "meaning": {
+    "en": "Lunch break"
+   },
+   "note": {
+    "en": "Banks, post offices and clinics may pause service."
+   },
+   "pictogram": null,
+   "plateColor": "#b9772a",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "b64",
+   "kind": "basic",
+   "group": "hours",
+   "koText": "매진",
+   "romanization": "maejin",
+   "reading": {},
+   "meaning": {
+    "en": "Sold out"
+   },
+   "note": {
+    "en": "On ticket windows and food stalls."
+   },
+   "pictogram": null,
+   "plateColor": "#b9772a",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "b65",
+   "kind": "basic",
+   "group": "hours",
+   "koText": "임시 휴업",
+   "romanization": "imsi hyueop",
+   "reading": {},
+   "meaning": {
+    "en": "Temporarily closed"
+   },
+   "note": {
+    "en": "The shop is closed for a while, not for good."
+   },
+   "pictogram": null,
+   "plateColor": "#b9772a",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "b66",
+   "kind": "basic",
+   "group": "hours",
+   "koText": "평일",
+   "romanization": "pyeongil",
+   "reading": {},
+   "meaning": {
+    "en": "Weekdays"
+   },
+   "note": {
+    "en": "Opposite of 주말 (weekend). Hours often differ between them."
+   },
+   "pictogram": null,
+   "plateColor": "#b9772a",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "b67",
+   "kind": "basic",
+   "group": "warning",
+   "koText": "위험",
+   "romanization": "wiheom",
+   "reading": {},
+   "meaning": {
+    "en": "Danger"
+   },
+   "note": {
+    "en": "Usually on a red or yellow sign. Stay back."
+   },
+   "pictogram": null,
+   "plateColor": "#c0392b",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "b68",
+   "kind": "basic",
+   "group": "warning",
+   "koText": "주차 금지",
+   "romanization": "jucha geumji",
+   "reading": {},
+   "meaning": {
+    "en": "No parking"
+   },
+   "note": {
+    "en": "금지 again — anything followed by it is forbidden."
+   },
+   "pictogram": null,
+   "plateColor": "#c0392b",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "b69",
+   "kind": "basic",
+   "group": "warning",
+   "koText": "음식물 반입 금지",
+   "romanization": "eumsingmul banip geumji",
+   "reading": {},
+   "meaning": {
+    "en": "No food or drink inside"
+   },
+   "note": {
+    "en": "반입 means bringing in. Common at museums and theatres."
+   },
+   "pictogram": null,
+   "plateColor": "#c0392b",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "b70",
+   "kind": "basic",
+   "group": "warning",
+   "koText": "손대지 마세요",
+   "romanization": "sondaeji maseyo",
+   "reading": {},
+   "meaning": {
+    "en": "Do not touch"
+   },
+   "note": {
+    "en": "On exhibits and shop displays."
+   },
+   "pictogram": null,
+   "plateColor": "#c0392b",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "b71",
+   "kind": "basic",
+   "group": "warning",
+   "koText": "발밑 조심",
+   "romanization": "balmit josim",
+   "reading": {},
+   "meaning": {
+    "en": "Watch your step"
+   },
+   "note": {
+    "en": "발밑 is under your feet. Gaps, steps and uneven floors."
+   },
+   "pictogram": null,
+   "plateColor": "#c0392b",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "b72",
+   "kind": "basic",
+   "group": "warning",
+   "koText": "공사중",
+   "romanization": "gongsajung",
+   "reading": {},
+   "meaning": {
+    "en": "Under construction"
+   },
+   "note": {
+    "en": "Expect detours or closed exits."
+   },
+   "pictogram": null,
+   "plateColor": "#c0392b",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "b73",
+   "kind": "basic",
+   "group": "warning",
+   "koText": "반려동물 동반 금지",
+   "romanization": "ballyeodongmul dongban geumji",
+   "reading": {},
+   "meaning": {
+    "en": "No pets"
+   },
+   "note": {
+    "en": "반려동물 is a companion animal."
+   },
+   "pictogram": null,
+   "plateColor": "#c0392b",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "b74",
+   "kind": "basic",
+   "group": "warning",
+   "koText": "소화기",
+   "romanization": "sohwagi",
+   "reading": {},
+   "meaning": {
+    "en": "Fire extinguisher"
+   },
+   "note": {
+    "en": "Red cabinets in stations and corridors."
+   },
+   "pictogram": null,
+   "plateColor": "#c0392b",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "b75",
+   "kind": "basic",
+   "group": "warning",
+   "koText": "고장",
+   "romanization": "gojang",
+   "reading": {},
+   "meaning": {
+    "en": "Out of order"
+   },
+   "note": {
+    "en": "On lifts, ticket machines and vending machines."
+   },
+   "pictogram": null,
+   "plateColor": "#c0392b",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "b76",
+   "kind": "basic",
+   "group": "warning",
+   "koText": "화기 엄금",
+   "romanization": "hwagi eomgeum",
+   "reading": {},
+   "meaning": {
+    "en": "No open flames"
+   },
+   "note": {
+    "en": "A stronger form of no fire, near fuel or gas."
+   },
+   "pictogram": null,
+   "plateColor": "#c0392b",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "b77",
+   "kind": "basic",
+   "group": "transit",
+   "koText": "에스컬레이터",
+   "romanization": "eseukeolleiteo",
+   "reading": {},
+   "meaning": {
+    "en": "Escalator"
+   },
+   "note": {
+    "en": "A loanword. Stand still or walk carefully."
+   },
+   "pictogram": "escalator",
+   "plateColor": "#1f6f78",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "b78",
+   "kind": "basic",
+   "group": "transit",
+   "koText": "택시 타는 곳",
+   "romanization": "taeksi taneun got",
+   "reading": {},
+   "meaning": {
+    "en": "Taxi stand"
+   },
+   "note": {
+    "en": "타는 곳 means where you board."
+   },
+   "pictogram": null,
+   "plateColor": "#1f6f78",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "b79",
+   "kind": "basic",
+   "group": "transit",
+   "koText": "내리는 문",
+   "romanization": "naerineun mun",
+   "reading": {},
+   "meaning": {
+    "en": "Exit doors (this side)"
+   },
+   "note": {
+    "en": "The subway screen shows which side the doors will open."
+   },
+   "pictogram": null,
+   "plateColor": "#1f6f78",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "b80",
+   "kind": "basic",
+   "group": "transit",
+   "koText": "노약자석",
+   "romanization": "noyakjaseok",
+   "reading": {},
+   "meaning": {
+    "en": "Priority seating"
+   },
+   "note": {
+    "en": "For older people, pregnant women and people with disabilities."
+   },
+   "pictogram": null,
+   "plateColor": "#1f6f78",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "b81",
+   "kind": "basic",
+   "group": "transit",
+   "koText": "임산부 배려석",
+   "romanization": "imsanbu baeryeoseok",
+   "reading": {},
+   "meaning": {
+    "en": "Seat for pregnant women"
+   },
+   "note": {
+    "en": "Pink seats on Seoul subways. Leave them empty."
+   },
+   "pictogram": null,
+   "plateColor": "#1f6f78",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "b82",
+   "kind": "basic",
+   "group": "transit",
+   "koText": "첫차",
+   "romanization": "cheotcha",
+   "reading": {},
+   "meaning": {
+    "en": "First train / bus"
+   },
+   "note": {
+    "en": "차 means vehicle."
+   },
+   "pictogram": null,
+   "plateColor": "#1f6f78",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "b83",
+   "kind": "basic",
+   "group": "transit",
+   "koText": "막차",
+   "romanization": "makcha",
+   "reading": {},
+   "meaning": {
+    "en": "Last train / bus"
+   },
+   "note": {
+    "en": "Check it before a late night out."
+   },
+   "pictogram": null,
+   "plateColor": "#1f6f78",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "b84",
+   "kind": "basic",
+   "group": "transit",
+   "koText": "급행",
+   "romanization": "geupaeng",
+   "reading": {},
+   "meaning": {
+    "en": "Express"
+   },
+   "note": {
+    "en": "Stops at fewer stations. Some lines run both."
+   },
+   "pictogram": null,
+   "plateColor": "#1f6f78",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "b85",
+   "kind": "basic",
+   "group": "transit",
+   "koText": "종점",
+   "romanization": "jongjeom",
+   "reading": {},
+   "meaning": {
+    "en": "Last stop"
+   },
+   "note": {
+    "en": "Everyone gets off here."
+   },
+   "pictogram": null,
+   "plateColor": "#1f6f78",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "b86",
+   "kind": "basic",
+   "group": "transit",
+   "koText": "방면",
+   "romanization": "bangmyeon",
+   "reading": {},
+   "meaning": {
+    "en": "Bound for"
+   },
+   "note": {
+    "en": "시청 방면 means toward City Hall. Pick the platform by it."
+   },
+   "pictogram": null,
+   "plateColor": "#1f6f78",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "b87",
+   "kind": "basic",
+   "group": "transit",
+   "koText": "횡단보도",
+   "romanization": "hoengdan bodo",
+   "reading": {},
+   "meaning": {
+    "en": "Pedestrian crossing"
+   },
+   "note": {
+    "en": "Painted stripes on the road."
+   },
+   "pictogram": null,
+   "plateColor": "#1f6f78",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "b88",
+   "kind": "basic",
+   "group": "transit",
+   "koText": "주차장",
+   "romanization": "juchajang",
+   "reading": {},
+   "meaning": {
+    "en": "Car park"
+   },
+   "note": {
+    "en": "장 at the end means place."
+   },
+   "pictogram": null,
+   "plateColor": "#1f6f78",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "b89",
+   "kind": "basic",
+   "group": "transit",
+   "koText": "공항",
+   "romanization": "gonghang",
+   "reading": {},
+   "meaning": {
+    "en": "Airport"
+   },
+   "note": {
+    "en": "On airport railroad and bus signs."
+   },
+   "pictogram": null,
+   "plateColor": "#1f6f78",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "b90",
+   "kind": "basic",
+   "group": "transit",
+   "koText": "하차",
+   "romanization": "hacha",
+   "reading": {},
+   "meaning": {
+    "en": "Get off"
+   },
+   "note": {
+    "en": "Bus card readers at the back door say 하차. Tap again when you get off."
+   },
+   "pictogram": null,
+   "plateColor": "#1f6f78",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "b91",
+   "kind": "basic",
+   "group": "service",
+   "koText": "무료",
+   "romanization": "muryo",
+   "reading": {},
+   "meaning": {
+    "en": "Free of charge"
+   },
+   "note": {
+    "en": "무 means without. 무료 입장 is free entry."
+   },
+   "pictogram": null,
+   "plateColor": "#5b4b8a",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "b92",
+   "kind": "basic",
+   "group": "service",
+   "koText": "셀프",
+   "romanization": "selpeu",
+   "reading": {},
+   "meaning": {
+    "en": "Self-service"
+   },
+   "note": {
+    "en": "Water, side dishes or returning trays are up to you."
+   },
+   "pictogram": null,
+   "plateColor": "#5b4b8a",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "b93",
+   "kind": "basic",
+   "group": "service",
+   "koText": "계산대",
+   "romanization": "gyesandae",
+   "reading": {},
+   "meaning": {
+    "en": "Checkout"
+   },
+   "note": {
+    "en": "Where you pay. 계산 means paying the bill."
+   },
+   "pictogram": null,
+   "plateColor": "#5b4b8a",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "b94",
+   "kind": "basic",
+   "group": "service",
+   "koText": "영수증",
+   "romanization": "yeongsujeung",
+   "reading": {},
+   "meaning": {
+    "en": "Receipt"
+   },
+   "note": {
+    "en": "Machines ask if you want one printed."
+   },
+   "pictogram": null,
+   "plateColor": "#5b4b8a",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "b95",
+   "kind": "basic",
+   "group": "service",
+   "koText": "휴대폰 충전",
+   "romanization": "hyudaepon chungjeon",
+   "reading": {},
+   "meaning": {
+    "en": "Phone charging"
+   },
+   "note": {
+    "en": "Charging stations in cafés, stations and malls."
+   },
+   "pictogram": null,
+   "plateColor": "#5b4b8a",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "b96",
+   "kind": "basic",
+   "group": "service",
+   "koText": "빨래방",
+   "romanization": "ppallaebang",
+   "reading": {},
+   "meaning": {
+    "en": "Laundromat"
+   },
+   "note": {
+    "en": "Coin-operated, often open 24 hours."
+   },
+   "pictogram": null,
+   "plateColor": "#5b4b8a",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "b97",
+   "kind": "basic",
+   "group": "service",
+   "koText": "미용실",
+   "romanization": "miyongsil",
+   "reading": {},
+   "meaning": {
+    "en": "Hair salon"
+   },
+   "note": {
+    "en": "You will see one on almost every block."
+   },
+   "pictogram": null,
+   "plateColor": "#5b4b8a",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "b98",
+   "kind": "basic",
+   "group": "service",
+   "koText": "경찰서",
+   "romanization": "gyeongchalseo",
+   "reading": {},
+   "meaning": {
+    "en": "Police station"
+   },
+   "note": {
+    "en": "Smaller local posts are called 파출소 or 지구대."
+   },
+   "pictogram": null,
+   "plateColor": "#5b4b8a",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "b99",
+   "kind": "basic",
+   "group": "service",
+   "koText": "관광안내소",
+   "romanization": "gwangwang annaeso",
+   "reading": {},
+   "meaning": {
+    "en": "Tourist information"
+   },
+   "note": {
+    "en": "Maps and help in English. Look for the i sign."
+   },
+   "pictogram": null,
+   "plateColor": "#5b4b8a",
+   "audio": null,
+   "reviewed": true
+  },
+  {
+   "id": "b100",
+   "kind": "basic",
+   "group": "service",
+   "koText": "분리수거",
+   "romanization": "bullisugeo",
+   "reading": {},
+   "meaning": {
+    "en": "Recycling"
+   },
+   "note": {
+    "en": "Bins are split by type: 일반 (general), 플라스틱, 캔, 종이."
+   },
+   "pictogram": null,
+   "plateColor": "#5b4b8a",
+   "audio": null,
+   "reviewed": true
+  }
+ ],
+ "places": [
+  {
+   "id": "gyeongbokgung",
+   "areaId": "gyeongbokgung",
+   "typeId": "palace",
+   "koName": "경복궁",
+   "name": {
+    "en": "Gyeongbokgung Palace"
+   },
+   "address": {
+    "en": "161 Sajik-ro, Jongno-gu, Seoul"
+   },
+   "lat": 37.5796,
+   "lng": 126.977,
+   "signWords": null,
+   "photo": {
+    "url": "asset://content/photos/gyeongbokgung.jpg",
+    "license": {
+     "type": "CC0"
+    },
+    "source": "Wikimedia Commons",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Gyeonghoeru_Pavilion_at_Gyeongbokgung_Palace.jpg"
+   },
+   "isExample": false
+  },
+  {
+   "id": "changdeokgung",
+   "areaId": "gyeongbokgung",
+   "typeId": "palace",
+   "koName": "창덕궁",
+   "name": {
+    "en": "Changdeokgung Palace"
+   },
+   "address": {
+    "en": "99 Yulgok-ro, Jongno-gu, Seoul"
+   },
+   "lat": 37.5794,
+   "lng": 126.991,
+   "signWords": null,
+   "photo": {
+    "url": "https://tong.visitkorea.or.kr/cms/resource/78/3384878_image2_1.JPG",
+    "license": {
+     "type": "KOGL_3"
+    },
+    "source": "한국관광공사",
+    "sourceUrl": "https://korean.visitkorea.or.kr/detail/ms_detail.do?cotid=1604953"
+   },
+   "isExample": false
+  },
+  {
+   "id": "jongmyo",
+   "areaId": "gyeongbokgung",
+   "typeId": "palace",
+   "koName": "종묘",
+   "name": {
+    "en": "Jongmyo Shrine"
+   },
+   "address": {
+    "en": "157 Jong-ro, Jongno-gu, Seoul"
+   },
+   "lat": 37.5745,
+   "lng": 126.994,
+   "signWords": null,
+   "photo": {
+    "url": "https://tong.visitkorea.or.kr/cms/resource_photo/57/4063057_image2_1.jpg",
+    "license": {
+     "type": "KOGL_1"
+    },
+    "source": "한국관광공사",
+    "sourceUrl": "https://korean.visitkorea.or.kr/detail/ms_detail.do?cotid=126510"
+   },
+   "isExample": false
+  },
+  {
+   "id": "folkmuseum",
+   "areaId": "gyeongbokgung",
+   "typeId": "museum",
+   "koName": "국립민속박물관",
+   "name": {
+    "en": "National Folk Museum of Korea"
+   },
+   "address": {
+    "en": "37 Samcheong-ro, Jongno-gu, Seoul"
+   },
+   "lat": 37.5814,
+   "lng": 126.9793,
+   "signWords": null,
+   "photo": {
+    "url": "https://tong.visitkorea.or.kr/cms/resource/93/3512693_image2_1.jpg",
+    "license": {
+     "type": "KOGL_3"
+    },
+    "source": "한국관광공사",
+    "sourceUrl": "https://korean.visitkorea.or.kr/detail/ms_detail.do?cotid=2608977"
+   },
+   "isExample": false
+  },
+  {
+   "id": "mmca",
+   "areaId": "gyeongbokgung",
+   "typeId": "museum",
+   "koName": "국립현대미술관 서울",
+   "name": {
+    "en": "MMCA Seoul"
+   },
+   "address": {
+    "en": "30 Samcheong-ro, Jongno-gu, Seoul"
+   },
+   "lat": 37.5785,
+   "lng": 126.98,
+   "signWords": null,
+   "photo": {
+    "url": "https://tong.visitkorea.or.kr/cms/resource/02/2991502_image2_1.jpg",
+    "license": {
+     "type": "KOGL_3"
+    },
+    "source": "한국관광공사",
+    "sourceUrl": "https://korean.visitkorea.or.kr/detail/ms_detail.do?cotid=1934593"
+   },
+   "isExample": false
+  },
+  {
+   "id": "bukchon",
+   "areaId": "gyeongbokgung",
+   "typeId": "hanok",
+   "koName": "북촌한옥마을",
+   "name": {
+    "en": "Bukchon Hanok Village"
+   },
+   "address": {
+    "en": "37 Gyedong-gil, Jongno-gu, Seoul"
+   },
+   "lat": 37.5826,
+   "lng": 126.983,
+   "signWords": null,
+   "photo": {
+    "url": "https://tong.visitkorea.or.kr/cms/resource/04/3304404_image2_1.jpg",
+    "license": {
+     "type": "KOGL_3"
+    },
+    "source": "한국관광공사",
+    "sourceUrl": "https://korean.visitkorea.or.kr/detail/ms_detail.do?cotid=126537"
+   },
+   "isExample": false
+  },
+  {
+   "id": "samcheong",
+   "areaId": "gyeongbokgung",
+   "typeId": "cafe",
+   "koName": "삼청동길",
+   "name": {
+    "en": "Samcheong-dong Street"
+   },
+   "address": {
+    "en": "Samcheong-dong, Jongno-gu, Seoul"
+   },
+   "lat": 37.584,
+   "lng": 126.982,
+   "signWords": null,
+   "photo": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/7/79/Seoul-Samcheong.dong-01.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled",
+    "license": {
+     "type": "CC_BY",
+     "version": "2.0",
+     "author": "alice park"
+    },
+    "source": "Wikimedia Commons",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Seoul-Samcheong.dong-01.jpg"
+   },
+   "isExample": false
+  },
+  {
+   "id": "tongin",
+   "areaId": "gyeongbokgung",
+   "typeId": "market",
+   "koName": "통인시장",
+   "name": {
+    "en": "Tongin Market"
+   },
+   "address": {
+    "en": "18 Jahamun-ro 15-gil, Jongno-gu, Seoul"
+   },
+   "lat": 37.58,
+   "lng": 126.97,
+   "signWords": null,
+   "photo": {
+    "url": "https://tong.visitkorea.or.kr/cms/resource/39/3300739_image2_1.jpg",
+    "license": {
+     "type": "KOGL_1"
+    },
+    "source": "한국관광공사",
+    "sourceUrl": "https://korean.visitkorea.or.kr/detail/ms_detail.do?cotid=1590323"
+   },
+   "isExample": false
+  },
+  {
+   "id": "insadong",
+   "areaId": "gyeongbokgung",
+   "typeId": "hanok",
+   "koName": "인사동",
+   "name": {
+    "en": "Insadong Street"
+   },
+   "address": {
+    "en": "Insadong-gil, Jongno-gu, Seoul"
+   },
+   "lat": 37.574,
+   "lng": 126.985,
+   "signWords": null,
+   "photo": {
+    "url": "https://tong.visitkorea.or.kr/cms/resource/03/3412103_image2_1.JPG",
+    "license": {
+     "type": "KOGL_3"
+    },
+    "source": "한국관광공사",
+    "sourceUrl": "https://korean.visitkorea.or.kr/detail/ms_detail.do?cotid=264353"
+   },
+   "isExample": false
+  },
+  {
+   "id": "gwanghwamun",
+   "areaId": "gyeongbokgung",
+   "typeId": "landmark",
+   "koName": "광화문광장",
+   "name": {
+    "en": "Gwanghwamun Square"
+   },
+   "address": {
+    "en": "172 Sejong-daero, Jongno-gu, Seoul"
+   },
+   "lat": 37.572,
+   "lng": 126.9769,
+   "signWords": null,
+   "photo": {
+    "url": "https://tong.visitkorea.or.kr/cms/resource/02/4080502_image2_1.jpg",
+    "license": {
+     "type": "KOGL_1"
+    },
+    "source": "한국관광공사",
+    "sourceUrl": "https://korean.visitkorea.or.kr/detail/ms_detail.do?cotid=775394"
+   },
+   "isExample": false
+  },
+  {
+   "id": "seochon-ph",
+   "areaId": "gyeongbokgung",
+   "typeId": "services",
+   "koName": "서촌 약국",
+   "name": {
+    "en": "Example pharmacy · Seochon"
+   },
+   "address": {
+    "en": "Example place near Gyeongbokgung"
+   },
+   "lat": 37.579,
+   "lng": 126.97,
+   "signWords": [
+    "약국"
+   ],
+   "photo": null,
+   "isExample": true
+  },
+  {
+   "id": "myeongdong-cathedral",
+   "areaId": "myeongdong",
+   "typeId": "landmark",
+   "koName": "명동성당",
+   "name": {
+    "en": "Myeongdong Cathedral"
+   },
+   "address": {
+    "en": "74 Myeongdong-gil, Jung-gu, Seoul"
+   },
+   "lat": 37.5633,
+   "lng": 126.9872,
+   "signWords": null,
+   "photo": {
+    "url": "asset://content/photos/myeongdong.jpg",
+    "license": {
+     "type": "CC_BY",
+     "version": "4.0",
+     "author": "Sean Young (@assanges)"
+    },
+    "source": "Wikimedia Commons",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Myeongdong_Cathedral_20240217.jpg"
+   },
+   "isExample": false
+  },
+  {
+   "id": "namdaemun",
+   "areaId": "myeongdong",
+   "typeId": "market",
+   "koName": "남대문시장",
+   "name": {
+    "en": "Namdaemun Market"
+   },
+   "address": {
+    "en": "21 Namdaemunsijang 4-gil, Jung-gu, Seoul"
+   },
+   "lat": 37.5591,
+   "lng": 126.9772,
+   "signWords": null,
+   "photo": {
+    "url": "https://tong.visitkorea.or.kr/cms/resource/67/2612867_image2_1.jpg",
+    "license": {
+     "type": "KOGL_3"
+    },
+    "source": "한국관광공사",
+    "sourceUrl": "https://korean.visitkorea.or.kr/detail/ms_detail.do?cotid=132180"
+   },
+   "isExample": false
+  },
+  {
+   "id": "shinsegae",
+   "areaId": "myeongdong",
+   "typeId": "shopping",
+   "koName": "신세계백화점 본점",
+   "name": {
+    "en": "Shinsegae Department Store Main"
+   },
+   "address": {
+    "en": "63 Sogong-ro, Jung-gu, Seoul"
+   },
+   "lat": 37.561,
+   "lng": 126.981,
+   "signWords": null,
+   "photo": {
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b9/%E6%96%B0%E4%B8%96%E7%95%8C%E7%99%BE%E8%B2%A8%E5%BA%97_-_panoramio.jpg/1280px-%E6%96%B0%E4%B8%96%E7%95%8C%E7%99%BE%E8%B2%A8%E5%BA%97_-_panoramio.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    "license": {
+     "type": "CC_BY",
+     "version": "3.0",
+     "author": "米田賢一"
+    },
+    "source": "Wikimedia Commons",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:%E6%96%B0%E4%B8%96%E7%95%8C%E7%99%BE%E8%B2%A8%E5%BA%97_-_panoramio.jpg"
+   },
+   "isExample": false
+  },
+  {
+   "id": "lotte-main",
+   "areaId": "myeongdong",
+   "typeId": "shopping",
+   "koName": "롯데백화점 본점",
+   "name": {
+    "en": "Lotte Department Store Main"
+   },
+   "address": {
+    "en": "81 Namdaemun-ro, Jung-gu, Seoul"
+   },
+   "lat": 37.565,
+   "lng": 126.982,
+   "signWords": null,
+   "photo": {
+    "url": "https://tong.visitkorea.or.kr/cms/resource/24/2997124_image2_1.jpg",
+    "license": {
+     "type": "KOGL_3"
+    },
+    "source": "한국관광공사",
+    "sourceUrl": "https://korean.visitkorea.or.kr/detail/ms_detail.do?cotid=132668"
+   },
+   "isExample": false
+  },
+  {
+   "id": "deoksugung",
+   "areaId": "myeongdong",
+   "typeId": "palace",
+   "koName": "덕수궁",
+   "name": {
+    "en": "Deoksugung Palace"
+   },
+   "address": {
+    "en": "99 Sejong-daero, Jung-gu, Seoul"
+   },
+   "lat": 37.5658,
+   "lng": 126.9751,
+   "signWords": null,
+   "photo": {
+    "url": "https://tong.visitkorea.or.kr/cms/resource/44/3584644_image2_1.jpg",
+    "license": {
+     "type": "KOGL_1"
+    },
+    "source": "한국관광공사",
+    "sourceUrl": "https://korean.visitkorea.or.kr/detail/ms_detail.do?cotid=126509"
+   },
+   "isExample": false
+  },
+  {
+   "id": "seoulstation",
+   "areaId": "myeongdong",
+   "typeId": "station",
+   "koName": "서울역",
+   "name": {
+    "en": "Seoul Station"
+   },
+   "address": {
+    "en": "405 Hangang-daero, Jung-gu, Seoul"
+   },
+   "lat": 37.5547,
+   "lng": 126.9707,
+   "signWords": null,
+   "photo": {
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f2/Seoul_Station_%28145738821%29.jpeg/1280px-Seoul_Station_%28145738821%29.jpeg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    "license": {
+     "type": "CC_BY",
+     "version": "3.0",
+     "author": "Dongil Kim"
+    },
+    "source": "Wikimedia Commons",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Seoul_Station_(145738821).jpeg"
+   },
+   "isExample": false
+  },
+  {
+   "id": "namsan-tower",
+   "areaId": "myeongdong",
+   "typeId": "tower",
+   "koName": "남산서울타워",
+   "name": {
+    "en": "N Seoul Tower"
+   },
+   "address": {
+    "en": "105 Namsangongwon-gil, Yongsan-gu, Seoul"
+   },
+   "lat": 37.5512,
+   "lng": 126.9882,
+   "signWords": null,
+   "photo": {
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/cc/N_Seoul_Tower_%2813952097192%29.jpg/1280px-N_Seoul_Tower_%2813952097192%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    "license": {
+     "type": "CC_BY",
+     "version": "2.0",
+     "author": "Eugene Lim from Hong Kong"
+    },
+    "source": "Wikimedia Commons",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:N_Seoul_Tower_(13952097192).jpg"
+   },
+   "isExample": false
+  },
+  {
+   "id": "myeongdong-bank",
+   "areaId": "myeongdong",
+   "typeId": "services",
+   "koName": "명동 환전소",
+   "name": {
+    "en": "Example exchange booth · Myeongdong"
+   },
+   "address": {
+    "en": "Example place in Myeongdong"
+   },
+   "lat": 37.564,
+   "lng": 126.986,
+   "signWords": [
+    "환전"
+   ],
+   "photo": null,
+   "isExample": true
+  },
+  {
+   "id": "myeongdong-food",
+   "areaId": "myeongdong",
+   "typeId": "street",
+   "koName": "명동 먹자골목",
+   "name": {
+    "en": "Myeongdong Street Food Alley"
+   },
+   "address": {
+    "en": "Myeongdong-gil, Jung-gu, Seoul"
+   },
+   "lat": 37.5636,
+   "lng": 126.985,
+   "signWords": null,
+   "photo": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/7/73/Seoul-Myeongdong-03.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled",
+    "license": {
+     "type": "CC_BY",
+     "version": "2.0",
+     "author": "by thelearnr"
+    },
+    "source": "Wikimedia Commons",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Seoul-Myeongdong-03.jpg"
+   },
+   "isExample": false
+  },
+  {
+   "id": "ddp",
+   "areaId": "ddp",
+   "typeId": "landmark",
+   "koName": "동대문디자인플라자",
+   "name": {
+    "en": "Dongdaemun Design Plaza"
+   },
+   "address": {
+    "en": "281 Eulji-ro, Jung-gu, Seoul"
+   },
+   "lat": 37.5669,
+   "lng": 127.0094,
+   "signWords": null,
+   "photo": {
+    "url": "asset://content/photos/ddp.jpg",
+    "license": {
+     "type": "CC0"
+    },
+    "source": "Wikimedia Commons",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:DongDaemun_Design_Plaza_(%EB%8F%99%EB%8C%80%EB%AC%B8%EB%94%94%EC%9E%90%EC%9D%B8%ED%94%8C%EB%9D%BC%EC%9E%90_(DDP)),_Seoul,_South_Korea_(Unsplash_aNSniQXO424).jpg"
+   },
+   "isExample": false
+  },
+  {
+   "id": "gwangjang",
+   "areaId": "ddp",
+   "typeId": "market",
+   "koName": "광장시장",
+   "name": {
+    "en": "Gwangjang Market"
+   },
+   "address": {
+    "en": "88 Changgyeonggung-ro, Jongno-gu, Seoul"
+   },
+   "lat": 37.5701,
+   "lng": 126.9996,
+   "signWords": null,
+   "photo": {
+    "url": "https://tong.visitkorea.or.kr/cms/resource/81/2668981_image2_1.jpg",
+    "license": {
+     "type": "KOGL_3"
+    },
+    "source": "한국관광공사",
+    "sourceUrl": "https://korean.visitkorea.or.kr/detail/ms_detail.do?cotid=132183"
+   },
+   "isExample": false
+  },
+  {
+   "id": "cheonggyecheon",
+   "areaId": "ddp",
+   "typeId": "park",
+   "koName": "청계천",
+   "name": {
+    "en": "Cheonggyecheon Stream"
+   },
+   "address": {
+    "en": "Cheonggyecheon-ro, Jung-gu, Seoul"
+   },
+   "lat": 37.5692,
+   "lng": 126.9784,
+   "signWords": null,
+   "photo": {
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/41/Seoul_%2853853383087%29.jpg/1280px-Seoul_%2853853383087%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    "license": {
+     "type": "CC_BY",
+     "version": "2.0",
+     "author": "David Lee from Redmond, WA, USA"
+    },
+    "source": "Wikimedia Commons",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Seoul_(53853383087).jpg"
+   },
+   "isExample": false
+  },
+  {
+   "id": "euljiro",
+   "areaId": "ddp",
+   "typeId": "street",
+   "koName": "을지로 인쇄골목",
+   "name": {
+    "en": "Euljiro Printing Alleys"
+   },
+   "address": {
+    "en": "Euljiro 3-ga, Jung-gu, Seoul"
+   },
+   "lat": 37.566,
+   "lng": 126.991,
+   "signWords": null,
+   "photo": null,
+   "isExample": false
+  },
+  {
+   "id": "ikseon",
+   "areaId": "ddp",
+   "typeId": "hanok",
+   "koName": "익선동",
+   "name": {
+    "en": "Ikseon-dong Hanok Street"
+   },
+   "address": {
+    "en": "Ikseon-dong, Jongno-gu, Seoul"
+   },
+   "lat": 37.574,
+   "lng": 126.99,
+   "signWords": null,
+   "photo": {
+    "url": "https://tong.visitkorea.or.kr/cms/resource/22/2947522_image2_1.jpg",
+    "license": {
+     "type": "KOGL_1"
+    },
+    "source": "한국관광공사",
+    "sourceUrl": "https://korean.visitkorea.or.kr/detail/ms_detail.do?cotid=2946228"
+   },
+   "isExample": false
+  },
+  {
+   "id": "changgyeonggung",
+   "areaId": "ddp",
+   "typeId": "palace",
+   "koName": "창경궁",
+   "name": {
+    "en": "Changgyeonggung Palace"
+   },
+   "address": {
+    "en": "185 Changgyeonggung-ro, Jongno-gu, Seoul"
+   },
+   "lat": 37.5783,
+   "lng": 126.995,
+   "signWords": null,
+   "photo": {
+    "url": "https://tong.visitkorea.or.kr/cms/resource/94/3536794_image2_1.jpg",
+    "license": {
+     "type": "KOGL_1"
+    },
+    "source": "한국관광공사",
+    "sourceUrl": "https://korean.visitkorea.or.kr/detail/ms_detail.do?cotid=126511"
+   },
+   "isExample": false
+  },
+  {
+   "id": "seoulmuseum",
+   "areaId": "ddp",
+   "typeId": "museum",
+   "koName": "서울역사박물관",
+   "name": {
+    "en": "Seoul Museum of History"
+   },
+   "address": {
+    "en": "55 Saemunan-ro, Jongno-gu, Seoul"
+   },
+   "lat": 37.5704,
+   "lng": 126.97,
+   "signWords": null,
+   "photo": {
+    "url": "https://tong.visitkorea.or.kr/cms/resource/87/2661487_image2_1.JPG",
+    "license": {
+     "type": "KOGL_3"
+    },
+    "source": "한국관광공사",
+    "sourceUrl": "https://korean.visitkorea.or.kr/detail/ms_detail.do?cotid=130361"
+   },
+   "isExample": false
+  },
+  {
+   "id": "seoulforest",
+   "areaId": "seongsu",
+   "typeId": "park",
+   "koName": "서울숲",
+   "name": {
+    "en": "Seoul Forest"
+   },
+   "address": {
+    "en": "273 Ttukseom-ro, Seongdong-gu, Seoul"
+   },
+   "lat": 37.5444,
+   "lng": 127.0374,
+   "signWords": null,
+   "photo": {
+    "url": "https://tong.visitkorea.or.kr/cms/resource_photo/99/3580599_image2_1.jpg",
+    "license": {
+     "type": "KOGL_1"
+    },
+    "source": "한국관광공사",
+    "sourceUrl": "https://korean.visitkorea.or.kr/detail/ms_detail.do?cotid=128611"
+   },
+   "isExample": false
+  },
+  {
+   "id": "seongsu-cafe",
+   "areaId": "seongsu",
+   "typeId": "cafe",
+   "koName": "성수동 카페거리",
+   "name": {
+    "en": "Seongsu Café Street"
+   },
+   "address": {
+    "en": "Seongsui-ro, Seongdong-gu, Seoul"
+   },
+   "lat": 37.5445,
+   "lng": 127.0557,
+   "signWords": null,
+   "photo": {
+    "url": "https://tong.visitkorea.or.kr/cms/resource/06/4095806_image2_1.jpg",
+    "license": {
+     "type": "KOGL_1"
+    },
+    "source": "한국관광공사",
+    "sourceUrl": "https://korean.visitkorea.or.kr/detail/ms_detail.do?cotid=2930901"
+   },
+   "isExample": false
+  },
+  {
+   "id": "seongsu-ph",
+   "areaId": "seongsu",
+   "typeId": "services",
+   "koName": "성수 병원",
+   "name": {
+    "en": "Example clinic · Seongsu"
+   },
+   "address": {
+    "en": "Example place near Seoul Forest"
+   },
+   "lat": 37.545,
+   "lng": 127.05,
+   "signWords": [
+    "병원"
+   ],
+   "photo": null,
+   "isExample": true
+  },
+  {
+   "id": "ttukseom",
+   "areaId": "seongsu",
+   "typeId": "station",
+   "koName": "뚝섬역",
+   "name": {
+    "en": "Ttukseom Station"
+   },
+   "address": {
+    "en": "Seongsui-ro, Seongdong-gu, Seoul"
+   },
+   "lat": 37.5471,
+   "lng": 127.0474,
+   "signWords": null,
+   "photo": {
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/04/20260501_%EB%9A%9D%EC%84%AC%EC%97%AD_%EC%97%AD%EB%AA%85%ED%8C%90.jpg/1280px-20260501_%EB%9A%9D%EC%84%AC%EC%97%AD_%EC%97%AD%EB%AA%85%ED%8C%90.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    "license": {
+     "type": "CC0"
+    },
+    "source": "Wikimedia Commons",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:20260501_%EB%9A%9D%EC%84%AC%EC%97%AD_%EC%97%AD%EB%AA%85%ED%8C%90.jpg"
+   },
+   "isExample": false
+  },
+  {
+   "id": "hongdae-station",
+   "areaId": "hongdae",
+   "typeId": "station",
+   "koName": "홍대입구역",
+   "name": {
+    "en": "Hongik Univ. Station"
+   },
+   "address": {
+    "en": "Yanghwa-ro, Mapo-gu, Seoul"
+   },
+   "lat": 37.5572,
+   "lng": 126.9254,
+   "signWords": null,
+   "photo": {
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/ac/20250510_%ED%99%8D%EB%8C%80%EC%9E%85%EA%B5%AC%EC%97%AD_3%EB%B2%88%EC%B6%9C%EA%B5%AC.jpg/1280px-20250510_%ED%99%8D%EB%8C%80%EC%9E%85%EA%B5%AC%EC%97%AD_3%EB%B2%88%EC%B6%9C%EA%B5%AC.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    "license": {
+     "type": "CC0"
+    },
+    "source": "Wikimedia Commons",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:20250510_%ED%99%8D%EB%8C%80%EC%9E%85%EA%B5%AC%EC%97%AD_3%EB%B2%88%EC%B6%9C%EA%B5%AC.jpg"
+   },
+   "isExample": false
+  },
+  {
+   "id": "yeonnam",
+   "areaId": "hongdae",
+   "typeId": "cafe",
+   "koName": "연남동 카페거리",
+   "name": {
+    "en": "Yeonnam-dong Café Street"
+   },
+   "address": {
+    "en": "Yeonnam-dong, Mapo-gu, Seoul"
+   },
+   "lat": 37.56,
+   "lng": 126.925,
+   "signWords": null,
+   "photo": null,
+   "isExample": false
+  },
+  {
+   "id": "gyeongui-park",
+   "areaId": "hongdae",
+   "typeId": "park",
+   "koName": "경의선숲길",
+   "name": {
+    "en": "Gyeongui Line Forest Park"
+   },
+   "address": {
+    "en": "Yeonnam-dong, Mapo-gu, Seoul"
+   },
+   "lat": 37.561,
+   "lng": 126.927,
+   "signWords": null,
+   "photo": {
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5c/20250510_%EA%B2%BD%EC%9D%98%EC%84%A0%EC%88%B2%EA%B8%B8_1.jpg/1280px-20250510_%EA%B2%BD%EC%9D%98%EC%84%A0%EC%88%B2%EA%B8%B8_1.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    "license": {
+     "type": "CC0"
+    },
+    "source": "Wikimedia Commons",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:20250510_%EA%B2%BD%EC%9D%98%EC%84%A0%EC%88%B2%EA%B8%B8_1.jpg"
+   },
+   "isExample": false
+  },
+  {
+   "id": "mangwon",
+   "areaId": "hongdae",
+   "typeId": "market",
+   "koName": "망원시장",
+   "name": {
+    "en": "Mangwon Market"
+   },
+   "address": {
+    "en": "14 Poeun-ro 8-gil, Mapo-gu, Seoul"
+   },
+   "lat": 37.556,
+   "lng": 126.905,
+   "signWords": null,
+   "photo": {
+    "url": "https://tong.visitkorea.or.kr/cms/resource/10/3509910_image2_1.jpg",
+    "license": {
+     "type": "KOGL_1"
+    },
+    "source": "한국관광공사",
+    "sourceUrl": "https://korean.visitkorea.or.kr/detail/ms_detail.do?cotid=2499807"
+   },
+   "isExample": false
+  },
+  {
+   "id": "hongdae-street",
+   "areaId": "hongdae",
+   "typeId": "street",
+   "koName": "홍대 걷고싶은거리",
+   "name": {
+    "en": "Hongdae Walking Street"
+   },
+   "address": {
+    "en": "Eoulmadang-ro, Mapo-gu, Seoul"
+   },
+   "lat": 37.554,
+   "lng": 126.923,
+   "signWords": null,
+   "photo": {
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5e/Hongdae%2C_Seoul-_Part_II_-_Hongdae2237.jpg/1280px-Hongdae%2C_Seoul-_Part_II_-_Hongdae2237.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    "license": {
+     "type": "CC0"
+    },
+    "source": "Wikimedia Commons",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Hongdae,_Seoul-_Part_II_-_Hongdae2237.jpg"
+   },
+   "isExample": false
+  },
+  {
+   "id": "nmk",
+   "areaId": "yongsan",
+   "typeId": "museum",
+   "koName": "국립중앙박물관",
+   "name": {
+    "en": "National Museum of Korea"
+   },
+   "address": {
+    "en": "137 Seobinggo-ro, Yongsan-gu, Seoul"
+   },
+   "lat": 37.524,
+   "lng": 126.9803,
+   "signWords": null,
+   "photo": {
+    "url": "https://tong.visitkorea.or.kr/cms/resource/12/3495012_image2_1.jpg",
+    "license": {
+     "type": "KOGL_1"
+    },
+    "source": "한국관광공사",
+    "sourceUrl": "https://korean.visitkorea.or.kr/detail/ms_detail.do?cotid=129703"
+   },
+   "isExample": false
+  },
+  {
+   "id": "warmemorial",
+   "areaId": "yongsan",
+   "typeId": "museum",
+   "koName": "전쟁기념관",
+   "name": {
+    "en": "War Memorial of Korea"
+   },
+   "address": {
+    "en": "29 Itaewon-ro, Yongsan-gu, Seoul"
+   },
+   "lat": 37.5365,
+   "lng": 126.977,
+   "signWords": null,
+   "photo": {
+    "url": "https://tong.visitkorea.or.kr/cms/resource/29/3465929_image2_1.JPG",
+    "license": {
+     "type": "KOGL_3"
+    },
+    "source": "한국관광공사",
+    "sourceUrl": "https://korean.visitkorea.or.kr/detail/ms_detail.do?cotid=130431"
+   },
+   "isExample": false
+  },
+  {
+   "id": "itaewon",
+   "areaId": "yongsan",
+   "typeId": "street",
+   "koName": "이태원 거리",
+   "name": {
+    "en": "Itaewon Street"
+   },
+   "address": {
+    "en": "Itaewon-ro, Yongsan-gu, Seoul"
+   },
+   "lat": 37.5345,
+   "lng": 126.9946,
+   "signWords": null,
+   "photo": {
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/31/Itaewon_Street_%28230036983%29.jpeg/1280px-Itaewon_Street_%28230036983%29.jpeg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    "license": {
+     "type": "CC_BY",
+     "version": "3.0",
+     "author": "Jongsu Pyeon"
+    },
+    "source": "Wikimedia Commons",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Itaewon_Street_(230036983).jpeg"
+   },
+   "isExample": false
+  },
+  {
+   "id": "namsan-park",
+   "areaId": "yongsan",
+   "typeId": "park",
+   "koName": "남산공원",
+   "name": {
+    "en": "Namsan Park"
+   },
+   "address": {
+    "en": "Samil-daero, Jung-gu, Seoul"
+   },
+   "lat": 37.5512,
+   "lng": 126.991,
+   "signWords": null,
+   "photo": {
+    "url": "https://tong.visitkorea.or.kr/cms/resource/56/3539656_image2_1.jpg",
+    "license": {
+     "type": "KOGL_1"
+    },
+    "source": "한국관광공사",
+    "sourceUrl": "https://korean.visitkorea.or.kr/detail/ms_detail.do?cotid=126485"
+   },
+   "isExample": false
+  },
+  {
+   "id": "itaewon-bank",
+   "areaId": "yongsan",
+   "typeId": "services",
+   "koName": "이태원 은행",
+   "name": {
+    "en": "Example bank branch · Itaewon"
+   },
+   "address": {
+    "en": "Example place in Itaewon"
+   },
+   "lat": 37.534,
+   "lng": 126.995,
+   "signWords": [
+    "은행",
+    "환전"
+   ],
+   "photo": null,
+   "isExample": true
+  },
+  {
+   "id": "yeouido-park",
+   "areaId": "yeouido",
+   "typeId": "park",
+   "koName": "여의도한강공원",
+   "name": {
+    "en": "Yeouido Hangang Park"
+   },
+   "address": {
+    "en": "330 Yeouidong-ro, Yeongdeungpo-gu, Seoul"
+   },
+   "lat": 37.5285,
+   "lng": 126.934,
+   "signWords": null,
+   "photo": {
+    "url": "https://tong.visitkorea.or.kr/cms/resource/89/3544389_image2_1.jpg",
+    "license": {
+     "type": "KOGL_1"
+    },
+    "source": "한국관광공사",
+    "sourceUrl": "https://korean.visitkorea.or.kr/detail/ms_detail.do?cotid=1059479"
+   },
+   "isExample": false
+  },
+  {
+   "id": "thehyundai",
+   "areaId": "yeouido",
+   "typeId": "shopping",
+   "koName": "더현대 서울",
+   "name": {
+    "en": "The Hyundai Seoul"
+   },
+   "address": {
+    "en": "108 Yeoui-daero, Yeongdeungpo-gu, Seoul"
+   },
+   "lat": 37.5259,
+   "lng": 126.9285,
+   "signWords": null,
+   "photo": {
+    "url": "https://tong.visitkorea.or.kr/cms/resource/71/4097071_image2_1.png",
+    "license": {
+     "type": "KOGL_3"
+    },
+    "source": "한국관광공사",
+    "sourceUrl": "https://korean.visitkorea.or.kr/detail/ms_detail.do?cotid=2708109"
+   },
+   "isExample": false
+  },
+  {
+   "id": "yeouinaru",
+   "areaId": "yeouido",
+   "typeId": "station",
+   "koName": "여의나루역",
+   "name": {
+    "en": "Yeouinaru Station"
+   },
+   "address": {
+    "en": "Yeouidong-ro, Yeongdeungpo-gu, Seoul"
+   },
+   "lat": 37.527,
+   "lng": 126.9325,
+   "signWords": null,
+   "photo": {
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/13/20250727_%EC%97%AC%EC%9D%98%EB%82%98%EB%A3%A8%EC%97%AD_1%EB%B2%88%EC%B6%9C%EA%B5%AC.jpg/1280px-20250727_%EC%97%AC%EC%9D%98%EB%82%98%EB%A3%A8%EC%97%AD_1%EB%B2%88%EC%B6%9C%EA%B5%AC.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    "license": {
+     "type": "CC0"
+    },
+    "source": "Wikimedia Commons",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:20250727_%EC%97%AC%EC%9D%98%EB%82%98%EB%A3%A8%EC%97%AD_1%EB%B2%88%EC%B6%9C%EA%B5%AC.jpg"
+   },
+   "isExample": false
+  },
+  {
+   "id": "coex",
+   "areaId": "gangnam",
+   "typeId": "shopping",
+   "koName": "코엑스몰",
+   "name": {
+    "en": "COEX Mall"
+   },
+   "address": {
+    "en": "513 Yeongdong-daero, Gangnam-gu, Seoul"
+   },
+   "lat": 37.5126,
+   "lng": 127.0589,
+   "signWords": null,
+   "photo": {
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/fe/Starfield_Library_COEX_20240218.jpg/1280px-Starfield_Library_COEX_20240218.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    "license": {
+     "type": "CC_BY",
+     "version": "4.0",
+     "author": "Sean Young (@assanges)"
+    },
+    "source": "Wikimedia Commons",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Starfield_Library_COEX_20240218.jpg"
+   },
+   "isExample": false
+  },
+  {
+   "id": "lotteworldtower",
+   "areaId": "gangnam",
+   "typeId": "tower",
+   "koName": "롯데월드타워",
+   "name": {
+    "en": "Lotte World Tower"
+   },
+   "address": {
+    "en": "300 Olympic-ro, Songpa-gu, Seoul"
+   },
+   "lat": 37.5125,
+   "lng": 127.1025,
+   "signWords": null,
+   "photo": {
+    "url": "https://tong.visitkorea.or.kr/cms/resource/66/3092766_image2_1.jpg",
+    "license": {
+     "type": "KOGL_1"
+    },
+    "source": "한국관광공사",
+    "sourceUrl": "https://korean.visitkorea.or.kr/detail/ms_detail.do?cotid=2492348"
+   },
+   "isExample": false
+  },
+  {
+   "id": "olympicpark",
+   "areaId": "gangnam",
+   "typeId": "park",
+   "koName": "올림픽공원",
+   "name": {
+    "en": "Olympic Park"
+   },
+   "address": {
+    "en": "424 Olympic-ro, Songpa-gu, Seoul"
+   },
+   "lat": 37.5202,
+   "lng": 127.1216,
+   "signWords": null,
+   "photo": {
+    "url": "https://tong.visitkorea.or.kr/cms/resource/59/3527359_image2_1.jpg",
+    "license": {
+     "type": "KOGL_1"
+    },
+    "source": "한국관광공사",
+    "sourceUrl": "https://korean.visitkorea.or.kr/detail/ms_detail.do?cotid=126532"
+   },
+   "isExample": false
+  },
+  {
+   "id": "gangnam-station",
+   "areaId": "gangnam",
+   "typeId": "station",
+   "koName": "강남역",
+   "name": {
+    "en": "Gangnam Station"
+   },
+   "address": {
+    "en": "Gangnam-daero, Gangnam-gu, Seoul"
+   },
+   "lat": 37.4979,
+   "lng": 127.0276,
+   "signWords": null,
+   "photo": {
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e0/Gangnam_Station_sign.jpg/1280px-Gangnam_Station_sign.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    "license": {
+     "type": "CC0"
+    },
+    "source": "Wikimedia Commons",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Gangnam_Station_sign.jpg"
+   },
+   "isExample": false
+  },
+  {
+   "id": "garosugil",
+   "areaId": "gangnam",
+   "typeId": "cafe",
+   "koName": "가로수길",
+   "name": {
+    "en": "Garosu-gil"
+   },
+   "address": {
+    "en": "Sinsa-dong, Gangnam-gu, Seoul"
+   },
+   "lat": 37.5205,
+   "lng": 127.023,
+   "signWords": null,
+   "photo": {
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4b/Garosu-gil_at_night.jpg/1280px-Garosu-gil_at_night.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    "license": {
+     "type": "CC_BY",
+     "version": "2.0",
+     "author": "sellyourseoul"
+    },
+    "source": "Wikimedia Commons",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Garosu-gil_at_night.jpg"
+   },
+   "isExample": false
+  }
+ ]
+}
