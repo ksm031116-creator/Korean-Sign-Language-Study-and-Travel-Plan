@@ -144,4 +144,66 @@ class LearnViewModelTest {
         assertFalse(vm.state.value.loading)
         assertTrue(vm.state.value.noSession)
     }
+
+    @Test
+    fun `다른 곳에서 세션이 바뀌어 지난 입력이 되면 오류가 아니라 새 세션을 보인다 (리뷰 HIGH-3)`() = runTest {
+        val vm = viewModel()
+        // 다른 화면이 같은 세션에서 판정을 하나 진행했다.
+        val s = sessions.current()!!
+        JudgeCard(sessions, states, tx, clock)(s.id, s.decisionSeq, Verdict.Know)
+        vm.onAction(LearnAction.Judge(Verdict.Know))
+        assertNull(vm.state.value.error)
+        assertEquals(CardId("b01"), vm.state.value.card?.id)
+        assertEquals(1, vm.state.value.decisions)
+    }
+
+    @Test
+    fun `콘텐츠를 읽지 못하면 멈추지 않고 다시 시도로 다시 읽는다 (리뷰 HIGH-4)`() = runTest {
+        StartSession(sessions, states, tx, SequentialIdGenerator())(SessionSource.Basics, Mode.All, cards, false)
+        var fail = true
+        val flaky = object : app.signkorean.domain.content.ContentRepository {
+            override suspend fun load() = if (fail) throw java.io.IOException("asset") else pack
+        }
+        val vm = LearnViewModel(flaky, sessions, JudgeCard(sessions, states, tx, clock), UndoJudgement(sessions, states, tx))
+        assertTrue(vm.state.value.loadFailed)
+        fail = false
+        vm.onAction(LearnAction.Retry)
+        assertEquals(CardId("t-market-1"), vm.state.value.card?.id)
+    }
+
+    @Test
+    fun `끝난 세션으로 들어오면 결과로 보낸다`() = runTest {
+        val one = StartSession(sessions, states, tx, SequentialIdGenerator())(SessionSource.Basics, Mode.All, cards.take(1), false) as StartOutcome.Started
+        JudgeCard(sessions, states, tx, clock)(one.session.id, 0, Verdict.Know)
+        val vm = LearnViewModel(InMemoryContentRepository(pack), sessions, JudgeCard(sessions, states, tx, clock), UndoJudgement(sessions, states, tx))
+        assertEquals(LearnEffect.Finished, vm.effects.tryReceive().getOrNull())
+    }
+
+    @Test
+    fun `콘텐츠에서 사라진 카드면 빈 화면 대신 돌아갈 길을 보인다`() = runTest {
+        viewModel()
+        val withoutFirst = ContentFixtures.pack(cards = cards.drop(1))
+        val vm = LearnViewModel(InMemoryContentRepository(withoutFirst), sessions, JudgeCard(sessions, states, tx, clock), UndoJudgement(sessions, states, tx))
+        assertTrue(vm.state.value.noSession)
+    }
+
+    @Test
+    fun `뒤집어도 저장 오류 안내는 남는다`() = runTest {
+        val vm = viewModel()
+        sessions.failNextSave = true
+        vm.onAction(LearnAction.Judge(Verdict.Know))
+        vm.onAction(LearnAction.Flip)
+        assertNotNull(vm.state.value.error)
+        assertEquals(Face.Back, vm.state.value.face)
+    }
+
+    @Test
+    fun `같은 카드가 다시 나와도 순번이 바뀌어 화면이 카드를 제자리로 돌린다`() = runTest {
+        val vm = viewModel()
+        val before = vm.state.value.seq
+        vm.onAction(LearnAction.Judge(Verdict.Know))
+        vm.onAction(LearnAction.Undo)
+        assertEquals(CardId("t-market-1"), vm.state.value.card?.id)
+        assertTrue(vm.state.value.seq != before)
+    }
 }

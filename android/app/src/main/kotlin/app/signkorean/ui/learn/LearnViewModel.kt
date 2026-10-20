@@ -19,6 +19,7 @@ import app.signkorean.domain.learning.UndoJudgement
 import app.signkorean.domain.learning.UndoOutcome
 import app.signkorean.domain.learning.Verdict
 import app.signkorean.ui.text.UiText
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -30,14 +31,18 @@ import kotlinx.coroutines.launch
 /** SC04 Learn 화면 상태 (설계서 §5.3). 문구는 리소스 ID 로만 담는다. */
 data class LearnUiState(
     val loading: Boolean = true,
-    /** 진행 중 세션이 없다. 화면은 Explore 로 돌아갈 길을 보인다. */
+    /** 진행 중 세션이 없거나 카드를 찾을 수 없다. 화면은 Explore 로 돌아갈 길을 보인다. */
     val noSession: Boolean = false,
+    /** 세션·콘텐츠를 읽지 못했다. 다시 시도로 다시 읽는다. */
+    val loadFailed: Boolean = false,
     val card: SignCard? = null,
     val face: Face = Face.Front,
     /** 장소 없는 카드(Basics)는 아래 방향·장소 버튼이 없다 (FR31, UX11). */
     val hasPlaces: Boolean = false,
     val decisions: Int = 0,
     val maxDecisions: Int = SessionRules.MAX_DECISIONS,
+    /** 세션 판정 순번. 같은 카드가 다시 나와도(재출제·Undo·저장 실패) 화면이 카드 위치를 되돌리는 기준이다. */
+    val seq: Int = 0,
     val isTryAgain: Boolean = false,
     /** 저장 중에는 입력을 받지 않는다 (UX03). */
     val saving: Boolean = false,
@@ -81,22 +86,46 @@ class LearnViewModel(
     private var failed: LearnAction? = null
 
     init {
+        load()
+    }
+
+    /** 콘텐츠와 현재 세션을 읽는다. 실패하면 앱을 멈추지 않고 다시 시도할 수 있는 상태로 둔다. */
+    private fun load() {
+        _state.value = LearnUiState(loading = true)
         viewModelScope.launch {
-            pack = content.load()
-            val current = sessions.current()
-            if (current == null) {
-                _state.value = LearnUiState(loading = false, noSession = true)
-            } else {
-                show(current)
+            try {
+                pack = content.load()
+                val current = sessions.current()
+                when {
+                    current == null -> _state.value = LearnUiState(loading = false, noSession = true)
+                    current.finished -> {
+                        show(current)
+                        _effects.send(LearnEffect.Finished)
+                    }
+                    else -> show(current)
+                }
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                _state.value = LearnUiState(loading = false, loadFailed = true)
             }
         }
     }
 
     fun onAction(action: LearnAction) {
         val s = _state.value
+        if (action == LearnAction.Retry && s.loadFailed) {
+            load()
+            return
+        }
         if (s.loading || s.saving) return
         when (action) {
-            LearnAction.Flip -> session?.let { show(SessionReducer.flip(it)) }
+            // 뒤집기는 면만 바꾼다. 저장 오류 안내와 다시 시도는 그대로 둔다.
+            LearnAction.Flip -> session?.let { cur ->
+                val flipped = SessionReducer.flip(cur)
+                session = flipped
+                _state.update { it.copy(face = flipped.face) }
+            }
             LearnAction.OpenPlaces -> if (s.hasPlaces) s.card?.let { _effects.trySend(LearnEffect.OpenPlaces(it.id)) }
             is LearnAction.Judge -> save(action)
             LearnAction.Undo -> if (s.canUndo) save(action)
@@ -108,35 +137,80 @@ class LearnViewModel(
         val current = session ?: return
         _state.update { it.copy(saving = true, error = null) }
         viewModelScope.launch {
-            val next: LearningSession? = when (action) {
-                is LearnAction.Judge -> (judge(current.id, current.decisionSeq, action.verdict) as? JudgeOutcome.Judged)?.session
-                LearnAction.Undo -> (undo(current.id, current.decisionSeq) as? UndoOutcome.Undone)?.session
-                else -> null
+            val result: Result = when (action) {
+                is LearnAction.Judge -> when (val o = judge(current.id, current.decisionSeq, action.verdict)) {
+                    is JudgeOutcome.Judged -> Result.Saved(o.session)
+                    JudgeOutcome.StaleInput -> Result.Stale
+                    JudgeOutcome.NoSession -> Result.Gone
+                    JudgeOutcome.SaveFailed -> Result.Failed
+                }
+                LearnAction.Undo -> when (val o = undo(current.id, current.decisionSeq)) {
+                    is UndoOutcome.Undone -> Result.Saved(o.session)
+                    UndoOutcome.StaleInput, UndoOutcome.NothingToUndo -> Result.Stale
+                    UndoOutcome.SaveFailed -> Result.Failed
+                }
+                else -> return@launch
             }
-            if (next == null) {
-                failed = action
-                _state.update { it.copy(saving = false, error = UiText.Res(R.string.common_save_failed)) }
-                return@launch
+            when (result) {
+                is Result.Saved -> {
+                    failed = null
+                    show(result.session)
+                    if (result.session.finished) _effects.send(LearnEffect.Finished)
+                }
+                // 이미 지난 입력(중복 탭, 다른 화면에서 바뀐 세션)은 오류가 아니다. 저장된 세션을 다시 읽어 보여 준다.
+                Result.Stale -> {
+                    failed = null
+                    reloadSession()
+                }
+                Result.Gone -> {
+                    failed = null
+                    _state.value = LearnUiState(loading = false, noSession = true)
+                }
+                Result.Failed -> {
+                    failed = action
+                    _state.update { it.copy(saving = false, error = UiText.Res(R.string.common_save_failed)) }
+                }
             }
-            failed = null
-            show(next)
-            if (next.finished) _effects.send(LearnEffect.Finished)
         }
+    }
+
+    private suspend fun reloadSession() {
+        val current = try {
+            sessions.current()
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            null
+        }
+        if (current == null) _state.value = LearnUiState(loading = false, noSession = true) else show(current)
     }
 
     private fun show(s: LearningSession) {
         session = s
         val p = pack
         val card = s.current?.let { id -> p?.cards?.firstOrNull { it.id == id } }
+        if (!s.finished && card == null) {
+            // 콘텐츠 갱신으로 카드가 사라졌다. 빈 화면 대신 돌아갈 길을 보인다.
+            _state.value = LearnUiState(loading = false, noSession = true)
+            return
+        }
         _state.value = LearnUiState(
             loading = false,
             card = card,
             face = s.face,
             hasPlaces = card != null && p != null && CardPlaceLinker.hasPlaces(card, p.places),
             decisions = s.decisions.size,
+            seq = s.decisionSeq,
             isTryAgain = s.isTryAgain,
             canUndo = s.canUndo,
             finished = s.finished,
         )
+    }
+
+    private sealed interface Result {
+        data class Saved(val session: LearningSession) : Result
+        data object Stale : Result
+        data object Gone : Result
+        data object Failed : Result
     }
 }
