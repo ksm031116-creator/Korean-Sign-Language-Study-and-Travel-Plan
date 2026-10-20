@@ -212,4 +212,13 @@ class LearningUseCasesTest {
         assertEquals(1, results.count { it is JudgeOutcome.Judged })
         assertEquals(1, slowStates.saveCount)
     }
+
+    @Test
+    fun `교체를 확인하면 같은 출처·모드여도 새 세션을 만든다 (카드에서 바로 시작)`() = runTest {
+        val s = started()
+        val replaced = start(SessionSource.Basics, Mode.All, cards.reversed(), replaceUnfinished = true)
+        assertTrue(replaced is StartOutcome.Started)
+        assertTrue((replaced as StartOutcome.Started).session.id != s.id)
+        assertEquals(CardId("b04"), replaced.session.current)
+    }
 }

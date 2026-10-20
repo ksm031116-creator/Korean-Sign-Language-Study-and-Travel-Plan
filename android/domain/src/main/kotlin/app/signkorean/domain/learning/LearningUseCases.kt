@@ -37,10 +37,11 @@ class StartSession(
                     StartResult.NoCards -> StartOutcome.NoCards
                     StartResult.NothingToReview -> StartOutcome.NothingToReview
                     is StartResult.Started -> {
-                        val existing = sessions.current()?.takeUnless { it.finished }
+                        val existing = sessions.current()?.takeUnless { it.finished }?.takeUnless { replaceUnfinished }
                         when {
+                            // 사용자가 교체를 확인했으면(replaceUnfinished) 같은 출처여도 새로 만든다.
                             existing != null && existing.isSameStart(source, mode) -> StartOutcome.Resumed(existing)
-                            existing != null && !replaceUnfinished -> StartOutcome.NeedsConfirmation(existing)
+                            existing != null -> StartOutcome.NeedsConfirmation(existing)
                             else -> {
                                 sessions.save(r.session)
                                 StartOutcome.Started(r.session)

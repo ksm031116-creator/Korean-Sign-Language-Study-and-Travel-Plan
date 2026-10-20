@@ -10,7 +10,10 @@ import app.signkorean.domain.content.SignCard
  * Saved(북마크)·TripDay(일정)는 각자의 저장소가 카드 목록을 만들어 넘긴다(Phase 11·20).
  */
 object SourceCards {
-    fun of(pack: ContentPack, source: SessionSource): List<SignCard> = when (source) {
+    /** 출제할 수 있는(활성) 카드만. 진행률 Known x/y 도 세션이 낼 수 있는 카드로 센다. */
+    fun of(pack: ContentPack, source: SessionSource): List<SignCard> = all(pack, source).filter { it.active }
+
+    private fun all(pack: ContentPack, source: SessionSource): List<SignCard> = when (source) {
         SessionSource.Basics -> pack.cards.filter { it.kind is CardKind.Basic }
         is SessionSource.Area -> {
             val places = pack.places.filter { it.areaId == source.area }

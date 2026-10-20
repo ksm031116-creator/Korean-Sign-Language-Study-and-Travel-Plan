@@ -38,6 +38,12 @@ class SourceCardsTest {
         assertEquals(listOf(pharmacy), SourceCards.of(p, SessionSource.Place("ph")))
 
     @Test
+    fun `비활성 카드는 빠진다 (진행률·단어 칩이 세션과 같은 카드를 센다)`() {
+        val inactive = basic("b09", "비활성").copy(romanization = "")
+        assertEquals(listOf(restroom), SourceCards.of(p.copy(cards = p.cards + inactive), SessionSource.Basics))
+    }
+
+    @Test
     fun `없는 지역·장소는 빈 목록`() {
         assertEquals(emptyList<Any>(), SourceCards.of(p, SessionSource.Area(AreaId("nowhere"))))
         assertEquals(emptyList<Any>(), SourceCards.of(p, SessionSource.Place("nowhere")))
