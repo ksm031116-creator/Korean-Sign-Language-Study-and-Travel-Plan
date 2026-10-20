@@ -39,7 +39,7 @@ import java.time.Instant
 class LearnViewModelTest {
 
     private val cards = listOf(
-        ContentFixtures.card("t-market-1", "국밥", CardKind.PlaceSign("market")),
+        ContentFixtures.card("t-market-1", "국밥", CardKind.PlaceSign("market")).copy(audio = app.signkorean.domain.content.AudioClip("audio/t-market-1.m4a", "s", 1, 900)),
         ContentFixtures.basic("b01", "화장실"),
         ContentFixtures.basic("b02", "출구"),
     )
@@ -48,6 +48,7 @@ class LearnViewModelTest {
     private val sessions = FakeSessionStore()
     private val tx = FakeTransactionRunner(states, sessions)
     private val onboarding = FakeOnboardingStore(coach = true)
+    private val player = app.signkorean.testing.FakeAudioPlayer()
     private val clock = FixedClock(Instant.parse("2026-10-21T09:00:00Z"))
 
     @Before
@@ -59,7 +60,7 @@ class LearnViewModelTest {
     private suspend fun viewModel(): LearnViewModel {
         val started = StartSession(sessions, states, tx, SequentialIdGenerator())(SessionSource.Basics, Mode.All, cards, false)
         assertTrue(started is StartOutcome.Started)
-        return LearnViewModel(InMemoryContentRepository(pack), sessions, JudgeCard(sessions, states, tx, clock), UndoJudgement(sessions, states, tx), onboarding)
+        return LearnViewModel(InMemoryContentRepository(pack), sessions, JudgeCard(sessions, states, tx, clock), UndoJudgement(sessions, states, tx), onboarding, player)
     }
 
     @Test
@@ -141,7 +142,7 @@ class LearnViewModelTest {
 
     @Test
     fun `세션이 없으면 빈 상태`() = runTest {
-        val vm = LearnViewModel(InMemoryContentRepository(pack), FakeSessionStore(), JudgeCard(sessions, states, tx, clock), UndoJudgement(sessions, states, tx), onboarding)
+        val vm = LearnViewModel(InMemoryContentRepository(pack), FakeSessionStore(), JudgeCard(sessions, states, tx, clock), UndoJudgement(sessions, states, tx), onboarding, player)
         assertNull(vm.state.value.card)
         assertFalse(vm.state.value.loading)
         assertTrue(vm.state.value.noSession)
@@ -166,7 +167,7 @@ class LearnViewModelTest {
         val flaky = object : app.signkorean.domain.content.ContentRepository {
             override suspend fun load() = if (fail) throw java.io.IOException("asset") else pack
         }
-        val vm = LearnViewModel(flaky, sessions, JudgeCard(sessions, states, tx, clock), UndoJudgement(sessions, states, tx), onboarding)
+        val vm = LearnViewModel(flaky, sessions, JudgeCard(sessions, states, tx, clock), UndoJudgement(sessions, states, tx), onboarding, player)
         assertTrue(vm.state.value.loadFailed)
         fail = false
         vm.onAction(LearnAction.Retry)
@@ -177,7 +178,7 @@ class LearnViewModelTest {
     fun `끝난 세션으로 들어오면 결과로 보낸다`() = runTest {
         val one = StartSession(sessions, states, tx, SequentialIdGenerator())(SessionSource.Basics, Mode.All, cards.take(1), false) as StartOutcome.Started
         JudgeCard(sessions, states, tx, clock)(one.session.id, 0, Verdict.Know)
-        val vm = LearnViewModel(InMemoryContentRepository(pack), sessions, JudgeCard(sessions, states, tx, clock), UndoJudgement(sessions, states, tx), onboarding)
+        val vm = LearnViewModel(InMemoryContentRepository(pack), sessions, JudgeCard(sessions, states, tx, clock), UndoJudgement(sessions, states, tx), onboarding, player)
         assertEquals(LearnEffect.Finished, vm.effects.tryReceive().getOrNull())
     }
 
@@ -185,7 +186,7 @@ class LearnViewModelTest {
     fun `콘텐츠에서 사라진 카드면 빈 화면 대신 돌아갈 길을 보인다`() = runTest {
         viewModel()
         val withoutFirst = ContentFixtures.pack(cards = cards.drop(1))
-        val vm = LearnViewModel(InMemoryContentRepository(withoutFirst), sessions, JudgeCard(sessions, states, tx, clock), UndoJudgement(sessions, states, tx), onboarding)
+        val vm = LearnViewModel(InMemoryContentRepository(withoutFirst), sessions, JudgeCard(sessions, states, tx, clock), UndoJudgement(sessions, states, tx), onboarding, player)
         assertTrue(vm.state.value.noSession)
     }
 
@@ -213,7 +214,7 @@ class LearnViewModelTest {
     fun `처음이면 스와이프 시연을 보이고, 닫으면 기록해 다시 보이지 않는다`() = runTest {
         val fresh = FakeOnboardingStore(coach = false)
         StartSession(sessions, states, tx, SequentialIdGenerator())(SessionSource.Basics, Mode.All, cards, false)
-        val vm = LearnViewModel(InMemoryContentRepository(pack), sessions, JudgeCard(sessions, states, tx, clock), UndoJudgement(sessions, states, tx), fresh)
+        val vm = LearnViewModel(InMemoryContentRepository(pack), sessions, JudgeCard(sessions, states, tx, clock), UndoJudgement(sessions, states, tx), fresh, player)
         assertTrue(vm.state.value.showCoach)
         vm.onAction(LearnAction.DismissCoach)
         assertFalse(vm.state.value.showCoach)
@@ -230,5 +231,37 @@ class LearnViewModelTest {
         assertEquals(app.signkorean.ui.text.UiText.Res(app.signkorean.R.string.learn_announce_dont_know), vm.state.value.announcement)
         vm.onAction(LearnAction.Undo)
         assertEquals(app.signkorean.ui.text.UiText.Res(app.signkorean.R.string.learn_announce_undo), vm.state.value.announcement)
+    }
+
+    @Test
+    fun `L-11 발음 듣기는 판정이 아니고 학습 상태를 바꾸지 않는다`() = runTest {
+        val vm = viewModel()
+        vm.onAction(LearnAction.PlayAudio)
+        assertEquals(AudioUi.Playing, vm.state.value.audio)
+        assertEquals(1, player.played.size)
+        assertEquals(0, vm.state.value.decisions)
+        assertEquals(emptyMap<CardId, Any>(), states.all())
+        vm.onAction(LearnAction.PlayAudio)
+        assertEquals("재생 중 다시 누르면 처음부터", 2, player.played.size)
+        player.complete()
+        assertEquals(AudioUi.Ready, vm.state.value.audio)
+    }
+
+    @Test
+    fun `U-12 음성이 없는 카드는 Unavailable 이고 재생을 부르지 않는다`() = runTest {
+        val vm = viewModel()
+        vm.onAction(LearnAction.Judge(Verdict.Know)) // 다음 카드(b01)는 음성이 없다
+        assertEquals(AudioUi.Unavailable, vm.state.value.audio)
+        vm.onAction(LearnAction.PlayAudio)
+        assertEquals(0, player.played.size)
+    }
+
+    @Test
+    fun `다른 카드로 넘어가면 재생을 멈춘다`() = runTest {
+        val vm = viewModel()
+        vm.onAction(LearnAction.PlayAudio)
+        val before = player.stops
+        vm.onAction(LearnAction.Judge(Verdict.Know))
+        assertTrue(player.stops > before)
     }
 }

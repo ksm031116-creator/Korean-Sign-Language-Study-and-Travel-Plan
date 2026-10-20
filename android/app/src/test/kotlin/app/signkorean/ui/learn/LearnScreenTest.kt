@@ -186,4 +186,32 @@ class LearnScreenTest {
         assertEquals("화면 루트의 폭이 창보다 넓어지면 가로 스크롤이 생긴다", window, root.size.width)
         compose.onNodeWithTag(LearnTags.CARD).assertIsNotDisplayed()
     }
+
+    @Test
+    fun `U-12 음성이 없으면 표기는 그대로이고 버튼은 Audio unavailable 로 눌리지 않는다`() {
+        host = LearnUiState()
+        compose.setContent {
+            SignKoreanTheme {
+                LearnContent(LearnUiState(loading = false, card = market, hasPlaces = true, face = Face.Back, audio = AudioUi.Unavailable), { actions += it }, {}, true)
+            }
+        }
+        compose.onNodeWithText("roman").assertExists()
+        compose.onNodeWithText("Audio unavailable").assertExists()
+        compose.onNodeWithTag(LearnTags.AUDIO).performClick()
+        assertEquals(emptyList<LearnAction>(), actions)
+    }
+
+    @Test
+    @org.robolectric.annotation.Config(qualifiers = "w390dp-h844dp")
+    fun `음성 버튼을 눌러도 카드 스와이프·뒤집기로 번지지 않는다 (G-09)`() {
+        compose.setContent {
+            SignKoreanTheme {
+                LearnContent(LearnUiState(loading = false, card = market, hasPlaces = true, face = Face.Back, audio = AudioUi.Ready), { actions += it }, {}, true)
+            }
+        }
+        compose.onNodeWithTag(LearnTags.AUDIO).performClick()
+        compose.onNodeWithTag(LearnTags.AUDIO).performTouchInput { swipeRight() }
+        compose.waitForIdle()
+        assertEquals(listOf(LearnAction.PlayAudio), actions.distinct())
+    }
 }

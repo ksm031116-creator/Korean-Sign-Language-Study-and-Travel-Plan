@@ -3,6 +3,8 @@ package app.signkorean.ui.learn
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import app.signkorean.R
+import app.signkorean.domain.audio.AudioPlayer
+import app.signkorean.domain.audio.PlaybackState
 import app.signkorean.domain.content.CardId
 import app.signkorean.domain.content.CardPlaceLinker
 import app.signkorean.domain.content.ContentPack
@@ -55,7 +57,12 @@ data class LearnUiState(
     val showCoach: Boolean = false,
     /** 스크린리더에 알릴 판정 결과 (U-03). 화면이 알림 영역에 한 번 싣는다. */
     val announcement: UiText? = null,
+    /** 이 카드의 발음 버튼 상태 (FR29, UX10, U-12). */
+    val audio: AudioUi = AudioUi.Ready,
 )
+
+/** Ready: 누르면 재생. Playing: 재생 중(다시 누르면 처음부터). Unavailable: 음성 없음·실패. */
+enum class AudioUi { Ready, Playing, Unavailable }
 
 sealed interface LearnAction {
     data class Judge(val verdict: Verdict) : LearnAction
@@ -64,6 +71,9 @@ sealed interface LearnAction {
     data object OpenPlaces : LearnAction
     data object Retry : LearnAction
     data object DismissCoach : LearnAction
+
+    /** 발음 듣기. 판정이 아니며 학습 상태를 바꾸지 않는다 (FR29, L-11). */
+    data object PlayAudio : LearnAction
 }
 
 /** 한 번만 처리할 일. 화면 재구성으로 두 번 처리되지 않게 Channel 로 낸다 (설계서 §5.3). */
@@ -78,6 +88,7 @@ class LearnViewModel(
     private val judge: JudgeCard,
     private val undo: UndoJudgement,
     private val onboarding: OnboardingStore,
+    private val audio: AudioPlayer,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(LearnUiState())
@@ -97,6 +108,23 @@ class LearnViewModel(
 
     init {
         load()
+        viewModelScope.launch {
+            audio.state.collect { playback -> _state.update { it.copy(audio = audioUi(it.card, playback)) } }
+        }
+    }
+
+    private fun audioUi(card: SignCard?, playback: PlaybackState): AudioUi = when {
+        card?.audio == null -> AudioUi.Unavailable
+        playback is PlaybackState.Playing && playback.clip == card.audio -> AudioUi.Playing
+        playback is PlaybackState.Unavailable && failedClip == card.audio -> AudioUi.Unavailable
+        else -> AudioUi.Ready
+    }
+
+    /** 재생에 실패한 음성. 그 카드에서만 "음성 없음"으로 보인다. */
+    private var failedClip: app.signkorean.domain.content.AudioClip? = null
+
+    override fun onCleared() {
+        audio.stop()
     }
 
     /** 콘텐츠와 현재 세션을 읽는다. 실패하면 앱을 멈추지 않고 다시 시도할 수 있는 상태로 둔다. */
@@ -129,6 +157,14 @@ class LearnViewModel(
             load()
             return
         }
+        if (action == LearnAction.PlayAudio) {
+            val card = s.card ?: return
+            if (card.audio == null) return
+            audio.play(card.audio)
+            if (audio.state.value == PlaybackState.Unavailable) failedClip = card.audio
+            _state.update { it.copy(audio = audioUi(it.card, audio.state.value)) }
+            return
+        }
         if (action == LearnAction.DismissCoach) {
             coach = false
             _state.update { it.copy(showCoach = false) }
@@ -147,7 +183,7 @@ class LearnViewModel(
             is LearnAction.Judge -> save(action)
             LearnAction.Undo -> if (s.canUndo) save(action)
             LearnAction.Retry -> failed?.let { save(it) }
-            LearnAction.DismissCoach -> Unit // 위에서 처리했다
+            LearnAction.DismissCoach, LearnAction.PlayAudio -> Unit // 위에서 처리했다
         }
     }
 
@@ -213,6 +249,11 @@ class LearnViewModel(
         session = s
         val p = pack
         val card = s.current?.let { id -> p?.cards?.firstOrNull { it.id == id } }
+        // 다른 카드로 넘어가면 재생을 멈춘다(설계서 §7.4).
+        if (card?.id != _state.value.card?.id) {
+            audio.stop()
+            failedClip = null
+        }
         if (!s.finished && card == null) {
             // 콘텐츠 갱신으로 카드가 사라졌다. 빈 화면 대신 돌아갈 길을 보인다.
             _state.value = LearnUiState(loading = false, noSession = true)
@@ -230,6 +271,7 @@ class LearnViewModel(
             finished = s.finished,
             showCoach = coach && !s.finished,
             announcement = announcement,
+            audio = audioUi(card, audio.state.value),
         )
     }
 

@@ -7,6 +7,7 @@ import app.signkorean.adapter.content.ContentPackParser
 import app.signkorean.adapter.content.ContentPackSource
 import app.signkorean.adapter.content.LogcatContentIssueReporter
 import app.signkorean.adapter.db.RoomLearningStorage
+import app.signkorean.adapter.audio.MediaPlayerAudioPlayer
 import app.signkorean.adapter.locale.AppCompatCurrentLocale
 import app.signkorean.adapter.prefs.DataStoreOnboardingStore
 import app.signkorean.adapter.platform.SystemTimeClock
@@ -24,6 +25,7 @@ import app.signkorean.domain.learning.SessionStore
 import app.signkorean.domain.learning.StartSession
 import app.signkorean.domain.learning.TransactionRunner
 import app.signkorean.domain.learning.UndoJudgement
+import app.signkorean.domain.audio.AudioPlayer
 import app.signkorean.domain.locale.CurrentLocale
 import app.signkorean.domain.onboarding.OnboardingStore
 import app.signkorean.domain.locale.ResolveAppLanguage
@@ -77,6 +79,7 @@ val learningModule = module {
     factory { JudgeCard(get(), get(), get(), get()) }
     factory { UndoJudgement(get(), get(), get()) }
     single<OnboardingStore> { DataStoreOnboardingStore.create(androidContext()) }
+    single<AudioPlayer> { MediaPlayerAudioPlayer(androidContext()) }
 }
 
 /** 화면 ViewModel. 화면은 koinViewModel() 로만 받는다 (AR-03). */

@@ -86,4 +86,12 @@ class ArchitectureTest {
         val violations = production("app").flatMap { f -> HardcodedUiText.findIn(f.text).map { "${f.path}: $it" } }
         assertNoViolations("AR-06", violations)
     }
+
+    @Test
+    fun `U-12 기기 TTS 로 발음을 대신 읽지 않는다 (검수 안 된 발음이 나간다)`() {
+        val users = listOf("app", "adapter").flatMap { m -> production(m) }
+            .filter { f -> f.references("android.speech.tts").isNotEmpty() || "TextToSpeech" in f.code }
+            .map { it.path }
+        assertNoViolations("U-12", users)
+    }
 }

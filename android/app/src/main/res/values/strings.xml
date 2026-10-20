@@ -148,6 +148,11 @@
     <string name="replace_keep">Keep session</string>
     <string name="replace_end">End session</string>
 
+    <string name="audio_listen">Listen</string>
+    <string name="audio_playing">Playing</string>
+    <string name="audio_unavailable">Audio unavailable</string>
+    <string name="reading_hint">guide</string>
+
     <plurals name="places_count">
         <item quantity="one">%d place</item>
         <item quantity="other">%d places</item>

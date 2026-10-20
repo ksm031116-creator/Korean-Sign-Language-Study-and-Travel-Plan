@@ -128,6 +128,11 @@
     <string name="replace_keep">今の練習を続ける</string>
     <string name="replace_end">終えて新しくはじめる</string>
 
+    <string name="audio_listen">聞く</string>
+    <string name="audio_playing">再生中</string>
+    <string name="audio_unavailable">音声は準備中</string>
+    <string name="reading_hint">目安</string>
+
     <plurals name="places_count">
         <item quantity="other">%dか所</item>
     </plurals>

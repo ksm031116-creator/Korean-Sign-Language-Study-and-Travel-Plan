@@ -16,6 +16,7 @@ import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.disabled
 import androidx.compose.ui.semantics.onClick
 import androidx.compose.ui.semantics.stateDescription
+import androidx.compose.ui.semantics.invisibleToUser
 import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.liveRegion
 import androidx.lifecycle.compose.LifecycleResumeEffect
@@ -109,6 +110,7 @@ object LearnTags {
     const val BUTTON_PLACES = "learn-places"
     const val LEGEND_PLACES = "legend-places"
     const val ANNOUNCEMENT = "learn-announcement"
+    const val AUDIO = "learn-audio"
 }
 
 /** SC04 Learn 화면. ViewModel 을 받아 상태와 효과를 화면 이동으로 잇는다. */
@@ -337,7 +339,7 @@ private fun CardArea(state: LearnUiState, onAction: (LearnAction) -> Unit, reduc
                         true
                     },
             ) {
-                CardFace(card, state.face)
+                CardFace(card, state.face, state.audio) { onAction(LearnAction.PlayAudio) }
             }
             Stamp(hint)
         }
@@ -348,8 +350,9 @@ private fun CardArea(state: LearnUiState, onAction: (LearnAction) -> Unit, reduc
 }
 
 @Composable
-private fun CardFace(card: SignCard, face: Face) {
-    val chain = LanguagePolicy.fallbackChain(LocaleTag(stringResource(R.string.format_locale)))
+private fun CardFace(card: SignCard, face: Face, audio: AudioUi, onPlay: () -> Unit) {
+    val language = LocaleTag(stringResource(R.string.format_locale))
+    val chain = LanguagePolicy.fallbackChain(language)
     Column(
         Modifier.fillMaxSize().padding(20.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -366,7 +369,17 @@ private fun CardFace(card: SignCard, face: Face) {
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(10.dp),
             ) {
+                // 발음 보조 (설계서 §8.4): en 은 로마자, ja 는 카타카나 + 로마자. 카타카나는 근사 표기라 "目安" 을 붙인다.
+                if (language != LanguagePolicy.BASE) {
+                    card.reading[language]?.let { reading ->
+                        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                            Text(reading, style = MaterialTheme.typography.titleMedium)
+                            Text(stringResource(R.string.reading_hint), style = MaterialTheme.typography.labelMedium, color = SignKoreanTheme.tokens.muted)
+                        }
+                    }
+                }
                 Text(card.romanization, style = MaterialTheme.typography.bodyLarge, fontStyle = FontStyle.Italic, color = SignKoreanTheme.tokens.muted)
+                AudioButton(audio, onPlay)
                 card.meaning.resolve(chain)?.let {
                     Text(it, style = MaterialTheme.typography.headlineSmall, color = SignKoreanTheme.tokens.primary, textAlign = TextAlign.Center)
                 }
@@ -465,5 +478,29 @@ private fun RoundButton(
             Text(symbol, color = symbolColor, fontSize = 22.sp)
         }
         Text(label, color = labelColor, style = MaterialTheme.typography.labelMedium)
+    }
+}
+
+/**
+ * 발음 버튼 (FR29, UX10). 아이콘과 글자로 상태를 함께 보인다. 음성이 없으면 "Audio unavailable" 로 바뀌고
+ * 누를 수 없다(U-12). 카드 위 버튼이라 누름은 버튼이 가져가 카드 스와이프로 번지지 않는다(G-09).
+ */
+@Composable
+private fun AudioButton(audio: AudioUi, onPlay: () -> Unit) {
+    val t = SignKoreanTheme.tokens
+    val (symbol, label) = when (audio) {
+        AudioUi.Ready -> "▶" to stringResource(R.string.audio_listen)
+        AudioUi.Playing -> "■" to stringResource(R.string.audio_playing)
+        AudioUi.Unavailable -> "–" to stringResource(R.string.audio_unavailable)
+    }
+    androidx.compose.material3.OutlinedButton(
+        onClick = onPlay,
+        enabled = audio != AudioUi.Unavailable,
+        modifier = Modifier.height(MinTouch).testTag(LearnTags.AUDIO),
+        border = androidx.compose.foundation.BorderStroke(1.dp, t.outlineStrong),
+    ) {
+        Text(symbol, modifier = Modifier.semantics { invisibleToUser() })
+        Spacer(Modifier.size(8.dp))
+        Text(label)
     }
 }
