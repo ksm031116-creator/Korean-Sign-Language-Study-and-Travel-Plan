@@ -477,31 +477,42 @@ fun calculate(start: LocalTime, origin: Origin?, stops: List<Stop>, legs: List<L
 
 ### 7.1 콘텐츠 팩
 
-프로토타입의 `data.js`를 **콘텐츠 원본**에서 생성한 JSON 팩으로 바꾼다. 앱은 assets의 팩을 읽고, 시작 시 스키마·무결성을 검증한다.
+프로토타입의 `data.js`를 `.work/build_content_pack.py`가 JSON 팩(`adapter/src/main/assets/content/content-pack.json`)으로 바꾼다. 앱은 assets의 팩을 한 번 읽어 검사한 뒤 메모리에 둔다. 아래는 구현된 스키마 1이다.
 
 ```json
 {
-  "schema": 1,
-  "contentVersion": "2026.10.20-1",
-  "locales": ["en", "ja"],
+  "schemaVersion": 1,
+  "version": "0d494671456c",
+  "locales": { "en": "reviewed", "ja": "draft" },
+  "areas": [{ "id": "myeongdong", "koName": "명동·남대문", "name": { "en": "Myeongdong & Namdaemun" }, "active": true }],
   "cards": [{
     "id": "b26",
-    "kind": "basic", "groupId": "service",
-    "ko": "편의점",
+    "kind": "basic", "group": "service",
+    "koText": "편의점",
     "romanization": "pyeonuijeom",
-    "reading": { "en": "pyeonuijeom", "ja": "ピョニジョム" },
+    "reading": { "ja": "ピョニジョム" },
     "meaning": { "en": "Convenience store", "ja": "コンビニ" },
-    "note": {
-      "en": "편의 means convenience, 점 means shop. Most are open 24 hours.",
-      "ja": "日本と同じく24時間営業の店が多い。T-moneyのチャージもここでできる。"
-    },
-    "audio": { "file": "audio/b26.m4a", "sha256": "…", "durationMs": 1240 },
-    "review": { "ko": "2026-10-19", "en": "2026-10-19", "ja": "draft" }
+    "note": { "en": "편의 means convenience, 점 means shop. Most are open 24 hours.", "ja": "…" },
+    "pictogram": null, "plateColor": "#5b4b8a",
+    "audio": null,
+    "reviewed": true
+  }],
+  "places": [{
+    "id": "seochon-ph", "areaId": "gyeongbokgung", "typeId": "services",
+    "koName": "서촌 약국", "name": { "en": "Example pharmacy · Seochon" }, "address": { "en": "…" },
+    "lat": 37.579, "lng": 126.97, "signWords": ["약국"],
+    "photo": { "url": "https://…", "license": { "type": "KOGL_1" }, "source": "한국관광공사", "sourceUrl": "…" },
+    "isExample": true
   }]
 }
 ```
 
-- `ContentPackValidator`: 필수 필드, 언어별 필드 존재, 오디오 파일 존재·체크섬, ID 중복, 카드→장소 연결 대상 존재를 검사한다. 실패한 카드는 비활성으로 처리하고 앱은 계속 동작한다.
+- `version`은 내용 해시다. 내용이 같으면 값도 같아 팩을 다시 만들어도 diff가 생기지 않는다.
+- `locales`는 언어별 검수 상태다. 앱이 고를 수 있는 언어 목록은 이 값에서 온다(L10N-08). `draft` 언어는 출시 검사에서 막힌다(§8.8).
+- `en` 읽기 표기는 로마자 자체이므로 `reading`에는 `en`을 쓰지 않는다.
+- **ID 고정**: 생성기가 `android/content-id-lock.json`(ID → 한국어 원문)을 관리한다. 잠금은 늘기만 한다. 커밋된 잠금에서 항목이 지워지거나 바뀌면 생성기가 실패하고, `BundledContentPackTest`도 같은 조건을 검사한다(C-08).
+- **검사와 복구**(`ContentValidator`, 도메인 순수 함수): ID·단어 중복, 원문 앞뒤 공백, 없는 지역, Example 표시 불일치, signWords 오타, 카드 없는 장소 유형, 장소 없는 카드, 없는 픽토그램, 비활성 카드를 본다. 실행 중에는 **문제 항목만 빼거나 고친 팩으로 계속 동작**하고, 출시 빌드는 오류가 하나라도 있으면 테스트에서 막는다. 형식 오류(JSON·스키마·허용되지 않는 사진 라이선스)만 팩 전체를 쓸 수 없게 한다.
+- 사진 `url`이 `asset://`이면 앱 내장 사진이다. UI가 이미지 로더에 넘기기 전에 `file:///android_asset/`으로 바꾼다.
 - 오디오는 PRD §7.3 기준 **AAC(m4a) 모노**로 통일한다(Android 전 버전에서 하드웨어 디코딩). 프로토타입의 mp3는 생성 스크립트에서 변환한다.
 - 원격 갱신(P1)은 `ContentUpdateSource` 포트만 정의한다. 갱신은 **세션 종료 뒤** 적용한다(PRD §5.1).
 
