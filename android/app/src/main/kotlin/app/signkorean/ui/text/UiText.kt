@@ -13,11 +13,12 @@ import androidx.compose.ui.res.stringResource
 sealed interface UiText {
     data class Res(@StringRes val id: Int, val args: List<Any> = emptyList()) : UiText
 
-    data class Plural(@PluralsRes val id: Int, val count: Int, val args: List<Any> = listOf(count)) : UiText
+    /** 문구의 첫 자리표시자는 항상 [count] 다. [formatArgs] 는 그 뒤 자리표시자. count 를 바꿔도 숫자가 따라 바뀐다. */
+    data class Plural(@PluralsRes val id: Int, val count: Int, val formatArgs: List<Any> = emptyList()) : UiText
 }
 
 @Composable
 fun UiText.asString(): String = when (this) {
     is UiText.Res -> stringResource(id, *args.toTypedArray())
-    is UiText.Plural -> pluralStringResource(id, count, *args.toTypedArray())
+    is UiText.Plural -> pluralStringResource(id, count, *(listOf<Any>(count) + formatArgs).toTypedArray())
 }
