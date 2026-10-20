@@ -9,11 +9,14 @@ ID 는 프로토타입이 배열 순서로 계산한 현재 값(b01~b100, t-pala
 한 번 정한 ID 와 원문의 짝은 content-id-lock.json 에 쌓이고, 다음 생성에서 같은 ID 의 원문이 바뀌거나
 ID 가 사라지면 실패한다(C-08). 카드를 중간에 끼워 넣으면 뒤쪽 ID 가 밀려서 바로 여기서 걸린다.
 
-사용: py -X utf8 .work/build_content_pack.py [--check]
-  --check  파일을 쓰지 않고 현재 팩·잠금과 비교만 한다(CI·커밋 전 확인용). 다르면 종료 코드 1.
+사용: py -X utf8 .work/build_content_pack.py [--check] [--init-lock]
+  --check      파일을 쓰지 않고 현재 팩·잠금·사진과 비교만 한다(CI·커밋 전 확인용). 다르면 종료 코드 1.
+  --init-lock  잠금 파일이 없을 때 새로 만든다. 처음 한 번만 쓴다.
+잠금은 늘기만 한다: git HEAD 에 커밋된 잠금에서 항목이 지워지거나 바뀌면 실패한다.
 """
 from __future__ import annotations
 
+import filecmp
 import hashlib
 import html
 import json
@@ -65,7 +68,8 @@ def commons_license(name: str, author: str) -> dict:
     m = ALLOWED_CC.match(name.strip())
     if not m:
         # SA·NC·ND 를 포함한 다른 라이선스는 팩에 넣지 않는다 (C-10).
-        raise BuildError(f'허용되지 않는 사진 라이선스: {name!r}')
+        raise BuildError(f'허용되지 않는 사진 라이선스: {name!r}. 허용: CC0, CC BY x.y. '
+                         '같은 라이선스의 다른 표기(예: "CC0 1.0")라면 ALLOWED_CC 에 정규화를 추가한다')
     if m.group(1) == 'CC0':
         return {'type': 'CC0'}
     if not author:
@@ -179,24 +183,60 @@ def check_lock(pack: dict, lock: dict) -> dict:
     return {**lock, **{k: v for k, v in current.items() if k not in lock}}
 
 
+def committed_lock() -> dict | None:
+    """git HEAD 에 커밋된 잠금. 잠금 파일을 지우거나 손으로 고쳐 C-08 을 우회하는 것을 막는 기준이다."""
+    rel = LOCK.relative_to(ROOT).as_posix()
+    out = subprocess.run(['git', '-C', str(ROOT), 'show', f'HEAD:{rel}'], capture_output=True)
+    if out.returncode != 0:
+        return None  # 아직 커밋된 잠금이 없다(최초 생성) 또는 git 밖에서 실행
+    return json.loads(out.stdout.decode('utf-8'))
+
+
+def load_lock(init: bool) -> dict:
+    """작업 트리의 잠금. 커밋된 잠금보다 줄어들거나 바뀌었으면 거부한다(잠금은 늘기만 한다)."""
+    if not LOCK.exists():
+        if not init:
+            raise BuildError(f'{LOCK.name} 이 없다. 잠금을 지우면 ID 이력이 사라진다. 처음 만들 때만 --init-lock 을 쓴다')
+        lock = {}
+    else:
+        lock = json.loads(LOCK.read_text(encoding='utf-8'))
+    head = committed_lock()
+    if head:
+        changed = [k for k, v in head.items() if lock.get(k) != v]
+        if changed:
+            raise BuildError('커밋된 잠금에서 지워지거나 바뀐 ID 가 있다 (C-08): ' + ', '.join(changed[:10]))
+    return lock
+
+
 def to_json(obj) -> str:
     return json.dumps(obj, ensure_ascii=False, indent=1) + '\n'
 
 
+def photos_up_to_date(photo_files: list[Path]) -> bool:
+    return all((ASSETS / 'photos' / f.name).is_file() and filecmp.cmp(f, ASSETS / 'photos' / f.name, shallow=False)
+               for f in photo_files)
+
+
 def main() -> int:
-    check_only = '--check' in sys.argv[1:]
+    args = sys.argv[1:]
+    check_only = '--check' in args
     try:
         pack, photo_files = build(dump_prototype())
-        lock = json.loads(LOCK.read_text(encoding='utf-8')) if LOCK.exists() else {}
+        lock = load_lock(init='--init-lock' in args)
         new_lock = check_lock(pack, lock)
     except BuildError as e:
         print(f'실패: {e}', file=sys.stderr)
         return 1
+    except (KeyError, ValueError, OSError) as e:
+        # 프로토타입 데이터·사진 출처·잠금 파일의 형식 문제. 추적 내용 대신 원인을 한 줄로 알린다.
+        print(f'실패: 입력 데이터를 읽지 못했다 ({type(e).__name__}: {e})', file=sys.stderr)
+        return 1
 
     pack_text, lock_text = to_json(pack), to_json(dict(sorted(new_lock.items())))
     if check_only:
-        same = PACK.exists() and PACK.read_text(encoding='utf-8') == pack_text \
-            and LOCK.exists() and LOCK.read_text(encoding='utf-8') == lock_text
+        same = (PACK.exists() and PACK.read_text(encoding='utf-8') == pack_text
+                and LOCK.exists() and LOCK.read_text(encoding='utf-8') == lock_text
+                and photos_up_to_date(photo_files))
         print('콘텐츠 팩이 최신이다' if same else '콘텐츠 팩이 프로토타입 데이터와 다르다. 스크립트를 다시 실행하라')
         return 0 if same else 1
 
