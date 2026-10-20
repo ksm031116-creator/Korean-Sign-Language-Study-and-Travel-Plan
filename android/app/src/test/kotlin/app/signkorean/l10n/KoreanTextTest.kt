@@ -3,6 +3,8 @@ package app.signkorean.l10n
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.semantics.SemanticsActions
+import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.intl.LocaleList
 import app.signkorean.ui.text.KoreanText
@@ -31,8 +33,10 @@ class KoreanTextTest {
     }
 
     @Test
-    fun `KoreanText 는 일본어 앱에서도 원문을 그대로 그린다`() {
+    fun `KoreanText 가 실제로 그린 글자의 언어는 ko-KR 이다`() {
         compose.setContent { MaterialTheme { KoreanText("출구") } }
-        compose.onNodeWithText("출구").assertExists()
+        val layouts = mutableListOf<TextLayoutResult>()
+        compose.onNodeWithText("출구").fetchSemanticsNode().config[SemanticsActions.GetTextLayoutResult].action!!.invoke(layouts)
+        assertEquals(LocaleList("ko-KR"), layouts.single().layoutInput.style.localeList)
     }
 }
