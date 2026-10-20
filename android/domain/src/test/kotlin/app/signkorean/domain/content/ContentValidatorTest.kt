@@ -121,4 +121,27 @@ class ContentValidatorTest {
         assertEquals(listOf(ContentIssue.CardWithoutPlaces(CardId("t-market-1"))), result.issues)
         assertFalse(result.hasErrors)
     }
+
+    @Test
+    fun `연결 검사는 활성 카드만 센다 (비활성 카드만 있는 유형의 장소는 갈 길이 없다)`() {
+        val inactive = card("t-market-1", "국밥", reviewed = false)
+        val result = validator.validate(pack(cards = listOf(inactive), places = listOf(place("p", signWords = setOf("국밥")))))
+        assertEquals(
+            listOf(ContentIssue.PlaceTypeWithoutCards(PlaceId("p"), "market"), ContentIssue.UnknownSignWord(PlaceId("p"), "국밥")),
+            result.issues.filter { it.isError },
+        )
+        assertTrue(result.issues.none { it is ContentIssue.CardWithoutPlaces })
+    }
+
+    @Test
+    fun `앱에서 뺀 장소에는 연결 이슈를 더 보고하지 않는다`() {
+        val result = validator.validate(pack(cards = listOf(marketCard), places = listOf(place("p", areaId = "nowhere", signWords = setOf("오타")))))
+        assertTrue(result.issues.none { it is ContentIssue.UnknownSignWord }, result.issues.toString())
+    }
+
+    @Test
+    fun `같은 단어가 겹치면 활성 카드를 남긴다`() {
+        val result = validator.validate(pack(cards = listOf(basic("b01", "출구").copy(romanization = ""), basic("b02", "출구"))))
+        assertEquals(listOf("b02"), ids(result.pack.cards))
+    }
 }

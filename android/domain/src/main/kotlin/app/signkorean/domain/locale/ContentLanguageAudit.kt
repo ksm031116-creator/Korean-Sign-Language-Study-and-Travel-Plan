@@ -6,12 +6,17 @@ import app.signkorean.domain.content.ReviewStatus
 
 /** 지원 언어로 채워지지 않은 콘텐츠 칸 하나. [id] 는 카드 또는 장소 ID. */
 data class LanguageGap(val id: String, val locale: LocaleTag, val field: Field) {
-    enum class Field { Meaning, Note, Reading, PlaceName }
+    enum class Field { Meaning, Note, Reading, PlaceName, PlaceAddress, AreaName }
 }
 
-data class LanguageAuditReport(val gaps: List<LanguageGap>, val draftLocales: List<LocaleTag>) {
-    /** 출시 빌드에 넣어도 되는지. 누락도, 검수 전 언어도 없어야 한다 (설계서 §8.8). */
-    val isReleasable: Boolean get() = gaps.isEmpty() && draftLocales.isEmpty()
+data class LanguageAuditReport(
+    val gaps: List<LanguageGap>,
+    val draftLocales: List<LocaleTag>,
+    /** 기준 언어 en 이 팩에 없다. 대체의 마지막 단계가 비어 빈 문구가 보일 수 있다. */
+    val baseLocaleMissing: Boolean = false,
+) {
+    /** 출시 빌드에 넣어도 되는지. 누락도, 검수 전 언어도 없고 기준 언어가 있어야 한다 (설계서 §8.8). */
+    val isReleasable: Boolean get() = gaps.isEmpty() && draftLocales.isEmpty() && !baseLocaleMissing
 }
 
 /**
@@ -33,9 +38,13 @@ object ContentLanguageAudit {
             }
             pack.places.forEach { place ->
                 if (place.name[locale] == null) gaps += LanguageGap(place.id.value, locale, LanguageGap.Field.PlaceName)
+                if (place.address[locale] == null) gaps += LanguageGap(place.id.value, locale, LanguageGap.Field.PlaceAddress)
+            }
+            pack.areas.filter { it.active }.forEach { area ->
+                if (area.name[locale] == null) gaps += LanguageGap(area.id.value, locale, LanguageGap.Field.AreaName)
             }
         }
         val drafts = pack.locales.filterValues { it == ReviewStatus.Draft }.keys.toList()
-        return LanguageAuditReport(gaps, drafts)
+        return LanguageAuditReport(gaps, drafts, baseLocaleMissing = LanguagePolicy.BASE !in pack.locales)
     }
 }

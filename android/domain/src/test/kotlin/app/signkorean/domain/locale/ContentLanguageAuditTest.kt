@@ -5,6 +5,7 @@ import app.signkorean.domain.common.LocalizedText
 import app.signkorean.domain.content.ReviewStatus
 import app.signkorean.testing.ContentFixtures.EN
 import app.signkorean.testing.ContentFixtures.JA
+import app.signkorean.testing.ContentFixtures.area
 import app.signkorean.testing.ContentFixtures.card
 import app.signkorean.testing.ContentFixtures.pack
 import app.signkorean.testing.ContentFixtures.place
@@ -21,7 +22,12 @@ class ContentLanguageAuditTest {
 
     @Test
     fun `모든 지원 언어가 채워져 있으면 빈 결과`() {
-        val p = pack(cards = listOf(complete), places = listOf(place("p").copy(name = both("A", "A"))), locales = mapOf(EN to ReviewStatus.Reviewed, JA to ReviewStatus.Reviewed))
+        val p = pack(
+            cards = listOf(complete),
+            places = listOf(place("p").copy(name = both("A", "A"), address = both("1 St", "1番地"))),
+            areas = listOf(area().copy(name = both("Myeongdong", "明洞"))),
+            locales = mapOf(EN to ReviewStatus.Reviewed, JA to ReviewStatus.Reviewed),
+        )
         val report = ContentLanguageAudit.audit(p)
         assertTrue(report.isReleasable, "$report")
     }
@@ -36,6 +42,8 @@ class ContentLanguageAuditTest {
                 LanguageGap("b01", JA, LanguageGap.Field.Note),
                 LanguageGap("b01", JA, LanguageGap.Field.Reading),
                 LanguageGap("p", JA, LanguageGap.Field.PlaceName),
+                LanguageGap("p", JA, LanguageGap.Field.PlaceAddress),
+                LanguageGap("myeongdong", JA, LanguageGap.Field.AreaName),
             ),
             gaps.toSet(),
         )
@@ -50,7 +58,7 @@ class ContentLanguageAuditTest {
     @Test
     fun `비활성 카드는 검사하지 않는다`() {
         val p = pack(cards = listOf(card("b01", reviewed = false)), locales = mapOf(EN to ReviewStatus.Reviewed, JA to ReviewStatus.Reviewed))
-        assertEquals(emptyList<LanguageGap>(), ContentLanguageAudit.audit(p).gaps)
+        assertEquals(emptyList<LanguageGap>(), ContentLanguageAudit.audit(p).gaps.filter { it.id == "b01" })
     }
 
     @Test
@@ -66,5 +74,25 @@ class ContentLanguageAuditTest {
         val p = pack(locales = mapOf(EN to ReviewStatus.Reviewed, JA to ReviewStatus.Draft, LocaleTag("xx") to ReviewStatus.Reviewed))
         assertEquals(listOf(EN, LocaleTag("xx")), p.selectableLocales(includeDrafts = false))
         assertEquals(listOf(EN, JA, LocaleTag("xx")), p.selectableLocales(includeDrafts = true))
+    }
+
+    @Test
+    fun `지역 이름과 장소 주소도 검사한다`() {
+        val p = pack(
+            places = listOf(place("p").copy(name = both("A", "A"))),
+            areas = listOf(area("myeongdong")),
+            locales = mapOf(EN to ReviewStatus.Reviewed, JA to ReviewStatus.Reviewed),
+        )
+        assertEquals(
+            setOf(LanguageGap("myeongdong", JA, LanguageGap.Field.AreaName), LanguageGap("p", JA, LanguageGap.Field.PlaceAddress)),
+            ContentLanguageAudit.audit(p).gaps.toSet(),
+        )
+    }
+
+    @Test
+    fun `기준 언어 en 이 팩에 없으면 출시할 수 없다`() {
+        val report = ContentLanguageAudit.audit(pack(locales = mapOf(JA to ReviewStatus.Reviewed)))
+        assertTrue(report.baseLocaleMissing)
+        assertEquals(false, report.isReleasable)
     }
 }

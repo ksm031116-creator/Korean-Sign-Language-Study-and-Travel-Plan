@@ -138,6 +138,20 @@ class ContentPackParserTest {
     }
 
     @Test
+    fun `팩 언어는 언어 부분만 쓴다 (지역·문자 체계 태그는 언어 결정과 맞지 않는다)`() {
+        val e = assertThrows(ContentPackFormatException::class.java) { parser.parse(pack().replace("\"ja\":\"draft\"", "\"pt-BR\":\"draft\"")) }
+        assertTrue(e.message, e.message!!.contains("locales"))
+    }
+
+    @Test
+    fun `콘텐츠 문구의 언어는 팩 언어 목록에 있어야 한다`() {
+        val e = assertThrows(ContentPackFormatException::class.java) {
+            parser.parse(pack(cards = "[${basicCard.replace("\"reading\":{\"ja\"", "\"reading\":{\"ko\"")}]"))
+        }
+        assertTrue(e.message, e.message!!.contains("cards[0].reading.ko"))
+    }
+
+    @Test
     fun `JSON 이 아니면 형식 오류`() {
         assertThrows(ContentPackFormatException::class.java) { parser.parse("{not json") }
     }

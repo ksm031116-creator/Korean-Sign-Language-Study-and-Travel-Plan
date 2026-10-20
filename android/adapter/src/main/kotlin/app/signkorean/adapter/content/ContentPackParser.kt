@@ -36,6 +36,11 @@ class ContentPackFormatException(message: String, cause: Throwable? = null) : Ru
  */
 class ContentPackParser {
 
+    /** 지금 읽는 팩의 언어 목록. 콘텐츠 문구의 언어 키는 이 안에 있어야 한다. */
+    private var packLocales: Set<LocaleTag>? = null
+
+    /** 팩 언어 목록을 읽는 동안 들고 있으므로 한 번에 하나씩 읽는다. */
+    @Synchronized
     fun parse(json: String): ContentPack {
         val root = try {
             Json.parseToJsonElement(json)
@@ -45,9 +50,11 @@ class ContentPackParser {
         return Node(root, "").run {
             val schema = field("schemaVersion").int()
             if (schema != SCHEMA_VERSION) fail("schemaVersion", "지원하지 않는 스키마 $schema (지원: $SCHEMA_VERSION)")
+            val locales = field("locales").reviewStatuses()
+            packLocales = locales.keys
             ContentPack(
                 version = field("version").string(),
-                locales = field("locales").reviewStatuses(),
+                locales = locales,
                 areas = field("areas").list { area() },
                 cards = field("cards").list { card() },
                 places = field("places").list { place() },
@@ -57,6 +64,8 @@ class ContentPackParser {
 
     private fun Node.reviewStatuses(): Map<LocaleTag, ReviewStatus> {
         val statuses = entries { tag, value ->
+            // 앱의 언어 결정(LanguagePolicy)은 언어 부분만 쓴다. pt-BR 같은 키는 영영 선택되지 않으므로 받지 않는다.
+            if (!LANGUAGE_ONLY.matches(tag.value)) fail(tag.value, "팩 언어는 언어 부분만 쓴다(예: ja)")
             when (val v = value.string()) {
                 "reviewed" -> ReviewStatus.Reviewed
                 "draft" -> ReviewStatus.Draft
@@ -70,7 +79,7 @@ class ContentPackParser {
     private fun Node.area() = Area(
         id = AreaId(field("id").string()),
         koName = field("koName").string(),
-        name = field("name").localized(),
+        name = field("name").localized(packLocales),
         active = field("active").boolean(),
     )
 
@@ -86,9 +95,9 @@ class ContentPackParser {
             kind = kind,
             koText = field("koText").string(),
             romanization = field("romanization").string(),
-            reading = field("reading").localized(),
-            meaning = field("meaning").localized(),
-            note = field("note").localized(),
+            reading = field("reading").localized(packLocales),
+            meaning = field("meaning").localized(packLocales),
+            note = field("note").localized(packLocales),
             pictogram = field("pictogram").stringOrNull()?.let(::PictogramId),
             plateColor = field("plateColor").string().also {
                 if (!HEX_COLOR.matches(it)) fail("plateColor", "#rrggbb 형식이 아니다: '$it'")
@@ -103,8 +112,8 @@ class ContentPackParser {
         areaId = AreaId(field("areaId").string()),
         typeId = field("typeId").string(),
         koName = field("koName").string(),
-        name = field("name").localized(),
-        address = field("address").localized(),
+        name = field("name").localized(packLocales),
+        address = field("address").localized(packLocales),
         coordinate = Coordinate(
             lat = field("lat").double().also { if (it !in -90.0..90.0) fail("lat", "위도 범위 밖: $it") },
             lng = field("lng").double().also { if (it !in -180.0..180.0) fail("lng", "경도 범위 밖: $it") },
@@ -143,7 +152,7 @@ class ContentPackParser {
 
         private fun child(name: String) = if (path.isEmpty()) name else "$path.$name"
 
-        private fun failHere(reason: String): Nothing = throw ContentPackFormatException("$path: $reason")
+        fun failHere(reason: String): Nothing = throw ContentPackFormatException("$path: $reason")
 
         fun field(name: String): Node {
             val obj = element as? JsonObject ?: failHere("객체가 아니다")
@@ -184,12 +193,19 @@ class ContentPackParser {
             }
         }
 
-        fun localized(): LocalizedText = LocalizedText(entries { _, node -> node.string() })
+        /** [allowed] 가 있으면 그 밖의 언어 키는 거부한다(팩 언어 목록에 없는 언어는 어디서도 고를 수 없다). */
+        fun localized(allowed: Set<LocaleTag>?): LocalizedText = LocalizedText(
+            entries { tag, node ->
+                if (allowed != null && tag !in allowed) node.failHere("팩 언어 목록(locales)에 없는 언어")
+                node.string()
+            },
+        )
     }
 
     private companion object {
         const val SCHEMA_VERSION = 1
         val HEX_COLOR = Regex("#[0-9a-fA-F]{6}")
         val CC_VERSION = Regex("[0-9][.][0-9]")
+        val LANGUAGE_ONLY = Regex("[a-z]{2,3}")
     }
 }

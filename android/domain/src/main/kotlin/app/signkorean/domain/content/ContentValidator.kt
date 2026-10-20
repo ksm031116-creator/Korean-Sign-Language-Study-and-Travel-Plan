@@ -81,10 +81,12 @@ class ContentValidator(private val pictograms: PictogramCatalog) {
         uniqueCards.groupBy { it.koText.trim() }.forEach { (word, same) ->
             if (same.size > 1) issues += ContentIssue.DuplicateWord(word, same.map { it.id })
         }
-        val seenWords = mutableSetOf<String>()
+        // 같은 단어가 겹치면 출제할 수 있는(활성) 카드를 남긴다. 둘 다 같으면 먼저 나온 카드.
+        val keptForWord = uniqueCards.groupBy { it.koText.trim() }
+            .mapValues { (_, same) -> same.firstOrNull { it.active } ?: same.first() }
         uniqueCards.forEach { card ->
             if (card.koText != card.koText.trim()) issues += ContentIssue.UntrimmedText(card.id)
-            if (!seenWords.add(card.koText.trim())) return@forEach
+            if (keptForWord[card.koText.trim()] !== card) return@forEach
             val reasons = CardActivation.reasons(card)
             if (reasons.isNotEmpty()) issues += ContentIssue.InactiveCard(card.id, reasons)
             val pictogram = card.pictogram
@@ -96,6 +98,7 @@ class ContentValidator(private val pictograms: PictogramCatalog) {
             }
         }
 
+        val activeCards = cards.filter { it.active }
         val areaIds = areas.map { it.id }.toSet()
         val places = pack.places.firstOfEach({ it.id.value }, issues).filter { place ->
             var keep = true
@@ -108,17 +111,20 @@ class ContentValidator(private val pictograms: PictogramCatalog) {
                 issues += ContentIssue.ExampleNotMarked(place.id)
                 keep = false
             }
-            val typeCards = cards.filter { (it.kind as? CardKind.PlaceSign)?.typeId == place.typeId }
+            // 앱에서 뺀 장소는 연결 검사를 하지 않는다(이미 오류로 보고했다).
+            if (!keep) return@filter false
+            // 연결은 출제할 수 있는 카드로만 이어진다. 비활성 카드만 가리키는 장소는 어느 카드에서도 갈 수 없다.
+            val typeCards = activeCards.filter { (it.kind as? CardKind.PlaceSign)?.typeId == place.typeId }
             if (typeCards.isEmpty()) issues += ContentIssue.PlaceTypeWithoutCards(place.id, place.typeId)
             place.signWords?.forEach { word ->
                 // 단어별로 연결 규칙(CardPlaceLinker)을 그대로 적용해, 그 단어 하나만으로 연결되는 카드가 있는지 본다.
                 val probe = place.copy(signWords = setOf(word))
                 if (typeCards.none { CardPlaceLinker.links(it, probe) }) issues += ContentIssue.UnknownSignWord(place.id, word)
             }
-            keep
+            true
         }
 
-        cards.filter { it.kind is CardKind.PlaceSign && !CardPlaceLinker.hasPlaces(it, places) }
+        activeCards.filter { it.kind is CardKind.PlaceSign && !CardPlaceLinker.hasPlaces(it, places) }
             .forEach { issues += ContentIssue.CardWithoutPlaces(it.id) }
 
         return ValidatedContent(pack.copy(areas = areas, cards = cards, places = places), issues)
