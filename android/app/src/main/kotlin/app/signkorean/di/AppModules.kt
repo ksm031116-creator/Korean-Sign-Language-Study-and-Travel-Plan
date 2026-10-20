@@ -13,7 +13,7 @@ import app.signkorean.domain.common.Clock
 import app.signkorean.domain.common.IdGenerator
 import app.signkorean.domain.content.ContentRepository
 import app.signkorean.domain.content.ContentValidator
-import app.signkorean.domain.content.Pictograms
+import app.signkorean.domain.content.PictogramCatalog
 import kotlinx.coroutines.Dispatchers
 import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
@@ -33,7 +33,8 @@ val contentModule = module {
     single<ContentPackSource> { AndroidAssetContentPackSource(androidContext().assets) }
     single<ContentIssueReporter> { LogcatContentIssueReporter }
     single { ContentPackParser() }
-    single { ContentValidator(Pictograms.ALL) }
+    single { PictogramCatalog.BUNDLED }
+    single { ContentValidator(get()) }
     single<ContentRepository> { AssetContentRepository(get(), get(), get(), get(), get()) }
 }
 

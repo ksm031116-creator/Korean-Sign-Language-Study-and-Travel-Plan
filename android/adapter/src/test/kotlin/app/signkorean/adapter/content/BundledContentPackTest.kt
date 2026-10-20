@@ -7,7 +7,7 @@ import app.signkorean.domain.content.ContentIssue
 import app.signkorean.domain.content.ContentPack
 import app.signkorean.domain.content.ContentValidator
 import app.signkorean.domain.content.PhotoLicense
-import app.signkorean.domain.content.Pictograms
+import app.signkorean.domain.content.PictogramCatalog
 import app.signkorean.domain.content.ReviewStatus
 import app.signkorean.domain.locale.ContentLanguageAudit
 import app.signkorean.domain.locale.LanguageGap
@@ -35,7 +35,7 @@ class BundledContentPackTest {
         assertEquals(135, pack.cards.size)
         assertEquals(49, pack.places.size)
         assertEquals(8, pack.areas.size)
-        val issues = ContentValidator(Pictograms.ALL).validate(pack).issues
+        val issues = ContentValidator(PictogramCatalog.BUNDLED).validate(pack).issues
         assertEquals(emptyList<ContentIssue>(), issues)
     }
 

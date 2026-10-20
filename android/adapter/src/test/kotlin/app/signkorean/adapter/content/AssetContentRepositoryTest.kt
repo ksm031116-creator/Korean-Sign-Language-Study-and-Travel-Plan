@@ -2,7 +2,7 @@ package app.signkorean.adapter.content
 
 import app.signkorean.domain.content.ContentIssue
 import app.signkorean.domain.content.ContentValidator
-import app.signkorean.domain.content.Pictograms
+import app.signkorean.domain.content.PictogramCatalog
 import app.signkorean.testing.testDispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -30,7 +30,7 @@ class AssetContentRepositoryTest {
     private fun TestScope.repo(json: String) = AssetContentRepository(
         source = { opens.incrementAndGet(); json.byteInputStream() },
         parser = ContentPackParser(),
-        validator = ContentValidator(Pictograms.ALL),
+        validator = ContentValidator(PictogramCatalog.BUNDLED),
         reporter = { reported += it },
         dispatchers = testDispatchers(StandardTestDispatcher(testScheduler)),
     )
@@ -51,19 +51,38 @@ class AssetContentRepositoryTest {
     }
 
     @Test
-    fun `오류가 있는 팩은 예외로 알리고 다음 호출에서 다시 읽는다`() = runTest {
-        val repository = repo(pack(card("b01", "출구", null), card("b02", "출구", null)))
-        repeat(2) {
-            val error = runCatching { repository.load() }.exceptionOrNull()
-            assertTrue("$error", error is InvalidContentPackException)
-        }
-        assertEquals(2, opens.get())
+    fun `항목 오류는 보고하고 그 항목만 뺀 팩으로 계속 동작한다 (설계서 7장 1절)`() = runTest {
+        val loaded = repo(pack(card("b01", "출구", null), card("b02", "출구", null))).load()
+        assertEquals(listOf("b01"), loaded.cards.map { it.id.value })
         assertTrue(reported.any { it is ContentIssue.DuplicateWord })
     }
 
     @Test
-    fun `형식 오류도 예외로 알린다`() = runTest {
-        val error = runCatching { repo("{broken").load() }.exceptionOrNull()
-        assertTrue("$error", error is ContentPackFormatException)
+    fun `형식 오류는 예외로 알리고, 내장 팩이라 결과가 같으므로 다시 읽지 않는다`() = runTest {
+        val repository = repo("{broken")
+        repeat(2) {
+            val error = runCatching { repository.load() }.exceptionOrNull()
+            assertTrue("$error", error is ContentPackFormatException)
+        }
+        assertEquals(1, opens.get())
+    }
+
+    @Test
+    fun `입출력 오류는 기억하지 않고 다음 호출에서 다시 읽는다`() = runTest {
+        var fail = true
+        val repository = AssetContentRepository(
+            source = {
+                opens.incrementAndGet()
+                if (fail) throw java.io.IOException("disk") else pack(card("b01", "화장실", null)).byteInputStream()
+            },
+            parser = ContentPackParser(),
+            validator = ContentValidator(PictogramCatalog.BUNDLED),
+            reporter = { reported += it },
+            dispatchers = testDispatchers(StandardTestDispatcher(testScheduler)),
+        )
+        assertTrue(runCatching { repository.load() }.exceptionOrNull() is java.io.IOException)
+        fail = false
+        assertEquals(1, repository.load().cards.size)
+        assertEquals(2, opens.get())
     }
 }

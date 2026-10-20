@@ -75,6 +75,10 @@ data class Place(
 )
 
 data class PlacePhoto(
+    /**
+     * https:// 원격 사진, 또는 asset://<assets 기준 경로> 앱 내장 사진.
+     * asset:// 은 콘텐츠 팩의 약속이며, 이미지 로더에 넘기기 전에 UI 쪽에서 file:///android_asset/ 으로 바꾼다(Phase 14).
+     */
     val url: String,
     val license: PhotoLicense,
     /** 사람이 읽는 출처 (예: "한국관광공사", "Wikimedia Commons"). */

@@ -16,11 +16,12 @@ fun interface ContentPackSource {
     fun open(): InputStream
 }
 
-class AndroidAssetContentPackSource(
-    private val assets: AssetManager,
-    private val path: String = "content/content-pack.json",
-) : ContentPackSource {
-    override fun open(): InputStream = assets.open(path)
+class AndroidAssetContentPackSource(private val assets: AssetManager) : ContentPackSource {
+    override fun open(): InputStream = assets.open(PATH)
+
+    private companion object {
+        const val PATH = "content/content-pack.json"
+    }
 }
 
 /** 검사 결과를 남기는 곳. 실제 앱은 로그, 테스트는 목록. */
@@ -28,13 +29,12 @@ fun interface ContentIssueReporter {
     fun report(issues: List<ContentIssue>)
 }
 
-/** 팩에 출시를 막는 오류가 있다. 테스트(BundledContentPackTest)가 먼저 잡아야 하는 상황이다. */
-class InvalidContentPackException(val issues: List<ContentIssue>) :
-    RuntimeException("콘텐츠 팩 오류 ${issues.count { it.isError }}건: ${issues.filter { it.isError }.take(3)}")
-
 /**
  * 앱에 내장된 콘텐츠 팩을 읽어 검사한 뒤 메모리에 둔다. 팩은 앱과 함께 바뀌므로 한 번만 읽는다.
- * 실패는 캐시하지 않아 다음 호출에서 다시 시도한다.
+ *
+ * 항목 하나의 문제는 그 항목만 뺀 팩으로 계속 동작한다(설계서 §7.1). 출시 전 오류는 BundledContentPackTest 가 막는다.
+ * 형식 오류(JSON·스키마·라이선스)는 팩 전체를 쓸 수 없다는 뜻이라 예외로 알린다. 내장 파일이라 다시 읽어도
+ * 결과가 같으므로 실패도 기억해 두고 같은 예외를 다시 던진다.
  */
 class AssetContentRepository(
     private val source: ContentPackSource,
@@ -47,20 +47,26 @@ class AssetContentRepository(
     private val mutex = Mutex()
 
     @Volatile
-    private var cached: ContentPack? = null
+    private var cached: Result<ContentPack>? = null
 
     override suspend fun load(): ContentPack {
-        cached?.let { return it }
-        return mutex.withLock {
-            cached ?: withContext(dispatchers.io) { read() }.also { cached = it }
+        val result = cached ?: mutex.withLock {
+            cached ?: withContext(dispatchers.io) { readOrFormatFailure() }.also { cached = it }
         }
+        return result.getOrThrow()
+    }
+
+    /** 형식 오류만 결과로 기억한다. 취소·입출력 오류는 일시적일 수 있어 그대로 던지고 다음 호출에서 다시 읽는다. */
+    private fun readOrFormatFailure(): Result<ContentPack> = try {
+        Result.success(read())
+    } catch (e: ContentPackFormatException) {
+        Result.failure(e)
     }
 
     private fun read(): ContentPack {
         val text = source.open().use { it.readBytes().toString(Charsets.UTF_8) }
         val result = validator.validate(parser.parse(text))
         if (result.issues.isNotEmpty()) reporter.report(result.issues)
-        if (result.hasErrors) throw InvalidContentPackException(result.issues)
         return result.pack
     }
 }
