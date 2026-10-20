@@ -26,7 +26,9 @@ import app.signkorean.domain.learning.UndoJudgement
 import app.signkorean.domain.locale.CurrentLocale
 import app.signkorean.domain.locale.ResolveAppLanguage
 import kotlinx.coroutines.Dispatchers
+import app.signkorean.ui.learn.LearnViewModel
 import org.koin.android.ext.koin.androidContext
+import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
 
 /**
@@ -67,5 +69,10 @@ val learningModule = module {
     factory { UndoJudgement(get(), get(), get()) }
 }
 
+/** 화면 ViewModel. 화면은 koinViewModel() 로만 받는다 (AR-03). */
+val uiModule = module {
+    viewModelOf(::LearnViewModel)
+}
+
 /** 앱이 시작할 때 올리는 모듈 전체. 기능이 늘면 여기에 모듈을 추가한다. */
-val appModules = listOf(platformModule, contentModule, localeModule, learningModule)
+val appModules = listOf(platformModule, contentModule, localeModule, learningModule, uiModule)

@@ -38,6 +38,22 @@
     <string name="pictogram_exit">running person and door symbol</string>
     <string name="pictogram_no_smoking">no smoking symbol</string>
 
+    <!-- SC04 Learn. 방향 범례는 사용자 언어 + 한국어 병기 (설계서 §8.5, UX11). 한국어 부분은 학습 요소라 번역하지 않는다. -->
+    <string name="ko_know" translatable="false">알아요</string>
+    <string name="ko_dont_know" translatable="false">몰라요</string>
+    <string name="ko_places" translatable="false">장소</string>
+    <string name="learn_know">I know</string>
+    <string name="learn_dont_know">Don\'t know</string>
+    <string name="learn_places">Places</string>
+    <string name="learn_close">Close practice</string>
+    <string name="learn_progress">Decisions %1$d/%2$d</string>
+    <string name="learn_tap_hint">Tap the card to see the meaning</string>
+    <string name="learn_tap_back">Tap again to show the sign</string>
+    <string name="learn_try_again">Try again</string>
+    <string name="learn_no_session_title">No practice in progress</string>
+    <string name="learn_no_session_body">Pick a set of signs in Explore to start.</string>
+    <string name="learn_back_to_explore">Back to Explore</string>
+
     <plurals name="places_count">
         <item quantity="one">%d place</item>
         <item quantity="other">%d places</item>

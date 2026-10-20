@@ -33,6 +33,18 @@
     <string name="pictogram_exit">走る人と扉のマーク</string>
     <string name="pictogram_no_smoking">禁煙マーク</string>
 
+    <string name="learn_know">知ってる</string>
+    <string name="learn_dont_know">知らない</string>
+    <string name="learn_places">場所</string>
+    <string name="learn_close">練習を閉じる</string>
+    <string name="learn_progress">判定 %1$d/%2$d</string>
+    <string name="learn_tap_hint">カードをタップすると意味が見られます</string>
+    <string name="learn_tap_back">もう一度タップすると看板に戻ります</string>
+    <string name="learn_try_again">もう一度</string>
+    <string name="learn_no_session_title">進行中の練習はありません</string>
+    <string name="learn_no_session_body">「探す」から看板のセットを選んで始めましょう。</string>
+    <string name="learn_back_to_explore">「探す」に戻る</string>
+
     <plurals name="places_count">
         <item quantity="other">%dか所</item>
     </plurals>

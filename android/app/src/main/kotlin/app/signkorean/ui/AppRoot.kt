@@ -56,7 +56,7 @@ private const val WIDE_SCREEN_DP = 600
 @Composable
 fun AppRoot(
     navigator: AppNavigator = viewModel<NavigatorViewModel>().navigator,
-    screen: @Composable (Route, AppNavigator) -> Unit = { route, _ -> PlaceholderScreen(route) },
+    screen: @Composable (Route, AppNavigator) -> Unit = { route, nav -> AppScreen(route, nav) },
 ) {
     SignKoreanTheme {
         val state by navigator.state.collectAsState()
@@ -130,7 +130,7 @@ private fun RootTab.label(): Int = when (this) {
 
 /** 아직 만들지 않은 화면. 진입점은 숨기므로 사용자에게는 보이지 않는다(구현 계획 원칙 3). */
 @Composable
-private fun PlaceholderScreen(route: Route) {
+internal fun PlaceholderScreen(route: Route) {
     Column(Modifier.fillMaxSize().padding(24.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Text(text = stringResource(R.string.app_name), style = MaterialTheme.typography.headlineSmall)
         Text(text = stringResource(R.string.screen_placeholder), style = MaterialTheme.typography.bodyLarge)
