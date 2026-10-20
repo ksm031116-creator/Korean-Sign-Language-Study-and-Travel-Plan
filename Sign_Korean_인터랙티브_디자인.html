@@ -197,6 +197,15 @@
 .spot-photo .spot-img.photo-intact,.place-hero-img.photo-intact{object-fit:contain;background:#1f2a26}
 .place-hero{position:relative;margin-bottom:18px;border-radius:24px;overflow:hidden;aspect-ratio:16/9;background:var(--sage)}
 .place-hero-img{width:100%;height:100%;object-fit:cover;display:block}
+
+/* 공공 안내 표지판 카드 (PRD §8.3, v2.6): 앞면은 단어만, 뒷면은 픽토그램 + 단어 */
+.sign-plate.card-plate .plate-group{display:none}
+.sign-plate.back-plate{flex:none;height:auto;min-height:0;max-width:210px;aspect-ratio:auto;padding:.9rem .8rem .8rem;gap:.4rem} /* 기본 .sign-plate 의 height:100% 를 끊는다 — 안 끊으면 뒷면 판이 카드 높이만큼 늘어나 나머지를 밀어낸다 */
+.sign-plate.back-plate .plate-word{font-size:clamp(1.6rem,6vw,2.1rem)}
+.sign-plate .plate-pictogram{width:min(132px,70%);height:auto;color:#fff;display:block}
+/* 뒷면은 표지판·발음·뜻·설명이 들어가 앞면보다 길다. 카드가 낮거나(작은 화면) 글자가 크면(200%, NFR04)
+   가운데 정렬이 위쪽을 잘라 버리므로, 넘칠 때는 위에서부터 놓고 카드 안에서 스크롤한다. */
+.card-face.back{justify-content:safe center;overflow-y:auto;overscroll-behavior:contain}
 </style>
 </head>
 <body>
@@ -522,6 +531,15 @@ window.DATA = {
 // Explore 그리드는 지역 묶음을 쓴다. 기존 코드 호환을 위해 같은 배열을 가리킨다.
 DATA.landmarks = DATA.areas;
 
+// ---------- 표지판 픽토그램 (PRD §8.3, v2.6) ----------
+// 실제로 그림과 함께 쓰이는 표지판만. 카드 뒷면에서만 그린다 — 앞면에 그림이 있으면 글자를 읽지 않고도 맞힐 수 있다.
+// 그림은 app.js 의 PICTOGRAMS 에서 공공 기호를 단순화해 직접 그린 SVG.
+DATA.pictograms = {
+  '화장실':'restroom', '공중 화장실':'restroom', '남자 화장실':'men', '여자 화장실':'women', '장애인 화장실':'accessible',
+  '출구':'exit', '비상구':'exit', '엘리베이터':'elevator', '에스컬레이터':'escalator', '계단':'stairs', '비상계단':'stairs',
+  '지하철':'subway', '버스 정류장':'bus', '금연':'noSmoking', '촬영 금지':'noPhoto', '와이파이':'wifi', '약국':'pharmacy'
+};
+
 // ---------- 카드 생성 ----------
 // 단어 1개 = 카드 1장. 장소마다 복제하지 않는다.
 DATA.placeTypes.forEach(t => t.signs.forEach((s,i) => DATA.cards.push({
@@ -533,6 +551,7 @@ DATA.placeTypes.forEach(t => t.signs.forEach((s,i) => DATA.cards.push({
   groupLabel: t.label,
   color: t.color,
   word: s[0], roman: s[1], meaning: s[2], note: s[3],
+  pictogram: DATA.pictograms[s[0]] || null,
   image: null,
   alt: 'Sign plate showing ' + s[0]
 })));
@@ -547,6 +566,7 @@ DATA.basicSigns.forEach((s,i) => {
     placeId: null,
     groupId: s[0], groupLabel: g.label, color: g.color,
     word: s[1], roman: s[2], meaning: s[3], note: s[4],
+    pictogram: DATA.pictograms[s[1]] || null,
     image: null,
     alt: 'Street sign plate showing ' + s[1]
   });
@@ -968,7 +988,33 @@ window.AUDIO_FILES = {
   };
   const photoFigure = (p,cls) => { const ph=placePhoto(p); return ph ? `${image(ph.src,p.name,cls+(ph.intact?' photo-intact':''))}<span class="photo-credit">Photo: ${esc(ph.credit)}</span>` : ''; };
   // 기초 표지판은 사진이 아니라 앱이 그리는 표지판 판으로 보여준다.
-  const signPlate = (c,cls='',roman=true) => `<div class="${cls} sign-plate" role="img" aria-label="${esc(c.alt||c.word)}" style="--plate:${esc(c.color||'#2f6fb0')}"><span class="plate-group">${esc(c.groupLabel||'STREET SIGN')}</span><span class="plate-word" lang="ko">${esc(c.word)}</span>${roman?`<span class="plate-roman">${esc(c.roman||'')}</span>`:''}</div>`;
+  // 표지판 픽토그램. 공공 기호를 단순화해 직접 그린 SVG(사진·타사 이미지 아님). 판 색 위에 흰색으로 그린다.
+  const man = x => `<circle cx="${x}" cy="-34" r="9"/><path d="M${x-13} -22h26v28h-6v34h-6v-34h-2v34h-6v-34h-6z"/>`;
+  const woman = x => `<circle cx="${x}" cy="-34" r="9"/><path d="M${x-9} -22h18l11 32h-9v30h-6v-30h-2v30h-6v-30h-9z"/>`;
+  const line = 'fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"';
+  const PICTOGRAMS = {
+    restroom: { label:'Men\u2019s and women\u2019s restroom pictograms', svg: man(-30) + '<rect x="-1.5" y="-44" width="3" height="88" opacity=".7"/>' + woman(30) },
+    men: { label:'Man pictogram', svg: man(0) },
+    women: { label:'Woman pictogram', svg: woman(0) },
+    accessible: { label:'Wheelchair pictogram', svg: `<circle cx="-8" cy="-36" r="8"/><path d="M-12 -24v26h24l8 22" ${line} stroke-width="7"/><circle cx="-6" cy="18" r="22" ${line} stroke-width="6"/>` },
+    exit: { label:'Running person and door pictogram', svg: `<rect x="18" y="-42" width="28" height="84" ${line} stroke-width="6"/><circle cx="-14" cy="-34" r="8"/><path d="M-26 -16l14 -4 10 16 14 2M-12 -20l-8 26-16 14M-14 6l14 12v22" ${line} stroke-width="7"/>` },
+    elevator: { label:'Elevator pictogram', svg: `<rect x="-34" y="-44" width="68" height="88" rx="6" ${line} stroke-width="6"/><path d="M0 -32l-14 18h28zM0 32l-14 -18h28z"/>` },
+    escalator: { label:'Escalator pictogram', svg: `<path d="M-48 32h20l40 -52h28" ${line} stroke-width="9"/><circle cx="-4" cy="-30" r="7"/><path d="M-4 -20v16" ${line} stroke-width="7"/>` },
+    stairs: { label:'Stairs pictogram', svg: `<path d="M-44 40v-16h22v-20h22v-20h22v-20h22" ${line} stroke-width="8"/>` },
+    subway: { label:'Subway train pictogram', svg: `<rect x="-28" y="-42" width="56" height="70" rx="12"/><rect x="-18" y="-32" width="36" height="22" rx="3" style="fill:var(--plate)"/><circle cx="-14" cy="12" r="5" style="fill:var(--plate)"/><circle cx="14" cy="12" r="5" style="fill:var(--plate)"/><path d="M-20 32l-10 12M20 32l10 12" ${line} stroke-width="6"/>` },
+    bus: { label:'Bus pictogram', svg: `<rect x="-34" y="-40" width="68" height="64" rx="10"/><rect x="-26" y="-30" width="52" height="24" rx="3" style="fill:var(--plate)"/><circle cx="-20" cy="30" r="9"/><circle cx="20" cy="30" r="9"/>` },
+    noSmoking: { label:'No smoking symbol', svg: `<rect x="-30" y="-6" width="44" height="12"/><rect x="16" y="-6" width="10" height="12" opacity=".6"/><circle r="42" ${line} stroke-width="8"/><path d="M-30 -30L30 30" ${line} stroke-width="8"/>` },
+    noPhoto: { label:'No photography symbol', svg: `<rect x="-28" y="-16" width="56" height="36" rx="6"/><rect x="-10" y="-24" width="20" height="10" rx="2"/><circle cy="2" r="11" style="fill:var(--plate)"/><circle r="42" ${line} stroke-width="8"/><path d="M-30 -30L30 30" ${line} stroke-width="8"/>` },
+    wifi: { label:'Wi-Fi symbol', svg: `<path d="M-40 -10a58 58 0 0 1 80 0M-26 6a38 38 0 0 1 52 0M-12 22a18 18 0 0 1 24 0" ${line} stroke-width="8"/><circle cy="36" r="6"/>` },
+    pharmacy: { label:'Pharmacy cross', svg: `<path d="M-12 -40h24v28h28v24h-28v28h-24v-28h-28v-24h28z"/>` }
+  };
+  // 카드는 공공 안내 표지판 틀로 그린다 (PRD §8.3, v2.6). 앞면은 단어만 — 픽토그램이 있는 표지판이어도
+  // 앞면에는 그리지 않는다(그림으로 뜻을 맞히지 않게). 픽토그램은 뒷면(withPictogram)에서만 넣는다.
+  const signPlate = (c,cls='',roman=true,withPictogram=false) => {
+    const p = withPictogram && c.pictogram ? PICTOGRAMS[c.pictogram] : null;
+    const label = (c.alt||c.word) + (p ? ', with ' + p.label : '');
+    return `<div class="${cls} sign-plate${p?' has-pictogram':''}" role="img" aria-label="${esc(label)}" style="--plate:${esc(c.color||'#2f6fb0')}">${p?`<svg class="plate-pictogram" viewBox="-60 -50 120 100" fill="currentColor" aria-hidden="true">${p.svg}</svg>`:''}<span class="plate-group">${esc(c.groupLabel||'STREET SIGN')}</span><span class="plate-word" lang="ko">${esc(c.word)}</span>${roman?`<span class="plate-roman">${esc(c.roman||'')}</span>`:''}</div>`;
+  };
   // 장소 유형 카드도 v2.1부터 사진이 없다(image:null). 사진이 없으면 표지판 판으로 그린다.
   const cardVisual = (c,cls='') => c && (isBasic(c)||!c.image) ? signPlate(c,cls) : image(c?.image,c?.alt||c?.word,cls);
   // FR29 발음 재생. 미리 생성한 Gemini TTS 파일(audio_index.js)을 재생하고,
@@ -1048,7 +1094,7 @@ window.AUDIO_FILES = {
       <div class="deck-card top${s.meaning?' flipped':''}" id="swipe-card" tabindex="0" role="group" aria-roledescription="sign card" aria-label="${esc(cardAria(c,spots.length))}">
         <div class="card-inner">
           <div class="card-face front"><span class="badge">${esc(c.groupLabel||'Seoul sign')}</span>${signPlate(c,'card-plate',false)}<p class="eyebrow">CAN YOU READ THIS SIGN?</p></div>
-          <div class="card-face back"><p class="eyebrow">MEANING · 뜻</p><h2 lang="ko">${esc(c.word)}</h2><div class="pronunciation">${c.roman?`<span class="roman">${esc(c.roman)}</span>`:''}${speakBtn(c)}</div><h3 class="card-meaning">${esc(c.meaning)}</h3><p class="card-note">${esc(c.note||'')}</p></div>
+          <div class="card-face back">${signPlate(c,'card-plate back-plate',false,true)}<div class="pronunciation">${c.roman?`<span class="roman">${esc(c.roman)}</span>`:''}${speakBtn(c)}</div><h3 class="card-meaning">${esc(c.meaning)}</h3><p class="card-note">${esc(c.note||'')}</p></div>
         </div>
         <button type="button" class="card-bookmark${saved?' active':''}" data-action="save:${c.id}" aria-label="${saved?'Unsave sign':'Save sign'}" aria-pressed="${saved}">${icon('saved')}</button>
         <div class="stamp stamp-know" aria-hidden="true">I know<small>알아요</small></div>
