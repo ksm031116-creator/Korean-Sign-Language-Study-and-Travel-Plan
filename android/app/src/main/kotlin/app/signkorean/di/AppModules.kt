@@ -6,6 +6,7 @@ import app.signkorean.adapter.content.ContentIssueReporter
 import app.signkorean.adapter.content.ContentPackParser
 import app.signkorean.adapter.content.ContentPackSource
 import app.signkorean.adapter.content.LogcatContentIssueReporter
+import app.signkorean.adapter.db.RoomLearningStorage
 import app.signkorean.adapter.locale.AppCompatCurrentLocale
 import app.signkorean.adapter.platform.SystemTimeClock
 import app.signkorean.adapter.platform.UuidIdGenerator
@@ -15,6 +16,13 @@ import app.signkorean.domain.common.IdGenerator
 import app.signkorean.domain.content.ContentRepository
 import app.signkorean.domain.content.ContentValidator
 import app.signkorean.domain.content.PictogramCatalog
+import app.signkorean.domain.learning.JudgeCard
+import app.signkorean.domain.learning.LearningStateStore
+import app.signkorean.domain.learning.ResumeSession
+import app.signkorean.domain.learning.SessionStore
+import app.signkorean.domain.learning.StartSession
+import app.signkorean.domain.learning.TransactionRunner
+import app.signkorean.domain.learning.UndoJudgement
 import app.signkorean.domain.locale.CurrentLocale
 import app.signkorean.domain.locale.ResolveAppLanguage
 import kotlinx.coroutines.Dispatchers
@@ -47,5 +55,17 @@ val localeModule = module {
     factory { ResolveAppLanguage(get()) }
 }
 
+/** 학습 저장과 판정 (Phase 6). 판정은 카드 상태·세션을 한 트랜잭션으로 저장한다. */
+val learningModule = module {
+    single { RoomLearningStorage.open(androidContext()) }
+    single<LearningStateStore> { get<RoomLearningStorage>().states }
+    single<SessionStore> { get<RoomLearningStorage>().sessions }
+    single<TransactionRunner> { get<RoomLearningStorage>().transactions }
+    factory { StartSession(get(), get(), get(), get()) }
+    factory { ResumeSession(get()) }
+    factory { JudgeCard(get(), get(), get(), get()) }
+    factory { UndoJudgement(get(), get(), get()) }
+}
+
 /** 앱이 시작할 때 올리는 모듈 전체. 기능이 늘면 여기에 모듈을 추가한다. */
-val appModules = listOf(platformModule, contentModule, localeModule)
+val appModules = listOf(platformModule, contentModule, localeModule, learningModule)

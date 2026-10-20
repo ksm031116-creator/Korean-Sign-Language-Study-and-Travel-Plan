@@ -2,6 +2,13 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.kotlin.serialization)
+}
+
+// Room 스키마를 저장소에 남긴다. 마이그레이션 테스트가 이 파일을 쓴다 (설계서 §7.2).
+ksp {
+    arg("room.schemaLocation", "$projectDir/schemas")
 }
 
 android {
@@ -19,6 +26,8 @@ android {
 
     testOptions {
         unitTests.isIncludeAndroidResources = true
+        // MigrationTestHelper 가 내보낸 스키마를 assets 처럼 읽는다.
+        sourceSets.getByName("test").assets.srcDir("$projectDir/schemas")
         unitTests.all {
             // 연결 감사 스냅샷(C-07) 갱신: ./gradlew :adapter:testDebugUnitTest -PupdateSnapshots=true
             it.systemProperty("updateSnapshots", project.findProperty("updateSnapshots") ?: "false")
@@ -45,9 +54,14 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
     // 앱별 언어(per-app language). 언어 값의 저장은 AppCompat 하나만 한다 (설계서 §8.2).
     implementation(libs.androidx.appcompat)
+    implementation(libs.room.runtime)
+    implementation(libs.room.ktx)
+    ksp(libs.room.compiler)
 
     // Robolectric 이 JUnit 4 러너만 지원하므로 Android 모듈의 단위 테스트는 JUnit 4 로 쓴다 (설계서 §9.1).
     testImplementation(project(":testing"))
     testImplementation(libs.junit4)
     testImplementation(libs.robolectric)
+    testImplementation(libs.room.testing)
+    testImplementation(libs.androidx.test.core)
 }

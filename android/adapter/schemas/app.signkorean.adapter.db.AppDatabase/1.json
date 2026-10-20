@@ -1,0 +1,120 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 1,
+    "identityHash": "de20cc9297c9b54cef4b973f1419ef45",
+    "entities": [
+      {
+        "tableName": "card_state",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`card_id` TEXT NOT NULL, `state` TEXT NOT NULL, `last_judged_at` INTEGER NOT NULL, `judgement_count` INTEGER NOT NULL, PRIMARY KEY(`card_id`))",
+        "fields": [
+          {
+            "fieldPath": "cardId",
+            "columnName": "card_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "state",
+            "columnName": "state",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "lastJudgedAt",
+            "columnName": "last_judged_at",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "judgementCount",
+            "columnName": "judgement_count",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "card_id"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "session",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `source_json` TEXT NOT NULL, `mode` TEXT NOT NULL, `queue_json` TEXT NOT NULL, `decisions_json` TEXT NOT NULL, `undo_json` TEXT, `statuses_json` TEXT NOT NULL, `decision_seq` INTEGER NOT NULL, `face` TEXT NOT NULL, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sourceJson",
+            "columnName": "source_json",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mode",
+            "columnName": "mode",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "queueJson",
+            "columnName": "queue_json",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "decisionsJson",
+            "columnName": "decisions_json",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "undoJson",
+            "columnName": "undo_json",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "statusesJson",
+            "columnName": "statuses_json",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "decisionSeq",
+            "columnName": "decision_seq",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "face",
+            "columnName": "face",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      }
+    ],
+    "views": [],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'de20cc9297c9b54cef4b973f1419ef45')"
+    ]
+  }
+}

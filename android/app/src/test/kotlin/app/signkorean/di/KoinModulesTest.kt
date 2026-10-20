@@ -14,6 +14,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.koin.core.annotation.KoinExperimentalAPI
 import org.koin.dsl.koinApplication
+import org.koin.dsl.module
 import org.koin.test.verify.definition
 import org.koin.test.verify.injectedParameters
 import org.koin.test.verify.verify
@@ -30,7 +31,8 @@ class KoinModulesTest {
         val passedDirectly = listOf(CoroutineDispatcher::class, AssetManager::class, Context::class)
         // 픽토그램 목록 Set 은 PictogramCatalog 하나에만 값으로 들어간다. 그 정의에만 허용한다.
         val catalogIds = injectedParameters(definition<PictogramCatalog>(Set::class))
-        appModules.forEach { it.verify(extraTypes = passedDirectly, injections = catalogIds) }
+        // 모듈끼리 서로의 정의를 쓰므로(예: StartSession 이 platformModule 의 IdGenerator) 전체를 한 그래프로 검사한다.
+        module { includes(appModules) }.verify(extraTypes = passedDirectly, injections = catalogIds)
     }
 
     @Test
