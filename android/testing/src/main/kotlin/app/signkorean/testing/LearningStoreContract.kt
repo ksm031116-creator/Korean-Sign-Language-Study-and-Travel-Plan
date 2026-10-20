@@ -39,6 +39,30 @@ class LearningStoreContract(
         sessionRoundTripKeepsEveryField()
         saveReplacesCurrent()
         transactionRollsBackBothStores()
+        saveUnseenDeletes()
+        nestedTransactionJoinsOuter()
+    }
+
+    suspend fun saveUnseenDeletes() {
+        states.clear()
+        states.save(CardState(CardId("b01"), CardStatus.Known, now))
+        states.save(CardState(CardId("b01"), CardStatus.Unseen, now))
+        val all = states.all()
+        expect(all.isEmpty()) { "Unseen 저장은 기록을 지운다: $all" }
+    }
+
+    /** 안쪽 run 은 바깥 트랜잭션에 합류한다. 바깥이 실패하면 안쪽 쓰기도 되돌린다. 교착이 생기면 안 된다. */
+    suspend fun nestedTransactionJoinsOuter() {
+        states.clear()
+        val failed = runCatching {
+            tx.run {
+                tx.run { states.save(CardState(CardId("b01"), CardStatus.Known, now)) }
+                error("바깥에서 실패")
+            }
+        }
+        expect(failed.isFailure) { "예외가 밖으로 전해져야 한다" }
+        val all = states.all()
+        expect(all.isEmpty()) { "바깥 실패 뒤 안쪽 쓰기가 남았다: $all" }
     }
 
     suspend fun cardStatesRoundTrip() {
@@ -103,13 +127,20 @@ class LearningStoreContract(
         expect(sessions.current() == null) { "롤백 뒤 세션이 남았다" }
     }
 
-    /** 판정·재출제·Undo 기록이 모두 들어간 세션. 직렬화가 값을 하나라도 잃으면 왕복 검사에서 걸린다. */
-    private fun sampleSession(id: String = "s1", source: SessionSource = SessionSource.Area(AreaId("myeongdong"))): app.signkorean.domain.learning.LearningSession {
+    private fun sampleSession(id: String = "s1", source: SessionSource = SessionSource.Area(AreaId("myeongdong"))) =
+        Companion.sampleSession(id, source)
+
+    companion object {
+        private val now = Instant.parse("2026-10-21T09:00:00Z")
+
+        /** 판정·재출제·Undo 기록이 모두 들어간 세션. 직렬화가 값을 하나라도 잃으면 왕복 검사에서 걸린다. */
+        fun sampleSession(id: String = "s1", source: SessionSource = SessionSource.Area(AreaId("myeongdong"))): app.signkorean.domain.learning.LearningSession {
         val cards = (1..4).map { ContentFixtures.basic("b0$it", "단어$it") }
         var s = (SessionFactory.start(SessionId(id), source, Mode.All, cards, mapOf(CardId("b02") to CardStatus.Known)) as StartResult.Started).session
         s = SessionReducer.judge(s, Verdict.DontKnow, now)!!.session
         s = SessionReducer.flip(s)
         s = SessionReducer.judge(s, Verdict.Know, now)!!.session
         return SessionReducer.flip(s)
+    }
     }
 }
