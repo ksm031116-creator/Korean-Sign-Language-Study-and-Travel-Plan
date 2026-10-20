@@ -17,6 +17,13 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
 
+    testOptions {
+        unitTests.all {
+            // 연결 감사 스냅샷(C-07) 갱신: ./gradlew :adapter:testDebugUnitTest -PupdateSnapshots=true
+            it.systemProperty("updateSnapshots", project.findProperty("updateSnapshots") ?: "false")
+        }
+    }
+
     lint {
         abortOnError = true
         warningsAsErrors = false
@@ -30,6 +37,8 @@ kotlin {
 
 dependencies {
     implementation(project(":domain"))
+    // 콘텐츠 팩 JSON. 컴파일러 플러그인 없이 JsonElement 로 읽어 필드별 오류 위치를 직접 알린다.
+    implementation(libs.kotlinx.serialization.json)
 
     // Robolectric 이 JUnit 4 러너만 지원하므로 Android 모듈의 단위 테스트는 JUnit 4 로 쓴다 (설계서 §9.1).
     testImplementation(project(":testing"))
