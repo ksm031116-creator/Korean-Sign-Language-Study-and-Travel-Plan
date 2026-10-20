@@ -1,6 +1,10 @@
 package app.signkorean.domain.common
 
-/** BCP 47 언어 태그. 예: "en", "ja", "zh-Hant". 밑줄 형식(en_US)은 받지 않는다. */
+/**
+ * BCP 47 언어 태그의 정규형. 예: "en", "ja", "en-US", "zh-Hant".
+ * 언어는 소문자, 문자 체계는 첫 글자만 대문자, 지역은 대문자다. "EN" 과 "en" 이 서로 다른 키가 되어
+ * 콘텐츠를 못 찾는 일이 없도록 정규형이 아니면 받지 않는다. 기기 태그는 LanguagePolicy.normalize 로 맞춘다.
+ */
 @JvmInline
 value class LocaleTag(val value: String) {
     init {
@@ -8,7 +12,7 @@ value class LocaleTag(val value: String) {
     }
 
     private companion object {
-        val PATTERN = Regex("[a-zA-Z]{2,3}(-[a-zA-Z0-9]{2,8})*")
+        val PATTERN = Regex("[a-z]{2,3}(-[A-Z][a-z]{3})?(-([A-Z]{2}|[0-9]{3}))?")
     }
 }
 

@@ -35,4 +35,13 @@ class LocalizedTextTest {
         assertThrows<IllegalArgumentException> { LocaleTag("") }
         assertThrows<IllegalArgumentException> { LocaleTag("en_US") }
     }
+
+    @Test
+    fun `LocaleTag 는 정규형만 받는다 (EN 과 en 이 다른 키가 되어 카드가 꺼지는 것을 막는다)`() {
+        assertEquals("en-US", LocaleTag("en-US").value)
+        assertEquals("zh-Hant-TW", LocaleTag("zh-Hant-TW").value)
+        assertThrows<IllegalArgumentException> { LocaleTag("EN") }
+        assertThrows<IllegalArgumentException> { LocaleTag("en-us") }
+        assertThrows<IllegalArgumentException> { LocaleTag("zh-hant") }
+    }
 }
