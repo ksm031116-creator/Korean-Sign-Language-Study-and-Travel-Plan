@@ -17,6 +17,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
@@ -89,7 +90,8 @@ fun ExploreScreen(
     onOpenBasics: () -> Unit,
     onOpenArea: (AreaId) -> Unit,
     onResume: () -> Unit,
-    onOpenSettings: () -> Unit,
+    /** 설정 화면이 생기기 전에는 null. 진입점을 그리지 않는다(구현 계획 원칙 3). */
+    onOpenSettings: (() -> Unit)?,
     viewModel: ExploreViewModel = koinViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -108,9 +110,10 @@ fun ExploreContent(
     onOpenBasics: () -> Unit,
     onOpenArea: (AreaId) -> Unit,
     onResume: () -> Unit,
-    onOpenSettings: () -> Unit,
+    onOpenSettings: (() -> Unit)?,
 ) {
     val t = SignKoreanTheme.tokens
+    if (state.loading) return
     Column(
         Modifier.fillMaxSize().background(t.paper).verticalScroll(rememberScrollState()).padding(horizontal = 20.dp, vertical = 12.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
@@ -120,7 +123,9 @@ fun ExploreContent(
                 Text(stringResource(R.string.explore_title), style = MaterialTheme.typography.headlineSmall, modifier = Modifier.semantics { heading() })
                 Text(stringResource(R.string.explore_subtitle), style = MaterialTheme.typography.bodyMedium, color = t.muted)
             }
-            IconButton(onClick = onOpenSettings) { Icon(Icons.Filled.Settings, contentDescription = stringResource(R.string.explore_settings)) }
+            if (onOpenSettings != null) {
+                IconButton(onClick = onOpenSettings) { Icon(Icons.Filled.Settings, contentDescription = stringResource(R.string.explore_settings)) }
+            }
         }
         OutlinedTextField(
             value = state.query,
@@ -139,12 +144,12 @@ fun ExploreContent(
         )
         if (state.failed) ErrorState(stringResource(R.string.explore_load_failed), onRetry = { onAction(ExploreAction.Refresh) })
         state.resume?.let { ResumeBanner(it, onResume) }
-        if (state.query.isBlank()) {
+        if (state.query.isBlank() || state.basicsMatches) {
             SectionHead(stringResource(R.string.explore_basics_section), stringResource(R.string.explore_basics_hint))
             BasicsCard(state, onOpenBasics)
         }
         SectionHead(stringResource(R.string.explore_areas_section), null)
-        if (state.areas.isEmpty() && state.query.isNotBlank()) {
+        if (state.areas.isEmpty() && state.query.isNotBlank() && !state.basicsMatches) {
             Text(stringResource(R.string.explore_no_results, state.query.trim()), color = t.muted, style = MaterialTheme.typography.bodyMedium)
         }
         state.areas.forEach { area -> AreaCard(area, onOpenArea) }
@@ -243,11 +248,17 @@ private fun AreaCard(area: AreaUi, onOpen: (AreaId) -> Unit) {
 fun CollectionScreen(
     source: SessionSource,
     onOpenLearn: () -> Unit,
-    onOpenPlace: (String) -> Unit,
+    /** 장소 상세(SC07)가 생기기 전에는 null. 장소 줄을 누를 수 없게 그린다. */
+    onOpenPlace: ((String) -> Unit)?,
     onBack: () -> Unit,
     viewModel: CollectionViewModel = koinViewModel(parameters = { parametersOf(source) }),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    // 학습에서 돌아오면 진행률과 칩 색을 다시 읽는다.
+    LifecycleResumeEffect(viewModel) {
+        viewModel.onAction(CollectionAction.Refresh)
+        onPauseOrDispose { }
+    }
     LaunchedEffect(viewModel) {
         for (effect in viewModel.effects) {
             when (effect) {
@@ -260,10 +271,18 @@ fun CollectionScreen(
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun CollectionContent(state: CollectionUiState, onAction: (CollectionAction) -> Unit, onOpenPlace: (String) -> Unit, onBack: () -> Unit) {
+fun CollectionContent(state: CollectionUiState, onAction: (CollectionAction) -> Unit, onOpenPlace: ((String) -> Unit)?, onBack: () -> Unit) {
     val t = SignKoreanTheme.tokens
-    if (state.missing) {
-        EmptyState(title = stringResource(R.string.collection_missing), body = "") { PrimaryButton(stringResource(R.string.learn_back_to_explore), onClick = onBack) }
+    if (state.loading) return
+    if (state.failed) {
+        ErrorState(stringResource(R.string.explore_load_failed), onRetry = { onAction(CollectionAction.Refresh) }, modifier = Modifier.padding(20.dp))
+        return
+    }
+    if (state.missing || state.progress.total == 0) {
+        // 카드가 0 장인 출처는 빈 상태와 돌아가기를 보인다(FR01).
+        EmptyState(title = stringResource(if (state.missing) R.string.collection_missing else R.string.result_no_cards), body = "") {
+            PrimaryButton(stringResource(R.string.learn_back_to_explore), onClick = onBack)
+        }
         return
     }
     if (state.confirmReplace) {
@@ -280,6 +299,7 @@ fun CollectionContent(state: CollectionUiState, onAction: (CollectionAction) -> 
         Modifier.fillMaxSize().background(t.paper).verticalScroll(rememberScrollState()).padding(20.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
+        IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.action_back)) }
         if (state.isBasics) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(stringResource(R.string.basics_name) + " · ", style = MaterialTheme.typography.headlineSmall, modifier = Modifier.semantics { heading() })
@@ -329,7 +349,8 @@ fun CollectionContent(state: CollectionUiState, onAction: (CollectionAction) -> 
             Text(stringResource(R.string.collection_places), style = MaterialTheme.typography.titleMedium, modifier = Modifier.semantics { heading() })
             state.places.forEach { p ->
                 Row(
-                    Modifier.fillMaxWidth().background(t.surface, RoundedCornerShape(12.dp)).clickable(role = Role.Button) { onOpenPlace(p.place.id.value) }
+                    Modifier.fillMaxWidth().background(t.surface, RoundedCornerShape(12.dp))
+                        .then(if (onOpenPlace != null) Modifier.clickable(role = Role.Button) { onOpenPlace(p.place.id.value) } else Modifier)
                         .padding(14.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {

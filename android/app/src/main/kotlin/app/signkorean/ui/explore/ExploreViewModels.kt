@@ -10,6 +10,7 @@ import app.signkorean.domain.content.CardKind
 import app.signkorean.domain.content.CardPlaceLinker
 import app.signkorean.domain.content.ContentPack
 import app.signkorean.domain.content.ContentRepository
+import app.signkorean.domain.content.GroupKind
 import app.signkorean.domain.content.Place
 import app.signkorean.domain.content.SignCard
 import app.signkorean.domain.content.SignGroup
@@ -24,6 +25,7 @@ import app.signkorean.domain.learning.StartOutcome
 import app.signkorean.domain.learning.StartSession
 import app.signkorean.ui.text.UiText
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -60,6 +62,8 @@ data class ResumeUi(val source: SessionSource, val areaName: LocalizedText?, val
 
 data class ExploreUiState(
     val loading: Boolean = true,
+    /** 검색어가 기초 표지판 단어·뜻과 맞는다. 검색 중에도 Basics 카드를 보인다. */
+    val basicsMatches: Boolean = false,
     val failed: Boolean = false,
     val basics: Progress = Progress(0, 0, 0),
     val basicsPreview: List<SignCard> = emptyList(),
@@ -88,6 +92,10 @@ class ExploreViewModel(
 
     private var all: List<AreaUi> = emptyList()
     private var searchIndex: Map<AreaId, String> = emptyMap()
+    private var basicsIndex: String = ""
+
+    /** 앞선 새로 읽기는 취소한다. 늦게 끝난 옛 결과가 새 결과를 덮지 않게. */
+    private var refreshJob: Job? = null
 
     init {
         refresh()
@@ -95,13 +103,14 @@ class ExploreViewModel(
 
     fun onAction(action: ExploreAction) {
         when (action) {
-            is ExploreAction.Search -> _state.update { it.copy(query = action.query, areas = filter(action.query)) }
+            is ExploreAction.Search -> _state.update { it.copy(query = action.query, areas = filter(action.query), basicsMatches = basicsMatch(action.query)) }
             ExploreAction.Refresh -> refresh()
         }
     }
 
     private fun refresh() {
-        viewModelScope.launch {
+        refreshJob?.cancel()
+        refreshJob = viewModelScope.launch {
             try {
                 val pack = content.load()
                 val statuses = states.all()
@@ -125,6 +134,7 @@ class ExploreViewModel(
                         cards.forEach { c -> append(c.koText).append(' '); c.meaning.locales.forEach { append(c.meaning[it]).append(' ') } }
                     }.lowercase()
                 }
+                basicsIndex = basics.joinToString(" ") { c -> c.koText + " " + c.meaning.locales.joinToString(" ") { c.meaning[it].orEmpty() } }.lowercase()
                 val session = resume()
                 _state.update {
                     it.copy(
@@ -133,6 +143,7 @@ class ExploreViewModel(
                         basics = Progress.of(basics, statuses),
                         basicsPreview = basics.take(3),
                         areas = filter(it.query),
+                        basicsMatches = basicsMatch(it.query),
                         resume = session?.let { s -> resumeOf(s, pack) },
                     )
                 }
@@ -149,6 +160,11 @@ class ExploreViewModel(
         areaName = (s.source as? SessionSource.Area)?.let { src -> pack.areas.firstOrNull { it.id == src.area }?.name },
         decisions = s.decisions.size,
     )
+
+    private fun basicsMatch(query: String): Boolean {
+        val q = query.trim().lowercase()
+        return q.isNotEmpty() && q in basicsIndex
+    }
 
     private fun filter(query: String): List<AreaUi> {
         val q = query.trim().lowercase()
@@ -167,6 +183,8 @@ data class PlaceUi(val place: Place, val group: SignGroup?)
 data class CollectionUiState(
     val loading: Boolean = true,
     val missing: Boolean = false,
+    /** 읽기 실패. 사라진 콘텐츠(missing)와 달리 다시 시도할 수 있다. */
+    val failed: Boolean = false,
     val isBasics: Boolean = false,
     val name: LocalizedText = LocalizedText.EMPTY,
     val koName: String = "",
@@ -191,6 +209,9 @@ sealed interface CollectionAction {
     data class StartFrom(val card: CardId) : CollectionAction
     data object ConfirmReplace : CollectionAction
     data object KeepSession : CollectionAction
+
+    /** 학습에서 돌아왔을 때 진행률·칩 색을 다시 읽는다. */
+    data object Refresh : CollectionAction
 }
 
 sealed interface CollectionEffect {
@@ -223,17 +244,24 @@ class CollectionViewModel(
         viewModelScope.launch { load() }
     }
 
+    private var loadJob: Job? = null
+
     private suspend fun load() {
         try {
             val pack = content.load()
             val statuses = states.all()
             cards = SourceCards.of(pack, source)
-            val base = CollectionUiState(loading = false, progress = Progress.of(cards, statuses), mode = _state.value.mode)
+            val progress = Progress.of(cards, statuses)
+            // 복습할 카드가 없어졌으면 All 로 돌린다.
+            val mode = if (progress.learning == 0) Mode.All else _state.value.mode
+            val base = CollectionUiState(loading = false, progress = progress, mode = mode)
             _state.value = when (source) {
                 SessionSource.Basics -> base.copy(
                     isBasics = true,
-                    groups = cards.groupBy { (it.kind as CardKind.Basic).groupId }
-                        .map { (id, cs) -> GroupUi(pack.groups.firstOrNull { it.id == id }, cs.map { WordChip(it.id, it.koText, statuses[it.id] ?: CardStatus.Unseen) }) },
+                    // 묶음 순서는 콘텐츠 팩의 묶음 순서를 따른다(카드가 놓인 순서와 무관).
+                    groups = cards.groupBy { pack.groupOf(it) }.entries
+                        .sortedBy { (g, _) -> pack.groups.indexOf(g).let { if (it < 0) Int.MAX_VALUE else it } }
+                        .map { (g, cs) -> GroupUi(g, cs.map { WordChip(it.id, it.koText, statuses[it.id] ?: CardStatus.Unseen) }) },
                 )
                 is SessionSource.Area -> {
                     val area = pack.areas.firstOrNull { it.id == source.area }
@@ -246,11 +274,10 @@ class CollectionViewModel(
                             koName = area.koName,
                             description = area.description,
                             color = area.color,
-                            places = places.map { p -> PlaceUi(p, pack.groups.firstOrNull { it.id == p.typeId }) },
-                            groups = places.map { p -> p to CardPlaceLinker.cardsFor(p, cards) }
-                                .flatMap { it.second }.distinct()
-                                .groupBy { (it.kind as CardKind.PlaceSign).typeId }
-                                .map { (id, cs) -> GroupUi(pack.groups.firstOrNull { it.id == id }, cs.map { WordChip(it.id, it.koText, statuses[it.id] ?: CardStatus.Unseen) }) },
+                            places = places.map { p -> PlaceUi(p, pack.groups.firstOrNull { it.kind == GroupKind.PlaceType && it.id == p.typeId }) },
+                            groups = places.flatMap { p -> CardPlaceLinker.cardsFor(p, cards) }.distinct()
+                                .groupBy { pack.groupOf(it) }
+                                .map { (g, cs) -> GroupUi(g, cs.map { WordChip(it.id, it.koText, statuses[it.id] ?: CardStatus.Unseen) }) },
                         )
                     }
                 }
@@ -259,14 +286,21 @@ class CollectionViewModel(
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
-            _state.value = CollectionUiState(loading = false, missing = true)
+            _state.value = CollectionUiState(loading = false, failed = true)
         }
     }
 
     fun onAction(action: CollectionAction) {
         val s = _state.value
+        if (action == CollectionAction.Refresh) {
+            if (s.busy) return
+            loadJob?.cancel()
+            loadJob = viewModelScope.launch { load() }
+            return
+        }
         if (s.busy) return
         when (action) {
+            CollectionAction.Refresh -> Unit
             is CollectionAction.SetMode -> if (action.mode == Mode.All || s.canReview) _state.update { it.copy(mode = action.mode, message = null) }
             CollectionAction.Start -> begin(s.mode, null, replace = false)
             is CollectionAction.StartFrom -> begin(Mode.All, action.card, replace = false)
@@ -291,7 +325,17 @@ class CollectionViewModel(
                 StartOutcome.SaveFailed
             }
             when (outcome) {
-                is StartOutcome.Started, is StartOutcome.Resumed -> {
+                // 단어 칩에서 시작했는데 같은 출처의 진행 중 세션이 이어졌다면 고른 카드가 먼저 나오지 않는다.
+                // 그 경우도 교체할지 묻는다.
+                is StartOutcome.Resumed -> if (from != null && !replace) {
+                    pending = mode to from
+                    _state.update { it.copy(busy = false, confirmReplace = true) }
+                } else {
+                    pending = null
+                    _state.update { it.copy(busy = false) }
+                    _effects.send(CollectionEffect.OpenLearn)
+                }
+                is StartOutcome.Started -> {
                     pending = null
                     _state.update { it.copy(busy = false) }
                     _effects.send(CollectionEffect.OpenLearn)

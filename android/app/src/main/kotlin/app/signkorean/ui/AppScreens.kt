@@ -31,7 +31,7 @@ fun AppScreen(route: Route, navigator: AppNavigator) {
             onOpenBasics = { navigator.push(Route(ScreenId.SC03, CollectionArg.BASICS)) },
             onOpenArea = { id -> navigator.push(Route(ScreenId.SC03, CollectionArg.area(id))) },
             onResume = { navigator.push(Route(ScreenId.SC04)) },
-            onOpenSettings = { navigator.push(Route(ScreenId.SC10)) },
+            onOpenSettings = null, // SC10 은 Phase 20 에서 연다
         )
         ScreenId.SC03 -> {
             val source = CollectionArg.parse(route.arg)
@@ -41,7 +41,7 @@ fun AppScreen(route: Route, navigator: AppNavigator) {
                 CollectionScreen(
                     source = source,
                     onOpenLearn = { navigator.push(Route(ScreenId.SC04)) },
-                    onOpenPlace = { id -> navigator.push(Route(ScreenId.SC07, id)) },
+                    onOpenPlace = null, // SC07 은 Phase 14 에서 연다
                     onBack = { navigator.back() },
                 )
             }

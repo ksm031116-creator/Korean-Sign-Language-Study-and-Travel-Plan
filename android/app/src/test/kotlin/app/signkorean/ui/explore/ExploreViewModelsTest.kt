@@ -160,4 +160,44 @@ class ExploreViewModelsTest {
     fun `없는 지역이면 빈 상태`() = runTest {
         assertTrue(collection(SessionSource.Area(AreaId("nowhere"))).state.value.missing)
     }
+
+    @Test
+    fun `학습에서 돌아와 새로 읽으면 진행률과 칩 색이 바뀐다 (리뷰 HIGH-2)`() = runTest {
+        val vm = collection(SessionSource.Basics)
+        assertEquals(0, vm.state.value.progress.known)
+        states.save(CardState(CardId("b01"), CardStatus.Known, now))
+        vm.onAction(CollectionAction.Refresh)
+        assertEquals(1, vm.state.value.progress.known)
+        assertEquals(CardStatus.Known, vm.state.value.groups.flatMap { it.words }.single { it.id == CardId("b01") }.status)
+    }
+
+    @Test
+    fun `같은 출처 세션 중에 단어 칩을 누르면 이어 하지 않고 교체를 묻는다`() = runTest {
+        val vm = collection(SessionSource.Basics)
+        vm.onAction(CollectionAction.Start)
+        vm.effects.tryReceive()
+        vm.onAction(CollectionAction.StartFrom(CardId("b02")))
+        assertTrue(vm.state.value.confirmReplace)
+        vm.onAction(CollectionAction.ConfirmReplace)
+        assertEquals(CardId("b02"), sessions.current()!!.current)
+    }
+
+    @Test
+    fun `검색어가 기초 표지판 단어면 Basics 를 보인다`() = runTest {
+        val vm = explore()
+        vm.onAction(ExploreAction.Search("화장실"))
+        assertTrue(vm.state.value.basicsMatches)
+        vm.onAction(ExploreAction.Search("떡볶이"))
+        assertFalse(vm.state.value.basicsMatches)
+    }
+
+    @Test
+    fun `읽기에 실패하면 사라진 콘텐츠가 아니라 다시 시도할 수 있는 상태`() = runTest {
+        val failing = object : app.signkorean.domain.content.ContentRepository {
+            override suspend fun load(): app.signkorean.domain.content.ContentPack = throw java.io.IOException("x")
+        }
+        val s = CollectionViewModel(SessionSource.Basics, failing, states, start).state.value
+        assertTrue(s.failed)
+        assertFalse(s.missing)
+    }
 }
