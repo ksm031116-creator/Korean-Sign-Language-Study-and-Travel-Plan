@@ -18,6 +18,7 @@ android {
     }
 
     testOptions {
+        unitTests.isIncludeAndroidResources = true
         unitTests.all {
             // 연결 감사 스냅샷(C-07) 갱신: ./gradlew :adapter:testDebugUnitTest -PupdateSnapshots=true
             it.systemProperty("updateSnapshots", project.findProperty("updateSnapshots") ?: "false")
@@ -42,8 +43,11 @@ dependencies {
     implementation(project(":domain"))
     // 콘텐츠 팩 JSON. 컴파일러 플러그인 없이 JsonElement 로 읽어 필드별 오류 위치를 직접 알린다.
     implementation(libs.kotlinx.serialization.json)
+    // 앱별 언어(per-app language). 언어 값의 저장은 AppCompat 하나만 한다 (설계서 §8.2).
+    implementation(libs.androidx.appcompat)
 
     // Robolectric 이 JUnit 4 러너만 지원하므로 Android 모듈의 단위 테스트는 JUnit 4 로 쓴다 (설계서 §9.1).
     testImplementation(project(":testing"))
     testImplementation(libs.junit4)
+    testImplementation(libs.robolectric)
 }

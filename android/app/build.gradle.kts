@@ -17,6 +17,10 @@ android {
     }
 
     buildTypes {
+        debug {
+            // 의사 언어 en-XA(긴 문구)·ar-XB(오른쪽→왼쪽)로 레이아웃을 검사한다 (설계서 §8.7, L10N-09).
+            isPseudoLocalesEnabled = true
+        }
         release {
             isMinifyEnabled = false
         }
@@ -46,6 +50,7 @@ android {
 
     testOptions {
         unitTests.isReturnDefaultValues = true
+        unitTests.isIncludeAndroidResources = true
         unitTests.all {
             // ContentModuleTest 가 File 로 직접 읽는 내장 팩. 입력으로 알려야 팩만 바뀌어도 다시 실행된다.
             it.inputs.dir(rootProject.file("adapter/src/main/assets/content"))
@@ -68,10 +73,15 @@ dependencies {
     implementation(libs.compose.material3)
     implementation(libs.compose.ui.tooling.preview)
     implementation(libs.koin.android)
+    implementation(libs.androidx.appcompat)
 
     testImplementation(project(":testing"))
     testImplementation(libs.junit4)
     testImplementation(libs.koin.test)
     testImplementation(libs.koin.test.junit4)
     testImplementation(libs.konsist)
+    testImplementation(libs.robolectric)
+    testImplementation(platform(libs.compose.bom))
+    testImplementation(libs.compose.ui.test.junit4)
+    debugImplementation(libs.compose.ui.test.manifest)
 }

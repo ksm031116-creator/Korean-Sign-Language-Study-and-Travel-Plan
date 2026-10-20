@@ -1,5 +1,6 @@
 package app.signkorean.di
 
+import android.content.Context
 import android.content.res.AssetManager
 import app.signkorean.adapter.platform.SystemTimeClock
 import app.signkorean.adapter.platform.UuidIdGenerator
@@ -24,9 +25,9 @@ class KoinModulesTest {
     @Test
     fun `AR-05 모든 Koin 모듈의 정의가 해석된다`() {
         // verify() 는 생성자 인자 타입마다 Koin 정의를 찾는다. 아래 타입은 정의가 아니라 조립부에서 값을 직접 넣는다.
-        // 디스패처: kotlinx.coroutines.Dispatchers / AssetManager: androidContext().assets.
+        // 디스패처: kotlinx.coroutines.Dispatchers / AssetManager·Context: androidContext().
         // String·Set 같은 넓은 타입은 넣지 않는다. 넣으면 앞으로 그런 의존성이 빠져도 검사가 통과해 버린다.
-        val passedDirectly = listOf(CoroutineDispatcher::class, AssetManager::class)
+        val passedDirectly = listOf(CoroutineDispatcher::class, AssetManager::class, Context::class)
         // 픽토그램 목록 Set 은 PictogramCatalog 하나에만 값으로 들어간다. 그 정의에만 허용한다.
         val catalogIds = injectedParameters(definition<PictogramCatalog>(Set::class))
         appModules.forEach { it.verify(extraTypes = passedDirectly, injections = catalogIds) }

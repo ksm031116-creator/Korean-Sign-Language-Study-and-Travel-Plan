@@ -6,6 +6,7 @@ import app.signkorean.adapter.content.ContentIssueReporter
 import app.signkorean.adapter.content.ContentPackParser
 import app.signkorean.adapter.content.ContentPackSource
 import app.signkorean.adapter.content.LogcatContentIssueReporter
+import app.signkorean.adapter.locale.AppCompatCurrentLocale
 import app.signkorean.adapter.platform.SystemTimeClock
 import app.signkorean.adapter.platform.UuidIdGenerator
 import app.signkorean.domain.common.AppDispatchers
@@ -14,6 +15,8 @@ import app.signkorean.domain.common.IdGenerator
 import app.signkorean.domain.content.ContentRepository
 import app.signkorean.domain.content.ContentValidator
 import app.signkorean.domain.content.PictogramCatalog
+import app.signkorean.domain.locale.CurrentLocale
+import app.signkorean.domain.locale.ResolveAppLanguage
 import kotlinx.coroutines.Dispatchers
 import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
@@ -38,5 +41,11 @@ val contentModule = module {
     single<ContentRepository> { AssetContentRepository(get(), get(), get(), get(), get()) }
 }
 
+/** 언어 (Phase 3). 앱 언어 저장은 AppCompat 하나만 한다 (설계서 §8.2). */
+val localeModule = module {
+    single<CurrentLocale> { AppCompatCurrentLocale(androidContext()) }
+    factory { ResolveAppLanguage(get()) }
+}
+
 /** 앱이 시작할 때 올리는 모듈 전체. 기능이 늘면 여기에 모듈을 추가한다. */
-val appModules = listOf(platformModule, contentModule)
+val appModules = listOf(platformModule, contentModule, localeModule)

@@ -1,5 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- 일본어. 영어를 옮기지 않고 일본어 화자에게 자연스러운 말로 쓴다 (PRD §1.4). 원어민 검수 전 초안. -->
+<!-- 일본어. 영어를 옮기지 않고 일본어 화자에게 자연스러운 말로 쓴다 (PRD §1.4). 원어민 검수 전 초안(Q-01).
+     정중체(です・ます)가 기본이고, 버튼은 짧은 체언·동사형으로 쓴다 (설계서 §8.3). -->
 <resources>
     <string name="app_tagline">街の看板を、ひとつずつ読めるように。</string>
+
+    <string name="common_saved">保存しました</string>
+    <string name="common_save_failed">保存できませんでした。もう一度お試しください。</string>
+    <string name="common_offline">オフラインです。一度開いた看板はそのまま見られます。</string>
+    <string name="common_retry">もう一度</string>
+    <string name="common_undo">元に戻す</string>
+    <string name="common_loading">読み込み中</string>
+
+    <string name="format_date_short">M月d日(E)</string>
+    <string name="format_duration_hm">%1$d時間%2$d分</string>
+    <string name="format_duration_h">%1$d時間</string>
+    <string name="format_duration_m">%1$d分</string>
+    <string name="format_distance_m">%1$d m</string>
+    <string name="format_distance_km">%1$s km</string>
+
+    <plurals name="places_count">
+        <item quantity="other">%dか所</item>
+    </plurals>
 </resources>
