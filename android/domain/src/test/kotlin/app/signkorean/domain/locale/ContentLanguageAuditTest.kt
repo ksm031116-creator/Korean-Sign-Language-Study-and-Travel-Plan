@@ -25,8 +25,9 @@ class ContentLanguageAuditTest {
         val p = pack(
             cards = listOf(complete),
             places = listOf(place("p").copy(name = both("A", "A"), address = both("1 St", "1番地"))),
-            areas = listOf(area().copy(name = both("Myeongdong", "明洞"))),
+            areas = listOf(area().copy(name = both("Myeongdong", "明洞"), tag = both("Food", "グルメ"), description = both("d", "d"))),
             locales = mapOf(EN to ReviewStatus.Reviewed, JA to ReviewStatus.Reviewed),
+            groups = emptyList(),
         )
         val report = ContentLanguageAudit.audit(p)
         assertTrue(report.isReleasable, "$report")
@@ -35,7 +36,8 @@ class ContentLanguageAuditTest {
     @Test
     fun `L10N-04 ja 뜻·설명·읽기·장소 이름 누락을 항목별로 보고한다`() {
         val p = pack(cards = listOf(card("b01")), places = listOf(place("p")), locales = mapOf(EN to ReviewStatus.Reviewed, JA to ReviewStatus.Reviewed))
-        val gaps = ContentLanguageAudit.audit(p).gaps
+        val contentFields = setOf(LanguageGap.Field.Meaning, LanguageGap.Field.Note, LanguageGap.Field.Reading, LanguageGap.Field.PlaceName, LanguageGap.Field.PlaceAddress, LanguageGap.Field.AreaName)
+        val gaps = ContentLanguageAudit.audit(p).gaps.filter { it.field in contentFields }
         assertEquals(
             setOf(
                 LanguageGap("b01", JA, LanguageGap.Field.Meaning),
@@ -85,8 +87,15 @@ class ContentLanguageAuditTest {
         )
         assertEquals(
             setOf(LanguageGap("myeongdong", JA, LanguageGap.Field.AreaName), LanguageGap("p", JA, LanguageGap.Field.PlaceAddress)),
-            ContentLanguageAudit.audit(p).gaps.toSet(),
+            ContentLanguageAudit.audit(p).gaps.filter { it.field == LanguageGap.Field.AreaName || it.field == LanguageGap.Field.PlaceAddress }.toSet(),
         )
+    }
+
+    @Test
+    fun `지역 설명·묶음 이름도 검사한다`() {
+        val p = pack(locales = mapOf(EN to ReviewStatus.Reviewed, JA to ReviewStatus.Reviewed))
+        val fields = ContentLanguageAudit.audit(p).gaps.filter { it.locale == JA }.map { it.field }.toSet()
+        assertTrue(fields.containsAll(setOf(LanguageGap.Field.AreaTag, LanguageGap.Field.AreaDescription, LanguageGap.Field.GroupLabel)), "$fields")
     }
 
     @Test

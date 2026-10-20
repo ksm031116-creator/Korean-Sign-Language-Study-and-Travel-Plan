@@ -41,6 +41,11 @@ sealed interface ContentIssue {
         override val isError get() = true
     }
 
+    /** 카드의 묶음(기초 분류·장소 유형)이 팩에 없다. 화면이 묶음 이름·색을 찾지 못한다. */
+    data class UnknownGroup(val card: CardId, val group: String) : ContentIssue {
+        override val isError get() = true
+    }
+
     /** 장소 유형 카드인데 연결되는 장소가 없다. 아래로 넘기기가 빠질 뿐 학습은 된다. */
     data class CardWithoutPlaces(val card: CardId) : ContentIssue {
         override val isError get() = false
@@ -86,6 +91,10 @@ class ContentValidator(private val pictograms: PictogramCatalog) {
             .mapValues { (_, same) -> same.firstOrNull { it.active } ?: same.first() }
         uniqueCards.forEach { card ->
             if (card.koText != card.koText.trim()) issues += ContentIssue.UntrimmedText(card.id)
+            if (pack.groups.isNotEmpty() && pack.groupOf(card) == null) {
+                val group = when (val k = card.kind) { is CardKind.Basic -> k.groupId; is CardKind.PlaceSign -> k.typeId }
+                issues += ContentIssue.UnknownGroup(card.id, group)
+            }
             if (keptForWord[card.koText.trim()] !== card) return@forEach
             val reasons = CardActivation.reasons(card)
             if (reasons.isNotEmpty()) issues += ContentIssue.InactiveCard(card.id, reasons)

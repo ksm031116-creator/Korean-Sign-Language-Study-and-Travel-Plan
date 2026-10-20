@@ -17,7 +17,8 @@ class ContentPackParserTest {
 
     private fun pack(cards: String = "[]", places: String = "[]", schema: Int = 1) = """
         {"schemaVersion":$schema,"version":"abc","locales":{"en":"reviewed","ja":"draft"},
-         "areas":[{"id":"myeongdong","koName":"명동","name":{"en":"Myeongdong"},"active":true}],
+         "areas":[{"id":"myeongdong","koName":"명동","name":{"en":"Myeongdong"},"active":true,"tag":{"en":"Food"},"description":{"en":"d"},"color":"#b8554a"}],
+         "groups":[{"id":"restroom","kind":"basic","koLabel":"화장실·시설","label":{"en":"Restrooms"},"color":"#2f6fb0"}],
          "cards":$cards,"places":$places}
     """.trimIndent()
 

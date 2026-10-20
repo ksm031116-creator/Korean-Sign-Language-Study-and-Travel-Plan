@@ -6,7 +6,7 @@ import app.signkorean.domain.content.ReviewStatus
 
 /** 지원 언어로 채워지지 않은 콘텐츠 칸 하나. [id] 는 카드 또는 장소 ID. */
 data class LanguageGap(val id: String, val locale: LocaleTag, val field: Field) {
-    enum class Field { Meaning, Note, Reading, PlaceName, PlaceAddress, AreaName }
+    enum class Field { Meaning, Note, Reading, PlaceName, PlaceAddress, AreaName, AreaTag, AreaDescription, GroupLabel }
 }
 
 data class LanguageAuditReport(
@@ -42,6 +42,11 @@ object ContentLanguageAudit {
             }
             pack.areas.filter { it.active }.forEach { area ->
                 if (area.name[locale] == null) gaps += LanguageGap(area.id.value, locale, LanguageGap.Field.AreaName)
+                if (area.tag[locale] == null) gaps += LanguageGap(area.id.value, locale, LanguageGap.Field.AreaTag)
+                if (area.description[locale] == null) gaps += LanguageGap(area.id.value, locale, LanguageGap.Field.AreaDescription)
+            }
+            pack.groups.forEach { group ->
+                if (group.label[locale] == null) gaps += LanguageGap(group.id, locale, LanguageGap.Field.GroupLabel)
             }
         }
         val drafts = pack.locales.filterValues { it == ReviewStatus.Draft }.keys.toList()

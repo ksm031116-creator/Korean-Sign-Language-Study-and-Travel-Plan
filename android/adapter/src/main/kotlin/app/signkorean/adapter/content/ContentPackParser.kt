@@ -8,6 +8,7 @@ import app.signkorean.domain.content.AudioClip
 import app.signkorean.domain.content.CardId
 import app.signkorean.domain.content.CardKind
 import app.signkorean.domain.content.ContentPack
+import app.signkorean.domain.content.GroupKind
 import app.signkorean.domain.content.PhotoLicense
 import app.signkorean.domain.content.PictogramId
 import app.signkorean.domain.content.Place
@@ -15,6 +16,7 @@ import app.signkorean.domain.content.PlaceId
 import app.signkorean.domain.content.PlacePhoto
 import app.signkorean.domain.content.ReviewStatus
 import app.signkorean.domain.content.SignCard
+import app.signkorean.domain.content.SignGroup
 import app.signkorean.domain.location.Coordinate
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
@@ -56,6 +58,7 @@ class ContentPackParser {
                 version = field("version").string(),
                 locales = locales,
                 areas = field("areas").list { area() },
+                groups = field("groups").list { group() },
                 cards = field("cards").list { card() },
                 places = field("places").list { place() },
             )
@@ -81,6 +84,21 @@ class ContentPackParser {
         koName = field("koName").string(),
         name = field("name").localized(packLocales),
         active = field("active").boolean(),
+        tag = field("tag").localized(packLocales),
+        description = field("description").localized(packLocales),
+        color = field("color").hexColor(),
+    )
+
+    private fun Node.group() = SignGroup(
+        id = field("id").string(),
+        kind = when (val k = field("kind").string()) {
+            "basic" -> GroupKind.Basic
+            "place" -> GroupKind.PlaceType
+            else -> fail("kind", "알 수 없는 묶음 종류 '$k'")
+        },
+        koLabel = field("koLabel").string(),
+        label = field("label").localized(packLocales),
+        color = field("color").hexColor(),
     )
 
     private fun Node.card(): SignCard {
@@ -99,9 +117,7 @@ class ContentPackParser {
             meaning = field("meaning").localized(packLocales),
             note = field("note").localized(packLocales),
             pictogram = field("pictogram").stringOrNull()?.let(::PictogramId),
-            plateColor = field("plateColor").string().also {
-                if (!HEX_COLOR.matches(it)) fail("plateColor", "#rrggbb 형식이 아니다: '$it'")
-            },
+            plateColor = field("plateColor").hexColor(),
             audio = field("audio").stringOrNull()?.let(::AudioClip),
             reviewed = field("reviewed").boolean(),
         )
@@ -166,6 +182,8 @@ class ContentPackParser {
         fun string(): String = primitive().takeIf { it.isString }?.content ?: failHere("문자열이 아니다")
 
         fun nonBlank(): String = string().ifBlank { failHere("비어 있다") }
+
+        fun hexColor(): String = string().also { if (!HEX_COLOR.matches(it)) failHere("#rrggbb 형식이 아니다: '$it'") }
 
         fun stringOrNull(): String? = orNull()?.string()
 

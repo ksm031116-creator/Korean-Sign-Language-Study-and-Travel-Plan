@@ -56,6 +56,22 @@ data class Area(
     val koName: String,
     val name: LocalizedText,
     val active: Boolean,
+    /** 한 줄 성격(예: History & quiet lanes). */
+    val tag: LocalizedText = LocalizedText.EMPTY,
+    val description: LocalizedText = LocalizedText.EMPTY,
+    /** 사진이 없을 때 쓰는 지역 색 (#rrggbb). */
+    val color: String = "#2f6f5e",
+)
+
+enum class GroupKind { Basic, PlaceType }
+
+/** 카드 묶음: 기초 표지판 분류 또는 장소 유형. 카드의 CardKind 가 이 id 를 가리킨다. */
+data class SignGroup(
+    val id: String,
+    val kind: GroupKind,
+    val koLabel: String,
+    val label: LocalizedText,
+    val color: String,
 )
 
 data class Place(
@@ -115,10 +131,17 @@ data class ContentPack(
     val version: String,
     val locales: Map<LocaleTag, ReviewStatus>,
     val areas: List<Area>,
+    val groups: List<SignGroup> = emptyList(),
     val cards: List<SignCard>,
     val places: List<Place>,
 ) {
     /** 언어 선택 화면에 보여 줄 언어. 출시 빌드는 검수 완료 언어만, 디버그는 초안도 포함한다. */
     fun selectableLocales(includeDrafts: Boolean): List<LocaleTag> =
         locales.filter { (_, status) -> includeDrafts || status == ReviewStatus.Reviewed }.keys.toList()
+
+    /** 카드가 속한 묶음. */
+    fun groupOf(card: SignCard): SignGroup? = when (val k = card.kind) {
+        is CardKind.Basic -> groups.firstOrNull { it.kind == GroupKind.Basic && it.id == k.groupId }
+        is CardKind.PlaceSign -> groups.firstOrNull { it.kind == GroupKind.PlaceType && it.id == k.typeId }
+    }
 }

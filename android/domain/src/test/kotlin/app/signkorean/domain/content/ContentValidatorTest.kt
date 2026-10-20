@@ -144,4 +144,10 @@ class ContentValidatorTest {
         val result = validator.validate(pack(cards = listOf(basic("b01", "출구").copy(romanization = ""), basic("b02", "출구"))))
         assertEquals(listOf("b02"), ids(result.pack.cards))
     }
+
+    @Test
+    fun `카드의 묶음이 팩에 없으면 오류`() {
+        val result = validator.validate(pack(cards = listOf(basic("b01", "화장실", group = "nowhere"))))
+        assertEquals(listOf(ContentIssue.UnknownGroup(CardId("b01"), "nowhere")), result.issues)
+    }
 }

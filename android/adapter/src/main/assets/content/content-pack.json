@@ -1,6 +1,6 @@
 {
  "schemaVersion": 1,
- "version": "0d494671456c",
+ "version": "c43b11aeccf9",
  "locales": {
   "en": "reviewed",
   "ja": "draft"
@@ -12,6 +12,13 @@
    "name": {
     "en": "Gyeongbokgung & Seochon"
    },
+   "tag": {
+    "en": "History & quiet lanes"
+   },
+   "description": {
+    "en": "Palace courtyards, museum halls and the slow lanes of Seochon and Samcheong-dong."
+   },
+   "color": "#2f6f5e",
    "active": true
   },
   {
@@ -20,6 +27,13 @@
    "name": {
     "en": "Myeongdong & Namdaemun"
    },
+   "tag": {
+    "en": "Food & shopping"
+   },
+   "description": {
+    "en": "A dense grid of shops, street food and the oldest market in the city."
+   },
+   "color": "#b8554a",
    "active": true
   },
   {
@@ -28,6 +42,13 @@
    "name": {
     "en": "Dongdaemun & Euljiro"
    },
+   "tag": {
+    "en": "Design & night walks"
+   },
+   "description": {
+    "en": "Curved architecture, fabric markets and the printing alleys of Euljiro."
+   },
+   "color": "#4a5b8c",
    "active": true
   },
   {
@@ -36,6 +57,13 @@
    "name": {
     "en": "Seongsu & Seoul Forest"
    },
+   "tag": {
+    "en": "Cafés & parks"
+   },
+   "description": {
+    "en": "Converted factories, a long green park and the city’s busiest café street."
+   },
+   "color": "#6b8e3d",
    "active": true
   },
   {
@@ -44,6 +72,13 @@
    "name": {
     "en": "Hongdae & Yeonnam"
    },
+   "tag": {
+    "en": "Youth & late nights"
+   },
+   "description": {
+    "en": "Music venues, student streets and a converted railway park."
+   },
+   "color": "#9c5a9e",
    "active": true
   },
   {
@@ -52,6 +87,13 @@
    "name": {
     "en": "Yongsan & Itaewon"
    },
+   "tag": {
+    "en": "Museums & global food"
+   },
+   "description": {
+    "en": "The national museum, a war memorial, and the most international street in Seoul."
+   },
+   "color": "#c07a2c",
    "active": true
   },
   {
@@ -60,6 +102,13 @@
    "name": {
     "en": "Yeouido & the Han River"
    },
+   "tag": {
+    "en": "River & skyline"
+   },
+   "description": {
+    "en": "Riverside parks, a department store and the city’s financial district."
+   },
+   "color": "#2f7f94",
    "active": true
   },
   {
@@ -68,7 +117,178 @@
    "name": {
     "en": "Gangnam & Jamsil"
    },
+   "tag": {
+    "en": "Towers & malls"
+   },
+   "description": {
+    "en": "Underground malls, an observation tower and a large Olympic park."
+   },
+   "color": "#5b4b8a",
    "active": true
+  }
+ ],
+ "groups": [
+  {
+   "id": "restroom",
+   "kind": "basic",
+   "koLabel": "화장실·시설",
+   "label": {
+    "en": "Restrooms & facilities"
+   },
+   "color": "#2f6fb0"
+  },
+  {
+   "id": "door",
+   "kind": "basic",
+   "koLabel": "문·방향",
+   "label": {
+    "en": "Doors & direction"
+   },
+   "color": "#3a7d44"
+  },
+  {
+   "id": "hours",
+   "kind": "basic",
+   "koLabel": "영업시간",
+   "label": {
+    "en": "Opening hours"
+   },
+   "color": "#b9772a"
+  },
+  {
+   "id": "warning",
+   "kind": "basic",
+   "koLabel": "주의·금지",
+   "label": {
+    "en": "Warnings & bans"
+   },
+   "color": "#c0392b"
+  },
+  {
+   "id": "transit",
+   "kind": "basic",
+   "koLabel": "교통·이동",
+   "label": {
+    "en": "Transit & moving around"
+   },
+   "color": "#1f6f78"
+  },
+  {
+   "id": "service",
+   "kind": "basic",
+   "koLabel": "생활 서비스",
+   "label": {
+    "en": "Everyday services"
+   },
+   "color": "#5b4b8a"
+  },
+  {
+   "id": "palace",
+   "kind": "place",
+   "koLabel": "고궁·유적",
+   "label": {
+    "en": "Palace & heritage site"
+   },
+   "color": "#2f6f5e"
+  },
+  {
+   "id": "museum",
+   "kind": "place",
+   "koLabel": "박물관·미술관",
+   "label": {
+    "en": "Museum & gallery"
+   },
+   "color": "#4a5b8c"
+  },
+  {
+   "id": "market",
+   "kind": "place",
+   "koLabel": "전통시장",
+   "label": {
+    "en": "Traditional market"
+   },
+   "color": "#b8554a"
+  },
+  {
+   "id": "cafe",
+   "kind": "place",
+   "koLabel": "카페거리",
+   "label": {
+    "en": "Café street"
+   },
+   "color": "#8c6239"
+  },
+  {
+   "id": "street",
+   "kind": "place",
+   "koLabel": "먹자골목·상점가",
+   "label": {
+    "en": "Food street & shops"
+   },
+   "color": "#a8492f"
+  },
+  {
+   "id": "shopping",
+   "kind": "place",
+   "koLabel": "백화점·쇼핑몰",
+   "label": {
+    "en": "Department store & mall"
+   },
+   "color": "#9c5a9e"
+  },
+  {
+   "id": "hanok",
+   "kind": "place",
+   "koLabel": "한옥마을·공방거리",
+   "label": {
+    "en": "Hanok village & craft street"
+   },
+   "color": "#7a6a3a"
+  },
+  {
+   "id": "landmark",
+   "kind": "place",
+   "koLabel": "랜드마크·광장",
+   "label": {
+    "en": "Landmark & plaza"
+   },
+   "color": "#3d6f8f"
+  },
+  {
+   "id": "tower",
+   "kind": "place",
+   "koLabel": "전망대",
+   "label": {
+    "en": "Observation tower"
+   },
+   "color": "#2f7f94"
+  },
+  {
+   "id": "station",
+   "kind": "place",
+   "koLabel": "역·터미널",
+   "label": {
+    "en": "Station & terminal"
+   },
+   "color": "#1f6f78"
+  },
+  {
+   "id": "park",
+   "kind": "place",
+   "koLabel": "공원·한강",
+   "label": {
+    "en": "Park & riverside"
+   },
+   "color": "#6b8e3d"
+  },
+  {
+   "id": "services",
+   "kind": "place",
+   "koLabel": "약국·병원·은행",
+   "label": {
+    "en": "Pharmacy, clinic & bank"
+   },
+   "color": "#3a7d44"
   }
  ],
  "cards": [

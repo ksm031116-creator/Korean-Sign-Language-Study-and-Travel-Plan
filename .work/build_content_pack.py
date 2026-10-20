@@ -35,6 +35,12 @@ SCHEMA_VERSION = 1
 # 설명 언어와 검수 상태. ja 는 원어민 검수(Q-01) 전까지 draft 이며 출시 빌드 검사가 막는다 (설계서 §8.8).
 LOCALES = {'en': 'reviewed', 'ja': 'draft'}
 
+# 기초 표지판 분류의 한국어 이름. 프로토타입 데이터에는 영어 이름만 있다.
+BASIC_GROUP_KO = {
+    'restroom': '화장실·시설', 'door': '문·방향', 'hours': '영업시간',
+    'warning': '주의·금지', 'transit': '교통·이동', 'service': '생활 서비스',
+}
+
 # 프로토타입 JS 를 그대로 실행해 window.* 값을 꺼낸다. 데이터를 두 번 적지 않기 위해서다.
 NODE_DUMP = r"""
 const fs = require('fs'), vm = require('vm');
@@ -115,7 +121,16 @@ def build(proto: dict) -> tuple[dict, list[Path]]:
     data, tour, commons = proto['data'], proto['tour'], proto['commons']
     bundled = {c['id']: c for c in json.loads((PROTO / 'assets' / 'credits.json').read_text(encoding='utf-8'))}
 
-    areas = [{'id': a['id'], 'koName': a['koName'], 'name': {'en': a['name']}, 'active': True} for a in data['areas']]
+    areas = [{
+        'id': a['id'], 'koName': a['koName'], 'name': {'en': a['name']},
+        'tag': {'en': a['tag']}, 'description': {'en': a['description']}, 'color': a['color'], 'active': True,
+    } for a in data['areas']]
+
+    # 카드 묶음: 기초 표지판 분류(Basics)와 장소 유형. 화면의 묶음 이름·판 색에 쓴다.
+    groups = [{'id': g['id'], 'kind': 'basic', 'koLabel': BASIC_GROUP_KO[g['id']], 'label': {'en': g['label']}, 'color': g['color']}
+              for g in data['basicGroups']]
+    groups += [{'id': t['id'], 'kind': 'place', 'koLabel': t['koLabel'], 'label': {'en': t['label']}, 'color': t['color']}
+               for t in data['placeTypes']]
 
     cards = []
     for c in data['cards']:
@@ -154,7 +169,7 @@ def build(proto: dict) -> tuple[dict, list[Path]]:
             'isExample': bool(p.get('example')),
         })
 
-    body = {'locales': LOCALES, 'areas': areas, 'cards': cards, 'places': places}
+    body = {'locales': LOCALES, 'areas': areas, 'groups': groups, 'cards': cards, 'places': places}
     # 내용이 같으면 버전도 같도록 내용 해시를 쓴다(생성 날짜를 쓰면 매번 diff 가 생긴다).
     version = hashlib.sha256(json.dumps(body, ensure_ascii=False, sort_keys=True).encode('utf-8')).hexdigest()[:12]
     pack = {
@@ -162,6 +177,7 @@ def build(proto: dict) -> tuple[dict, list[Path]]:
         'version': version,
         'locales': LOCALES,
         'areas': areas,
+        'groups': groups,
         'cards': cards,
         'places': places,
     }
