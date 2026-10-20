@@ -18,7 +18,9 @@ import org.robolectric.annotation.Config
 
 /**
  * 앱별 언어 저장은 한 곳만 한다 (설계서 §8.2). API 30(AppCompat)과 34(OS LocaleManager) 모두 확인한다.
- * 화면(AppCompatActivity)이 하나도 없는 상태에서 실행된다. 앱 시작 직후·백그라운드와 같은 조건이다.
+ * API 34 는 화면 없이도 OS 에 저장되는지 확인한다(AppCompat 을 거치면 저장되지 않던 문제의 회귀).
+ * API 30 은 AppCompat 의 메모리 값만 확인한다. 디스크 저장(autoStoreLocales)은 AppCompat 화면이 붙어야 일어나며
+ * 그 계약은 AppCompatCurrentLocale 문서에 적었다.
  */
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [30, 34])
@@ -46,7 +48,7 @@ class AppCompatCurrentLocaleTest {
     }
 
     @Test
-    fun `화면이 없어도 고른 언어를 저장하고 다시 읽는다`() {
+    fun `고른 언어를 이 SDK 의 언어 저장소에 넣고 다시 읽는다`() {
         locale.select(LocaleTag("ja"))
         assertEquals("ja", stored())
         assertEquals(LocaleTag("ja"), locale.selected())
