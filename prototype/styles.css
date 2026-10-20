@@ -190,3 +190,12 @@
 .spot-photo .spot-img.photo-intact,.place-hero-img.photo-intact{object-fit:contain;background:#1f2a26}
 .place-hero{position:relative;margin-bottom:18px;border-radius:24px;overflow:hidden;aspect-ratio:16/9;background:var(--sage)}
 .place-hero-img{width:100%;height:100%;object-fit:cover;display:block}
+
+/* 공공 안내 표지판 카드 (PRD §8.3, v2.6): 앞면은 단어만, 뒷면은 픽토그램 + 단어 */
+.sign-plate.card-plate .plate-group{display:none}
+.sign-plate.back-plate{flex:none;height:auto;min-height:0;max-width:210px;aspect-ratio:auto;padding:.9rem .8rem .8rem;gap:.4rem} /* 기본 .sign-plate 의 height:100% 를 끊는다 — 안 끊으면 뒷면 판이 카드 높이만큼 늘어나 나머지를 밀어낸다 */
+.sign-plate.back-plate .plate-word{font-size:clamp(1.6rem,6vw,2.1rem)}
+.sign-plate .plate-pictogram{width:min(132px,70%);height:auto;color:#fff;display:block}
+/* 뒷면은 표지판·발음·뜻·설명이 들어가 앞면보다 길다. 카드가 낮거나(작은 화면) 글자가 크면(200%, NFR04)
+   가운데 정렬이 위쪽을 잘라 버리므로, 넘칠 때는 위에서부터 놓고 카드 안에서 스크롤한다. */
+.card-face.back{justify-content:safe center;overflow-y:auto;overscroll-behavior:contain}

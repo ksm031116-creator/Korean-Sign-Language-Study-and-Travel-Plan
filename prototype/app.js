@@ -67,7 +67,33 @@
   };
   const photoFigure = (p,cls) => { const ph=placePhoto(p); return ph ? `${image(ph.src,p.name,cls+(ph.intact?' photo-intact':''))}<span class="photo-credit">Photo: ${esc(ph.credit)}</span>` : ''; };
   // 기초 표지판은 사진이 아니라 앱이 그리는 표지판 판으로 보여준다.
-  const signPlate = (c,cls='',roman=true) => `<div class="${cls} sign-plate" role="img" aria-label="${esc(c.alt||c.word)}" style="--plate:${esc(c.color||'#2f6fb0')}"><span class="plate-group">${esc(c.groupLabel||'STREET SIGN')}</span><span class="plate-word" lang="ko">${esc(c.word)}</span>${roman?`<span class="plate-roman">${esc(c.roman||'')}</span>`:''}</div>`;
+  // 표지판 픽토그램. 공공 기호를 단순화해 직접 그린 SVG(사진·타사 이미지 아님). 판 색 위에 흰색으로 그린다.
+  const man = x => `<circle cx="${x}" cy="-34" r="9"/><path d="M${x-13} -22h26v28h-6v34h-6v-34h-2v34h-6v-34h-6z"/>`;
+  const woman = x => `<circle cx="${x}" cy="-34" r="9"/><path d="M${x-9} -22h18l11 32h-9v30h-6v-30h-2v30h-6v-30h-9z"/>`;
+  const line = 'fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"';
+  const PICTOGRAMS = {
+    restroom: { label:'Men\u2019s and women\u2019s restroom pictograms', svg: man(-30) + '<rect x="-1.5" y="-44" width="3" height="88" opacity=".7"/>' + woman(30) },
+    men: { label:'Man pictogram', svg: man(0) },
+    women: { label:'Woman pictogram', svg: woman(0) },
+    accessible: { label:'Wheelchair pictogram', svg: `<circle cx="-8" cy="-36" r="8"/><path d="M-12 -24v26h24l8 22" ${line} stroke-width="7"/><circle cx="-6" cy="18" r="22" ${line} stroke-width="6"/>` },
+    exit: { label:'Running person and door pictogram', svg: `<rect x="18" y="-42" width="28" height="84" ${line} stroke-width="6"/><circle cx="-14" cy="-34" r="8"/><path d="M-26 -16l14 -4 10 16 14 2M-12 -20l-8 26-16 14M-14 6l14 12v22" ${line} stroke-width="7"/>` },
+    elevator: { label:'Elevator pictogram', svg: `<rect x="-34" y="-44" width="68" height="88" rx="6" ${line} stroke-width="6"/><path d="M0 -32l-14 18h28zM0 32l-14 -18h28z"/>` },
+    escalator: { label:'Escalator pictogram', svg: `<path d="M-48 32h20l40 -52h28" ${line} stroke-width="9"/><circle cx="-4" cy="-30" r="7"/><path d="M-4 -20v16" ${line} stroke-width="7"/>` },
+    stairs: { label:'Stairs pictogram', svg: `<path d="M-44 40v-16h22v-20h22v-20h22v-20h22" ${line} stroke-width="8"/>` },
+    subway: { label:'Subway train pictogram', svg: `<rect x="-28" y="-42" width="56" height="70" rx="12"/><rect x="-18" y="-32" width="36" height="22" rx="3" style="fill:var(--plate)"/><circle cx="-14" cy="12" r="5" style="fill:var(--plate)"/><circle cx="14" cy="12" r="5" style="fill:var(--plate)"/><path d="M-20 32l-10 12M20 32l10 12" ${line} stroke-width="6"/>` },
+    bus: { label:'Bus pictogram', svg: `<rect x="-34" y="-40" width="68" height="64" rx="10"/><rect x="-26" y="-30" width="52" height="24" rx="3" style="fill:var(--plate)"/><circle cx="-20" cy="30" r="9"/><circle cx="20" cy="30" r="9"/>` },
+    noSmoking: { label:'No smoking symbol', svg: `<rect x="-30" y="-6" width="44" height="12"/><rect x="16" y="-6" width="10" height="12" opacity=".6"/><circle r="42" ${line} stroke-width="8"/><path d="M-30 -30L30 30" ${line} stroke-width="8"/>` },
+    noPhoto: { label:'No photography symbol', svg: `<rect x="-28" y="-16" width="56" height="36" rx="6"/><rect x="-10" y="-24" width="20" height="10" rx="2"/><circle cy="2" r="11" style="fill:var(--plate)"/><circle r="42" ${line} stroke-width="8"/><path d="M-30 -30L30 30" ${line} stroke-width="8"/>` },
+    wifi: { label:'Wi-Fi symbol', svg: `<path d="M-40 -10a58 58 0 0 1 80 0M-26 6a38 38 0 0 1 52 0M-12 22a18 18 0 0 1 24 0" ${line} stroke-width="8"/><circle cy="36" r="6"/>` },
+    pharmacy: { label:'Pharmacy cross', svg: `<path d="M-12 -40h24v28h28v24h-28v28h-24v-28h-28v-24h28z"/>` }
+  };
+  // 카드는 공공 안내 표지판 틀로 그린다 (PRD §8.3, v2.6). 앞면은 단어만 — 픽토그램이 있는 표지판이어도
+  // 앞면에는 그리지 않는다(그림으로 뜻을 맞히지 않게). 픽토그램은 뒷면(withPictogram)에서만 넣는다.
+  const signPlate = (c,cls='',roman=true,withPictogram=false) => {
+    const p = withPictogram && c.pictogram ? PICTOGRAMS[c.pictogram] : null;
+    const label = (c.alt||c.word) + (p ? ', with ' + p.label : '');
+    return `<div class="${cls} sign-plate${p?' has-pictogram':''}" role="img" aria-label="${esc(label)}" style="--plate:${esc(c.color||'#2f6fb0')}">${p?`<svg class="plate-pictogram" viewBox="-60 -50 120 100" fill="currentColor" aria-hidden="true">${p.svg}</svg>`:''}<span class="plate-group">${esc(c.groupLabel||'STREET SIGN')}</span><span class="plate-word" lang="ko">${esc(c.word)}</span>${roman?`<span class="plate-roman">${esc(c.roman||'')}</span>`:''}</div>`;
+  };
   // 장소 유형 카드도 v2.1부터 사진이 없다(image:null). 사진이 없으면 표지판 판으로 그린다.
   const cardVisual = (c,cls='') => c && (isBasic(c)||!c.image) ? signPlate(c,cls) : image(c?.image,c?.alt||c?.word,cls);
   // FR29 발음 재생. 미리 생성한 Gemini TTS 파일(audio_index.js)을 재생하고,
@@ -147,7 +173,7 @@
       <div class="deck-card top${s.meaning?' flipped':''}" id="swipe-card" tabindex="0" role="group" aria-roledescription="sign card" aria-label="${esc(cardAria(c,spots.length))}">
         <div class="card-inner">
           <div class="card-face front"><span class="badge">${esc(c.groupLabel||'Seoul sign')}</span>${signPlate(c,'card-plate',false)}<p class="eyebrow">CAN YOU READ THIS SIGN?</p></div>
-          <div class="card-face back"><p class="eyebrow">MEANING · 뜻</p><h2 lang="ko">${esc(c.word)}</h2><div class="pronunciation">${c.roman?`<span class="roman">${esc(c.roman)}</span>`:''}${speakBtn(c)}</div><h3 class="card-meaning">${esc(c.meaning)}</h3><p class="card-note">${esc(c.note||'')}</p></div>
+          <div class="card-face back">${signPlate(c,'card-plate back-plate',false,true)}<div class="pronunciation">${c.roman?`<span class="roman">${esc(c.roman)}</span>`:''}${speakBtn(c)}</div><h3 class="card-meaning">${esc(c.meaning)}</h3><p class="card-note">${esc(c.note||'')}</p></div>
         </div>
         <button type="button" class="card-bookmark${saved?' active':''}" data-action="save:${c.id}" aria-label="${saved?'Unsave sign':'Save sign'}" aria-pressed="${saved}">${icon('saved')}</button>
         <div class="stamp stamp-know" aria-hidden="true">I know<small>알아요</small></div>

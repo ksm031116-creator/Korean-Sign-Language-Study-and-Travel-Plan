@@ -319,6 +319,15 @@ window.DATA = {
 // Explore 그리드는 지역 묶음을 쓴다. 기존 코드 호환을 위해 같은 배열을 가리킨다.
 DATA.landmarks = DATA.areas;
 
+// ---------- 표지판 픽토그램 (PRD §8.3, v2.6) ----------
+// 실제로 그림과 함께 쓰이는 표지판만. 카드 뒷면에서만 그린다 — 앞면에 그림이 있으면 글자를 읽지 않고도 맞힐 수 있다.
+// 그림은 app.js 의 PICTOGRAMS 에서 공공 기호를 단순화해 직접 그린 SVG.
+DATA.pictograms = {
+  '화장실':'restroom', '공중 화장실':'restroom', '남자 화장실':'men', '여자 화장실':'women', '장애인 화장실':'accessible',
+  '출구':'exit', '비상구':'exit', '엘리베이터':'elevator', '에스컬레이터':'escalator', '계단':'stairs', '비상계단':'stairs',
+  '지하철':'subway', '버스 정류장':'bus', '금연':'noSmoking', '촬영 금지':'noPhoto', '와이파이':'wifi', '약국':'pharmacy'
+};
+
 // ---------- 카드 생성 ----------
 // 단어 1개 = 카드 1장. 장소마다 복제하지 않는다.
 DATA.placeTypes.forEach(t => t.signs.forEach((s,i) => DATA.cards.push({
@@ -330,6 +339,7 @@ DATA.placeTypes.forEach(t => t.signs.forEach((s,i) => DATA.cards.push({
   groupLabel: t.label,
   color: t.color,
   word: s[0], roman: s[1], meaning: s[2], note: s[3],
+  pictogram: DATA.pictograms[s[0]] || null,
   image: null,
   alt: 'Sign plate showing ' + s[0]
 })));
@@ -344,6 +354,7 @@ DATA.basicSigns.forEach((s,i) => {
     placeId: null,
     groupId: s[0], groupLabel: g.label, color: g.color,
     word: s[1], roman: s[2], meaning: s[3], note: s[4],
+    pictogram: DATA.pictograms[s[1]] || null,
     image: null,
     alt: 'Street sign plate showing ' + s[1]
   });
