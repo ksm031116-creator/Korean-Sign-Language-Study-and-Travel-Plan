@@ -14,8 +14,11 @@ import app.signkorean.domain.location.Coordinate
 /** 표지판 픽토그램 세트의 ID. 그림 자체는 앱(UI) 이 가진다. */
 @JvmInline value class PictogramId(val value: String)
 
-/** 발음 음성 파일. [path] 는 콘텐츠 팩 기준 상대 경로. */
-@JvmInline value class AudioClip(val path: String)
+/**
+ * 발음 음성 파일 (FR29). [path] 는 콘텐츠 팩 폴더 기준 상대 경로(audio/b01.m4a).
+ * 청취 검사를 통과한 카드만 가진다. 없으면 화면은 "음성 준비 중"으로 표기만 보인다(U-12).
+ */
+data class AudioClip(val path: String, val sha256: String, val bytes: Int, val durationMs: Int)
 
 sealed interface CardKind {
     /** 기초 표지판. 장소와 연결되지 않는다 (FR31). */

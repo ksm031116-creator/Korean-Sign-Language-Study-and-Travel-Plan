@@ -32,6 +32,10 @@ ASSETS = ROOT / 'android' / 'adapter' / 'src' / 'main' / 'assets' / 'content'
 PACK = ASSETS / 'content-pack.json'
 LOCK = ROOT / 'android' / 'content-id-lock.json'
 SCHEMA_VERSION = 1
+AUDIO_SOURCE = PROTO / 'audio'                      # generate_tts.py 가 만든 mp3
+TTS_MANIFEST = ROOT / '.work' / 'tts_manifest.json'  # 청취 검사(전사) 결과
+AUDIO_CACHE = ROOT / '.work' / 'audio_cache.json'    # 원본 mp3 해시 → 변환 결과. 원본이 같으면 다시 변환하지 않는다
+AUDIO_BUDGET_BYTES = 10 * 1024 * 1024                # 전체 오디오 10MB 이하 (PRD §7.3, NFR10)
 # 설명 언어와 검수 상태. ja 는 원어민 검수(Q-01) 전까지 draft 이며 출시 빌드 검사가 막는다 (설계서 §8.8).
 LOCALES = {'en': 'reviewed', 'ja': 'draft'}
 
@@ -117,7 +121,41 @@ def place_photo(place: dict, tour: dict, commons: dict, bundled: dict) -> dict |
     return None
 
 
-def build(proto: dict) -> tuple[dict, list[Path]]:
+def sha256_file(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def verified_audio_ids() -> set[str]:
+    """청취 검사(전사가 원문과 같음)를 통과한 카드만 음성을 싣는다. CHECK 표시 카드는 검수 전까지 뺀다(Q-02)."""
+    if not TTS_MANIFEST.exists():
+        return set()
+    manifest = json.loads(TTS_MANIFEST.read_text(encoding='utf-8'))
+    return {cid for cid, m in manifest.items() if m.get('ok') and (AUDIO_SOURCE / f'{cid}.mp3').exists()}
+
+
+def convert_audio(card_id: str, cache: dict, write: bool) -> dict:
+    """mp3 → AAC 모노 m4a (PRD §7.3). 같은 원본이면 이전 변환 결과를 그대로 쓴다(파일·해시가 매번 바뀌지 않게)."""
+    src = AUDIO_SOURCE / f'{card_id}.mp3'
+    out = ASSETS / 'audio' / f'{card_id}.m4a'
+    src_hash = sha256_file(src)
+    entry = cache.get(card_id)
+    if entry and entry['source'] == src_hash and out.exists() and sha256_file(out) == entry['sha256']:
+        return entry
+    if not write:
+        raise BuildError(f'{card_id}: 음성 변환이 최신이 아니다. 스크립트를 다시 실행하라')
+    out.parent.mkdir(parents=True, exist_ok=True)
+    subprocess.run(['ffmpeg', '-y', '-loglevel', 'error', '-i', str(src), '-ac', '1', '-ar', '24000',
+                    '-c:a', 'aac', '-b:a', '40k', '-map_metadata', '-1', '-fflags', '+bitexact',
+                    '-flags:a', '+bitexact', str(out)], check=True)
+    probe = subprocess.run(['ffprobe', '-v', 'error', '-show_entries', 'format=duration', '-of', 'csv=p=0', str(out)],
+                           capture_output=True, check=True)
+    entry = {'source': src_hash, 'sha256': sha256_file(out), 'bytes': out.stat().st_size,
+             'durationMs': round(float(probe.stdout.decode().strip()) * 1000)}
+    cache[card_id] = entry
+    return entry
+
+
+def build(proto: dict, write_audio: bool = False) -> tuple[dict, list[Path]]:
     data, tour, commons = proto['data'], proto['tour'], proto['commons']
     bundled = {c['id']: c for c in json.loads((PROTO / 'assets' / 'credits.json').read_text(encoding='utf-8'))}
 
@@ -132,6 +170,8 @@ def build(proto: dict) -> tuple[dict, list[Path]]:
     groups += [{'id': t['id'], 'kind': 'place', 'koLabel': t['koLabel'], 'label': {'en': t['label']}, 'color': t['color']}
                for t in data['placeTypes']]
 
+    cache = json.loads(AUDIO_CACHE.read_text(encoding='utf-8')) if AUDIO_CACHE.exists() else {}
+    with_audio = verified_audio_ids()
     cards = []
     for c in data['cards']:
         card = {
@@ -145,7 +185,7 @@ def build(proto: dict) -> tuple[dict, list[Path]]:
             'note': {'en': c['note']},
             'pictogram': c.get('pictogram'),
             'plateColor': c['color'],
-            'audio': None,
+            'audio': audio_entry(c['id'], with_audio, cache, write_audio),
             'reviewed': True,
         }
         cards.append(card)
@@ -181,7 +221,23 @@ def build(proto: dict) -> tuple[dict, list[Path]]:
         'cards': cards,
         'places': places,
     }
+    total_audio = sum(c['audio']['bytes'] for c in cards if c['audio'])
+    if total_audio > AUDIO_BUDGET_BYTES:
+        raise BuildError(f'음성 합계 {total_audio} 바이트가 10MB 를 넘는다 (NFR10)')
+    if write_audio:
+        AUDIO_CACHE.write_text(json.dumps(dict(sorted(cache.items())), indent=1) + '\n', encoding='utf-8', newline='\n')
+        # 검수를 통과하지 못한 카드의 옛 파일은 지운다.
+        for f in (ASSETS / 'audio').glob('*.m4a'):
+            if f.stem not in with_audio:
+                f.unlink()
     return pack, photo_files
+
+
+def audio_entry(card_id: str, with_audio: set[str], cache: dict, write: bool):
+    if card_id not in with_audio:
+        return None
+    e = convert_audio(card_id, cache, write)
+    return {'path': f'audio/{card_id}.m4a', 'sha256': e['sha256'], 'bytes': e['bytes'], 'durationMs': e['durationMs']}
 
 
 def check_lock(pack: dict, lock: dict) -> dict:
@@ -264,7 +320,7 @@ def main() -> int:
     args = sys.argv[1:]
     check_only = '--check' in args
     try:
-        pack, photo_files = build(dump_prototype())
+        pack, photo_files = build(dump_prototype(), write_audio=not check_only)
         lock = load_lock(init='--init-lock' in args)
         new_lock = check_lock(pack, lock)
     except BuildError as e:

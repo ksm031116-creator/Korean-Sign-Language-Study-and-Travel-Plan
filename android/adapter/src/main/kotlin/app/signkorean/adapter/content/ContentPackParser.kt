@@ -118,7 +118,14 @@ class ContentPackParser {
             note = field("note").localized(packLocales),
             pictogram = field("pictogram").stringOrNull()?.let(::PictogramId),
             plateColor = field("plateColor").hexColor(),
-            audio = field("audio").stringOrNull()?.let(::AudioClip),
+            audio = field("audio").orNull()?.let { a ->
+                AudioClip(
+                    path = a.field("path").nonBlank(),
+                    sha256 = a.field("sha256").nonBlank(),
+                    bytes = a.field("bytes").int(),
+                    durationMs = a.field("durationMs").int(),
+                )
+            },
             reviewed = field("reviewed").boolean(),
         )
     }

@@ -107,4 +107,24 @@ class BundledContentPackTest {
         if (!snapshot.isFile) fail("스냅샷이 없다. 검토 후 -PupdateSnapshots=true 로 만든다")
         assertEquals(snapshot.readText().replace("\r\n", "\n"), actual)
     }
+
+    @Test
+    fun `음성 파일은 모두 있고 체크섬이 맞으며 합계 10MB 이하다 (NFR10)`() {
+        val clips = pack.cards.mapNotNull { it.audio }
+        assertTrue("음성이 하나도 없다", clips.isNotEmpty())
+        clips.forEach { clip ->
+            val file = File("src/main/assets/content/" + clip.path)
+            assertTrue(clip.path, file.isFile)
+            val sha = java.security.MessageDigest.getInstance("SHA-256").digest(file.readBytes()).joinToString("") { "%02x".format(it) }
+            assertEquals(clip.path, clip.sha256, sha)
+            assertEquals(clip.path, clip.bytes.toLong(), file.length())
+            assertTrue("${clip.path} ${clip.durationMs}ms: 짧은 단어 음성이어야 한다", clip.durationMs in 200..4000)
+        }
+        assertTrue(clips.sumOf { it.bytes } <= 10 * 1024 * 1024)
+    }
+
+    @Test
+    fun `청취 검사를 통과하지 못한 카드(커피)는 음성이 없다`() {
+        assertEquals(null, pack.cards.single { it.id.value == "t-cafe-2" }.audio)
+    }
 }
