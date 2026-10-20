@@ -4,6 +4,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import app.signkorean.R
 import app.signkorean.domain.audio.AudioPlayer
+import app.signkorean.domain.bookmark.BookmarkOutcome
+import app.signkorean.domain.bookmark.BookmarkStore
+import app.signkorean.domain.bookmark.SetBookmark
 import app.signkorean.domain.audio.PlaybackState
 import app.signkorean.domain.content.CardId
 import app.signkorean.domain.content.CardPlaceLinker
@@ -59,6 +62,10 @@ data class LearnUiState(
     val announcement: UiText? = null,
     /** 이 카드의 발음 버튼 상태 (FR29, UX10, U-12). */
     val audio: AudioUi = AudioUi.Ready,
+    /** 이 카드가 저장돼 있는지 (FR12). */
+    val bookmarked: Boolean = false,
+    /** 한 번 보이고 사라지는 안내(무료 한도 등). */
+    val notice: UiText? = null,
 )
 
 /** Ready: 누르면 재생. Playing: 재생 중(다시 누르면 처음부터). Unavailable: 음성 없음·실패. */
@@ -77,12 +84,18 @@ sealed interface LearnAction {
 
     /** 화면을 떠나거나 앱이 뒤로 갈 때. */
     data object StopAudio : LearnAction
+
+    /** 카드 저장·해제. 판정이 아니며 카드를 뒤집거나 넘기지 않는다 (FR12). */
+    data object ToggleBookmark : LearnAction
 }
 
 /** 한 번만 처리할 일. 화면 재구성으로 두 번 처리되지 않게 Channel 로 낸다 (설계서 §5.3). */
 sealed interface LearnEffect {
     data class OpenPlaces(val card: CardId) : LearnEffect
     data object Finished : LearnEffect
+
+    /** 무료 한도에서 6번째 저장 (FR27). 업그레이드 화면은 Phase 13 에서 연결한다. */
+    data class BookmarkLimit(val count: Int, val limit: Int) : LearnEffect
 }
 
 class LearnViewModel(
@@ -92,6 +105,8 @@ class LearnViewModel(
     private val undo: UndoJudgement,
     private val onboarding: OnboardingStore,
     private val audio: AudioPlayer,
+    private val bookmarks: BookmarkStore,
+    private val setBookmark: SetBookmark,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(LearnUiState())
@@ -144,6 +159,7 @@ class LearnViewModel(
             try {
                 pack = content.load()
                 coach = runCatching { !onboarding.coachSeen() }.getOrDefault(false)
+                savedIds = runCatching { bookmarks.all().map { it.card }.toSet() }.getOrDefault(emptySet())
                 val current = sessions.current()
                 when {
                     current == null -> _state.value = LearnUiState(loading = false, noSession = true)
@@ -179,6 +195,24 @@ class LearnViewModel(
             stopMine()
             return
         }
+        if (action == LearnAction.ToggleBookmark) {
+            val card = s.card ?: return
+            val target = !s.bookmarked
+            _state.update { it.copy(bookmarked = target, notice = null) } // 바로 보이고, 실패하면 되돌린다
+            viewModelScope.launch {
+                when (val o = setBookmark(card.id, target)) {
+                    BookmarkOutcome.Saved, BookmarkOutcome.Removed, BookmarkOutcome.Unchanged ->
+                        savedIds = if (target) savedIds + card.id else savedIds - card.id
+                    is BookmarkOutcome.NeedsUpgrade -> {
+                        _state.update { if (it.card?.id == card.id) it.copy(bookmarked = false, notice = UiText.Res(R.string.bookmark_limit, listOf(o.count, o.limit))) else it }
+                        _effects.send(LearnEffect.BookmarkLimit(o.count, o.limit))
+                    }
+                    BookmarkOutcome.SaveFailed ->
+                        _state.update { if (it.card?.id == card.id) it.copy(bookmarked = !target, notice = UiText.Res(R.string.common_save_failed)) else it }
+                }
+            }
+            return
+        }
         if (action == LearnAction.DismissCoach) {
             coach = false
             _state.update { it.copy(showCoach = false) }
@@ -197,7 +231,7 @@ class LearnViewModel(
             is LearnAction.Judge -> save(action)
             LearnAction.Undo -> if (s.canUndo) save(action)
             LearnAction.Retry -> failed?.let { save(it) }
-            LearnAction.DismissCoach, LearnAction.PlayAudio, LearnAction.StopAudio -> Unit // 위에서 처리했다
+            LearnAction.DismissCoach, LearnAction.PlayAudio, LearnAction.StopAudio, LearnAction.ToggleBookmark -> Unit // 위에서 처리했다
         }
     }
 
@@ -284,8 +318,12 @@ class LearnViewModel(
             showCoach = coach && !s.finished,
             announcement = announcement,
             audio = audioUi(card, audio.state.value),
+            bookmarked = card != null && card.id in savedIds,
         )
     }
+
+    /** 저장된 카드 id. 카드가 바뀔 때마다 다시 읽지 않도록 들고 있다가 저장·해제 때 고친다. */
+    private var savedIds: Set<CardId> = emptySet()
 
     private sealed interface Result {
         data class Saved(val session: LearningSession) : Result

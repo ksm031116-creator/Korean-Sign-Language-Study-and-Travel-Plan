@@ -153,6 +153,22 @@
     <string name="audio_unavailable">Audio unavailable</string>
     <string name="reading_hint">guide</string>
 
+    <string name="bookmark_save">Save sign</string>
+    <string name="bookmark_remove">Remove from saved</string>
+    <string name="bookmark_limit">The free plan keeps %1$d of %2$d saved signs. Unlock trip planning to save more.</string>
+
+    <!-- SC09 Saved -->
+    <string name="saved_title">Saved signs</string>
+    <string name="saved_quota">%1$d of %2$d free bookmarks used</string>
+    <string name="saved_empty_title">No saved signs yet</string>
+    <string name="saved_empty_body">Tap the star on a card to keep it here.</string>
+    <string name="saved_practice">Practise saved signs</string>
+    <string name="saved_practice_this">Practise</string>
+    <string name="saved_unsave">Remove</string>
+    <string name="saved_unavailable">This sign is no longer available.</string>
+    <string name="saved_clear_filters">Clear filters</string>
+    <string name="saved_no_match">No saved signs match these filters.</string>
+
     <plurals name="places_count">
         <item quantity="one">%d place</item>
         <item quantity="other">%d places</item>

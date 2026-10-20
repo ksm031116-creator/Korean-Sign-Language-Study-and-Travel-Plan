@@ -112,6 +112,7 @@ object LearnTags {
     const val LEGEND_PLACES = "legend-places"
     const val ANNOUNCEMENT = "learn-announcement"
     const val AUDIO = "learn-audio"
+    const val BOOKMARK = "learn-bookmark"
 }
 
 /** SC04 Learn 화면. ViewModel 을 받아 상태와 효과를 화면 이동으로 잇는다. */
@@ -120,6 +121,7 @@ fun LearnScreen(
     onClose: () -> Unit,
     onOpenPlaces: (CardId) -> Unit,
     onFinished: () -> Unit,
+    onBookmarkLimit: () -> Unit = {},
     viewModel: LearnViewModel = koinViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -132,6 +134,8 @@ fun LearnScreen(
             when (effect) {
                 is LearnEffect.OpenPlaces -> onOpenPlaces(effect.card)
                 LearnEffect.Finished -> onFinished()
+                // 업그레이드 화면(SC21)은 Phase 13 에서 연다. 그전에는 카드 위 안내만 보인다.
+                is LearnEffect.BookmarkLimit -> onBookmarkLimit()
             }
         }
     }
@@ -276,6 +280,7 @@ private fun CardArea(state: LearnUiState, onAction: (LearnAction) -> Unit, reduc
         Legend(state.hasPlaces)
         if (state.isTryAgain) StatusBadge(stringResource(R.string.learn_try_again), StatusTone.Learning)
         state.error?.let { ErrorState(it.asString(), onRetry = { onAction(LearnAction.Retry) }) }
+        state.notice?.let { Text(it.asString(), style = MaterialTheme.typography.bodyMedium, color = SignKoreanTheme.tokens.accentInk, modifier = Modifier.semantics { liveRegion = LiveRegionMode.Polite }) }
 
         Box(Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.Center) {
             // 뒤 카드 겹침 (UX12): 앞 카드를 끌수록 뒤 카드가 앞으로 올라온다.
@@ -350,7 +355,11 @@ private fun CardArea(state: LearnUiState, onAction: (LearnAction) -> Unit, reduc
                         true
                     },
             ) {
-                CardFace(card, state.face, state.audio) { onAction(LearnAction.PlayAudio) }
+                Box {
+                    CardFace(card, state.face, state.audio) { onAction(LearnAction.PlayAudio) }
+                    // 북마크는 카드 오른쪽 위(UX12). 버튼이 터치를 가져가 카드가 뒤집히거나 넘어가지 않는다(G-09).
+                    BookmarkButton(state.bookmarked, Modifier.align(Alignment.TopEnd).padding(6.dp)) { onAction(LearnAction.ToggleBookmark) }
+                }
             }
             Stamp(hint)
         }
@@ -513,5 +522,18 @@ private fun AudioButton(audio: AudioUi, onPlay: () -> Unit) {
         Text(symbol, modifier = Modifier.semantics { invisibleToUser() })
         Spacer(Modifier.size(8.dp))
         Text(label)
+    }
+}
+
+@Composable
+private fun BookmarkButton(saved: Boolean, modifier: Modifier, onClick: () -> Unit) {
+    val t = SignKoreanTheme.tokens
+    val label = stringResource(if (saved) R.string.bookmark_remove else R.string.bookmark_save)
+    androidx.compose.material3.IconButton(
+        onClick = onClick,
+        modifier = modifier.testTag(LearnTags.BOOKMARK).semantics { stateDescription = if (saved) "saved" else "" },
+    ) {
+        // 채운 별 = 저장됨, 빈 별 = 저장 안 함. 글자 대신 이름은 스크린리더용 설명으로 준다.
+        Text(if (saved) "★" else "☆", fontSize = 26.sp, color = if (saved) t.primary else t.muted, modifier = Modifier.semantics { contentDescription = label })
     }
 }

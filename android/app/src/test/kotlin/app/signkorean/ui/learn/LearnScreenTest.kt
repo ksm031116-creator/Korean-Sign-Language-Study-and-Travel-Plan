@@ -233,4 +233,13 @@ class LearnScreenTest {
         compose.setContent { SignKoreanTheme { LearnContent(LearnUiState(loading = false, card = withReading, hasPlaces = true, face = Face.Back), {}, {}, true) } }
         compose.onNodeWithText("クッパプ").assertDoesNotExist()
     }
+
+    @Test
+    @org.robolectric.annotation.Config(qualifiers = "w390dp-h844dp")
+    fun `북마크 버튼은 판정·뒤집기 없이 저장만 한다`() {
+        show()
+        compose.onNodeWithTag(LearnTags.BOOKMARK).performClick()
+        compose.waitForIdle()
+        assertEquals(listOf(LearnAction.ToggleBookmark), actions)
+    }
 }

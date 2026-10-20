@@ -133,6 +133,21 @@
     <string name="audio_unavailable">音声は準備中</string>
     <string name="reading_hint">目安</string>
 
+    <string name="bookmark_save">看板を保存</string>
+    <string name="bookmark_remove">保存を外す</string>
+    <string name="bookmark_limit">無料プランで保存できる看板は %2$d 枚までです（現在 %1$d 枚）。旅の計画を解放すると、もっと保存できます。</string>
+
+    <string name="saved_title">保存した看板</string>
+    <string name="saved_quota">無料ブックマーク %1$d/%2$d 件使用中</string>
+    <string name="saved_empty_title">まだ保存した看板はありません</string>
+    <string name="saved_empty_body">カードの星をタップすると、ここに残ります。</string>
+    <string name="saved_practice">保存した看板を練習</string>
+    <string name="saved_practice_this">練習</string>
+    <string name="saved_unsave">外す</string>
+    <string name="saved_unavailable">この看板は利用できなくなりました。</string>
+    <string name="saved_clear_filters">絞り込みを解除</string>
+    <string name="saved_no_match">この条件に合う看板はありません。</string>
+
     <plurals name="places_count">
         <item quantity="other">%dか所</item>
     </plurals>

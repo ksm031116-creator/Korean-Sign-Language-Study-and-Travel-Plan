@@ -39,6 +39,7 @@ import android.content.pm.ApplicationInfo
 import app.signkorean.ui.explore.CollectionViewModel
 import app.signkorean.ui.explore.ExploreViewModel
 import app.signkorean.ui.learn.LearnViewModel
+import app.signkorean.ui.saved.SavedViewModel
 import app.signkorean.ui.onboarding.AppGateViewModel
 import app.signkorean.ui.onboarding.FirstRunViewModel
 import org.koin.core.module.dsl.viewModel
@@ -97,6 +98,7 @@ val uiModule = module {
     viewModelOf(::LearnViewModel)
     viewModelOf(::ResultViewModel)
     viewModelOf(::ExploreViewModel)
+    viewModelOf(::SavedViewModel)
     viewModel { params -> CollectionViewModel(params.get(), get(), get(), get()) }
     viewModelOf(::AppGateViewModel)
     viewModel {

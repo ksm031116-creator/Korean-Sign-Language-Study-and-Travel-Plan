@@ -49,6 +49,11 @@ class LearnViewModelTest {
     private val tx = FakeTransactionRunner(states, sessions)
     private val onboarding = FakeOnboardingStore(coach = true)
     private val player = app.signkorean.testing.FakeAudioPlayer()
+    private val bookmarkStore = app.signkorean.testing.FakeBookmarkStore()
+    private var entitlement = app.signkorean.domain.entitlement.Entitlement.Free
+    private val setBookmark by lazy {
+        app.signkorean.domain.bookmark.SetBookmark(bookmarkStore, FakeTransactionRunner(bookmarkStore), { entitlement }, clock)
+    }
     private val clock = FixedClock(Instant.parse("2026-10-21T09:00:00Z"))
 
     @Before
@@ -60,7 +65,7 @@ class LearnViewModelTest {
     private suspend fun viewModel(): LearnViewModel {
         val started = StartSession(sessions, states, tx, SequentialIdGenerator())(SessionSource.Basics, Mode.All, cards, false)
         assertTrue(started is StartOutcome.Started)
-        return LearnViewModel(InMemoryContentRepository(pack), sessions, JudgeCard(sessions, states, tx, clock), UndoJudgement(sessions, states, tx), onboarding, player)
+        return LearnViewModel(InMemoryContentRepository(pack), sessions, JudgeCard(sessions, states, tx, clock), UndoJudgement(sessions, states, tx), onboarding, player, bookmarkStore, setBookmark)
     }
 
     @Test
@@ -142,7 +147,7 @@ class LearnViewModelTest {
 
     @Test
     fun `세션이 없으면 빈 상태`() = runTest {
-        val vm = LearnViewModel(InMemoryContentRepository(pack), FakeSessionStore(), JudgeCard(sessions, states, tx, clock), UndoJudgement(sessions, states, tx), onboarding, player)
+        val vm = LearnViewModel(InMemoryContentRepository(pack), FakeSessionStore(), JudgeCard(sessions, states, tx, clock), UndoJudgement(sessions, states, tx), onboarding, player, bookmarkStore, setBookmark)
         assertNull(vm.state.value.card)
         assertFalse(vm.state.value.loading)
         assertTrue(vm.state.value.noSession)
@@ -167,7 +172,7 @@ class LearnViewModelTest {
         val flaky = object : app.signkorean.domain.content.ContentRepository {
             override suspend fun load() = if (fail) throw java.io.IOException("asset") else pack
         }
-        val vm = LearnViewModel(flaky, sessions, JudgeCard(sessions, states, tx, clock), UndoJudgement(sessions, states, tx), onboarding, player)
+        val vm = LearnViewModel(flaky, sessions, JudgeCard(sessions, states, tx, clock), UndoJudgement(sessions, states, tx), onboarding, player, bookmarkStore, setBookmark)
         assertTrue(vm.state.value.loadFailed)
         fail = false
         vm.onAction(LearnAction.Retry)
@@ -178,7 +183,7 @@ class LearnViewModelTest {
     fun `끝난 세션으로 들어오면 결과로 보낸다`() = runTest {
         val one = StartSession(sessions, states, tx, SequentialIdGenerator())(SessionSource.Basics, Mode.All, cards.take(1), false) as StartOutcome.Started
         JudgeCard(sessions, states, tx, clock)(one.session.id, 0, Verdict.Know)
-        val vm = LearnViewModel(InMemoryContentRepository(pack), sessions, JudgeCard(sessions, states, tx, clock), UndoJudgement(sessions, states, tx), onboarding, player)
+        val vm = LearnViewModel(InMemoryContentRepository(pack), sessions, JudgeCard(sessions, states, tx, clock), UndoJudgement(sessions, states, tx), onboarding, player, bookmarkStore, setBookmark)
         assertEquals(LearnEffect.Finished, vm.effects.tryReceive().getOrNull())
     }
 
@@ -186,7 +191,7 @@ class LearnViewModelTest {
     fun `콘텐츠에서 사라진 카드면 빈 화면 대신 돌아갈 길을 보인다`() = runTest {
         viewModel()
         val withoutFirst = ContentFixtures.pack(cards = cards.drop(1))
-        val vm = LearnViewModel(InMemoryContentRepository(withoutFirst), sessions, JudgeCard(sessions, states, tx, clock), UndoJudgement(sessions, states, tx), onboarding, player)
+        val vm = LearnViewModel(InMemoryContentRepository(withoutFirst), sessions, JudgeCard(sessions, states, tx, clock), UndoJudgement(sessions, states, tx), onboarding, player, bookmarkStore, setBookmark)
         assertTrue(vm.state.value.noSession)
     }
 
@@ -214,7 +219,7 @@ class LearnViewModelTest {
     fun `처음이면 스와이프 시연을 보이고, 닫으면 기록해 다시 보이지 않는다`() = runTest {
         val fresh = FakeOnboardingStore(coach = false)
         StartSession(sessions, states, tx, SequentialIdGenerator())(SessionSource.Basics, Mode.All, cards, false)
-        val vm = LearnViewModel(InMemoryContentRepository(pack), sessions, JudgeCard(sessions, states, tx, clock), UndoJudgement(sessions, states, tx), fresh, player)
+        val vm = LearnViewModel(InMemoryContentRepository(pack), sessions, JudgeCard(sessions, states, tx, clock), UndoJudgement(sessions, states, tx), fresh, player, bookmarkStore, setBookmark)
         assertTrue(vm.state.value.showCoach)
         vm.onAction(LearnAction.DismissCoach)
         assertFalse(vm.state.value.showCoach)
@@ -279,5 +284,35 @@ class LearnViewModelTest {
         player.play(other)
         vm.onAction(LearnAction.StopAudio)
         assertEquals(app.signkorean.domain.audio.PlaybackState.Playing(other), player.state.value)
+    }
+
+    @Test
+    fun `북마크는 판정이 아니고 카드를 넘기거나 뒤집지 않는다`() = runTest {
+        val vm = viewModel()
+        vm.onAction(LearnAction.ToggleBookmark)
+        assertTrue(vm.state.value.bookmarked)
+        assertEquals(CardId("t-market-1"), vm.state.value.card?.id)
+        assertEquals(Face.Front, vm.state.value.face)
+        assertEquals(0, vm.state.value.decisions)
+        assertTrue(bookmarkStore.contains(CardId("t-market-1")))
+        vm.onAction(LearnAction.ToggleBookmark)
+        assertFalse(vm.state.value.bookmarked)
+        assertFalse(bookmarkStore.contains(CardId("t-market-1")))
+    }
+
+    @Test
+    fun `무료 한도면 저장하지 않고 안내와 업그레이드 효과`() = runTest {
+        (1..5).forEach { bookmarkStore.add(app.signkorean.domain.bookmark.Bookmark(CardId("x$it"), clock.now())) }
+        val vm = viewModel()
+        vm.onAction(LearnAction.ToggleBookmark)
+        assertFalse(vm.state.value.bookmarked)
+        assertNotNull(vm.state.value.notice)
+        assertEquals(LearnEffect.BookmarkLimit(5, 5), vm.effects.tryReceive().getOrNull())
+    }
+
+    @Test
+    fun `저장된 카드로 돌아오면 저장 표시가 켜져 있다`() = runTest {
+        bookmarkStore.add(app.signkorean.domain.bookmark.Bookmark(CardId("t-market-1"), clock.now()))
+        assertTrue(viewModel().state.value.bookmarked)
     }
 }

@@ -10,6 +10,7 @@ import app.signkorean.ui.explore.CollectionScreen
 import app.signkorean.ui.explore.ExploreScreen
 import app.signkorean.ui.learn.LearnScreen
 import app.signkorean.ui.learn.ResultScreen
+import app.signkorean.ui.saved.SavedScreen
 
 /** SC03 인자: "basics" 또는 "area:<지역 id>". */
 object CollectionArg {
@@ -51,6 +52,7 @@ fun AppScreen(route: Route, navigator: AppNavigator) {
             onOpenPlaces = { card -> navigator.push(Route(ScreenId.SC08, card.value)) },
             onFinished = { navigator.replaceTop(Route(ScreenId.SC06)) },
         )
+        ScreenId.SC09 -> SavedScreen(onOpenLearn = { navigator.push(Route(ScreenId.SC04)) })
         ScreenId.SC06 -> ResultScreen(
             onOpenLearn = { navigator.replaceTop(Route(ScreenId.SC04)) },
             onClose = { navigator.back() },
