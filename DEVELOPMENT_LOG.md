@@ -21,7 +21,7 @@
 
 | 구분 | 수치 |
 |---|---|
-| 커밋 | 55개 (refactor 2 · feat 14 · fix 11 · docs 17 · chore 9 · test 1 · ci 1) |
+| 커밋 | 58개 (refactor 2 · feat 15 · fix 11 · docs 18 · chore 10 · test 1 · ci 1) |
 | 요구사항 | FR 31 · NFR 10 · AT 18 · 화면 SC 20 · 화면 시나리오 UI 8 · 공통 규칙 UX 12 |
 | 등록 장소 | 49곳 (실존 공공·관광시설 45 + Example 4), 지역 8개, 장소 유형 12종 |
 | 학습 카드 | 135장 (장소 유형 간판 35 + 기초 표지판 100) |
@@ -255,7 +255,7 @@ Commons 요청이 한도에 걸려(HTTP 429) 수집 스크립트에 재시도 �
 | **v2.1 문서** (10-10) | `2ed72b9` docs: add bug fix log for the v2.1 restructure<br>`e0e0216` docs(prd): put trip planning first and move photos from signs to places |
 | **TourAPI 장소 사진** (10-12) | `73d377f` chore: ignore API key files<br>`16cab17` feat(tools): fetch place photos from TourAPI<br>`3114047` fix(tools): include the last place when reading data.js<br>`1ade628` feat(sc08): show TourAPI place photos with credits<br>`f354a18` fix(cards): draw sign plates for cards without a photo<br>`523eb2c` chore: rebuild single-file bundle<br>`83d0315` docs: record TourAPI place photo integration (PRD v2.3) |
 | **README** (10-12) | `63421a7` docs: add README<br>`7e02644` docs(dev-log): link README and refresh versions |
-| **카드 디자인** (10-20) | docs: sign-plate card design, pictograms on the back (PRD v2.6) — 이 문서를 갱신한 커밋 |
+| **카드 디자인** (10-20) | `817ec99` docs: sign-plate card design, pictograms on the back (PRD v2.6)<br>`dfd71e1` feat(prototype): draw cards as public signs, pictograms on the back<br>`6838e45` chore: rebuild single-file bundle<br>docs(bugfix-log): add layout issues caught while building sign cards — 이 문서를 갱신한 커밋 |
 | **발음 음성** (10-20) | `9f59eef` feat(tools): generate pronunciation audio with Gemini TTS<br>`09d4b81` feat(prototype): play pre-generated pronunciation audio<br>`70cf29f` chore: rebuild single-file bundle |
 | **Android Phase 1** (10-20) | `25120e8` feat(domain): scaffold Android project with clock, id and dispatcher ports<br>`b27a326` feat(adapter): add system clock and UUID id generator<br>`29e8734` feat(app): add app shell and Koin composition root<br>`a9a6423` test(arch): enforce hexagonal and i18n rules with Konsist<br>`ba9502a` ci: run tests, architecture rules, lint and release build<br>`86f7703` fix(testing): make SequentialIdGenerator and FixedClock thread-safe<br>`9994d8d` fix(arch): close false passes and false failures in architecture rules<br>`ccd56c1` fix(app): generate locale config and correct the per-app language note<br>`262e714` fix(ci): pin script line endings and stop duplicate CI runs<br>`8e41131` docs: record Phase 1 and its code review |
 | **설계·계획** (10-20) | `aa07e96` docs: add Android implementation design (hexagonal, DI, TDD, en/ja)<br>`83483de` docs: add Android implementation plan (21 phases, 61 MD)<br>`c0918a0` docs: PRD v2.5 and design system colours |
