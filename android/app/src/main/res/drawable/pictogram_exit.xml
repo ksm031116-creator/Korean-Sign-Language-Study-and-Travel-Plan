@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 달리는 사람과 문 (출구·비상구).
+     프로토타입(app.js PICTOGRAMS)의 SVG 를 옮긴 것. 원래 좌표계(-60..60, -50..50)를 그룹 이동으로 맞춘다.
+     공공 기호를 단순화해 직접 그린 그림이며 타사 이미지가 아니다. 색은 SignPlate 가 흰색으로 칠한다. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="120dp"
+    android:height="100dp"
+    android:viewportWidth="120"
+    android:viewportHeight="100">
+    <group android:translateX="60" android:translateY="50">
+        <path android:strokeColor="#FFFFFFFF" android:strokeWidth="6" android:strokeLineCap="round" android:strokeLineJoin="round" android:pathData="M18,-42 h28 v84 h-28 Z" />
+        <path android:fillColor="#FFFFFFFF" android:pathData="M-22,-34 a8,8 0 1,0 16,0 a8,8 0 1,0 -16,0 Z" />
+        <path android:strokeColor="#FFFFFFFF" android:strokeWidth="7" android:strokeLineCap="round" android:strokeLineJoin="round" android:pathData="M-26,-16 l14,-4 l10,16 l14,2 M-12,-20 l-8,26 l-16,14 M-14,6 l14,12 v22" />
+    </group>
+</vector>

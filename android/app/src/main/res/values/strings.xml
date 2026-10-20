@@ -5,9 +5,9 @@
     <string name="app_tagline">Read the city, one sign at a time.</string>
 
     <!-- 공통 상태 문구 (PRD UX05). 짧고, 사용자가 할 수 있는 다음 행동을 함께 말한다. -->
-    <string name="common_saved">Saved</string>
-    <string name="common_save_failed">Couldn\'t save that. Try again.</string>
-    <string name="common_offline">You\'re offline. Signs you\'ve already opened still work.</string>
+    <string name="common_saved">Saved.</string>
+    <string name="common_save_failed">Couldn\'t save changes. Try again.</string>
+    <string name="common_offline">You\'re offline.</string>
     <string name="common_retry">Try again</string>
     <string name="common_undo">Undo</string>
     <string name="common_loading">Loading</string>
@@ -20,6 +20,21 @@
     <string name="format_duration_m">%1$dmin</string>
     <string name="format_distance_m">%1$d m</string>
     <string name="format_distance_km">%1$s km</string>
+
+    <!-- 앱 셸 -->
+    <string name="tab_explore">Explore</string>
+    <string name="tab_saved">Saved</string>
+    <string name="tab_plan">Plan</string>
+    <string name="screen_placeholder">This screen is on its way.</string>
+    <string name="action_back">Back</string>
+
+    <!-- 디자인 시스템 -->
+    <string name="lock_badge_description">Locked. %1$s. Opens the upgrade page.</string>
+    <string name="plate_description">Sign reading %1$s</string>
+    <string name="plate_description_pictogram">Sign reading %1$s, with a %2$s</string>
+    <string name="pictogram_restroom">men\'s and women\'s restroom symbol</string>
+    <string name="pictogram_exit">running person and door symbol</string>
+    <string name="pictogram_no_smoking">no smoking symbol</string>
 
     <plurals name="places_count">
         <item quantity="one">%d place</item>

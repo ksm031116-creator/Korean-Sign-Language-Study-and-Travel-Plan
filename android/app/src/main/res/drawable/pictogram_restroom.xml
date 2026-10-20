@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 남녀 화장실 픽토그램.
+     프로토타입(app.js PICTOGRAMS)의 SVG 를 옮긴 것. 원래 좌표계(-60..60, -50..50)를 그룹 이동으로 맞춘다.
+     공공 기호를 단순화해 직접 그린 그림이며 타사 이미지가 아니다. 색은 SignPlate 가 흰색으로 칠한다. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="120dp"
+    android:height="100dp"
+    android:viewportWidth="120"
+    android:viewportHeight="100">
+    <group android:translateX="60" android:translateY="50">
+        <path android:fillColor="#FFFFFFFF" android:pathData="M-39,-34 a9,9 0 1,0 18,0 a9,9 0 1,0 -18,0 Z M-43,-22 h26 v28 h-6 v34 h-6 v-34 h-2 v34 h-6 v-34 h-6 Z" />
+        <path android:fillColor="#FFFFFFFF" android:fillAlpha=".7" android:pathData="M-1.5,-44 h3 v88 h-3 Z" />
+        <path android:fillColor="#FFFFFFFF" android:pathData="M21,-34 a9,9 0 1,0 18,0 a9,9 0 1,0 -18,0 Z M21,-22 h18 l11,32 h-9 v30 h-6 v-30 h-2 v30 h-6 v-30 h-9 Z" />
+    </group>
+</vector>

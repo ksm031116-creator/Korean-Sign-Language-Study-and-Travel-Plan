@@ -6,7 +6,7 @@
 
     <string name="common_saved">保存しました</string>
     <string name="common_save_failed">保存できませんでした。もう一度お試しください。</string>
-    <string name="common_offline">オフラインです。一度開いた看板はそのまま見られます。</string>
+    <string name="common_offline">オフラインです。</string>
     <string name="common_retry">もう一度</string>
     <string name="common_undo">元に戻す</string>
     <string name="common_loading">読み込み中</string>
@@ -17,6 +17,19 @@
     <string name="format_duration_m">%1$d分</string>
     <string name="format_distance_m">%1$d m</string>
     <string name="format_distance_km">%1$s km</string>
+
+    <string name="tab_explore">探す</string>
+    <string name="tab_saved">保存</string>
+    <string name="tab_plan">旅の計画</string>
+    <string name="screen_placeholder">この画面は準備中です。</string>
+    <string name="action_back">戻る</string>
+
+    <string name="lock_badge_description">ロック中：%1$s。アップグレードの案内を開きます。</string>
+    <string name="plate_description">看板：%1$s</string>
+    <string name="plate_description_pictogram">看板：%1$s（%2$s）</string>
+    <string name="pictogram_restroom">男女トイレのマーク</string>
+    <string name="pictogram_exit">走る人と扉のマーク</string>
+    <string name="pictogram_no_smoking">禁煙マーク</string>
 
     <plurals name="places_count">
         <item quantity="other">%dか所</item>

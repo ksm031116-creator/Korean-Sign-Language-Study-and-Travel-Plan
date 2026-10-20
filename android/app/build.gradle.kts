@@ -2,6 +2,8 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    // 스크린샷 테스트. 기준 이미지는 app/src/test/screenshots 에 둔다 (record: ./gradlew recordRoborazziDebug)
+    alias(libs.plugins.roborazzi)
 }
 
 android {
@@ -62,6 +64,10 @@ kotlin {
     jvmToolchain(17)
 }
 
+roborazzi {
+    outputDir.set(file("src/test/screenshots"))
+}
+
 dependencies {
     implementation(project(":domain"))
     implementation(project(":adapter"))
@@ -84,4 +90,7 @@ dependencies {
     testImplementation(platform(libs.compose.bom))
     testImplementation(libs.compose.ui.test.junit4)
     debugImplementation(libs.compose.ui.test.manifest)
+    testImplementation(libs.roborazzi)
+    testImplementation(libs.roborazzi.compose)
+    testImplementation(libs.roborazzi.junit.rule)
 }
