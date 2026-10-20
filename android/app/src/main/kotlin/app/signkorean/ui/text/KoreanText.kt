@@ -19,6 +19,6 @@ fun TextStyle.korean(): TextStyle = copy(localeList = KOREAN)
  * 학습 대상인 한국어 원문(간판 단어, 범례의 한국어 부분). 번역하지 않는 콘텐츠라 리소스가 아니라 값으로 받는다.
  */
 @Composable
-fun KoreanText(text: String, modifier: Modifier = Modifier, style: TextStyle = LocalTextStyle.current) {
-    Text(text = text, modifier = modifier, style = style.korean())
+fun KoreanText(text: String, modifier: Modifier = Modifier, style: TextStyle = LocalTextStyle.current, maxLines: Int = Int.MAX_VALUE) {
+    Text(text = text, modifier = modifier, style = style.korean(), maxLines = maxLines, softWrap = maxLines > 1)
 }

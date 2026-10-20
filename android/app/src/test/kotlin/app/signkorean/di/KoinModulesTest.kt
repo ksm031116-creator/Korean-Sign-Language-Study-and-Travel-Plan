@@ -30,7 +30,13 @@ class KoinModulesTest {
         // String·Set 같은 넓은 타입은 넣지 않는다. 넣으면 앞으로 그런 의존성이 빠져도 검사가 통과해 버린다.
         val passedDirectly = listOf(CoroutineDispatcher::class, AssetManager::class, Context::class)
         // 픽토그램 목록 Set 은 PictogramCatalog 하나에만 값으로 들어간다. 그 정의에만 허용한다.
-        val catalogIds = injectedParameters(definition<PictogramCatalog>(Set::class))
+        // 화면 인자(SC03 의 출처)는 koinViewModel 의 parameters 로 넘긴다.
+        val catalogIds = injectedParameters(
+            definition<PictogramCatalog>(Set::class),
+            definition<app.signkorean.ui.explore.CollectionViewModel>(app.signkorean.domain.learning.SessionSource::class),
+            // 디버그 빌드 여부(앱 정보에서 읽은 값).
+            definition<app.signkorean.ui.onboarding.FirstRunViewModel>(Boolean::class),
+        )
         // 모듈끼리 서로의 정의를 쓰므로(예: StartSession 이 platformModule 의 IdGenerator) 전체를 한 그래프로 검사한다.
         module { includes(appModules) }.verify(extraTypes = passedDirectly, injections = catalogIds)
     }

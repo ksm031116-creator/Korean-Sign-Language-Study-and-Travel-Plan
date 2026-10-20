@@ -1,16 +1,51 @@
 package app.signkorean.ui
 
 import androidx.compose.runtime.Composable
+import app.signkorean.domain.content.AreaId
+import app.signkorean.domain.learning.SessionSource
 import app.signkorean.navigation.AppNavigator
 import app.signkorean.navigation.Route
 import app.signkorean.navigation.ScreenId
+import app.signkorean.ui.explore.CollectionScreen
+import app.signkorean.ui.explore.ExploreScreen
 import app.signkorean.ui.learn.LearnScreen
 import app.signkorean.ui.learn.ResultScreen
+
+/** SC03 인자: "basics" 또는 "area:<지역 id>". */
+object CollectionArg {
+    const val BASICS = "basics"
+    fun area(id: AreaId) = "area:${id.value}"
+
+    fun parse(arg: String?): SessionSource? = when {
+        arg == BASICS -> SessionSource.Basics
+        arg != null && arg.startsWith("area:") -> SessionSource.Area(AreaId(arg.removePrefix("area:")))
+        else -> null
+    }
+}
 
 /** 화면 ID → 화면. 아직 만들지 않은 화면은 자리 표시이며 진입점을 숨긴다(구현 계획 원칙 3). */
 @Composable
 fun AppScreen(route: Route, navigator: AppNavigator) {
     when (route.screen) {
+        ScreenId.SC02 -> ExploreScreen(
+            onOpenBasics = { navigator.push(Route(ScreenId.SC03, CollectionArg.BASICS)) },
+            onOpenArea = { id -> navigator.push(Route(ScreenId.SC03, CollectionArg.area(id))) },
+            onResume = { navigator.push(Route(ScreenId.SC04)) },
+            onOpenSettings = { navigator.push(Route(ScreenId.SC10)) },
+        )
+        ScreenId.SC03 -> {
+            val source = CollectionArg.parse(route.arg)
+            if (source == null) {
+                PlaceholderScreen(route)
+            } else {
+                CollectionScreen(
+                    source = source,
+                    onOpenLearn = { navigator.push(Route(ScreenId.SC04)) },
+                    onOpenPlace = { id -> navigator.push(Route(ScreenId.SC07, id)) },
+                    onBack = { navigator.back() },
+                )
+            }
+        }
         ScreenId.SC04 -> LearnScreen(
             onClose = { navigator.back() },
             onOpenPlaces = { card -> navigator.push(Route(ScreenId.SC08, card.value)) },

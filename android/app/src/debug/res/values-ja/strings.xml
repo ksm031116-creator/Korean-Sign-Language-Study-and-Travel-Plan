@@ -75,6 +75,59 @@
     <string name="result_nothing_to_review">ここで復習する看板はありません。</string>
     <string name="result_no_cards">ここには練習できる看板がありません。</string>
 
+    <string name="first_run_step">ステップ %1$d / %2$d</string>
+    <string name="first_run_title_1">街の看板を、ひとつずつ読めるように。</string>
+    <string name="first_run_body_1">ハングルが少し読めたら、次はソウルの看板の意味を知る番です。</string>
+    <string name="first_run_title_2">スワイプするだけ。</string>
+    <string name="first_run_body_2">知っていれば右、知らなければ左へ。自分の判断で、もう一度出てくるカードが決まります。</string>
+    <string name="first_run_title_3">次の行き先は、ここから。</string>
+    <string name="first_run_body_3">下へスワイプすると、その看板が見られる場所が出てきます。カードをタップすると意味が見られます。</string>
+    <string name="first_run_skip">スキップ</string>
+    <string name="first_run_next">次へ</string>
+    <string name="first_run_back">戻る</string>
+    <string name="first_run_start">はじめる</string>
+    <string name="first_run_language">アプリの言語</string>
+
+    <string name="explore_title">看板を見つけて、ソウルを歩こう。</string>
+    <string name="explore_subtitle">本物の街並みと、使える韓国語。読める旅に。</string>
+    <string name="explore_search">エリアや看板で検索</string>
+    <string name="explore_search_clear">検索をクリア</string>
+    <string name="explore_settings">設定</string>
+    <string name="explore_resume_title">前回の続きから</string>
+    <string name="explore_resume_detail">%1$s・判定 %2$d/%3$d</string>
+    <string name="explore_resume_action">練習を再開</string>
+    <string name="explore_basics_section">まずは基本の看板から</string>
+    <string name="explore_basics_hint">場所はいりません</string>
+    <string name="basics_name">街でよく見る基本の看板</string>
+    <string name="basics_description">ドア、トイレ、営業時間、駅。誰かと話す前に出会う看板です。</string>
+    <string name="explore_areas_section">エリアから探す</string>
+    <string name="explore_no_results">「%1$s」に合うエリアや看板はありません。</string>
+    <string name="progress_known">%1$d/%2$d 覚えた</string>
+    <plurals name="signs_count">
+        <item quantity="other">%d 枚</item>
+    </plurals>
+    <string name="explore_load_failed">看板を読み込めませんでした。</string>
+    <string name="source_saved">保存した看板</string>
+    <string name="source_trip_day">旅の日程</string>
+    <string name="source_place">場所</string>
+
+    <string name="collection_new">新しい</string>
+    <string name="collection_learning">もう一度</string>
+    <string name="collection_known">覚えた</string>
+    <string name="collection_mode_all">すべて</string>
+    <string name="collection_mode_review">復習</string>
+    <string name="collection_start">練習をはじめる</string>
+    <string name="collection_words">覚える看板</string>
+    <string name="collection_places">このエリアの場所</string>
+    <string name="collection_basics_notice_title">これはお店ではなく、街そのものの看板です。</string>
+    <string name="collection_basics_notice_body">そのため、ここにはレビューや経路、旅程のボタンはありません。</string>
+    <string name="collection_missing">このコレクションは見つかりません。</string>
+    <string name="collection_example">例</string>
+    <string name="replace_title">新しい練習をはじめますか？</string>
+    <string name="replace_body">途中の練習があります。覚えた内容は残りますが、残りのカードは入れ替わります。</string>
+    <string name="replace_keep">今の練習を続ける</string>
+    <string name="replace_end">終えて新しくはじめる</string>
+
     <plurals name="places_count">
         <item quantity="other">%dか所</item>
     </plurals>

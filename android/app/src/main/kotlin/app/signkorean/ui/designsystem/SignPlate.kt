@@ -41,6 +41,9 @@ import app.signkorean.ui.text.KoreanText
 
 enum class PlateFace { Front, Back }
 
+/** Regular: 학습 카드·상세. Mini: 목록 미리보기(좁은 칸에서도 단어를 한 줄로). */
+enum class PlateSize { Regular, Mini }
+
 object SignPlateTags {
     const val PLATE = "sign-plate"
 }
@@ -81,17 +84,17 @@ private fun parsePlate(hex: String): Color =
  * 그림으로 뜻을 맞히지 않게. 뒷면은 그림이 있는 카드만 표지판 안에 픽토그램을 넣는다.
  */
 @Composable
-fun SignPlate(card: SignCard, face: PlateFace, modifier: Modifier = Modifier) {
+fun SignPlate(card: SignCard, face: PlateFace, modifier: Modifier = Modifier, size: PlateSize = PlateSize.Regular) {
     when (face) {
-        PlateFace.Front -> PlateFront(card.koText, card.plateColor, modifier)
+        PlateFace.Front -> PlateFront(card.koText, card.plateColor, modifier, size)
         PlateFace.Back -> PlateBack(card, modifier)
     }
 }
 
 @Composable
-private fun PlateFront(koText: String, plateColor: String, modifier: Modifier) {
-    PlateFrame(plateColor, stringResource(R.string.plate_description, koText), drawnPictogram = null, modifier) {
-        PlateWord(koText, 34.sp)
+private fun PlateFront(koText: String, plateColor: String, modifier: Modifier, size: PlateSize) {
+    PlateFrame(plateColor, stringResource(R.string.plate_description, koText), drawnPictogram = null, modifier, size) {
+        if (size == PlateSize.Mini) PlateWord(koText, 18.sp, singleLine = true) else PlateWord(koText, 34.sp)
     }
 }
 
@@ -122,19 +125,20 @@ private fun PlateFrame(
     description: String,
     drawnPictogram: PictogramId?,
     modifier: Modifier,
+    size: PlateSize = PlateSize.Regular,
     content: @Composable () -> Unit,
 ) {
     val plate = remember(plateColor) { parsePlate(plateColor) }
     val shape = RoundedCornerShape(12.dp)
     Column(
         modifier = modifier
-            .widthIn(min = 160.dp, max = 260.dp)
+            .then(if (size == PlateSize.Mini) Modifier else Modifier.widthIn(min = 160.dp, max = 260.dp))
             .shadow(6.dp, shape)
             .clip(shape)
             .background(plate)
             .padding(5.dp)
             .border(2.dp, Color.White.copy(alpha = 0.3f), RoundedCornerShape(9.dp))
-            .padding(horizontal = 18.dp, vertical = 16.dp)
+            .padding(horizontal = if (size == PlateSize.Mini) 8.dp else 18.dp, vertical = if (size == PlateSize.Mini) 10.dp else 16.dp)
             .testTag(SignPlateTags.PLATE)
             .clearAndSetSemantics {
                 contentDescription = description
@@ -147,9 +151,10 @@ private fun PlateFrame(
 }
 
 @Composable
-private fun PlateWord(koText: String, size: TextUnit) {
+private fun PlateWord(koText: String, size: TextUnit, singleLine: Boolean = false) {
     KoreanText(
         text = koText,
+        maxLines = if (singleLine) 1 else Int.MAX_VALUE,
         style = MaterialTheme.typography.headlineSmall.copy(
             color = Color.White,
             fontWeight = FontWeight.ExtraBold,

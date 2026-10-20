@@ -59,7 +59,12 @@ class ArchitectureTest {
         val compositionRoot = { f: KoFileDeclaration ->
             SourceRules.inPackage(f.packagee?.name, "app.signkorean.di") || f.name == "SignKoreanApplication"
         }
-        val allowedInScreens = setOf("org.koin.androidx.compose.koinViewModel", "org.koin.compose.viewmodel.koinViewModel")
+        // 화면은 ViewModel 을 받기만 한다. 화면 인자(예: SC03 의 출처)를 넘기는 parametersOf 도 같은 받기의 일부다.
+        val allowedInScreens = setOf(
+            "org.koin.androidx.compose.koinViewModel",
+            "org.koin.compose.viewmodel.koinViewModel",
+            "org.koin.core.parameter.parametersOf",
+        )
         val appOutsideRoot = production("app").filterNot(compositionRoot)
             .flatMap { f -> f.references("org.koin").filterNot { it in allowedInScreens }.map { "${f.path}: $it" } }
         assertNoViolations("AR-03", outsideApp + serviceLocator + appOutsideRoot)

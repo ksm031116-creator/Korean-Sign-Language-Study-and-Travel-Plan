@@ -87,6 +87,67 @@
     <string name="result_nothing_to_review">Nothing left to review here.</string>
     <string name="result_no_cards">There are no signs to practise here.</string>
 
+    <!-- SC01 첫 실행 -->
+    <string name="first_run_step">Step %1$d of %2$d</string>
+    <string name="first_run_title_1">Read the city, one sign at a time.</string>
+    <string name="first_run_body_1">You can already read a little Hangul. Now find out what the signs around Seoul mean.</string>
+    <string name="first_run_title_2">A swipe is all it takes.</string>
+    <string name="first_run_body_2">Right if you know it, left if you don\'t. Your own judgement decides what comes back.</string>
+    <string name="first_run_title_3">Your next stop starts here.</string>
+    <string name="first_run_body_3">Swipe down to see the places that show the sign. Tap a card to flip it and see the meaning.</string>
+    <string name="ko_first_run_art_1" translatable="false">한글</string>
+    <string name="ko_first_run_art_2" translatable="false">몰라요 ← → 알아요</string>
+    <string name="ko_first_run_art_3" translatable="false">↓ 장소</string>
+    <string name="first_run_skip">Skip</string>
+    <string name="first_run_next">Next</string>
+    <string name="first_run_back">Back</string>
+    <string name="first_run_start">Get started</string>
+    <string name="first_run_language">App language</string>
+
+    <!-- SC02 Explore -->
+    <string name="explore_title">Find a sign. Find your Seoul.</string>
+    <string name="explore_subtitle">Real streets. Useful Korean. A trip you can read.</string>
+    <string name="explore_search">Search areas or signs</string>
+    <string name="explore_search_clear">Clear search</string>
+    <string name="explore_settings">Settings</string>
+    <string name="explore_resume_title">Pick up where you left off</string>
+    <string name="explore_resume_detail">%1$s · %2$d/%3$d decisions</string>
+    <string name="explore_resume_action">Resume practice</string>
+    <string name="explore_basics_section">Start with the basics</string>
+    <string name="explore_basics_hint">No place needed</string>
+    <string name="basics_name">Everyday street signs</string>
+    <string name="ko_basics_name" translatable="false">기초 간판</string>
+    <string name="basics_description">The signs you meet before you meet anyone: doors, restrooms, opening hours, stations.</string>
+    <string name="explore_areas_section">Seoul by area</string>
+    <string name="explore_no_results">No areas or signs match \"%1$s\".</string>
+    <string name="progress_known">%1$d/%2$d known</string>
+    <plurals name="signs_count">
+        <item quantity="one">%d sign</item>
+        <item quantity="other">%d signs</item>
+    </plurals>
+    <string name="explore_load_failed">Couldn\'t load the signs.</string>
+    <string name="source_saved">Saved signs</string>
+    <string name="source_trip_day">Trip day</string>
+    <string name="source_place">A place</string>
+
+    <!-- SC03 지역·Basics 상세 -->
+    <string name="collection_new">New</string>
+    <string name="collection_learning">Learn again</string>
+    <string name="collection_known">Known</string>
+    <string name="collection_mode_all">All cards</string>
+    <string name="collection_mode_review">Review</string>
+    <string name="collection_start">Start practice</string>
+    <string name="collection_words">What you will learn</string>
+    <string name="collection_places">Places in this area</string>
+    <string name="collection_basics_notice_title">These signs belong to the street, not to a shop.</string>
+    <string name="collection_basics_notice_body">That is why there are no reviews, routes or trip buttons here.</string>
+    <string name="collection_missing">This collection is no longer available.</string>
+    <string name="collection_example">Example</string>
+    <string name="replace_title">Start a new practice?</string>
+    <string name="replace_body">You have an unfinished practice. What you learned stays, but its remaining cards will be replaced.</string>
+    <string name="replace_keep">Keep session</string>
+    <string name="replace_end">End session</string>
+
     <plurals name="places_count">
         <item quantity="one">%d place</item>
         <item quantity="other">%d places</item>

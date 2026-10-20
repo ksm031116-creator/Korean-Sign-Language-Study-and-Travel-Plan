@@ -28,7 +28,13 @@ import app.signkorean.domain.locale.CurrentLocale
 import app.signkorean.domain.onboarding.OnboardingStore
 import app.signkorean.domain.locale.ResolveAppLanguage
 import kotlinx.coroutines.Dispatchers
+import android.content.pm.ApplicationInfo
+import app.signkorean.ui.explore.CollectionViewModel
+import app.signkorean.ui.explore.ExploreViewModel
 import app.signkorean.ui.learn.LearnViewModel
+import app.signkorean.ui.onboarding.AppGateViewModel
+import app.signkorean.ui.onboarding.FirstRunViewModel
+import org.koin.core.module.dsl.viewModel
 import app.signkorean.ui.learn.ResultViewModel
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.viewModelOf
@@ -77,6 +83,14 @@ val learningModule = module {
 val uiModule = module {
     viewModelOf(::LearnViewModel)
     viewModelOf(::ResultViewModel)
+    viewModelOf(::ExploreViewModel)
+    viewModel { params -> CollectionViewModel(params.get(), get(), get(), get()) }
+    viewModelOf(::AppGateViewModel)
+    viewModel {
+        val debuggable = (androidContext().applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE) != 0
+        // 디버그 빌드만 검수 전 언어(ja)를 고를 수 있다. 출시 빌드는 검수 완료 언어만 (설계서 §8.8).
+        FirstRunViewModel(get(), get(), get(), includeDraftLanguages = debuggable)
+    }
 }
 
 /** 앱이 시작할 때 올리는 모듈 전체. 기능이 늘면 여기에 모듈을 추가한다. */
