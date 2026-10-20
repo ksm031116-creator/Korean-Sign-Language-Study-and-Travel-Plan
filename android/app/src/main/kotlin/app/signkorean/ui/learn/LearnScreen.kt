@@ -16,6 +16,8 @@ import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.disabled
 import androidx.compose.ui.semantics.onClick
 import androidx.compose.ui.semantics.stateDescription
+import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.ui.semantics.liveRegion
 import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -106,6 +108,7 @@ object LearnTags {
     const val BUTTON_DONT_KNOW = "learn-dont-know"
     const val BUTTON_PLACES = "learn-places"
     const val LEGEND_PLACES = "legend-places"
+    const val ANNOUNCEMENT = "learn-announcement"
 }
 
 /** SC04 Learn 화면. ViewModel 을 받아 상태와 효과를 화면 이동으로 잇는다. */
@@ -149,6 +152,7 @@ fun rememberReduceMotion(): Boolean {
 fun LearnContent(state: LearnUiState, onAction: (LearnAction) -> Unit, onClose: () -> Unit, reduceMotion: Boolean) {
     val t = SignKoreanTheme.tokens
     // 날아가는 카드가 화면 밖으로 나가도 가로 스크롤이 생기지 않게 화면에서 잘라 낸다 (U-06, PRE-01).
+    Box(Modifier.fillMaxSize()) {
     Column(Modifier.fillMaxSize().background(t.paper).clipToBounds()) {
         LearnHeader(state, onAction, onClose)
         when {
@@ -157,8 +161,23 @@ fun LearnContent(state: LearnUiState, onAction: (LearnAction) -> Unit, onClose: 
                 title = stringResource(R.string.learn_no_session_title),
                 body = stringResource(R.string.learn_no_session_body),
             ) { SecondaryButton(stringResource(R.string.learn_back_to_explore), onClick = onClose) }
+            state.loadFailed -> ErrorState(stringResource(R.string.learn_load_failed), onRetry = { onAction(LearnAction.Retry) }, modifier = Modifier.padding(20.dp))
             state.card != null -> CardArea(state, onAction, reduceMotion)
         }
+    }
+    // 판정 결과를 스크린리더가 읽도록 알림 영역에 싣는다 (U-03). 화면에는 보이지 않는다.
+    state.announcement?.let { text ->
+        val spoken = text.asString()
+        Box(
+            Modifier.size(1.dp).testTag(LearnTags.ANNOUNCEMENT).semantics {
+                liveRegion = LiveRegionMode.Polite
+                contentDescription = spoken
+            },
+        )
+    }
+    if (state.showCoach && state.card != null) {
+        SwipeCoach(hasPlaces = state.hasPlaces, reduceMotion = reduceMotion, onDismiss = { onAction(LearnAction.DismissCoach) })
+    }
     }
 }
 

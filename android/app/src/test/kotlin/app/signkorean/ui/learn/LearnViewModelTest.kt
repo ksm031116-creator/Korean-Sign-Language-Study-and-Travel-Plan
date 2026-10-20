@@ -15,6 +15,7 @@ import app.signkorean.testing.ContentFixtures
 import app.signkorean.testing.FakeLearningStateStore
 import app.signkorean.testing.FakeSessionStore
 import app.signkorean.testing.FakeTransactionRunner
+import app.signkorean.testing.FakeOnboardingStore
 import app.signkorean.testing.FixedClock
 import app.signkorean.testing.InMemoryContentRepository
 import app.signkorean.testing.SequentialIdGenerator
@@ -46,6 +47,7 @@ class LearnViewModelTest {
     private val states = FakeLearningStateStore()
     private val sessions = FakeSessionStore()
     private val tx = FakeTransactionRunner(states, sessions)
+    private val onboarding = FakeOnboardingStore(coach = true)
     private val clock = FixedClock(Instant.parse("2026-10-21T09:00:00Z"))
 
     @Before
@@ -57,7 +59,7 @@ class LearnViewModelTest {
     private suspend fun viewModel(): LearnViewModel {
         val started = StartSession(sessions, states, tx, SequentialIdGenerator())(SessionSource.Basics, Mode.All, cards, false)
         assertTrue(started is StartOutcome.Started)
-        return LearnViewModel(InMemoryContentRepository(pack), sessions, JudgeCard(sessions, states, tx, clock), UndoJudgement(sessions, states, tx))
+        return LearnViewModel(InMemoryContentRepository(pack), sessions, JudgeCard(sessions, states, tx, clock), UndoJudgement(sessions, states, tx), onboarding)
     }
 
     @Test
@@ -139,7 +141,7 @@ class LearnViewModelTest {
 
     @Test
     fun `세션이 없으면 빈 상태`() = runTest {
-        val vm = LearnViewModel(InMemoryContentRepository(pack), FakeSessionStore(), JudgeCard(sessions, states, tx, clock), UndoJudgement(sessions, states, tx))
+        val vm = LearnViewModel(InMemoryContentRepository(pack), FakeSessionStore(), JudgeCard(sessions, states, tx, clock), UndoJudgement(sessions, states, tx), onboarding)
         assertNull(vm.state.value.card)
         assertFalse(vm.state.value.loading)
         assertTrue(vm.state.value.noSession)
@@ -164,7 +166,7 @@ class LearnViewModelTest {
         val flaky = object : app.signkorean.domain.content.ContentRepository {
             override suspend fun load() = if (fail) throw java.io.IOException("asset") else pack
         }
-        val vm = LearnViewModel(flaky, sessions, JudgeCard(sessions, states, tx, clock), UndoJudgement(sessions, states, tx))
+        val vm = LearnViewModel(flaky, sessions, JudgeCard(sessions, states, tx, clock), UndoJudgement(sessions, states, tx), onboarding)
         assertTrue(vm.state.value.loadFailed)
         fail = false
         vm.onAction(LearnAction.Retry)
@@ -175,7 +177,7 @@ class LearnViewModelTest {
     fun `끝난 세션으로 들어오면 결과로 보낸다`() = runTest {
         val one = StartSession(sessions, states, tx, SequentialIdGenerator())(SessionSource.Basics, Mode.All, cards.take(1), false) as StartOutcome.Started
         JudgeCard(sessions, states, tx, clock)(one.session.id, 0, Verdict.Know)
-        val vm = LearnViewModel(InMemoryContentRepository(pack), sessions, JudgeCard(sessions, states, tx, clock), UndoJudgement(sessions, states, tx))
+        val vm = LearnViewModel(InMemoryContentRepository(pack), sessions, JudgeCard(sessions, states, tx, clock), UndoJudgement(sessions, states, tx), onboarding)
         assertEquals(LearnEffect.Finished, vm.effects.tryReceive().getOrNull())
     }
 
@@ -183,7 +185,7 @@ class LearnViewModelTest {
     fun `콘텐츠에서 사라진 카드면 빈 화면 대신 돌아갈 길을 보인다`() = runTest {
         viewModel()
         val withoutFirst = ContentFixtures.pack(cards = cards.drop(1))
-        val vm = LearnViewModel(InMemoryContentRepository(withoutFirst), sessions, JudgeCard(sessions, states, tx, clock), UndoJudgement(sessions, states, tx))
+        val vm = LearnViewModel(InMemoryContentRepository(withoutFirst), sessions, JudgeCard(sessions, states, tx, clock), UndoJudgement(sessions, states, tx), onboarding)
         assertTrue(vm.state.value.noSession)
     }
 
@@ -205,5 +207,28 @@ class LearnViewModelTest {
         vm.onAction(LearnAction.Undo)
         assertEquals(CardId("t-market-1"), vm.state.value.card?.id)
         assertTrue(vm.state.value.seq != before)
+    }
+
+    @Test
+    fun `처음이면 스와이프 시연을 보이고, 닫으면 기록해 다시 보이지 않는다`() = runTest {
+        val fresh = FakeOnboardingStore(coach = false)
+        StartSession(sessions, states, tx, SequentialIdGenerator())(SessionSource.Basics, Mode.All, cards, false)
+        val vm = LearnViewModel(InMemoryContentRepository(pack), sessions, JudgeCard(sessions, states, tx, clock), UndoJudgement(sessions, states, tx), fresh)
+        assertTrue(vm.state.value.showCoach)
+        vm.onAction(LearnAction.DismissCoach)
+        assertFalse(vm.state.value.showCoach)
+        assertTrue(fresh.coachSeen())
+        vm.onAction(LearnAction.Judge(Verdict.Know))
+        assertFalse("판정 뒤에도 다시 나오지 않는다", vm.state.value.showCoach)
+    }
+
+    @Test
+    fun `U-03 판정·Undo 결과를 스크린리더 알림으로 싣는다`() = runTest {
+        val vm = viewModel()
+        assertNull(vm.state.value.announcement)
+        vm.onAction(LearnAction.Judge(Verdict.DontKnow))
+        assertEquals(app.signkorean.ui.text.UiText.Res(app.signkorean.R.string.learn_announce_dont_know), vm.state.value.announcement)
+        vm.onAction(LearnAction.Undo)
+        assertEquals(app.signkorean.ui.text.UiText.Res(app.signkorean.R.string.learn_announce_undo), vm.state.value.announcement)
     }
 }

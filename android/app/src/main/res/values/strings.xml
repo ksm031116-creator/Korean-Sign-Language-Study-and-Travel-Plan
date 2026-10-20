@@ -60,6 +60,21 @@
     <string name="learn_card_description">Sign card: %1$s. Swipe right or press the right arrow if you know it. Swipe left or press the left arrow if you don\'t. Press Enter to flip the card.</string>
     <string name="learn_card_description_places">Sign card: %1$s. Swipe right or press the right arrow if you know it. Swipe left or press the left arrow if you don\'t. Swipe down or press the down arrow to see places with this sign. Press Enter to flip the card.</string>
 
+    <string name="learn_load_failed">Couldn\'t open this practice.</string>
+    <string name="learn_announce_know">Saved as I know.</string>
+    <string name="learn_announce_dont_know">Saved as don\'t know. It will come back later.</string>
+    <string name="learn_announce_undo">Last decision undone.</string>
+    <string name="coach_title">How to swipe</string>
+    <string name="ko_coach_title" translatable="false">스와이프 방법</string>
+    <string name="ko_coach_sample" translatable="false">국밥</string>
+    <string name="ko_coach_meaning" translatable="false">뜻 보기</string>
+    <string name="coach_right">Swipe right: I know</string>
+    <string name="coach_left">Swipe left: Don\'t know</string>
+    <string name="coach_down">Swipe down: places with this sign</string>
+    <string name="coach_tap">Tap the card: see the meaning</string>
+    <string name="coach_note">The buttons under the card do the same. Swiping up does nothing.</string>
+    <string name="coach_done">Got it</string>
+
     <plurals name="places_count">
         <item quantity="one">%d place</item>
         <item quantity="other">%d places</item>

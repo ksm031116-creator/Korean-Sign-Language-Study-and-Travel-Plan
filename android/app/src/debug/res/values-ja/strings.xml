@@ -51,6 +51,18 @@
     <string name="learn_card_description">看板カード：%1$s。知っていれば右へスワイプ（右矢印キー）、知らなければ左へスワイプ（左矢印キー）。Enter キーで裏返します。</string>
     <string name="learn_card_description_places">看板カード：%1$s。知っていれば右へスワイプ（右矢印キー）、知らなければ左へスワイプ（左矢印キー）。下へスワイプ（下矢印キー）でこの看板がある場所を見られます。Enter キーで裏返します。</string>
 
+    <string name="learn_load_failed">この練習を開けませんでした。</string>
+    <string name="learn_announce_know">「知ってる」で保存しました。</string>
+    <string name="learn_announce_dont_know">「知らない」で保存しました。あとでもう一度出てきます。</string>
+    <string name="learn_announce_undo">直前の判定を取り消しました。</string>
+    <string name="coach_title">スワイプのしかた</string>
+    <string name="coach_right">右へ：知ってる</string>
+    <string name="coach_left">左へ：知らない</string>
+    <string name="coach_down">下へ：この看板がある場所</string>
+    <string name="coach_tap">カードをタップ：意味を見る</string>
+    <string name="coach_note">カードの下のボタンでも同じことができます。上へのスワイプは何もしません。</string>
+    <string name="coach_done">わかった</string>
+
     <plurals name="places_count">
         <item quantity="other">%dか所</item>
     </plurals>

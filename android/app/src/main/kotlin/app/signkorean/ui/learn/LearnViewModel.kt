@@ -18,6 +18,7 @@ import app.signkorean.domain.learning.SessionStore
 import app.signkorean.domain.learning.UndoJudgement
 import app.signkorean.domain.learning.UndoOutcome
 import app.signkorean.domain.learning.Verdict
+import app.signkorean.domain.onboarding.OnboardingStore
 import app.signkorean.ui.text.UiText
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.channels.Channel
@@ -50,6 +51,10 @@ data class LearnUiState(
     val error: UiText? = null,
     val canUndo: Boolean = false,
     val finished: Boolean = false,
+    /** 첫 진입 스와이프 시연을 보일지 (UX11 ③). */
+    val showCoach: Boolean = false,
+    /** 스크린리더에 알릴 판정 결과 (U-03). 화면이 알림 영역에 한 번 싣는다. */
+    val announcement: UiText? = null,
 )
 
 sealed interface LearnAction {
@@ -58,6 +63,7 @@ sealed interface LearnAction {
     data object Undo : LearnAction
     data object OpenPlaces : LearnAction
     data object Retry : LearnAction
+    data object DismissCoach : LearnAction
 }
 
 /** 한 번만 처리할 일. 화면 재구성으로 두 번 처리되지 않게 Channel 로 낸다 (설계서 §5.3). */
@@ -71,6 +77,7 @@ class LearnViewModel(
     private val sessions: SessionStore,
     private val judge: JudgeCard,
     private val undo: UndoJudgement,
+    private val onboarding: OnboardingStore,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(LearnUiState())
@@ -85,6 +92,9 @@ class LearnViewModel(
     /** 저장에 실패한 입력. 다시 시도하면 같은 입력을 보낸다. */
     private var failed: LearnAction? = null
 
+    /** 시연을 아직 보지 않았다. 닫으면 저장하고 다시 보이지 않는다(설정에서 다시 보기). */
+    private var coach = false
+
     init {
         load()
     }
@@ -95,6 +105,7 @@ class LearnViewModel(
         viewModelScope.launch {
             try {
                 pack = content.load()
+                coach = runCatching { !onboarding.coachSeen() }.getOrDefault(false)
                 val current = sessions.current()
                 when {
                     current == null -> _state.value = LearnUiState(loading = false, noSession = true)
@@ -118,6 +129,12 @@ class LearnViewModel(
             load()
             return
         }
+        if (action == LearnAction.DismissCoach) {
+            coach = false
+            _state.update { it.copy(showCoach = false) }
+            viewModelScope.launch { runCatching { onboarding.markCoachSeen() } }
+            return
+        }
         if (s.loading || s.saving) return
         when (action) {
             // 뒤집기는 면만 바꾼다. 저장 오류 안내와 다시 시도는 그대로 둔다.
@@ -130,6 +147,7 @@ class LearnViewModel(
             is LearnAction.Judge -> save(action)
             LearnAction.Undo -> if (s.canUndo) save(action)
             LearnAction.Retry -> failed?.let { save(it) }
+            LearnAction.DismissCoach -> Unit // 위에서 처리했다
         }
     }
 
@@ -154,7 +172,7 @@ class LearnViewModel(
             when (result) {
                 is Result.Saved -> {
                     failed = null
-                    show(result.session)
+                    show(result.session, announce(action))
                     if (result.session.finished) _effects.send(LearnEffect.Finished)
                 }
                 // 이미 지난 입력(중복 탭, 다른 화면에서 바뀐 세션)은 오류가 아니다. 저장된 세션을 다시 읽어 보여 준다.
@@ -185,7 +203,13 @@ class LearnViewModel(
         if (current == null) _state.value = LearnUiState(loading = false, noSession = true) else show(current)
     }
 
-    private fun show(s: LearningSession) {
+    private fun announce(action: LearnAction): UiText? = when (action) {
+        is LearnAction.Judge -> UiText.Res(if (action.verdict == Verdict.Know) R.string.learn_announce_know else R.string.learn_announce_dont_know)
+        LearnAction.Undo -> UiText.Res(R.string.learn_announce_undo)
+        else -> null
+    }
+
+    private fun show(s: LearningSession, announcement: UiText? = null) {
         session = s
         val p = pack
         val card = s.current?.let { id -> p?.cards?.firstOrNull { it.id == id } }
@@ -204,6 +228,8 @@ class LearnViewModel(
             isTryAgain = s.isTryAgain,
             canUndo = s.canUndo,
             finished = s.finished,
+            showCoach = coach && !s.finished,
+            announcement = announcement,
         )
     }
 
