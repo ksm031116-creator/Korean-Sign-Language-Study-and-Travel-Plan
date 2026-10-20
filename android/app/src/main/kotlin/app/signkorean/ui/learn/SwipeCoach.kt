@@ -48,6 +48,9 @@ object CoachTags {
 
 private enum class CoachStep { Right, Left, Down, Tap }
 
+/** 애니메이션 검사 도구에만 보이는 이름. 사용자 문구가 아니다. */
+private const val ANIMATION_NAME = "swipe-coach"
+
 /**
  * 첫 진입 스와이프 시연 (UX11 ③, U-07). 작은 카드가 오른쪽·왼쪽·아래로 움직이고 탭에 뒤집히며,
  * 그 순간 해당 설명을 강조한다. 움직임 줄이기에서는 멈춘 그림과 설명만 보인다. Got it 또는 Back 으로 닫는다.
@@ -61,11 +64,11 @@ fun SwipeCoach(hasPlaces: Boolean, reduceMotion: Boolean, onDismiss: () -> Unit)
     val phase = if (reduceMotion) {
         -1f
     } else {
-        rememberInfiniteTransition(label = "coach").animateFloat(
+        rememberInfiniteTransition(label = ANIMATION_NAME).animateFloat(
             initialValue = 0f,
             targetValue = steps.size.toFloat(),
             animationSpec = infiniteRepeatable(tween(steps.size * 1600, easing = LinearEasing), RepeatMode.Restart),
-            label = "coach-phase",
+            label = ANIMATION_NAME,
         ).value
     }
     val active = if (phase < 0) null else steps[phase.toInt().coerceIn(0, steps.lastIndex)]
