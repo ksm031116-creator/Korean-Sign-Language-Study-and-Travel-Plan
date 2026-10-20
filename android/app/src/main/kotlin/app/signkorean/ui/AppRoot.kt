@@ -33,7 +33,11 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelStore
+import androidx.lifecycle.ViewModelStoreOwner
+import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import app.signkorean.R
 import app.signkorean.navigation.AppNavigator
@@ -44,6 +48,33 @@ import app.signkorean.ui.designsystem.SignKoreanTheme
 /** 화면 회전·언어 변경으로 Activity 가 다시 만들어져도 이동 상태를 지킨다. 프로세스가 끝나면 처음부터(PRD §14). */
 class NavigatorViewModel : ViewModel() {
     val navigator = AppNavigator()
+    val entryStores = EntryViewModelStores()
+
+    override fun onCleared() = entryStores.clearAll()
+}
+
+/**
+ * 스택 항목마다 따로 둔 ViewModel 저장소. 화면 ViewModel 이 Activity 에 묶이면 같은 화면을 다시 열 때
+ * 지난번 ViewModel(지난 세션 상태, 남은 효과)을 그대로 받는다. 항목이 닫히면 그 저장소도 비운다.
+ */
+class EntryViewModelStores {
+    private val stores = mutableMapOf<Long, ViewModelStore>()
+
+    fun ownerFor(entryId: Long): ViewModelStoreOwner {
+        val store = stores.getOrPut(entryId) { ViewModelStore() }
+        return object : ViewModelStoreOwner {
+            override val viewModelStore = store
+        }
+    }
+
+    fun clear(entryId: Long) {
+        stores.remove(entryId)?.clear()
+    }
+
+    fun clearAll() {
+        stores.values.forEach { it.clear() }
+        stores.clear()
+    }
 }
 
 /** 넓은 화면(태블릿·펼친 폴더블)은 옆 레일, 휴대폰은 아래 탭 (구현 계획 Phase 4). */
@@ -55,7 +86,9 @@ private const val WIDE_SCREEN_DP = 600
  */
 @Composable
 fun AppRoot(
-    navigator: AppNavigator = viewModel<NavigatorViewModel>().navigator,
+    root: NavigatorViewModel = viewModel(),
+    navigator: AppNavigator = root.navigator,
+    entryStores: EntryViewModelStores = root.entryStores,
     screen: @Composable (Route, AppNavigator) -> Unit = { route, nav -> AppScreen(route, nav) },
 ) {
     SignKoreanTheme {
@@ -68,6 +101,7 @@ fun AppRoot(
         LaunchedEffect(state) {
             navigator.closedSince(seen.toSet()).forEach { id ->
                 holder.removeState(id)
+                entryStores.clear(id)
                 seen -= id
             }
             seen += state.allEntryIds
@@ -78,7 +112,11 @@ fun AppRoot(
         val content: @Composable (Modifier) -> Unit = { modifier ->
             Box(modifier) {
                 val entry = state.current
-                holder.SaveableStateProvider(key = entry.id) { screen(entry.route, navigator) }
+                holder.SaveableStateProvider(key = entry.id) {
+                    CompositionLocalProvider(LocalViewModelStoreOwner provides entryStores.ownerFor(entry.id)) {
+                        screen(entry.route, navigator)
+                    }
+                }
             }
         }
 

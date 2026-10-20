@@ -20,6 +20,7 @@ import app.signkorean.navigation.AppNavigator
 import app.signkorean.navigation.RootTab
 import app.signkorean.navigation.Route
 import app.signkorean.navigation.ScreenId
+import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -32,16 +33,29 @@ class AppRootTest {
     @get:Rule
     val compose = createComposeRule()
 
-    private val navigator = AppNavigator()
+    private val root = NavigatorViewModel()
+    private val navigator = root.navigator
+
+    class Probe : androidx.lifecycle.ViewModel() {
+        val id = counter++
+        companion object { var counter = 0 }
+    }
+
+    private val seenProbes = mutableListOf<Int>()
 
     private fun setUp() = compose.setContent {
-        AppRoot(navigator) { route, _ ->
+        AppRoot(root) { route, _ ->
             when (route.screen) {
                 ScreenId.SC02 -> {
                     val list = rememberLazyListState()
                     LazyColumn(state = list, modifier = Modifier.testTag("explore-list")) {
                         items(100) { Text("row $it") }
                     }
+                }
+                ScreenId.SC04 -> {
+                    val probe = androidx.lifecycle.viewmodel.compose.viewModel<Probe>()
+                    androidx.compose.runtime.SideEffect { if (seenProbes.lastOrNull() != probe.id) seenProbes += probe.id }
+                    Text("probe ${probe.id}")
                 }
                 else -> {
                     var draft by rememberSaveable { mutableStateOf("") }
@@ -80,5 +94,25 @@ class AppRootTest {
         compose.runOnIdle { navigator.selectTab(RootTab.Explore) }
         compose.runOnIdle { navigator.selectTab(RootTab.Plan) }
         compose.onNodeWithText("Busan").assertExists()
+    }
+
+    @Test
+    fun `같은 화면을 다시 열면 새 ViewModel 을 받는다 (지난 세션 상태가 남지 않게)`() {
+        setUp()
+        compose.runOnIdle { navigator.push(Route(ScreenId.SC04)) }
+        compose.runOnIdle { navigator.back() }
+        compose.runOnIdle { navigator.push(Route(ScreenId.SC04)) }
+        compose.waitForIdle()
+        assertEquals(2, seenProbes.distinct().size)
+    }
+
+    @Test
+    fun `탭을 오가는 동안에는 같은 ViewModel 을 쓴다`() {
+        setUp()
+        compose.runOnIdle { navigator.push(Route(ScreenId.SC04)) }
+        compose.runOnIdle { navigator.selectTab(RootTab.Saved) }
+        compose.runOnIdle { navigator.selectTab(RootTab.Explore) }
+        compose.waitForIdle()
+        assertEquals(1, seenProbes.distinct().size)
     }
 }
