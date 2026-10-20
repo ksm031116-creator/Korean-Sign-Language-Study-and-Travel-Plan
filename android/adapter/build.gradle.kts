@@ -55,6 +55,7 @@ dependencies {
     // 앱별 언어(per-app language). 언어 값의 저장은 AppCompat 하나만 한다 (설계서 §8.2).
     implementation(libs.androidx.appcompat)
     implementation(libs.room.runtime)
+    implementation(libs.androidx.datastore.preferences)
     implementation(libs.room.ktx)
     ksp(libs.room.compiler)
 
