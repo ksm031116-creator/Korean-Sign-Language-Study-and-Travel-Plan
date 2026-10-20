@@ -12,7 +12,7 @@ ID 가 사라지면 실패한다(C-08). 카드를 중간에 끼워 넣으면 뒤
 사용: py -X utf8 .work/build_content_pack.py [--check] [--init-lock]
   --check      파일을 쓰지 않고 현재 팩·잠금·사진과 비교만 한다(CI·커밋 전 확인용). 다르면 종료 코드 1.
   --init-lock  잠금 파일이 없을 때 새로 만든다. 처음 한 번만 쓴다.
-잠금은 늘기만 한다: git HEAD 에 커밋된 잠금에서 항목이 지워지거나 바뀌면 실패한다.
+잠금은 늘기만 한다: HEAD 와 origin/main 분기점의 잠금에서 항목이 지워지거나 바뀌면 실패한다.
 """
 from __future__ import annotations
 
@@ -183,13 +183,38 @@ def check_lock(pack: dict, lock: dict) -> dict:
     return {**lock, **{k: v for k, v in current.items() if k not in lock}}
 
 
-def committed_lock() -> dict | None:
-    """git HEAD 에 커밋된 잠금. 잠금 파일을 지우거나 손으로 고쳐 C-08 을 우회하는 것을 막는 기준이다."""
+def _git_show_lock(rev: str) -> dict | None:
     rel = LOCK.relative_to(ROOT).as_posix()
-    out = subprocess.run(['git', '-C', str(ROOT), 'show', f'HEAD:{rel}'], capture_output=True)
+    try:
+        out = subprocess.run(['git', '-C', str(ROOT), 'show', f'{rev}:{rel}'], capture_output=True)
+    except FileNotFoundError:
+        return None  # git 이 없는 환경
     if out.returncode != 0:
-        return None  # 아직 커밋된 잠금이 없다(최초 생성) 또는 git 밖에서 실행
+        return None
     return json.loads(out.stdout.decode('utf-8'))
+
+
+def _merge_base_with_main() -> str | None:
+    try:
+        out = subprocess.run(['git', '-C', str(ROOT), 'merge-base', 'HEAD', 'origin/main'], capture_output=True)
+    except FileNotFoundError:
+        return None
+    return out.stdout.decode().strip() if out.returncode == 0 else None
+
+
+def committed_locks() -> list[tuple[str, dict]]:
+    """비교 기준 잠금들. 잠금 파일을 지우거나 줄여서 C-08 을 우회하는 것을 막는다.
+
+    - HEAD: 작업 트리에서 지우거나 고친 것을 잡는다.
+    - origin/main 과의 merge-base: 잠금을 줄인 채 커밋까지 해 버린 것을 잡는다. CI 는 작업 트리가 HEAD 와 같아서
+      HEAD 비교만으로는 아무것도 잡지 못한다.
+    git 밖이거나 커밋된 잠금이 없으면(최초 생성) 비교하지 않는다.
+    """
+    refs = [('HEAD', 'HEAD')]
+    base = _merge_base_with_main()
+    if base:
+        refs.append(('origin/main 분기점', base))
+    return [(name, lock) for name, rev in refs if (lock := _git_show_lock(rev))]
 
 
 def load_lock(init: bool) -> dict:
@@ -200,11 +225,10 @@ def load_lock(init: bool) -> dict:
         lock = {}
     else:
         lock = json.loads(LOCK.read_text(encoding='utf-8'))
-    head = committed_lock()
-    if head:
-        changed = [k for k, v in head.items() if lock.get(k) != v]
+    for name, committed in committed_locks():
+        changed = [k for k, v in committed.items() if lock.get(k) != v]
         if changed:
-            raise BuildError('커밋된 잠금에서 지워지거나 바뀐 ID 가 있다 (C-08): ' + ', '.join(changed[:10]))
+            raise BuildError(f'{name} 의 잠금에서 지워지거나 바뀐 ID 가 있다 (C-08): ' + ', '.join(changed[:10]))
     return lock
 
 
@@ -213,8 +237,11 @@ def to_json(obj) -> str:
 
 
 def photos_up_to_date(photo_files: list[Path]) -> bool:
-    return all((ASSETS / 'photos' / f.name).is_file() and filecmp.cmp(f, ASSETS / 'photos' / f.name, shallow=False)
-               for f in photo_files)
+    """내장 사진이 원본과 같고, 팩이 쓰지 않는 사진 파일이 남아 있지 않은지."""
+    folder = ASSETS / 'photos'
+    expected = {f.name for f in photo_files}
+    present = {f.name for f in folder.iterdir()} if folder.is_dir() else set()
+    return present == expected and all(filecmp.cmp(f, folder / f.name, shallow=False) for f in photo_files)
 
 
 def main() -> int:
@@ -245,6 +272,9 @@ def main() -> int:
     LOCK.write_text(lock_text, encoding='utf-8', newline='\n')
     for f in photo_files:
         shutil.copyfile(f, ASSETS / 'photos' / f.name)
+    for stale in (ASSETS / 'photos').iterdir():
+        if stale.name not in {f.name for f in photo_files}:
+            stale.unlink()  # 팩이 더는 쓰지 않는 사진. 앱 크기만 키운다
     added = len(new_lock) - len(lock)
     print(f"카드 {len(pack['cards'])} · 장소 {len(pack['places'])} · 지역 {len(pack['areas'])} · 사진 파일 {len(photo_files)} · 새로 잠근 ID {added}")
     return 0
