@@ -1,5 +1,6 @@
 package app.signkorean.di
 
+import android.content.res.AssetManager
 import app.signkorean.adapter.platform.SystemTimeClock
 import app.signkorean.adapter.platform.UuidIdGenerator
 import app.signkorean.domain.common.AppDispatchers
@@ -19,9 +20,11 @@ class KoinModulesTest {
     @OptIn(KoinExperimentalAPI::class)
     @Test
     fun `AR-05 모든 Koin 모듈의 정의가 해석된다`() {
-        // verify() 는 생성자 인자 타입마다 Koin 정의를 찾는다. 디스패처는 정의가 아니라
-        // kotlinx.coroutines.Dispatchers 에서 직접 넣으므로 알려진 외부 타입으로 등록한다.
-        appModules.forEach { it.verify(extraTypes = listOf(CoroutineDispatcher::class)) }
+        // verify() 는 생성자 인자 타입마다 Koin 정의를 찾는다. 아래 타입은 정의가 아니라 조립부에서 값을 직접 넣는다.
+        // 디스패처: kotlinx.coroutines.Dispatchers / AssetManager·String: androidContext().assets 와 기본 경로 /
+        // Set: 픽토그램 목록(Pictograms.ALL).
+        val passedDirectly = listOf(CoroutineDispatcher::class, AssetManager::class, String::class, Set::class)
+        appModules.forEach { it.verify(extraTypes = passedDirectly) }
     }
 
     @Test
