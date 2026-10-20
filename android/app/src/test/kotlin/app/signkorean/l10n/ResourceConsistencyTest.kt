@@ -19,6 +19,19 @@ class ResourceConsistencyTest {
     }
 
     @Test
+    fun `언어 폴더만 언어로 본다 (car·night 은 아니고 b+ 형식은 맞다)`() {
+        val root = tmp.newFolder("q")
+        fun dir(name: String) = File(root, name).apply { mkdirs() }
+        assertEquals("default", ResourceStrings.languageOf(dir("values")))
+        assertEquals("ja", ResourceStrings.languageOf(dir("values-ja")))
+        assertEquals("pt-BR", ResourceStrings.languageOf(dir("values-pt-rBR")))
+        assertEquals("zh-Hant", ResourceStrings.languageOf(dir("values-b+zh+Hant")))
+        assertEquals(null, ResourceStrings.languageOf(dir("values-car")))
+        assertEquals(null, ResourceStrings.languageOf(dir("values-night")))
+        assertEquals(null, ResourceStrings.languageOf(dir("values-sw600dp")))
+    }
+
+    @Test
     fun `L10N-12 모든 키의 자리표시자가 언어마다 같다`() {
         assertEquals(emptyList<String>(), ResourceCheck.problems(ResourceStrings.all()))
     }
@@ -53,6 +66,7 @@ class ResourceConsistencyTest {
         )
         val all = ResourceStrings.all(res)
         assertEquals(listOf("default", "ja", "xx"), all.map { it.qualifier })
+        assertTrue(all.single { it.qualifier == "xx" }.strings.containsKey("hello"))
         assertTrue(ResourceCheck.problems(all).isEmpty())
     }
 
