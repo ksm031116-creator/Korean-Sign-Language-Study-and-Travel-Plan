@@ -31,6 +31,11 @@ android {
         compose = true
     }
 
+    // values-xx/ 를 추가하면 앱별 언어 목록이 자동으로 따라온다 (손으로 쓴 locales_config 와 어긋날 일이 없다).
+    androidResources {
+        generateLocaleConfig = true
+    }
+
     // 번역 누락은 경고가 아니라 오류 (설계서 §8.8, AR-06 과 함께 다국어 품질 게이트)
     lint {
         abortOnError = true

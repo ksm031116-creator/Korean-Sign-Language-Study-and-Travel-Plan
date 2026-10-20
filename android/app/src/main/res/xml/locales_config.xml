@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- 앱별 언어 설정에 노출할 언어 (설계서 §8.2). 언어를 추가하면 values-xx/ 와 함께 여기에 넣는다. -->
-<locale-config xmlns:android="http://schemas.android.com/apk/res/android">
-    <locale android:name="en" />
-    <locale android:name="ja" />
-</locale-config>

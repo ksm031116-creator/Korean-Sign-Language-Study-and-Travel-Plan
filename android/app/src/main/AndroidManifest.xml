@@ -5,7 +5,9 @@
     <!--
       allowBackup=false 만으로는 Android 12+ 의 기기 간 이전을 막지 못한다. 학습 기록·여행 계획은
       기기 안에만 두므로(PRD §10.4) dataExtractionRules 로 클라우드 백업과 기기 이전을 모두 제외한다.
-      localeConfig 는 API 33+ 에서만 쓰이고, 그 아래는 AppCompat 앱별 언어가 맡는다(설계서 §8.2).
+      앱별 언어 목록(localeConfig)은 AGP 가 values-xx/ 에서 자동으로 만든다(generateLocaleConfig).
+      OS 설정의 앱별 언어는 API 33+ 에서만 동작한다. API 30~32 의 앱 안 언어 전환은
+      AppCompat setApplicationLocales + autoStoreLocales 로 Phase 3 에서 구현한다(설계서 §8.2).
     -->
     <application
         android:name=".SignKoreanApplication"
@@ -14,7 +16,6 @@
         android:fullBackupContent="false"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:localeConfig="@xml/locales_config"
         android:supportsRtl="true"
         android:theme="@android:style/Theme.Material.Light.NoActionBar"
         tools:targetApi="33">
