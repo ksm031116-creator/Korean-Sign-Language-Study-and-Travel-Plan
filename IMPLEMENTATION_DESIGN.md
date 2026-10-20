@@ -251,6 +251,7 @@ data class LearnUiState(
 - `primary`는 판정에 쓰지 않는다.
 - 글자 대비는 모든 조합 4.5:1 이상, 포커스 링은 3:1 이상이다(U-10과 함께 스크린샷 테스트로 확인).
 - HTML 프로토타입(`prototype/styles.css`)은 v2.4까지의 초록·코랄 색을 쓰고 있다. 앱 구현의 기준은 이 표다.
+- **카드는 공공 안내 표지판 틀**로 그린다(PRD §8.3, v2.6). `ui.designsystem.SignPlate(card, face)` 하나가 앞면(단어만)과 뒷면(픽토그램 + 단어)을 모두 그리며, 픽토그램은 `res/drawable/pictogram_*.xml` 벡터 세트에서 `PictogramId` 로 찾는다. 앞면 분기에서 픽토그램을 그릴 경로 자체가 없게 만든다(U-18).
 
 ### 5.5 의존성 주입
 
@@ -300,6 +301,7 @@ data class SignCard(
     val reading: LocalizedText,         // 언어별 발음 보조. ja = 카타카나
     val meaning: LocalizedText,         // 언어별 뜻 — 직역 금지 (§8.3)
     val note: LocalizedText,            // 언어별 문화 설명 — 직역 금지
+    val pictogram: PictogramId?,        // 뒷면에만 그린다. 앞면에는 절대 그리지 않는다 (PRD FR02·§8.3)
     val audio: AudioClip?,              // null이면 음성 준비 중
     val active: Boolean,
 )
@@ -761,6 +763,7 @@ fun calculate(start: LocalTime, origin: Origin?, stops: List<Stop>, legs: List<L
 | C-08 | ID 고정 | 이전 콘텐츠 버전과 비교해 같은 ID의 한국어 원문이 바뀌지 않음. 카드 추가가 기존 ID를 밀어내지 않음 |
 | C-09 | Example 장소 | "Example" 표시, 실제 상호처럼 보이는 문구 없음 |
 | C-10 | 장소 사진 라이선스 | 모든 사진에 라이선스·출처, 금지 라이선스 0 |
+| C-11 | 픽토그램 참조 | 카드의 `pictogram` ID가 모두 앱의 픽토그램 세트에 있음. 없는 ID면 카드는 활성, 뒷면은 단어만(로그 경고) |
 
 ### 9.4 UI·접근성 테스트 케이스
 
@@ -774,6 +777,7 @@ fun calculate(start: LocalTime, origin: Origin?, stops: List<Stop>, legs: List<L
 | U-06 | 날아가는 카드 | 가로 스크롤 생기지 않음 (PRE-01 회귀) |
 | U-07 | 첫 실행 시연 | 시작부터 화면 안, Got it·Back으로 닫힘 (PRE-02 회귀) |
 | U-08 | Basics 카드 | 범례·버튼에 아래 없음, 잠금 아이콘도 없음 (UX09) |
+| U-18 | 표지판 카드 앞·뒤 | 앞면: 공공 안내 표지판 틀 + 단어만, 픽토그램 노드 없음(픽토그램이 있는 카드도). 뒷면: 픽토그램 있는 카드는 표지판 안에 픽토그램, 없는 카드는 단어만. 스크린리더는 앞면에서 그림을 설명하지 않음 |
 | U-09 | 무료 상태 Plan 탭 | 자물쇠 + 기능명, 탭하면 SC21 |
 | U-10 | 터치 영역 | 모든 버튼 48dp 이상 |
 | U-11 | 장소 사진 제3유형 | 자르지 않고 원본 비율, 출처 표시 |

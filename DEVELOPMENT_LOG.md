@@ -21,7 +21,7 @@
 
 | 구분 | 수치 |
 |---|---|
-| 커밋 | 54개 (refactor 2 · feat 14 · fix 11 · docs 16 · chore 9 · test 1 · ci 1) |
+| 커밋 | 55개 (refactor 2 · feat 14 · fix 11 · docs 17 · chore 9 · test 1 · ci 1) |
 | 요구사항 | FR 31 · NFR 10 · AT 18 · 화면 SC 20 · 화면 시나리오 UI 8 · 공통 규칙 UX 12 |
 | 등록 장소 | 49곳 (실존 공공·관광시설 45 + Example 4), 지역 8개, 장소 유형 12종 |
 | 학습 카드 | 135장 (장소 유형 간판 35 + 기초 표지판 100) |
@@ -216,6 +216,8 @@ Commons 요청이 한도에 걸려(HTTP 429) 수집 스크립트에 재시도 �
 - 코드 리뷰: 별도 에이전트 검토에서 4건(동시성 버그 1, 규칙 거짓 통과·실패 7가지, 설정 2)을 찾아 재현 테스트 후 수정 (BUGFIX_LOG "Android Phase 1 코드 리뷰")
 - 한국어 경로 때문에 생긴 빌드 환경 문제 2건(UTF-8 클래스패스, local.properties)을 기록했다
 
+**카드 디자인 (PRD v2.6)**: 카드에 실제 표지판 모양을 넣는 안을 캔버스에 4종(공공 안내·금지·출입문·가게 간판)으로 비교했다. 사용자가 **공공 안내 표지판 틀**을 고르고, **픽토그램은 뒤집었을 때만** 보이게 정했다 — 그림만 보고 뜻을 맞히면 글자 읽기 연습이 안 되기 때문이다. 픽토그램 세트(약 30~40개)는 계획서 Phase 20 D3에 1 MD로 넣었다(총 62 MD).
+
 ---
 
 ## 4. 결정 기록
@@ -240,6 +242,7 @@ Commons 요청이 한도에 걸려(HTTP 429) 수집 스크립트에 재시도 �
 | 16 | 수익 모델 현행 유지(C) — 여행 계획 전체 유료 | 장소 탐색까지 무료로 열려 동기는 생기고, 잠긴 기능도 자물쇠로 보여 준다. 파일럿 전환율이 낮으면 A안 재검토 | 2.4 | 사용자 선택 |
 | 17 | 영어·일본어 출시, 직역 금지 현지화 | 일본어 화자는 한자어 간판을 한자로 짐작 가능 — 언어마다 설명 근거가 다름 | 2.5 | 사용자 선택 |
 | 18 | 알아요 초록 ✓, 몰라요 주황 ✕, 바탕은 무채색 | 학습 대상인 표지판 판이 먼저 보이게. 초록·주황은 밝기 차이와 기호로 색약에서도 구분 | 2.5 | 사용자 선택 |
+| 19 | 카드는 공공 안내 표지판 틀, 픽토그램은 뒷면에만 | 실제 표지판 모양으로 현지에서 알아보게. 앞면에 그림이 있으면 글자를 안 읽고 맞힐 수 있음 | 2.6 | 사용자 선택 |
 
 ---
 
@@ -252,8 +255,9 @@ Commons 요청이 한도에 걸려(HTTP 429) 수집 스크립트에 재시도 �
 | **v2.1 문서** (10-10) | `2ed72b9` docs: add bug fix log for the v2.1 restructure<br>`e0e0216` docs(prd): put trip planning first and move photos from signs to places |
 | **TourAPI 장소 사진** (10-12) | `73d377f` chore: ignore API key files<br>`16cab17` feat(tools): fetch place photos from TourAPI<br>`3114047` fix(tools): include the last place when reading data.js<br>`1ade628` feat(sc08): show TourAPI place photos with credits<br>`f354a18` fix(cards): draw sign plates for cards without a photo<br>`523eb2c` chore: rebuild single-file bundle<br>`83d0315` docs: record TourAPI place photo integration (PRD v2.3) |
 | **README** (10-12) | `63421a7` docs: add README<br>`7e02644` docs(dev-log): link README and refresh versions |
+| **카드 디자인** (10-20) | docs: sign-plate card design, pictograms on the back (PRD v2.6) — 이 문서를 갱신한 커밋 |
 | **발음 음성** (10-20) | `9f59eef` feat(tools): generate pronunciation audio with Gemini TTS<br>`09d4b81` feat(prototype): play pre-generated pronunciation audio<br>`70cf29f` chore: rebuild single-file bundle |
-| **Android Phase 1** (10-20) | `25120e8` feat(domain): scaffold Android project with clock, id and dispatcher ports<br>`b27a326` feat(adapter): add system clock and UUID id generator<br>`29e8734` feat(app): add app shell and Koin composition root<br>`a9a6423` test(arch): enforce hexagonal and i18n rules with Konsist<br>`ba9502a` ci: run tests, architecture rules, lint and release build<br>`86f7703` fix(testing): make SequentialIdGenerator and FixedClock thread-safe<br>`9994d8d` fix(arch): close false passes and false failures in architecture rules<br>`ccd56c1` fix(app): generate locale config and correct the per-app language note<br>`262e714` fix(ci): pin script line endings and stop duplicate CI runs<br>docs: record Phase 1 and its code review — 이 문서를 갱신한 커밋 |
+| **Android Phase 1** (10-20) | `25120e8` feat(domain): scaffold Android project with clock, id and dispatcher ports<br>`b27a326` feat(adapter): add system clock and UUID id generator<br>`29e8734` feat(app): add app shell and Koin composition root<br>`a9a6423` test(arch): enforce hexagonal and i18n rules with Konsist<br>`ba9502a` ci: run tests, architecture rules, lint and release build<br>`86f7703` fix(testing): make SequentialIdGenerator and FixedClock thread-safe<br>`9994d8d` fix(arch): close false passes and false failures in architecture rules<br>`ccd56c1` fix(app): generate locale config and correct the per-app language note<br>`262e714` fix(ci): pin script line endings and stop duplicate CI runs<br>`8e41131` docs: record Phase 1 and its code review |
 | **설계·계획** (10-20) | `aa07e96` docs: add Android implementation design (hexagonal, DI, TDD, en/ja)<br>`83483de` docs: add Android implementation plan (21 phases, 61 MD)<br>`c0918a0` docs: PRD v2.5 and design system colours |
 | **v2.4** (10-19) | `2fe4e1b` docs(prd): keep trip planning fully paid (revenue option C, v2.4)<br>`93c1077` feat(content): expand everyday street signs from 30 to 100<br>`1202449` docs: update sign counts after expanding basics to 100<br>`661c797` feat(tools): add Wikimedia Commons photos for places TourAPI lacks<br>`015fa9f` feat(places): show Commons photos with author and license<br>`a1af6d8` chore: rebuild single-file bundle<br>docs: record Commons photos and v2.4 in PRD, dev log and README — 이 문서를 갱신한 커밋 |
 | **v2.2 Tinder식 카드** (10-10) | `992bd89` refactor(learn): remove sign zoom screen (SC05)<br>`186a21e` feat(learn): tinder-style swipe card, right for "I know"<br>`c5107db` feat(learn): show what each swipe direction means<br>`e660080` docs(prd): tinder-style card, right for "I know" (v2.2)<br>`bf6ad6c` docs(bugfix-log): add issues caught while building the v2.2 card<br>`9b2f2c1` chore: rebuild single-file bundle |
