@@ -74,6 +74,9 @@ sealed interface LearnAction {
 
     /** 발음 듣기. 판정이 아니며 학습 상태를 바꾸지 않는다 (FR29, L-11). */
     data object PlayAudio : LearnAction
+
+    /** 화면을 떠나거나 앱이 뒤로 갈 때. */
+    data object StopAudio : LearnAction
 }
 
 /** 한 번만 처리할 일. 화면 재구성으로 두 번 처리되지 않게 Channel 로 낸다 (설계서 §5.3). */
@@ -116,15 +119,22 @@ class LearnViewModel(
     private fun audioUi(card: SignCard?, playback: PlaybackState): AudioUi = when {
         card?.audio == null -> AudioUi.Unavailable
         playback is PlaybackState.Playing && playback.clip == card.audio -> AudioUi.Playing
-        playback is PlaybackState.Unavailable && failedClip == card.audio -> AudioUi.Unavailable
+        // 이 카드의 음성이 실패했을 때만(늦게 난 오류 포함) "음성 없음"이다.
+        playback is PlaybackState.Unavailable && playback.clip == card.audio -> AudioUi.Unavailable
         else -> AudioUi.Ready
     }
 
-    /** 재생에 실패한 음성. 그 카드에서만 "음성 없음"으로 보인다. */
-    private var failedClip: app.signkorean.domain.content.AudioClip? = null
+    /** 이 화면이 마지막으로 튼 음성. 재생기는 앱에 하나라서 남이 튼 음성은 멈추지 않는다. */
+    private var playedByMe: app.signkorean.domain.content.AudioClip? = null
+
+    private fun stopMine() {
+        val playing = (audio.state.value as? PlaybackState.Playing)?.clip
+        if (playing != null && playing == playedByMe) audio.stop()
+        playedByMe = null
+    }
 
     override fun onCleared() {
-        audio.stop()
+        stopMine()
     }
 
     /** 콘텐츠와 현재 세션을 읽는다. 실패하면 앱을 멈추지 않고 다시 시도할 수 있는 상태로 둔다. */
@@ -160,9 +170,13 @@ class LearnViewModel(
         if (action == LearnAction.PlayAudio) {
             val card = s.card ?: return
             if (card.audio == null) return
+            playedByMe = card.audio
             audio.play(card.audio)
-            if (audio.state.value == PlaybackState.Unavailable) failedClip = card.audio
             _state.update { it.copy(audio = audioUi(it.card, audio.state.value)) }
+            return
+        }
+        if (action == LearnAction.StopAudio) {
+            stopMine()
             return
         }
         if (action == LearnAction.DismissCoach) {
@@ -183,7 +197,7 @@ class LearnViewModel(
             is LearnAction.Judge -> save(action)
             LearnAction.Undo -> if (s.canUndo) save(action)
             LearnAction.Retry -> failed?.let { save(it) }
-            LearnAction.DismissCoach, LearnAction.PlayAudio -> Unit // 위에서 처리했다
+            LearnAction.DismissCoach, LearnAction.PlayAudio, LearnAction.StopAudio -> Unit // 위에서 처리했다
         }
     }
 
@@ -218,6 +232,7 @@ class LearnViewModel(
                 }
                 Result.Gone -> {
                     failed = null
+                    stopMine()
                     _state.value = LearnUiState(loading = false, noSession = true)
                 }
                 Result.Failed -> {
@@ -249,11 +264,8 @@ class LearnViewModel(
         session = s
         val p = pack
         val card = s.current?.let { id -> p?.cards?.firstOrNull { it.id == id } }
-        // 다른 카드로 넘어가면 재생을 멈춘다(설계서 §7.4).
-        if (card?.id != _state.value.card?.id) {
-            audio.stop()
-            failedClip = null
-        }
+        // 다른 카드로 넘어가거나 같은 카드가 다시 나오면(순번이 바뀜) 재생을 멈춘다(설계서 §7.4).
+        if (card?.id != _state.value.card?.id || s.decisionSeq != _state.value.seq) stopMine()
         if (!s.finished && card == null) {
             // 콘텐츠 갱신으로 카드가 사라졌다. 빈 화면 대신 돌아갈 길을 보인다.
             _state.value = LearnUiState(loading = false, noSession = true)

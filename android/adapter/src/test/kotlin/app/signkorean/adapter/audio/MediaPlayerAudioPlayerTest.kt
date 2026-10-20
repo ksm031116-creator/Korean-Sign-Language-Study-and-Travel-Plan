@@ -17,13 +17,14 @@ class MediaPlayerAudioPlayerTest {
     @Test
     fun `음성이 없는 카드는 Unavailable`() {
         player.play(null)
-        assertEquals(PlaybackState.Unavailable, player.state.value)
+        assertEquals(PlaybackState.Unavailable(null), player.state.value)
     }
 
     @Test
     fun `파일이 없으면 Unavailable, 멈추면 Idle`() {
-        player.play(AudioClip("audio/nope.m4a", "x", 1, 1000))
-        assertEquals(PlaybackState.Unavailable, player.state.value)
+        val missing = AudioClip("audio/nope.m4a", "x", 1, 1000)
+        player.play(missing)
+        assertEquals(PlaybackState.Unavailable(missing), player.state.value)
         player.stop()
         assertEquals(PlaybackState.Idle, player.state.value)
     }

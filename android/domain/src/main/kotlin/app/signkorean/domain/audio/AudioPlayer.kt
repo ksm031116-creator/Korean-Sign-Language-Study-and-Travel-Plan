@@ -8,8 +8,11 @@ sealed interface PlaybackState {
     data object Idle : PlaybackState
     data class Playing(val clip: AudioClip) : PlaybackState
 
-    /** 파일이 없거나(검수 전 포함) 재생에 실패했다. 표기는 그대로 보이고 기기 TTS 로 대신 읽지 않는다(설계서 §7.4). */
-    data object Unavailable : PlaybackState
+    /**
+     * 파일이 없거나(검수 전 포함) 재생에 실패했다. 표기는 그대로 보이고 기기 TTS 로 대신 읽지 않는다(설계서 §7.4).
+     * [clip] 은 실패한 음성. 재생 도중 늦게 난 오류도 어느 카드의 실패인지 알 수 있다.
+     */
+    data class Unavailable(val clip: AudioClip?) : PlaybackState
 }
 
 /**

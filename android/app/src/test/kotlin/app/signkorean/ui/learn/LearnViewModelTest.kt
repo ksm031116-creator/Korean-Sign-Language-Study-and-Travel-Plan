@@ -260,8 +260,24 @@ class LearnViewModelTest {
     fun `다른 카드로 넘어가면 재생을 멈춘다`() = runTest {
         val vm = viewModel()
         vm.onAction(LearnAction.PlayAudio)
-        val before = player.stops
         vm.onAction(LearnAction.Judge(Verdict.Know))
-        assertTrue(player.stops > before)
+        assertEquals(app.signkorean.domain.audio.PlaybackState.Idle, player.state.value)
+    }
+
+    @Test
+    fun `재생 도중 늦게 난 오류는 그 카드를 Audio unavailable 로 바꾼다 (리뷰 M-2)`() = runTest {
+        val vm = viewModel()
+        vm.onAction(LearnAction.PlayAudio)
+        player.failLater()
+        assertEquals(AudioUi.Unavailable, vm.state.value.audio)
+    }
+
+    @Test
+    fun `다른 화면이 튼 음성은 이 화면이 멈추지 않는다`() = runTest {
+        val vm = viewModel()
+        val other = app.signkorean.domain.content.AudioClip("audio/x.m4a", "s", 1, 900)
+        player.play(other)
+        vm.onAction(LearnAction.StopAudio)
+        assertEquals(app.signkorean.domain.audio.PlaybackState.Playing(other), player.state.value)
     }
 }

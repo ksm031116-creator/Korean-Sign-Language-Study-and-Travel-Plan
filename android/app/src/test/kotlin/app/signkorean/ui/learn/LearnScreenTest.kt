@@ -212,6 +212,25 @@ class LearnScreenTest {
         compose.onNodeWithTag(LearnTags.AUDIO).performClick()
         compose.onNodeWithTag(LearnTags.AUDIO).performTouchInput { swipeRight() }
         compose.waitForIdle()
-        assertEquals(listOf(LearnAction.PlayAudio), actions.distinct())
+        // 버튼 안에서 끝난 끌기는 버튼의 누름으로 처리된다(Material 동작). 카드 판정·뒤집기는 하나도 없어야 한다.
+        assertTrue("$actions", actions.isNotEmpty() && actions.all { it == LearnAction.PlayAudio })
+    }
+
+    @Test
+    @org.robolectric.annotation.Config(qualifiers = "ja-w390dp-h844dp")
+    fun `일본어 화면은 카타카나 읽기와 目安 표시를 로마자 위에 보인다 (설계서 8장 4절)`() {
+        val withReading = market.copy(reading = app.signkorean.domain.common.LocalizedText(mapOf(app.signkorean.domain.common.LocaleTag("ja") to "クッパプ")))
+        compose.setContent { SignKoreanTheme { LearnContent(LearnUiState(loading = false, card = withReading, hasPlaces = true, face = Face.Back), {}, {}, true) } }
+        compose.onNodeWithText("クッパプ").assertExists()
+        compose.onNodeWithText("目安").assertExists()
+        compose.onNodeWithText("roman").assertExists()
+    }
+
+    @Test
+    @org.robolectric.annotation.Config(qualifiers = "en-w390dp-h844dp")
+    fun `영어 화면은 카타카나를 보이지 않는다`() {
+        val withReading = market.copy(reading = app.signkorean.domain.common.LocalizedText(mapOf(app.signkorean.domain.common.LocaleTag("ja") to "クッパプ")))
+        compose.setContent { SignKoreanTheme { LearnContent(LearnUiState(loading = false, card = withReading, hasPlaces = true, face = Face.Back), {}, {}, true) } }
+        compose.onNodeWithText("クッパプ").assertDoesNotExist()
     }
 }

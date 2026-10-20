@@ -17,7 +17,7 @@ class FakeAudioPlayer(private val failing: Set<String> = emptySet()) : AudioPlay
 
     override fun play(clip: AudioClip?) {
         if (clip == null || clip.path in failing) {
-            _state.value = PlaybackState.Unavailable
+            _state.value = PlaybackState.Unavailable(clip)
             return
         }
         played += clip
@@ -32,5 +32,11 @@ class FakeAudioPlayer(private val failing: Set<String> = emptySet()) : AudioPlay
     /** 재생이 끝난 것처럼. */
     fun complete() {
         _state.value = PlaybackState.Idle
+    }
+
+    /** 재생 도중 늦게 난 디코딩 오류처럼. */
+    fun failLater() {
+        val playing = (_state.value as? PlaybackState.Playing)?.clip
+        _state.value = PlaybackState.Unavailable(playing)
     }
 }

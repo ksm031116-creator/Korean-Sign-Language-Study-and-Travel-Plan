@@ -123,6 +123,10 @@ fun LearnScreen(
     viewModel: LearnViewModel = koinViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    // 화면을 떠나거나 앱이 뒤로 가면 발음을 멈춘다.
+    LifecycleResumeEffect(viewModel) {
+        onPauseOrDispose { viewModel.onAction(LearnAction.StopAudio) }
+    }
     LaunchedEffect(viewModel) {
         for (effect in viewModel.effects) {
             when (effect) {
