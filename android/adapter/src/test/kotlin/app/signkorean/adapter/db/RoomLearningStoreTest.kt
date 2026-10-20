@@ -67,18 +67,18 @@ class RoomLearningStoreTest {
     }
 
     @Test
-    fun `L-12 판정 저장 중 죽어도 다시 열면 마지막 확정 판정까지 남는다 (실제 파일 DB)`() = runBlocking {
+    fun `L-12 두 쓰기 사이에서 실패하면 트랜잭션이 되돌리고, 다시 열어도 마지막 확정 판정까지 남는다 (실제 파일 DB)`() = runBlocking {
         val clock = FixedClock(Instant.parse("2026-10-21T09:00:00Z"))
         val (states, sessions, tx) = stores()
         val cards = (1..3).map { basic("b0$it", "단어$it") }
         var s = (StartSession(sessions, states, tx, SequentialIdGenerator("s"))(SessionSource.Basics, Mode.All, cards, false) as StartOutcome.Started).session
-        s = (JudgeCard(sessions, states, tx, clock)(s.decisionSeq, Verdict.Know) as JudgeOutcome.Judged).session
+        s = (JudgeCard(sessions, states, tx, clock)(s.id, s.decisionSeq, Verdict.Know) as JudgeOutcome.Judged).session
 
         // 두 번째 판정: 카드 상태는 쓰고 세션을 쓰는 순간 죽는다.
         val dying = object : SessionStore by sessions {
             override suspend fun save(session: LearningSession) = throw IllegalStateException("프로세스 종료")
         }
-        assertEquals(JudgeOutcome.SaveFailed, JudgeCard(dying, states, tx, clock)(s.decisionSeq, Verdict.DontKnow))
+        assertEquals(JudgeOutcome.SaveFailed, JudgeCard(dying, states, tx, clock)(s.id, s.decisionSeq, Verdict.DontKnow))
 
         db.close()
         db = open() // 재시작
@@ -91,7 +91,56 @@ class RoomLearningStoreTest {
     fun `스키마는 파괴적 마이그레이션 없이 내보내진다`() {
         val schema = File("schemas/app.signkorean.adapter.db.AppDatabase/1.json")
         assertTrue("Room 스키마 파일이 없다: ${schema.absolutePath}", schema.isFile)
-        val sources = File("src/main/kotlin").walkTopDown().filter { it.extension == "kt" }.map { it.readText() }
-        assertTrue("fallbackToDestructiveMigration 금지 (학습 기록이 사라진다)", sources.none { "fallbackToDestructiveMigration" in it })
+        // DB 빌더가 조립부로 옮겨 가도 잡도록 모든 모듈의 출시 소스를 본다.
+        val offenders = listOf("../app", "../adapter", "../domain").flatMap { module ->
+            File(module, "src").walkTopDown().filter { it.extension == "kt" && "/test/" !in it.invariantSeparatorsPath }
+                .filter { "fallbackToDestructiveMigration" in it.readText() }.toList()
+        }
+        assertEquals("fallbackToDestructiveMigration 금지 (학습 기록이 사라진다)", emptyList<File>(), offenders)
+    }
+
+    @Test
+    fun `알 수 없는 상태 값의 행은 건너뛰고 나머지는 읽는다`() = runBlocking {
+        db.cardStateDao().upsert(CardStateEntity("b01", "known", 0, 1))
+        db.cardStateDao().upsert(CardStateEntity("b02", "mastered", 0, 1))
+        val problems = mutableListOf<String>()
+        val states = RoomLearningStateStore(db.cardStateDao()) { what, _ -> problems += what }
+        assertEquals(mapOf(CardId("b01") to CardStatus.Known), states.all())
+        assertEquals(1, problems.size)
+    }
+
+    @Test
+    fun `읽지 못하는 세션은 지우고 없는 것으로 본다 (시작·판정이 영원히 막히지 않게)`() = runBlocking {
+        db.sessionDao().put(SessionEntity(id = "s1", format = 1, sourceJson = "{broken", mode = "all", cardIdsJson = "[]",
+            queueJson = "[]", decisionsJson = "[]", undoJson = null, statusesJson = "{}", decisionSeq = 0, face = "front"))
+        db.cardStateDao().upsert(CardStateEntity("b01", "learning", 0, 1))
+        val problems = mutableListOf<String>()
+        val sessions = RoomSessionStore(db.sessionDao()) { what, _ -> problems += what }
+        assertEquals(null, sessions.current())
+        assertEquals(null, db.sessionDao().current())
+        assertEquals(1, problems.size)
+        assertEquals("학습 상태는 그대로", 1, db.cardStateDao().all().size)
+        // 버린 뒤에는 새 세션을 시작할 수 있다.
+        val (states, _, tx) = stores()
+        val started = StartSession(sessions, states, tx, SequentialIdGenerator("n"))(SessionSource.Basics, Mode.All, listOf(basic("b01", "단어")), false)
+        assertTrue(started is StartOutcome.Started)
+    }
+
+    @Test
+    fun `모르는 형식 버전의 세션도 버린다`() = runBlocking {
+        val (_, sessions, _) = stores()
+        sessions.save(LearningStoreContract.sampleSession())
+        val row = db.sessionDao().current()!!
+        db.sessionDao().put(row.copy(format = 99))
+        assertEquals(null, sessions.current())
+    }
+
+    @Test
+    fun `세션 표에는 행이 하나뿐이다`() = runBlocking {
+        val (_, sessions, _) = stores()
+        sessions.save(LearningStoreContract.sampleSession("a"))
+        sessions.save(LearningStoreContract.sampleSession("b"))
+        val count = db.openHelper.readableDatabase.query("SELECT COUNT(*) FROM session").use { it.moveToFirst(); it.getInt(0) }
+        assertEquals(1, count)
     }
 }
