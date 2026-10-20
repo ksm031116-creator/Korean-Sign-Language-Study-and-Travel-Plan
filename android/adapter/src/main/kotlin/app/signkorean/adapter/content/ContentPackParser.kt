@@ -105,11 +105,10 @@ class ContentPackParser {
         koName = field("koName").string(),
         name = field("name").localized(),
         address = field("address").localized(),
-        coordinate = try {
-            Coordinate(field("lat").double(), field("lng").double())
-        } catch (e: IllegalArgumentException) {
-            fail("lat", e.message ?: "좌표 범위 밖")
-        },
+        coordinate = Coordinate(
+            lat = field("lat").double().also { if (it !in -90.0..90.0) fail("lat", "위도 범위 밖: $it") },
+            lng = field("lng").double().also { if (it !in -180.0..180.0) fail("lng", "경도 범위 밖: $it") },
+        ),
         signWords = field("signWords").orNull()?.list { string() }?.toSet(),
         photo = field("photo").orNull()?.photo(),
         isExample = field("isExample").boolean(),
@@ -125,7 +124,9 @@ class ContentPackParser {
                 "CC0" -> PhotoLicense.Cc0
                 "CC_BY" -> PhotoLicense.CcBy(
                     author = license.field("author").nonBlank(),
-                    version = license.field("version").nonBlank(),
+                    version = license.field("version").string().also {
+                        if (!CC_VERSION.matches(it)) license.fail("version", "CC BY 버전 형식(예: 4.0)이 아니다: '$it'")
+                    },
                 )
                 else -> license.fail("type", "허용되지 않는 사진 라이선스 '$type'")
             },
@@ -159,7 +160,7 @@ class ContentPackParser {
 
         fun stringOrNull(): String? = orNull()?.string()
 
-        fun int(): Int = primitive().intOrNull ?: failHere("정수가 아니다")
+        fun int(): Int = primitive().takeUnless { it.isString }?.intOrNull ?: failHere("정수가 아니다")
 
         fun double(): Double = primitive().takeUnless { it.isString }?.doubleOrNull ?: failHere("숫자가 아니다")
 
@@ -189,5 +190,6 @@ class ContentPackParser {
     private companion object {
         const val SCHEMA_VERSION = 1
         val HEX_COLOR = Regex("#[0-9a-fA-F]{6}")
+        val CC_VERSION = Regex("[0-9][.][0-9]")
     }
 }

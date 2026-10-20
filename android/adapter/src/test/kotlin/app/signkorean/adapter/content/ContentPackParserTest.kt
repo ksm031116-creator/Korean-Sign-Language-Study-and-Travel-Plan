@@ -113,6 +113,31 @@ class ContentPackParserTest {
     }
 
     @Test
+    fun `정수 자리에 문자열이 오면 거부한다`() {
+        val e = assertThrows(ContentPackFormatException::class.java) { parser.parse(pack().replace("\"schemaVersion\":1", "\"schemaVersion\":\"1\"")) }
+        assertTrue(e.message!!.contains("schemaVersion"))
+    }
+
+    @Test
+    fun `경도 오류는 lng 위치로 알린다`() {
+        val e = assertThrows(ContentPackFormatException::class.java) { parser.parse(pack(places = place("null").replace("126.9", "226.9"))) }
+        assertTrue(e.message, e.message!!.contains("places[0].lng"))
+    }
+
+    @Test
+    fun `CC BY 버전은 숫자 형식이어야 한다`() {
+        assertThrows(ContentPackFormatException::class.java) {
+            parser.parse(pack(places = place("""{"url":"u","license":{"type":"CC_BY","version":"latest","author":"a"},"source":"s","sourceUrl":null}""")))
+        }
+    }
+
+    @Test
+    fun `정규형이 아닌 언어 키는 거부한다 (EN 은 en 과 다른 키가 되어 카드가 꺼진다)`() {
+        val e = assertThrows(ContentPackFormatException::class.java) { parser.parse(pack(cards = "[${basicCard.replace("\"meaning\":{\"en\"", "\"meaning\":{\"EN\"")}]")) }
+        assertTrue(e.message, e.message!!.contains("cards[0].meaning"))
+    }
+
+    @Test
     fun `JSON 이 아니면 형식 오류`() {
         assertThrows(ContentPackFormatException::class.java) { parser.parse("{not json") }
     }
