@@ -1,0 +1,140 @@
+{
+ "t-palace-1": {
+  "word": "매표소",
+  "heard": "매표소",
+  "ok": true,
+  "attempts": 1
+ },
+ "t-palace-2": {
+  "word": "입장료",
+  "heard": "입장료",
+  "ok": true,
+  "attempts": 1
+ },
+ "t-palace-3": {
+  "word": "관람 시간",
+  "heard": "관람 시간",
+  "ok": true,
+  "attempts": 1
+ },
+ "t-museum-1": {
+  "word": "박물관",
+  "heard": "박물관",
+  "ok": true,
+  "attempts": 1
+ },
+ "t-museum-2": {
+  "word": "전시",
+  "heard": "전시",
+  "ok": true,
+  "attempts": 1
+ },
+ "t-museum-3": {
+  "word": "보관함",
+  "heard": "보관함",
+  "ok": true,
+  "attempts": 1
+ },
+ "t-market-1": {
+  "word": "국밥",
+  "heard": "국밥",
+  "ok": true,
+  "attempts": 1
+ },
+ "t-market-2": {
+  "word": "만두",
+  "heard": "만두",
+  "ok": true,
+  "attempts": 1
+ },
+ "t-market-3": {
+  "word": "칼국수",
+  "heard": "칼국수",
+  "ok": true,
+  "attempts": 1
+ },
+ "t-market-4": {
+  "word": "떡볶이",
+  "heard": "떡볶이",
+  "ok": true,
+  "attempts": 1
+ },
+ "t-market-5": {
+  "word": "순대",
+  "heard": "순대",
+  "ok": true,
+  "attempts": 1
+ },
+ "t-cafe-1": {
+  "word": "카페",
+  "heard": "카페",
+  "ok": true,
+  "attempts": 1
+ },
+ "t-cafe-2": {
+  "word": "커피",
+  "heard": "코피",
+  "ok": false,
+  "attempts": 2
+ },
+ "t-cafe-3": {
+  "word": "포장",
+  "heard": "포장",
+  "ok": true,
+  "attempts": 1
+ },
+ "t-street-1": {
+  "word": "식당",
+  "heard": "식당",
+  "ok": true,
+  "attempts": 1
+ },
+ "t-street-2": {
+  "word": "분식",
+  "heard": "분식",
+  "ok": true,
+  "attempts": 1
+ },
+ "t-street-3": {
+  "word": "호프",
+  "heard": "호프",
+  "ok": true,
+  "attempts": 1
+ },
+ "t-shopping-1": {
+  "word": "백화점",
+  "heard": "백화점",
+  "ok": true,
+  "attempts": 1
+ },
+ "t-shopping-2": {
+  "word": "면세점",
+  "heard": "면세점",
+  "ok": true,
+  "attempts": 1
+ },
+ "t-shopping-3": {
+  "word": "할인",
+  "heard": "할인",
+  "ok": true,
+  "attempts": 1
+ },
+ "t-hanok-1": {
+  "word": "한복 대여",
+  "heard": "한복 대여",
+  "ok": true,
+  "attempts": 1
+ },
+ "t-hanok-2": {
+  "word": "공방",
+  "heard": "공방",
+  "ok": true,
+  "attempts": 1
+ },
+ "t-hanok-3": {
+  "word": "찻집",
+  "heard": "찻집",
+  "ok": true,
+  "attempts": 1
+ }
+}
