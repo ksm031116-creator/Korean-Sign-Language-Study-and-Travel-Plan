@@ -5,6 +5,7 @@ import app.signkorean.navigation.AppNavigator
 import app.signkorean.navigation.Route
 import app.signkorean.navigation.ScreenId
 import app.signkorean.ui.learn.LearnScreen
+import app.signkorean.ui.learn.ResultScreen
 
 /** 화면 ID → 화면. 아직 만들지 않은 화면은 자리 표시이며 진입점을 숨긴다(구현 계획 원칙 3). */
 @Composable
@@ -14,6 +15,10 @@ fun AppScreen(route: Route, navigator: AppNavigator) {
             onClose = { navigator.back() },
             onOpenPlaces = { card -> navigator.push(Route(ScreenId.SC08, card.value)) },
             onFinished = { navigator.replaceTop(Route(ScreenId.SC06)) },
+        )
+        ScreenId.SC06 -> ResultScreen(
+            onOpenLearn = { navigator.replaceTop(Route(ScreenId.SC04)) },
+            onClose = { navigator.back() },
         )
         else -> PlaceholderScreen(route)
     }

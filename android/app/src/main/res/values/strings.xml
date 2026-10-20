@@ -75,6 +75,18 @@
     <string name="coach_note">The buttons under the card do the same. Swiping up does nothing.</string>
     <string name="coach_done">Got it</string>
 
+    <string name="result_title_complete">Session complete</string>
+    <string name="result_title_ended">Session ended</string>
+    <string name="result_known">I know</string>
+    <string name="result_learning">Don\'t know</string>
+    <string name="result_unique">Signs seen</string>
+    <string name="result_review_left">Left to review</string>
+    <string name="result_review_again">Review again</string>
+    <string name="result_practice_all">Practice all</string>
+    <string name="result_done">Done</string>
+    <string name="result_nothing_to_review">Nothing left to review here.</string>
+    <string name="result_no_cards">There are no signs to practise here.</string>
+
     <plurals name="places_count">
         <item quantity="one">%d place</item>
         <item quantity="other">%d places</item>

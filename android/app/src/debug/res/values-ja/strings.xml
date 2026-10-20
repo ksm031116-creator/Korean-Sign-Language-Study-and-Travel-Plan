@@ -63,6 +63,18 @@
     <string name="coach_note">カードの下のボタンでも同じことができます。上へのスワイプは何もしません。</string>
     <string name="coach_done">わかった</string>
 
+    <string name="result_title_complete">おつかれさまでした</string>
+    <string name="result_title_ended">ここまでの結果</string>
+    <string name="result_known">知ってる</string>
+    <string name="result_learning">知らない</string>
+    <string name="result_unique">見た看板</string>
+    <string name="result_review_left">復習が残っている看板</string>
+    <string name="result_review_again">もう一度復習</string>
+    <string name="result_practice_all">全部練習</string>
+    <string name="result_done">完了</string>
+    <string name="result_nothing_to_review">ここで復習する看板はありません。</string>
+    <string name="result_no_cards">ここには練習できる看板がありません。</string>
+
     <plurals name="places_count">
         <item quantity="other">%dか所</item>
     </plurals>

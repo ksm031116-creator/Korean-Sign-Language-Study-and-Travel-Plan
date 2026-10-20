@@ -29,6 +29,7 @@ import app.signkorean.domain.onboarding.OnboardingStore
 import app.signkorean.domain.locale.ResolveAppLanguage
 import kotlinx.coroutines.Dispatchers
 import app.signkorean.ui.learn.LearnViewModel
+import app.signkorean.ui.learn.ResultViewModel
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
@@ -75,6 +76,7 @@ val learningModule = module {
 /** 화면 ViewModel. 화면은 koinViewModel() 로만 받는다 (AR-03). */
 val uiModule = module {
     viewModelOf(::LearnViewModel)
+    viewModelOf(::ResultViewModel)
 }
 
 /** 앱이 시작할 때 올리는 모듈 전체. 기능이 늘면 여기에 모듈을 추가한다. */
