@@ -23,7 +23,7 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
       # JVM 모듈 테스트 + Android 모듈은 debug 변형만(release 변형은 같은 테스트의 반복). 릴리스는 빌드·Lint 로 확인.
       - name: Unit tests, architecture rules, lint, release build
-        run: ./gradlew :domain:test :testing:test testDebugUnitTest lint assembleRelease --console=plain
+        run: ./gradlew :domain:test :domain:jacocoTestCoverageVerification :testing:test testDebugUnitTest lint assembleRelease --console=plain
       - name: Upload test and lint reports
         if: failure()
         uses: actions/upload-artifact@v4
