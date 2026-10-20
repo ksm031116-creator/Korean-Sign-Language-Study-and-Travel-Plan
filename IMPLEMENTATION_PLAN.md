@@ -4,7 +4,7 @@
 |---|---|
 | 문서 버전 | 1.0 |
 | 작성일 | 2026-10-20 |
-| 기준 문서 | [IMPLEMENTATION_DESIGN.md](IMPLEMENTATION_DESIGN.md)(설계 원칙·테스트 ID), [PRD_SRS.md](PRD_SRS.md) v2.4, HTML 프로토타입([prototype/](prototype/)) |
+| 기준 문서 | [IMPLEMENTATION_DESIGN.md](IMPLEMENTATION_DESIGN.md)(설계 원칙·테스트 ID), [PRD_SRS.md](PRD_SRS.md) v2.5, HTML 프로토타입([prototype/](prototype/)) |
 | 인력 가정 | 개발자 **1명**, 1 man-day(MD) = 집중 개발 6시간 |
 | 단위 | phase 1개 = **최대 3 MD** |
 | 범위 | PRD/SRS의 모든 기능 요구사항(FR01~31)·비기능 요구사항(NFR01~10)·화면(SC01~21)과 HTML 프로토타입의 모든 기능(§6 매핑표) |

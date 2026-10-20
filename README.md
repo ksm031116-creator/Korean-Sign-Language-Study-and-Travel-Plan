@@ -70,9 +70,13 @@
 
 ### 문서 읽는 순서
 
-1. **[PRD_SRS.md](PRD_SRS.md)** (v2.4): 제품 범위, 수익 모델, 요구사항(FR 31 · NFR 10), 데이터 모델, 사진 권리 원칙, 검수 시나리오, 화면 목록
-2. **[DEVELOPMENT_LOG.md](DEVELOPMENT_LOG.md)**: 기존 기획서 분석에서 사진 보충까지 10단계와 결정 기록 16건
+1. **[PRD_SRS.md](PRD_SRS.md)** (v2.5): 제품 범위, 수익 모델, 요구사항(FR 31 · NFR 10), 데이터 모델, 사진 권리 원칙, 검수 시나리오, 화면 목록
+2. **[DEVELOPMENT_LOG.md](DEVELOPMENT_LOG.md)**: 기존 기획서 분석에서 사진 보충까지 10단계와 결정 기록 18건
 3. **[BUGFIX_LOG.md](BUGFIX_LOG.md)**: 버그 6건의 증상·원인·수정·검증, 재발 방지 체크리스트
+4. **[IMPLEMENTATION_DESIGN.md](IMPLEMENTATION_DESIGN.md)**: Android(Kotlin) 구현 설계 — 경량 헥사고날·의존성 주입·TDD, 영어·일본어 다국어, 테스트 케이스
+5. **[IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md)**: 1인 기준 구현 계획 — 21개 phase(phase당 3 man-day 이하), 요구사항·프로토타입 기능 매핑
+
+디자인 시안은 [앱 화면 캔버스](https://claude.ai/artifact/WDiZvUyad1Jhb2aiRrSa5n)와 [디자인 시스템](https://claude.ai/artifact/Hq267Dnf44Cf2DHVwmpEz2)에 있습니다(비공개 링크, 공유 전에는 소유자만 열람).
 
 ---
 
@@ -87,6 +91,7 @@ Git 이력만 읽어도 **요구사항 → 설계 → 구현 → 검증**의 흐
 | v2.2 | 10-10 | 학습 카드를 Tinder식 스와이프로 재설계하고 방향 안내 추가 |
 | v2.3 | 10-12 | 한국관광공사 TourAPI로 장소 사진 연동 |
 | v2.4 | 10-19 | 수익 모델 확정, 기초 표지판 100장, Wikimedia Commons로 사진 보충 |
+| v2.5 | 10-20 | Android 구현 설계·구현 계획, 영어·일본어 다국어, 디자인 시스템과 화면 시안 |
 
 **커밋 규칙**
 - 메시지는 `<유형>(<범위>): <요약>` 형식입니다 (`feat` · `fix` · `refactor` · `docs` · `chore`).

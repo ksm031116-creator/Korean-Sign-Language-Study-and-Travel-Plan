@@ -4,7 +4,7 @@
 |---|---|
 | 문서 버전 | 1.0 초안 |
 | 작성일 | 2026-10-20 |
-| 기준 산출물 | [PRD_SRS.md](PRD_SRS.md) v2.4, 인터랙티브 프로토타입([prototype/](prototype/), [Sign_Korean_인터랙티브_디자인.html](Sign_Korean_인터랙티브_디자인.html)) |
+| 기준 산출물 | [PRD_SRS.md](PRD_SRS.md) v2.5, 인터랙티브 프로토타입([prototype/](prototype/), [Sign_Korean_인터랙티브_디자인.html](Sign_Korean_인터랙티브_디자인.html)) |
 | 목표 플랫폼 | Android (Kotlin, Jetpack Compose) |
 | 지원 언어 | UI·설명 언어 **영어(`en`)·일본어(`ja`)**, 학습 대상 언어 한국어(`ko`). 이후 언어 추가 |
 | 상태 | 구현 전 기술·구조 설계. §3.2의 확인 항목은 구현 전에 정한다 |
@@ -31,7 +31,7 @@
 
 ### 1.3 PRD 변경이 필요한 항목
 
-이 설계는 아래 사항을 PRD v2.5에 반영하는 것을 전제로 한다.
+아래 사항은 **PRD v2.5(2026-10-20)에 반영했다.** 표는 무엇을 왜 바꿨는지의 기록으로 남긴다.
 
 | PRD 위치 | 현재 | 변경 |
 |---|---|---|
@@ -233,7 +233,26 @@ data class LearnUiState(
 )
 ```
 
-### 5.4 의존성 주입
+### 5.4 디자인 시스템
+
+화면 색·글자·간격은 디자인 시스템 **"Sign Korean"**([디자인 시스템](https://claude.ai/artifact/Hq267Dnf44Cf2DHVwmpEz2))의 토큰을 따른다. 화면 시안은 [디자인 캔버스](https://claude.ai/artifact/WDiZvUyad1Jhb2aiRrSa5n)에 있다(SC01·02·04 앞뒤·08·09·13·21). `ui.designsystem`의 Compose 테마는 이 토큰 이름을 그대로 쓴다.
+
+| 역할 | 토큰 | 값 |
+|---|---|---|
+| 바탕 / 카드 / 테두리 | `paper` / `surface` / `line` | #f6f7f9 / #ffffff / #e3e6ea |
+| 본문 / 보조 글자 | `ink` / `muted` | #1f2933 / #5b6672 (바탕 대비 13.8:1 / 5.5:1) |
+| 주 색 (버튼·탭·링크) | `primary` · `primary-dark` · `primary-soft` | #2b4c7e · #1d3a63 · #e8eef6 |
+| **알아요(✓)** | `know` · `know-soft` · `know-ink` | #1e7a4f · #e2f3e9 · #17613e |
+| **몰라요(✕)**·포커스 | `accent` · `accent-soft` · `accent-ink` | #c4661f · #fdeee4 · #a8460f |
+| 오류 | `danger` · `danger-soft` | #b42318 · #fdecea |
+| 표지판 판 | `plate-*` 18개 | 실제 거리 표지판 색 관례(화장실 파랑, 금지 빨강 등). 학습 내용이라 바꾸지 않는다 |
+
+- **판정 색은 색만으로 구분하지 않는다.** 알아요는 짙은 초록 채움 + 흰 ✓, 몰라요는 연한 주황 채움 + 진한 주황 ✕로 밝기 차이(4.7:1)를 두고 기호·글자를 항상 함께 쓴다(NFR04).
+- `primary`는 판정에 쓰지 않는다.
+- 글자 대비는 모든 조합 4.5:1 이상, 포커스 링은 3:1 이상이다(U-10과 함께 스크린샷 테스트로 확인).
+- HTML 프로토타입(`prototype/styles.css`)은 v2.4까지의 초록·코랄 색을 쓰고 있다. 앱 구현의 기준은 이 표다.
+
+### 5.5 의존성 주입
 
 ```kotlin
 // app/di/DomainModule.kt — 유일한 조립 위치
@@ -879,6 +898,8 @@ PRD §17.1 단계에 맞춘다. 각 단계는 **테스트 먼저**, 단계 끝�
 ---
 
 ## 14. 참고 자료
+
+- 디자인: [Sign Korean 디자인 시스템](https://claude.ai/artifact/Hq267Dnf44Cf2DHVwmpEz2) · [앱 화면 캔버스](https://claude.ai/artifact/WDiZvUyad1Jhb2aiRrSa5n)
 
 - [Android 앱 아키텍처 가이드](https://developer.android.com/topic/architecture)
 - [앱별 언어 설정](https://developer.android.com/guide/topics/resources/app-languages)

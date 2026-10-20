@@ -4,9 +4,9 @@
 
 | 항목 | 내용 |
 |---|---|
-| 기간 | 2026-10-07 ~ 2026-10-19 |
+| 기간 | 2026-10-07 ~ 2026-10-20 |
 | 저장소 | https://github.com/ksm031116-creator/Korean-Sign-Language-Study-and-Travel-Plan |
-| 현재 버전 | PRD/SRS **v2.4**, 인터랙티브 프로토타입 |
+| 현재 버전 | PRD/SRS **v2.5**, 인터랙티브 프로토타입, Android 구현 설계·계획 |
 | 관련 문서 | [README.md](README.md) 저장소 안내 · [PRD_SRS.md](PRD_SRS.md) 요구사항 명세 · [BUGFIX_LOG.md](BUGFIX_LOG.md) 버그 수정 기록 |
 
 이 문서는 기획 문서 분석부터 요구사항 재정의, 프로토타입 구현, 버그 수정, 학습 카드 재설계, 장소 사진 연동까지 **무엇을 왜 그렇게 결정했는지**를 순서대로 기록한다.
@@ -21,7 +21,7 @@
 
 | 구분 | 수치 |
 |---|---|
-| 커밋 | 38개 (refactor 2 · feat 9 · fix 7 · docs 12 · chore 8) |
+| 커밋 | 41개 (refactor 2 · feat 9 · fix 7 · docs 15 · chore 8) |
 | 요구사항 | FR 31 · NFR 10 · AT 18 · 화면 SC 20 · 화면 시나리오 UI 8 · 공통 규칙 UX 12 |
 | 등록 장소 | 49곳 (실존 공공·관광시설 45 + Example 4), 지역 8개, 장소 유형 12종 |
 | 학습 카드 | 135장 (장소 유형 간판 35 + 기초 표지판 100) |
@@ -193,6 +193,18 @@ Commons 요청이 한도에 걸려(HTTP 429) 수집 스크립트에 재시도 �
 
 ---
 
+### 3.11 Android 구현 설계·계획과 디자인 — 10월 20일
+
+**구현 설계서**([IMPLEMENTATION_DESIGN.md](IMPLEMENTATION_DESIGN.md))를 썼다. 사용자 요구는 Kotlin Android, 경량 헥사고날·의존성 주입·TDD, 영어·일본어 다국어(직역 금지)였다. `:domain`(순수 Kotlin)·`:adapter`·`:app`·`:testing` 4개 모듈로 나누고, 테스트 케이스 약 130개를 AT01~18에 연결했다. 별도 검토 에이전트가 PRD와 대조해 주요 지적 7건(언어별 활성화 규칙 모순, 배열 순서로 계산되던 카드 ID, 판정 트랜잭션 범위 등)을 냈고 커밋 전에 모두 고쳤다.
+
+**구현 계획서**([IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md))는 1인 기준 21개 phase, 61 man-day(+예비 6)다. 설계서의 테스트 126개와 프로토타입 동작 103개가 모두 phase에 배정됐는지 스크립트로 대조했다.
+
+**PRD v2.5**: 설계서 §1.3의 변경을 반영했다 — 영어·일본어 출시와 직역 금지 원칙(§1.4), 언어별 데이터 필드, 결제 대기 상태 분리(일본 편의점 결제), 현지 가격, §15.1의 방향 오기.
+
+**디자인**: 비어 있던 디자인 시스템을 프로토타입 CSS 값으로 채우고 [화면 캔버스](https://claude.ai/artifact/WDiZvUyad1Jhb2aiRrSa5n)에 8개 화면을 그렸다. 사용자 요청으로 색을 **학습에 맞게 단순화**했다 — 무채색 바탕(표지판 판이 가장 먼저 보이게), 남색 주 색, **알아요 초록 ✓ / 몰라요 주황 ✕**. 초록·주황은 색약에서 섞일 수 있어 밝기 차이(짙은 채움 대 연한 채움)와 기호를 함께 쓴다. 표지판 판 색은 실제 거리 표지판 관례를 가르치는 학습 내용이라 유지했다.
+
+---
+
 ## 4. 결정 기록
 
 | # | 결정 | 이유 | 버전 | 구분 |
@@ -213,6 +225,8 @@ Commons 요청이 한도에 걸려(HTTP 429) 수집 스크립트에 재시도 �
 | 14 | 방향 안내 3겹, 영어·한국어 병기 | 처음 쓰는 사람도 방향을 알 수 있게. 안내 문구 자체가 학습 | 2.2 | 사용자 선택 |
 | 15 | 커밋을 버그별로 다시 나눔, 날짜는 그대로 | 이력만 봐도 수정 과정이 보이게. 조작한 이력은 신뢰를 잃음 | — | 작업 원칙 |
 | 16 | 수익 모델 현행 유지(C) — 여행 계획 전체 유료 | 장소 탐색까지 무료로 열려 동기는 생기고, 잠긴 기능도 자물쇠로 보여 준다. 파일럿 전환율이 낮으면 A안 재검토 | 2.4 | 사용자 선택 |
+| 17 | 영어·일본어 출시, 직역 금지 현지화 | 일본어 화자는 한자어 간판을 한자로 짐작 가능 — 언어마다 설명 근거가 다름 | 2.5 | 사용자 선택 |
+| 18 | 알아요 초록 ✓, 몰라요 주황 ✕, 바탕은 무채색 | 학습 대상인 표지판 판이 먼저 보이게. 초록·주황은 밝기 차이와 기호로 색약에서도 구분 | 2.5 | 사용자 선택 |
 
 ---
 
@@ -225,6 +239,7 @@ Commons 요청이 한도에 걸려(HTTP 429) 수집 스크립트에 재시도 �
 | **v2.1 문서** (10-10) | `2ed72b9` docs: add bug fix log for the v2.1 restructure<br>`e0e0216` docs(prd): put trip planning first and move photos from signs to places |
 | **TourAPI 장소 사진** (10-12) | `73d377f` chore: ignore API key files<br>`16cab17` feat(tools): fetch place photos from TourAPI<br>`3114047` fix(tools): include the last place when reading data.js<br>`1ade628` feat(sc08): show TourAPI place photos with credits<br>`f354a18` fix(cards): draw sign plates for cards without a photo<br>`523eb2c` chore: rebuild single-file bundle<br>`83d0315` docs: record TourAPI place photo integration (PRD v2.3) |
 | **README** (10-12) | `63421a7` docs: add README<br>`7e02644` docs(dev-log): link README and refresh versions |
+| **설계·계획** (10-20) | `aa07e96` docs: add Android implementation design (hexagonal, DI, TDD, en/ja)<br>`83483de` docs: add Android implementation plan (21 phases, 61 MD)<br>docs: PRD v2.5 and design system colours — 이 문서를 갱신한 커밋 |
 | **v2.4** (10-19) | `2fe4e1b` docs(prd): keep trip planning fully paid (revenue option C, v2.4)<br>`93c1077` feat(content): expand everyday street signs from 30 to 100<br>`1202449` docs: update sign counts after expanding basics to 100<br>`661c797` feat(tools): add Wikimedia Commons photos for places TourAPI lacks<br>`015fa9f` feat(places): show Commons photos with author and license<br>`a1af6d8` chore: rebuild single-file bundle<br>docs: record Commons photos and v2.4 in PRD, dev log and README — 이 문서를 갱신한 커밋 |
 | **v2.2 Tinder식 카드** (10-10) | `992bd89` refactor(learn): remove sign zoom screen (SC05)<br>`186a21e` feat(learn): tinder-style swipe card, right for "I know"<br>`c5107db` feat(learn): show what each swipe direction means<br>`e660080` docs(prd): tinder-style card, right for "I know" (v2.2)<br>`bf6ad6c` docs(bugfix-log): add issues caught while building the v2.2 card<br>`9b2f2c1` chore: rebuild single-file bundle |
 
