@@ -14,6 +14,8 @@
 
     <!-- 형식 (설계서 §8.5). 언어마다 어순이 달라 숫자를 이어 붙이지 않고 자리표시자 하나로 쓴다.
          format_date_short 는 java.time 패턴이다. -->
+    <!-- 날짜·숫자 형식의 언어. 기기 언어가 아니라 이 문구 폴더의 언어로 맞춘다(문구와 형식이 섞이지 않게). -->
+    <string name="format_locale">en</string>
     <string name="format_date_short">EEE, MMM d</string>
     <string name="format_duration_hm">%1$dh %2$dmin</string>
     <string name="format_duration_h">%1$dh</string>
