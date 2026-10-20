@@ -3,6 +3,9 @@ package app.signkorean.ui
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -22,49 +25,66 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.saveable.Saver
-import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import app.signkorean.R
 import app.signkorean.navigation.AppNavigator
 import app.signkorean.navigation.RootTab
 import app.signkorean.navigation.Route
 import app.signkorean.ui.designsystem.SignKoreanTheme
 
-private val NavigatorSaver = Saver<AppNavigator, String>(save = { it.save() }, restore = { AppNavigator.restore(it) })
+/** 화면 회전·언어 변경으로 Activity 가 다시 만들어져도 이동 상태를 지킨다. 프로세스가 끝나면 처음부터(PRD §14). */
+class NavigatorViewModel : ViewModel() {
+    val navigator = AppNavigator()
+}
 
 /** 넓은 화면(태블릿·펼친 폴더블)은 옆 레일, 휴대폰은 아래 탭 (구현 계획 Phase 4). */
 private const val WIDE_SCREEN_DP = 600
 
 /**
  * 앱의 최상위 셸. 루트 탭 Explore·Saved·Plan 과 화면 스택을 그린다.
- * 각 화면의 스크롤·필터는 화면별 저장 상태로 보존한다(탭을 오가도 그대로, PRD §14).
+ * 각 화면의 스크롤·필터는 스택 항목 id 로 저장해 탭을 오가도 보존하고(PRD §14), 닫힌 항목의 저장 상태는 지운다.
  */
 @Composable
-fun AppRoot(screen: @Composable (Route, AppNavigator) -> Unit = { route, _ -> PlaceholderScreen(route) }) {
+fun AppRoot(
+    navigator: AppNavigator = viewModel<NavigatorViewModel>().navigator,
+    screen: @Composable (Route, AppNavigator) -> Unit = { route, _ -> PlaceholderScreen(route) },
+) {
     SignKoreanTheme {
-        val navigator = rememberSaveable(saver = NavigatorSaver) { AppNavigator() }
         val state by navigator.state.collectAsState()
         val holder = rememberSaveableStateHolder()
         val wide = LocalConfiguration.current.screenWidthDp >= WIDE_SCREEN_DP
+
+        // 닫힌 화면의 저장 상태를 지운다. 같은 화면을 다시 열면 새 항목이라 지난번 입력이 되살아나지 않는다.
+        val seen = remember { mutableSetOf<Long>() }
+        LaunchedEffect(state) {
+            navigator.closedSince(seen.toSet()).forEach { id ->
+                holder.removeState(id)
+                seen -= id
+            }
+            seen += state.allEntryIds
+        }
 
         BackHandler(enabled = state.stack.size > 1 || state.tab != RootTab.Explore) { navigator.back() }
 
         val content: @Composable (Modifier) -> Unit = { modifier ->
             Box(modifier) {
-                holder.SaveableStateProvider(key = "${state.tab}/${state.stack.size}/${state.current}") {
-                    screen(state.current, navigator)
-                }
+                val entry = state.current
+                holder.SaveableStateProvider(key = entry.id) { screen(entry.route, navigator) }
             }
         }
 
         if (wide) {
-            Row(Modifier.fillMaxSize()) {
+            // 휴대폰은 Scaffold 가 시스템 막대 여백을 넣는다. 넓은 화면도 같은 여백을 직접 넣는다(Android 15 전체 화면).
+            Row(Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.safeDrawing)) {
                 NavigationRail {
                     RootTab.entries.forEach { tab ->
                         NavigationRailItem(

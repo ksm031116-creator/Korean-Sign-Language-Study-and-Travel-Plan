@@ -2,6 +2,7 @@ package app.signkorean.navigation
 
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -9,7 +10,8 @@ import org.junit.Test
 class AppNavigatorTest {
 
     private val nav = AppNavigator()
-    private fun current() = nav.state.value.current
+    private fun current() = nav.state.value.current.route
+    private fun routes() = nav.state.value.stack.map { it.route }
 
     @Test
     fun `처음에는 Explore 루트`() {
@@ -54,10 +56,15 @@ class AppNavigatorTest {
     }
 
     @Test
-    fun `루트 화면은 push 할 수 없다 (탭 전환으로만 간다)`() {
+    fun `루트 화면을 push 하면 그 탭으로 간다`() {
         nav.push(Route(ScreenId.SC09))
         assertEquals(RootTab.Saved, nav.state.value.tab)
         assertEquals(1, nav.state.value.stack.size)
+    }
+
+    @Test(expected = IllegalArgumentException::class)
+    fun `루트 화면에는 인자를 줄 수 없다 (조용히 버리지 않는다)`() {
+        nav.push(Route(ScreenId.SC09, "filter"))
     }
 
     @Test
@@ -71,22 +78,50 @@ class AppNavigatorTest {
     fun `replaceTop 은 현재 화면만 바꾼다 (SC21 결제 성공 뒤 원래 동작으로)`() {
         nav.push(Route(ScreenId.SC21, "plan"))
         nav.replaceTop(Route(ScreenId.SC12))
-        assertEquals(listOf(Route(ScreenId.SC02), Route(ScreenId.SC12)), nav.state.value.stack)
+        assertEquals(listOf(Route(ScreenId.SC02), Route(ScreenId.SC12)), routes())
     }
 
     @Test
-    fun `저장했다가 복원하면 탭과 모든 스택이 같다 (프로세스 종료 후)`() {
-        nav.push(Route(ScreenId.SC03, "a:b|c"))
-        nav.selectTab(RootTab.Saved)
-        nav.push(Route(ScreenId.SC08, "b01"))
-        val restored = AppNavigator.restore(nav.save())
-        assertEquals(nav.state.value, restored.state.value)
+    fun `replaceTop 으로 루트 화면을 고르면 현재 화면을 닫고 그 탭으로 간다`() {
+        nav.push(Route(ScreenId.SC21, "plan"))
+        nav.replaceTop(Route(ScreenId.SC11))
+        assertEquals(RootTab.Plan, nav.state.value.tab)
+        assertEquals(listOf(Route(ScreenId.SC02)), nav.state.value.stacks.getValue(RootTab.Explore).map { it.route })
     }
 
     @Test
-    fun `깨진 저장값은 처음 상태로 복원한다`() {
-        assertEquals(AppNavigator().state.value, AppNavigator.restore("garbage").state.value)
-        assertEquals(AppNavigator().state.value, AppNavigator.restore("").state.value)
+    fun `replaceTop 할 화면이 바로 아래에 있으면 겹치지 않고 그리로 돌아간다`() {
+        nav.push(Route(ScreenId.SC12))
+        nav.push(Route(ScreenId.SC21, "plan"))
+        nav.replaceTop(Route(ScreenId.SC12))
+        assertEquals(listOf(Route(ScreenId.SC02), Route(ScreenId.SC12)), routes())
+    }
+
+    @Test
+    fun `루트만 있을 때 replaceTop 은 루트를 지우지 않고 위에 쌓는다`() {
+        nav.replaceTop(Route(ScreenId.SC03, "a"))
+        assertEquals(listOf(Route(ScreenId.SC02), Route(ScreenId.SC03, "a")), routes())
+    }
+
+    @Test
+    fun `같은 화면을 다시 열면 새 항목이다 (지난번 입력·스크롤을 되살리지 않는다)`() {
+        nav.push(Route(ScreenId.SC12))
+        val first = nav.state.value.current.id
+        nav.back()
+        nav.push(Route(ScreenId.SC12))
+        assertNotEquals(first, nav.state.value.current.id)
+    }
+
+    @Test
+    fun `닫힌 항목을 알려 준다 (Back·탭 다시 누르기·replaceTop)`() {
+        nav.push(Route(ScreenId.SC03, "a"))
+        val a = nav.state.value.current.id
+        nav.push(Route(ScreenId.SC04, "x"))
+        val x = nav.state.value.current.id
+        nav.back()
+        assertEquals(setOf(x), nav.closedSince(setOf(a, x)))
+        nav.selectTab(RootTab.Explore)
+        assertEquals(setOf(a), nav.closedSince(setOf(a)))
     }
 
     @Test

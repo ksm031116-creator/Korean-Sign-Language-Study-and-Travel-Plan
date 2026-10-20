@@ -80,6 +80,8 @@ dependencies {
     implementation(libs.compose.ui.tooling.preview)
     implementation(libs.koin.android)
     implementation(libs.androidx.appcompat)
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation(libs.androidx.lifecycle.runtime.compose)
 
     testImplementation(project(":testing"))
     testImplementation(libs.junit4)
