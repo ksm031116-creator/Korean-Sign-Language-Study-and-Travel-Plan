@@ -21,6 +21,9 @@ android {
         unitTests.all {
             // 연결 감사 스냅샷(C-07) 갱신: ./gradlew :adapter:testDebugUnitTest -PupdateSnapshots=true
             it.systemProperty("updateSnapshots", project.findProperty("updateSnapshots") ?: "false")
+            // 테스트가 File 로 직접 읽는 데이터. 입력으로 알려야 데이터만 바꿨을 때 테스트가 UP-TO-DATE 로 건너뛰지 않는다.
+            it.inputs.dir("src/main/assets/content")
+            it.inputs.file(rootProject.file("content-id-lock.json"))
         }
     }
 
