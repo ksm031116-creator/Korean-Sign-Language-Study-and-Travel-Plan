@@ -32,7 +32,9 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.isTraversalGroup
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -77,7 +79,10 @@ fun SwipeCoach(hasPlaces: Boolean, reduceMotion: Boolean, onDismiss: () -> Unit)
     val swing = if (within < 0.5f) within * 2 else (1 - within) * 2
 
     Box(
-        Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.45f)).testTag(CoachTags.COACH),
+        Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.45f)).testTag(CoachTags.COACH)
+            // 어두운 배경을 눌러도 아래 카드·버튼으로 터치가 새지 않게 모두 받는다.
+            .pointerInput(Unit) { awaitPointerEventScope { while (true) awaitPointerEvent().changes.forEach { it.consume() } } }
+            .semantics { isTraversalGroup = true },
         contentAlignment = Alignment.Center,
     ) {
         Surface(shape = RoundedCornerShape(20.dp), color = t.surface, modifier = Modifier.padding(20.dp).fillMaxWidth()) {

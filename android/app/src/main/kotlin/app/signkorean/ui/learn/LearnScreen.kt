@@ -43,6 +43,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.key
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -155,7 +156,9 @@ fun LearnContent(state: LearnUiState, onAction: (LearnAction) -> Unit, onClose: 
     val t = SignKoreanTheme.tokens
     // 날아가는 카드가 화면 밖으로 나가도 가로 스크롤이 생기지 않게 화면에서 잘라 낸다 (U-06, PRE-01).
     Box(Modifier.fillMaxSize()) {
-    Column(Modifier.fillMaxSize().background(t.paper).clipToBounds()) {
+    // 시연이 떠 있는 동안 뒤 화면은 스크린리더에서 숨긴다(모달).
+    val behindCoach = if (state.showCoach) Modifier.clearAndSetSemantics { } else Modifier
+    Column(Modifier.fillMaxSize().background(t.paper).clipToBounds().then(behindCoach)) {
         LearnHeader(state, onAction, onClose)
         when {
             state.loading -> Unit
@@ -170,12 +173,15 @@ fun LearnContent(state: LearnUiState, onAction: (LearnAction) -> Unit, onClose: 
     // 판정 결과를 스크린리더가 읽도록 알림 영역에 싣는다 (U-03). 화면에는 보이지 않는다.
     state.announcement?.let { text ->
         val spoken = text.asString()
+        // 판정마다 새 노드로 만든다. 같은 문구가 이어져도("알아요" 두 번) 다시 읽힌다.
+        key(state.seq) {
         Box(
             Modifier.size(1.dp).testTag(LearnTags.ANNOUNCEMENT).semantics {
                 liveRegion = LiveRegionMode.Polite
                 contentDescription = spoken
             },
         )
+        }
     }
     if (state.showCoach && state.card != null) {
         SwipeCoach(hasPlaces = state.hasPlaces, reduceMotion = reduceMotion, onDismiss = { onAction(LearnAction.DismissCoach) })
@@ -259,7 +265,8 @@ private fun CardArea(state: LearnUiState, onAction: (LearnAction) -> Unit, reduc
         card.koText,
     )
 
-    LaunchedEffect(card.id) { runCatching { focus.requestFocus() } }
+    // 새 카드가 나오거나 시연을 닫으면 초점을 카드로 돌린다(UX11 ③).
+    LaunchedEffect(card.id, state.showCoach) { if (!state.showCoach) runCatching { focus.requestFocus() } }
 
     Column(Modifier.fillMaxSize().padding(horizontal = 20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         Legend(state.hasPlaces)

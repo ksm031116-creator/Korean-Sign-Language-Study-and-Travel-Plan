@@ -11,6 +11,10 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performTouchInput
+import androidx.compose.ui.test.swipe
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
 import app.signkorean.domain.content.CardKind
@@ -88,5 +92,24 @@ class LearnAccessibilityTest {
         }
         bounds.forEach { b -> assertTrue("48dp 이상: $b", with(compose.density) { b.width.toDp() >= 48.dp && b.height.toDp() >= 48.dp }) }
         bounds.zipWithNext().forEach { (a, b) -> assertTrue("겹침: $a / $b", a.right <= b.left) }
+    }
+
+    @Test
+    fun `시연이 떠 있으면 어두운 배경을 끌어도 카드가 판정되지 않는다 (리뷰 HIGH-1)`() {
+        show(LearnUiState(loading = false, card = market, hasPlaces = true, showCoach = true), reduceMotion = true)
+        compose.onNodeWithTag(CoachTags.COACH).performTouchInput { swipe(androidx.compose.ui.geometry.Offset(width * 0.1f, height * 0.05f), androidx.compose.ui.geometry.Offset(width * 0.95f, height * 0.05f)) }
+        compose.waitForIdle()
+        assertTrue("$actions", actions.none { it is LearnAction.Judge })
+    }
+
+    @Test
+    fun `같은 판정이 이어져도 알림 노드를 새로 만들어 다시 읽힌다`() {
+        var state by androidx.compose.runtime.mutableStateOf(LearnUiState(loading = false, card = market, hasPlaces = true, seq = 1, announcement = UiText.Res(app.signkorean.R.string.learn_announce_know)))
+        var ids = mutableSetOf<Int>()
+        compose.setContent { SignKoreanTheme { LearnContent(state, {}, {}, true) } }
+        ids += compose.onNodeWithTag(LearnTags.ANNOUNCEMENT).fetchSemanticsNode().id
+        compose.runOnIdle { state = state.copy(seq = 2) }
+        ids += compose.onNodeWithTag(LearnTags.ANNOUNCEMENT).fetchSemanticsNode().id
+        assertEquals("같은 문구라도 판정마다 새 알림 노드", 2, ids.size)
     }
 }

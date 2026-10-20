@@ -59,6 +59,13 @@ fun ResultScreen(onOpenLearn: () -> Unit, onClose: () -> Unit, viewModel: Result
 fun ResultContent(state: ResultUiState, onAction: (ResultAction) -> Unit) {
     val t = SignKoreanTheme.tokens
     val summary = state.summary
+    if (state.loading) return
+    if (summary == null) {
+        app.signkorean.ui.designsystem.EmptyState(title = stringResource(R.string.learn_no_session_title), body = "") {
+            QuietButton(stringResource(R.string.result_done), onClick = { onAction(ResultAction.Done) })
+        }
+        return
+    }
     Column(
         Modifier.fillMaxSize().background(t.paper).verticalScroll(rememberScrollState()).padding(24.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
@@ -68,7 +75,7 @@ fun ResultContent(state: ResultUiState, onAction: (ResultAction) -> Unit) {
             style = MaterialTheme.typography.headlineSmall,
             modifier = Modifier.semantics { heading() },
         )
-        if (summary != null) {
+        run {
             // 판정 횟수와 고유 카드 수는 다를 수 있어 따로 보인다 (FR08, PRD §15.1).
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 Stat(stringResource(R.string.result_known), summary.knownDecisions, t.knowSoft, t.knowInk, ResultTags.KNOWN, Modifier.weight(1f))

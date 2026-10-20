@@ -74,7 +74,8 @@ class ResultViewModel(
                 ResultUiState(
                     loading = false,
                     summary = summary,
-                    reachedLimit = s.decisions.size >= app.signkorean.domain.learning.SessionRules.MAX_DECISIONS,
+                    // 10회 또는 대기열 소진 모두 정상 종료다(PRD §5.1).
+                    reachedLimit = s.finished,
                     canReview = summary.remainingReview > 0,
                 )
             }
