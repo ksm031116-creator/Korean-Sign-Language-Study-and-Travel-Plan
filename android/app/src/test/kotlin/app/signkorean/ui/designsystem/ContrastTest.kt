@@ -46,6 +46,17 @@ class ContrastTest {
     }
 
     @Test
+    fun `누르는 부품의 테두리는 바탕과 3 이상 (WCAG 1_4_11)`() {
+        assertContrast(c.outlineStrong, c.paper, 3.0, "outlineStrong/paper")
+        assertContrast(c.outlineStrong, c.surface, 3.0, "outlineStrong/surface")
+    }
+
+    @Test
+    fun `Material secondary 위 흰 글자도 4·5 이상`() {
+        assertContrast(Color.White, c.accentInk, 4.5, "white/accentInk(secondary)")
+    }
+
+    @Test
     fun `알아요와 몰라요 버튼은 색이 아니라 밝기로도 3 이상 차이 난다`() {
         assertContrast(c.know, c.accentSoft, 3.0, "know/accentSoft")
     }

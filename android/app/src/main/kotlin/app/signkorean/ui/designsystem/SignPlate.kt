@@ -14,6 +14,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -30,6 +31,7 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import app.signkorean.R
@@ -67,23 +69,63 @@ object PictogramArt {
     val drawnIds: Set<String> get() = art.keys
 }
 
+/** 콘텐츠 팩이 #rrggbb 를 보장한다(파서 검사). 그래도 반투명이면 흰 글자 대비가 무너지므로 불투명으로 맞춘다. */
+private val FallbackPlate = Color(0xFF2F6FB0)
+
 private fun parsePlate(hex: String): Color =
-    runCatching { Color(android.graphics.Color.parseColor(hex)) }.getOrDefault(Color(0xFF2F6FB0))
+    runCatching { Color(android.graphics.Color.parseColor(hex)).copy(alpha = 1f) }.getOrDefault(FallbackPlate)
 
 /**
  * 카드를 공공 안내 표지판 틀로 그린다 (PRD §8.3, v2.6, 설계서 §5.4).
- * 앞면은 단어만 그린다. 앞면 분기에는 픽토그램을 그리는 경로 자체가 없다(U-18): 그림으로 뜻을 맞히지 않게.
- * 뒷면은 그림이 있는 카드만 표지판 안에 픽토그램을 넣는다.
+ * 앞면은 [PlateFront] 로만 그린다. 앞면 함수는 픽토그램 값을 받지도 않아서 그림을 그릴 경로 자체가 없다(U-18):
+ * 그림으로 뜻을 맞히지 않게. 뒷면은 그림이 있는 카드만 표지판 안에 픽토그램을 넣는다.
  */
 @Composable
 fun SignPlate(card: SignCard, face: PlateFace, modifier: Modifier = Modifier) {
-    val plate = parsePlate(card.plateColor)
-    val shape = RoundedCornerShape(12.dp)
-    val pictogram = if (face == PlateFace.Back) card.pictogram?.let { id -> PictogramArt.drawable(id)?.let { id to it } } else null
-    val description = when (pictogram) {
-        null -> stringResource(R.string.plate_description, card.koText)
-        else -> stringResource(R.string.plate_description_pictogram, card.koText, stringResource(PictogramArt.label(pictogram.first)!!))
+    when (face) {
+        PlateFace.Front -> PlateFront(card.koText, card.plateColor, modifier)
+        PlateFace.Back -> PlateBack(card, modifier)
     }
+}
+
+@Composable
+private fun PlateFront(koText: String, plateColor: String, modifier: Modifier) {
+    PlateFrame(plateColor, stringResource(R.string.plate_description, koText), drawnPictogram = null, modifier) {
+        PlateWord(koText, 34.sp)
+    }
+}
+
+@Composable
+private fun PlateBack(card: SignCard, modifier: Modifier) {
+    val art = card.pictogram?.let { id -> PictogramArt.drawable(id)?.let { id to it } }
+    val description = when (art) {
+        null -> stringResource(R.string.plate_description, card.koText)
+        else -> stringResource(R.string.plate_description_pictogram, card.koText, stringResource(PictogramArt.label(art.first)!!))
+    }
+    PlateFrame(card.plateColor, description, drawnPictogram = art?.first, modifier) {
+        if (art != null) {
+            Icon(
+                painter = painterResource(art.second),
+                contentDescription = null,
+                tint = Color.White,
+                modifier = Modifier.size(width = 104.dp, height = 86.dp),
+            )
+        }
+        PlateWord(card.koText, 28.sp)
+    }
+}
+
+/** 표지판 판. 스크린리더에는 설명 하나로 보인다. */
+@Composable
+private fun PlateFrame(
+    plateColor: String,
+    description: String,
+    drawnPictogram: PictogramId?,
+    modifier: Modifier,
+    content: @Composable () -> Unit,
+) {
+    val plate = remember(plateColor) { parsePlate(plateColor) }
+    val shape = RoundedCornerShape(12.dp)
     Column(
         modifier = modifier
             .widthIn(min = 160.dp, max = 260.dp)
@@ -97,28 +139,23 @@ fun SignPlate(card: SignCard, face: PlateFace, modifier: Modifier = Modifier) {
             .clearAndSetSemantics {
                 contentDescription = description
                 role = Role.Image
-                if (pictogram != null) drawnPictogram = pictogram.first.value
+                if (drawnPictogram != null) this.drawnPictogram = drawnPictogram.value
             },
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(10.dp),
-    ) {
-        if (pictogram != null) {
-            Icon(
-                painter = painterResource(pictogram.second),
-                contentDescription = null,
-                tint = Color.White,
-                modifier = Modifier.size(width = 104.dp, height = 86.dp),
-            )
-        }
-        KoreanText(
-            text = card.koText,
-            style = MaterialTheme.typography.headlineSmall.copy(
-                color = Color.White,
-                fontWeight = FontWeight.ExtraBold,
-                fontSize = if (face == PlateFace.Front) 34.sp else 28.sp,
-                textAlign = TextAlign.Center,
-            ),
-            modifier = Modifier.fillMaxWidth(),
-        )
-    }
+    ) { content() }
+}
+
+@Composable
+private fun PlateWord(koText: String, size: TextUnit) {
+    KoreanText(
+        text = koText,
+        style = MaterialTheme.typography.headlineSmall.copy(
+            color = Color.White,
+            fontWeight = FontWeight.ExtraBold,
+            fontSize = size,
+            textAlign = TextAlign.Center,
+        ),
+        modifier = Modifier.fillMaxWidth(),
+    )
 }

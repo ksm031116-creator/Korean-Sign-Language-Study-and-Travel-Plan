@@ -18,7 +18,9 @@ import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import app.signkorean.R
 import org.robolectric.RobolectricTestRunner
+import org.robolectric.RuntimeEnvironment
 import org.robolectric.annotation.Config
 
 @RunWith(RobolectricTestRunner::class)
@@ -61,8 +63,10 @@ class DesignSystemTest {
     fun `U-18 앞면의 스크린리더 설명은 그림을 말하지 않는다`() {
         compose.setContent { SignKoreanTheme { SignPlate(restroomCard, PlateFace.Front) } }
         val description = compose.onNodeWithTag(SignPlateTags.PLATE).fetchSemanticsNode().config[SemanticsProperties.ContentDescription].joinToString()
-        assertTrue(description, "화장실" in description)
-        assertTrue(description, "pictogram" !in description.lowercase())
+        val resources = RuntimeEnvironment.getApplication().resources
+        // 앞면 설명은 단어 설명 문구와 정확히 같고, 그림 이름을 담지 않는다.
+        assertEquals(resources.getString(R.string.plate_description, "화장실"), description)
+        assertTrue(description, resources.getString(R.string.pictogram_restroom) !in description)
     }
 
     @Test

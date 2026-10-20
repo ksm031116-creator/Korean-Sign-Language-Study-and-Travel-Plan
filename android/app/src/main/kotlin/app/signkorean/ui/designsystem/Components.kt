@@ -18,6 +18,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.FilterChip
@@ -36,6 +38,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
@@ -60,7 +63,7 @@ fun SecondaryButton(text: String, onClick: () -> Unit, modifier: Modifier = Modi
         onClick = onClick,
         enabled = enabled,
         modifier = modifier.defaultMinSize(minWidth = MinTouch, minHeight = MinTouch),
-        border = BorderStroke(1.dp, SignKoreanTheme.tokens.line),
+        border = BorderStroke(1.dp, SignKoreanTheme.tokens.outlineStrong),
         contentPadding = PaddingValues(horizontal = 20.dp, vertical = 12.dp),
     ) { Text(text, style = MaterialTheme.typography.labelLarge) }
 }
@@ -136,7 +139,13 @@ fun LockBadge(feature: String, onClick: () -> Unit, modifier: Modifier = Modifie
 fun LoadingSkeleton(modifier: Modifier = Modifier, rows: Int = 3) {
     val t = SignKoreanTheme.tokens
     val label = stringResource(R.string.common_loading)
-    Column(modifier.semantics(mergeDescendants = true) { contentDescription = label }, verticalArrangement = Arrangement.spacedBy(12.dp)) {
+    Column(
+        modifier.semantics(mergeDescendants = true) {
+            contentDescription = label
+            liveRegion = LiveRegionMode.Polite
+        },
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
         repeat(rows) { i ->
             Box(
                 Modifier.fillMaxWidth(if (i % 2 == 0) 1f else 0.7f).height(18.dp)
@@ -222,6 +231,20 @@ fun UndoBar(message: String, onUndo: () -> Unit, modifier: Modifier = Modifier) 
             TextButton(onClick = onUndo, modifier = Modifier.defaultMinSize(minWidth = MinTouch, minHeight = MinTouch)) {
                 Text(stringResource(R.string.common_undo), color = t.primarySoft, style = MaterialTheme.typography.labelLarge)
             }
+        }
+    }
+}
+
+/**
+ * 공통 하단 시트 (SC15·SC16·SC17). 시트 바깥을 누르면 Back 과 같다(PRD UX07): 닫기만 하고 아무것도 저장하지 않는다.
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun AppBottomSheet(title: String, onDismiss: () -> Unit, content: @Composable () -> Unit) {
+    ModalBottomSheet(onDismissRequest = onDismiss, containerColor = SignKoreanTheme.tokens.surface) {
+        Column(Modifier.padding(start = 20.dp, end = 20.dp, bottom = 24.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            Text(title, style = MaterialTheme.typography.titleMedium, modifier = Modifier.semantics { heading() })
+            content()
         }
     }
 }

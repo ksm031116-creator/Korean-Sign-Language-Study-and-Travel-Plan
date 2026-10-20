@@ -10,6 +10,6 @@
     <group android:translateX="60" android:translateY="50">
         <path android:fillColor="#FFFFFFFF" android:pathData="M-39,-34 a9,9 0 1,0 18,0 a9,9 0 1,0 -18,0 Z M-43,-22 h26 v28 h-6 v34 h-6 v-34 h-2 v34 h-6 v-34 h-6 Z" />
         <path android:fillColor="#FFFFFFFF" android:fillAlpha=".7" android:pathData="M-1.5,-44 h3 v88 h-3 Z" />
-        <path android:fillColor="#FFFFFFFF" android:pathData="M21,-34 a9,9 0 1,0 18,0 a9,9 0 1,0 -18,0 Z M21,-22 h18 l11,32 h-9 v30 h-6 v-30 h-2 v30 h-6 v-30 h-9 Z" />
+        <path android:fillColor="#FFFFFFFF" android:pathData="M21,-34 a9,9 0 1,0 18,0 a9,9 0 1,0 -18,0 Z M21,-22 h18 l11,32 h-13 v30 h-6 v-30 h-2 v30 h-6 v-30 h-13 Z" />
     </group>
 </vector>
