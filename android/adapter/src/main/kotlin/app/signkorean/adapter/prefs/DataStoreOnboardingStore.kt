@@ -2,6 +2,8 @@ package app.signkorean.adapter.prefs
 
 import android.content.Context
 import androidx.datastore.core.DataStore
+import androidx.datastore.core.handlers.ReplaceFileCorruptionHandler
+import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
@@ -25,7 +27,10 @@ class DataStoreOnboardingStore(private val store: DataStore<Preferences>) : Onbo
 
         /** DataStore 는 파일 하나에 하나만 만들어야 한다. 앱 조립부에서 single 로 한 번만 부른다. */
         fun create(context: Context) = DataStoreOnboardingStore(
-            PreferenceDataStoreFactory.create { context.preferencesDataStoreFile("onboarding") },
+            PreferenceDataStoreFactory.create(
+                // 파일이 손상되면 비우고 다시 시작한다(안내를 한 번 더 볼 뿐, 앱은 멈추지 않는다).
+                corruptionHandler = ReplaceFileCorruptionHandler { emptyPreferences() },
+            ) { context.preferencesDataStoreFile("onboarding") },
         )
     }
 }

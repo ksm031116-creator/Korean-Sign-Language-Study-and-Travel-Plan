@@ -1,6 +1,12 @@
 package app.signkorean.ui.onboarding
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -49,12 +55,16 @@ fun FirstRunScreen(viewModel: FirstRunViewModel, onFinished: () -> Unit) {
 }
 
 /** SC01 첫 실행 안내. 영어·한국어 병기 설명, Skip/Next/Back/Get started. */
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun FirstRunContent(state: FirstRunUiState, onAction: (FirstRunAction) -> Unit) {
     val t = SignKoreanTheme.tokens
     val last = state.step == state.steps - 1
+    // 시스템 Back 은 한 단계 뒤로. 첫 단계에서는 앱을 떠난다.
+    BackHandler(enabled = state.step > 0) { onAction(FirstRunAction.Back) }
     Column(
-        Modifier.fillMaxSize().background(t.paper).verticalScroll(rememberScrollState()).padding(24.dp),
+        // 앱 셸 밖에서 그리므로 시스템 막대 여백을 직접 넣는다(Android 15 전체 화면).
+        Modifier.fillMaxSize().background(t.paper).windowInsetsPadding(WindowInsets.safeDrawing).verticalScroll(rememberScrollState()).padding(24.dp),
         verticalArrangement = Arrangement.spacedBy(18.dp),
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -69,7 +79,7 @@ fun FirstRunContent(state: FirstRunUiState, onAction: (FirstRunAction) -> Unit) 
         Text(stringResource(BODIES[state.step]), style = MaterialTheme.typography.bodyLarge)
         if (state.step == 0 && state.languages.size > 1) {
             Text(stringResource(R.string.first_run_language), style = MaterialTheme.typography.labelLarge)
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 state.languages.forEach { tag ->
                     // 언어 이름은 그 언어로 쓴다(English, 日本語). 언어를 더해도 코드는 바뀌지 않는다(L10N-08).
                     val locale = Locale.forLanguageTag(tag.value)
