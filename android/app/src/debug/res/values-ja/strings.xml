@@ -45,6 +45,12 @@
     <string name="learn_no_session_body">「探す」から看板のセットを選んで始めましょう。</string>
     <string name="learn_back_to_explore">「探す」に戻る</string>
 
+    <string name="learn_flip_action">カードを裏返す</string>
+    <string name="learn_face_front">表：韓国語の看板だけ</string>
+    <string name="learn_face_back">裏：読み方と意味</string>
+    <string name="learn_card_description">看板カード：%1$s。知っていれば右へスワイプ（右矢印キー）、知らなければ左へスワイプ（左矢印キー）。Enter キーで裏返します。</string>
+    <string name="learn_card_description_places">看板カード：%1$s。知っていれば右へスワイプ（右矢印キー）、知らなければ左へスワイプ（左矢印キー）。下へスワイプ（下矢印キー）でこの看板がある場所を見られます。Enter キーで裏返します。</string>
+
     <plurals name="places_count">
         <item quantity="other">%dか所</item>
     </plurals>

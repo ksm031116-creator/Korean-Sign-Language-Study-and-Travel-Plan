@@ -54,6 +54,12 @@
     <string name="learn_no_session_body">Pick a set of signs in Explore to start.</string>
     <string name="learn_back_to_explore">Back to Explore</string>
 
+    <string name="learn_flip_action">Flip the card</string>
+    <string name="learn_face_front">Front: Korean sign only</string>
+    <string name="learn_face_back">Back: reading and meaning</string>
+    <string name="learn_card_description">Sign card: %1$s. Swipe right or press the right arrow if you know it. Swipe left or press the left arrow if you don\'t. Press Enter to flip the card.</string>
+    <string name="learn_card_description_places">Sign card: %1$s. Swipe right or press the right arrow if you know it. Swipe left or press the left arrow if you don\'t. Swipe down or press the down arrow to see places with this sign. Press Enter to flip the card.</string>
+
     <plurals name="places_count">
         <item quantity="one">%d place</item>
         <item quantity="other">%d places</item>

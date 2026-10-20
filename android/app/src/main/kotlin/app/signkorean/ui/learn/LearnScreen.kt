@@ -8,7 +8,15 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.focusable
-import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.ui.input.pointer.positionChange
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.disabled
+import androidx.compose.ui.semantics.onClick
+import androidx.compose.ui.semantics.stateDescription
+import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -120,11 +128,20 @@ fun LearnScreen(
     LearnContent(state, viewModel::onAction, onClose, reduceMotion = rememberReduceMotion())
 }
 
-/** 기기 설정의 "애니메이션 없음"(애니메이터 길이 0). 켜져 있으면 카드를 날리지 않고 바로 처리한다 (U-05). */
+/**
+ * 기기 설정의 "애니메이션 없음"(애니메이터 길이 0). 켜져 있으면 카드를 날리지 않고 바로 처리한다 (U-05).
+ * 화면이 다시 보일 때마다 다시 읽어, 설정을 바꾸고 돌아와도 따른다.
+ */
 @Composable
 fun rememberReduceMotion(): Boolean {
     val resolver = LocalContext.current.contentResolver
-    return remember(resolver) { Settings.Global.getFloat(resolver, Settings.Global.ANIMATOR_DURATION_SCALE, 1f) == 0f }
+    fun read() = Settings.Global.getFloat(resolver, Settings.Global.ANIMATOR_DURATION_SCALE, 1f) == 0f
+    var reduce by remember(resolver) { mutableStateOf(read()) }
+    LifecycleResumeEffect(resolver) {
+        reduce = read()
+        onPauseOrDispose { }
+    }
+    return reduce
 }
 
 /** 상태만 받아 그리는 Learn 화면. 테스트는 이 함수를 직접 쓴다. */
@@ -171,18 +188,32 @@ private fun LearnHeader(state: LearnUiState, onAction: (LearnAction) -> Unit, on
 private fun CardArea(state: LearnUiState, onAction: (LearnAction) -> Unit, reduceMotion: Boolean) {
     val card = state.card ?: return
     val scope = rememberCoroutineScope()
-    val offset = remember(card.id) { Animatable(Offset.Zero, Offset.VectorConverter) }
+    // 같은 카드가 다시 나와도(재출제·Undo·저장 실패) 순번이 바뀌면 새 위치에서 시작한다. 날아간 채 남지 않게.
+    val offset = remember(card.id, state.seq) { Animatable(Offset.Zero, Offset.VectorConverter) }
     var size by remember { mutableStateOf(IntSize.Zero) }
     val focus = remember { FocusRequester() }
+    // 날아가는 동안(판정을 보내기 전)에는 다른 입력을 받지 않는다. 두 번째 입력이 첫 판정을 덮지 않게.
+    var committing by remember(card.id, state.seq) { mutableStateOf(false) }
+
+    // 저장이 실패하면 같은 카드에 머문다(FR07). 날아간 카드를 제자리로 돌린다.
+    LaunchedEffect(state.error) {
+        if (state.error != null) {
+            committing = false
+            offset.snapTo(Offset.Zero)
+        }
+    }
 
     /** 스와이프·버튼·키보드가 모두 같은 길로 간다: 날아가는 움직임 뒤 판정 (UX12). */
     fun commit(gesture: Gesture) {
-        if (state.saving) return
+        if (state.saving || committing) return
         when (gesture) {
-            Gesture.Know, Gesture.DontKnow -> scope.launch {
-                val dir = if (gesture == Gesture.Know) 1f else -1f
-                if (!reduceMotion) offset.animateTo(Offset(dir * size.width * 1.5f, 0f), tween(220)) else offset.snapTo(Offset.Zero)
-                onAction(LearnAction.Judge(if (gesture == Gesture.Know) Verdict.Know else Verdict.DontKnow))
+            Gesture.Know, Gesture.DontKnow -> {
+                committing = true
+                scope.launch {
+                    val dir = if (gesture == Gesture.Know) 1f else -1f
+                    if (!reduceMotion) offset.animateTo(Offset(dir * size.width * 1.5f, 0f), tween(220)) else offset.snapTo(Offset.Zero)
+                    onAction(LearnAction.Judge(if (gesture == Gesture.Know) Verdict.Know else Verdict.DontKnow))
+                }
             }
             Gesture.Places -> scope.launch {
                 if (!reduceMotion) offset.animateTo(Offset.Zero, tween(160)) else offset.snapTo(Offset.Zero)
@@ -195,6 +226,18 @@ private fun CardArea(state: LearnUiState, onAction: (LearnAction) -> Unit, reduc
         }
     }
 
+    // 지역 함수 참조(::commit)는 구성마다 "같은 값"으로 비교돼 갱신되지 않는다. 새 람다로 넘겨 최신 상태를 쓰게 한다.
+    val currentCommit by rememberUpdatedState<(Gesture) -> Unit> { g -> commit(g) }
+    val cardSize = CardSize(size.width.toFloat().coerceAtLeast(1f), size.height.toFloat().coerceAtLeast(1f))
+    val currentSize by rememberUpdatedState(cardSize)
+    val hasPlaces by rememberUpdatedState(state.hasPlaces)
+    val flipLabel = stringResource(R.string.learn_flip_action)
+    val faceDescription = stringResource(if (state.face == Face.Front) R.string.learn_face_front else R.string.learn_face_back)
+    val cardDescription = stringResource(
+        if (state.hasPlaces) R.string.learn_card_description_places else R.string.learn_card_description,
+        card.koText,
+    )
+
     LaunchedEffect(card.id) { runCatching { focus.requestFocus() } }
 
     Column(Modifier.fillMaxSize().padding(horizontal = 20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -203,9 +246,15 @@ private fun CardArea(state: LearnUiState, onAction: (LearnAction) -> Unit, reduc
         state.error?.let { ErrorState(it.asString(), onRetry = { onAction(LearnAction.Retry) }) }
 
         Box(Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.Center) {
-            val drag = Drag(offset.value.x, offset.value.y)
-            val cardSize = CardSize(size.width.toFloat().coerceAtLeast(1f), size.height.toFloat().coerceAtLeast(1f))
-            val hint = GestureClassifier.hint(drag, cardSize, state.hasPlaces)
+            // 뒤 카드 겹침 (UX12): 앞 카드를 끌수록 뒤 카드가 앞으로 올라온다.
+            val pull = (kotlin.math.abs(offset.value.x) / cardSize.width).coerceIn(0f, 1f)
+            Surface(
+                shape = RoundedCornerShape(24.dp),
+                color = SignKoreanTheme.tokens.surface,
+                border = androidx.compose.foundation.BorderStroke(1.dp, SignKoreanTheme.tokens.line),
+                modifier = Modifier.fillMaxSize().padding(horizontal = (10 * (1 - pull)).dp).offset(y = (14 * (1 - pull)).dp),
+            ) {}
+            val hint = GestureClassifier.hint(Drag(offset.value.x, offset.value.y), cardSize, state.hasPlaces)
             Surface(
                 shape = RoundedCornerShape(24.dp),
                 color = SignKoreanTheme.tokens.surface,
@@ -213,44 +262,68 @@ private fun CardArea(state: LearnUiState, onAction: (LearnAction) -> Unit, reduc
                 modifier = Modifier
                     .fillMaxSize()
                     .onSizeChanged { size = it }
+                    // 터치는 움직이기 전 좌표에서 받는다(기울어진 좌표계로 끌기 거리가 비틀리지 않게).
+                    .pointerInput(card.id, state.seq) {
+                        awaitEachGesture {
+                            val down = awaitFirstDown(requireUnconsumed = true)
+                            var total = Offset.Zero
+                            var cancelled = false
+                            while (true) {
+                                val event = awaitPointerEvent()
+                                val change = event.changes.firstOrNull { it.id == down.id } ?: break
+                                if (!change.pressed) break
+                                // 카드 안 스크롤(뒷면 본문)이 가져간 끌기는 판정하지 않는다(PRD UX01: 본문 제외).
+                                if (change.isConsumed) {
+                                    cancelled = true
+                                    break
+                                }
+                                total += change.positionChange()
+                                if (total.getDistance() >= GestureClassifier.TAP_SLOP_PX && !committing) {
+                                    change.consume()
+                                    scope.launch { offset.snapTo(total) }
+                                }
+                            }
+                            if (cancelled || committing) {
+                                currentCommit(Gesture.None)
+                                return@awaitEachGesture
+                            }
+                            // 탭과 끌기를 같은 거리 기준으로 나눈다: 8px 미만이면 뒤집기 (G-08·10).
+                            currentCommit(GestureClassifier.classify(Drag(total.x, total.y), currentSize, hasPlaces, startedOnControl = false))
+                        }
+                    }
                     .offset { IntOffset(offset.value.x.roundToInt(), offset.value.y.roundToInt()) }
                     .rotate(if (size.width > 0) offset.value.x / size.width * 12f else 0f)
                     .testTag(LearnTags.CARD)
+                    .semantics {
+                        contentDescription = cardDescription
+                        stateDescription = faceDescription
+                        onClick(label = flipLabel) {
+                            currentCommit(Gesture.Flip)
+                            true
+                        }
+                    }
                     .focusRequester(focus)
                     .focusable()
                     .onKeyEvent { e ->
                         if (e.type != KeyEventType.KeyDown) return@onKeyEvent false
+                        // 길게 누른 키의 반복은 무시한다. 한 번 누름 = 판정 한 번.
+                        if (e.nativeKeyEvent.repeatCount > 0) return@onKeyEvent true
                         when (e.key) {
-                            Key.DirectionRight -> commit(Gesture.Know)
-                            Key.DirectionLeft -> commit(Gesture.DontKnow)
-                            Key.DirectionDown -> if (state.hasPlaces) commit(Gesture.Places)
-                            Key.Enter, Key.Spacebar -> commit(Gesture.Flip)
+                            Key.DirectionRight -> currentCommit(Gesture.Know)
+                            Key.DirectionLeft -> currentCommit(Gesture.DontKnow)
+                            Key.DirectionDown -> if (hasPlaces) currentCommit(Gesture.Places)
+                            Key.Enter, Key.Spacebar -> currentCommit(Gesture.Flip)
                             else -> return@onKeyEvent false
                         }
                         true
-                    }
-                    .pointerInput(card.id, state.hasPlaces, state.saving) {
-                        detectDragGestures(
-                            onDragEnd = {
-                                // 카드 위 버튼(북마크·음성, Phase 10·11)은 스스로 터치를 소비해 여기까지 오지 않는다.
-                                val g = GestureClassifier.classify(Drag(offset.value.x, offset.value.y), cardSize, state.hasPlaces, startedOnControl = false)
-                                commit(if (g == Gesture.Flip) Gesture.None else g)
-                            },
-                            onDragCancel = { scope.launch { offset.snapTo(Offset.Zero) } },
-                        ) { change, amount ->
-                            if (state.saving) return@detectDragGestures
-                            change.consume()
-                            scope.launch { offset.snapTo(offset.value + amount) }
-                        }
-                    }
-                    .clickable(enabled = !state.saving, onClickLabel = null) { commit(Gesture.Flip) },
+                    },
             ) {
                 CardFace(card, state.face)
             }
             Stamp(hint)
         }
 
-        JudgeButtons(state, ::commit)
+        JudgeButtons(state.copy(saving = state.saving || committing), ::commit)
         Spacer(Modifier.height(8.dp))
     }
 }
@@ -258,11 +331,8 @@ private fun CardArea(state: LearnUiState, onAction: (LearnAction) -> Unit, reduc
 @Composable
 private fun CardFace(card: SignCard, face: Face) {
     val chain = LanguagePolicy.fallbackChain(LocaleTag(stringResource(R.string.format_locale)))
-    // 앞면은 스크롤하지 않는다: 스크롤이 세로 끌기를 가져가 아래(장소) 스와이프가 먹히지 않는다.
-    // 뒷면 본문은 길 수 있어(200% 글자) 스크롤하며, PRD UX01 도 본문에서 시작한 끌기는 판정에서 뺀다.
-    val scroll = if (face == Face.Back) Modifier.verticalScroll(rememberScrollState()) else Modifier
     Column(
-        Modifier.fillMaxSize().then(scroll).padding(20.dp),
+        Modifier.fillMaxSize().padding(20.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(14.dp, Alignment.CenterVertically),
     ) {
@@ -270,13 +340,20 @@ private fun CardFace(card: SignCard, face: Face) {
             SignPlate(card, PlateFace.Front)
             Text(stringResource(R.string.learn_tap_hint), style = MaterialTheme.typography.labelMedium, color = SignKoreanTheme.tokens.muted)
         } else {
+            // 표지판 판에서 시작한 끌기는 판정에 쓰고, 긴 본문(200% 글자)만 따로 스크롤한다(PRD UX01: 본문 제외).
             SignPlate(card, PlateFace.Back)
-            Text(card.romanization, style = MaterialTheme.typography.bodyLarge, fontStyle = FontStyle.Italic, color = SignKoreanTheme.tokens.muted)
-            card.meaning.resolve(chain)?.let {
-                Text(it, style = MaterialTheme.typography.headlineSmall, color = SignKoreanTheme.tokens.primary, textAlign = TextAlign.Center)
-            }
-            card.note.resolve(chain)?.let {
-                Text(it, style = MaterialTheme.typography.bodyMedium, textAlign = TextAlign.Center)
+            Column(
+                Modifier.weight(1f, fill = false).verticalScroll(rememberScrollState()),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(10.dp),
+            ) {
+                Text(card.romanization, style = MaterialTheme.typography.bodyLarge, fontStyle = FontStyle.Italic, color = SignKoreanTheme.tokens.muted)
+                card.meaning.resolve(chain)?.let {
+                    Text(it, style = MaterialTheme.typography.headlineSmall, color = SignKoreanTheme.tokens.primary, textAlign = TextAlign.Center)
+                }
+                card.note.resolve(chain)?.let {
+                    Text(it, style = MaterialTheme.typography.bodyMedium, textAlign = TextAlign.Center)
+                }
             }
             Text(stringResource(R.string.learn_tap_back), style = MaterialTheme.typography.labelMedium, color = SignKoreanTheme.tokens.muted)
         }
@@ -352,9 +429,15 @@ private fun RoundButton(
 ) {
     Column(
         Modifier
-            .clickable(enabled = enabled, role = Role.Button, onClick = onClick)
-            .semantics(mergeDescendants = true) { contentDescription = label; role = Role.Button }
             .testTag(tag)
+            .clickable(enabled = enabled, role = Role.Button, onClick = onClick)
+            // 기호(✕ ✓)는 읽지 않고 이름만 읽는다.
+            .clearAndSetSemantics {
+                contentDescription = label
+                role = Role.Button
+                if (!enabled) disabled()
+                onClick(label = label) { if (enabled) onClick(); enabled }
+            }
             .padding(4.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(4.dp),
