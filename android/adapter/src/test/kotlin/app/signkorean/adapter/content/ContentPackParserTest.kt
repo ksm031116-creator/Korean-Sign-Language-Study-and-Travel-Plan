@@ -4,6 +4,7 @@ import app.signkorean.domain.common.LocaleTag
 import app.signkorean.domain.content.CardKind
 import app.signkorean.domain.content.PhotoLicense
 import app.signkorean.domain.content.PictogramId
+import app.signkorean.domain.content.ReviewStatus
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertThrows
@@ -15,7 +16,7 @@ class ContentPackParserTest {
     private val parser = ContentPackParser()
 
     private fun pack(cards: String = "[]", places: String = "[]", schema: Int = 1) = """
-        {"schemaVersion":$schema,"version":"abc",
+        {"schemaVersion":$schema,"version":"abc","locales":{"en":"reviewed","ja":"draft"},
          "areas":[{"id":"myeongdong","koName":"명동","name":{"en":"Myeongdong"},"active":true}],
          "cards":$cards,"places":$places}
     """.trimIndent()
@@ -84,6 +85,18 @@ class ContentPackParserTest {
         assertThrows(ContentPackFormatException::class.java) {
             parser.parse(pack(places = place("""{"url":"u","license":{"type":"CC0"},"source":"","sourceUrl":null}""")))
         }
+    }
+
+    @Test
+    fun `언어별 검수 상태를 읽는다`() {
+        val locales = parser.parse(pack()).locales
+        assertEquals(mapOf(LocaleTag("en") to ReviewStatus.Reviewed, LocaleTag("ja") to ReviewStatus.Draft), locales)
+    }
+
+    @Test
+    fun `모르는 검수 상태는 거부한다`() {
+        val e = assertThrows(ContentPackFormatException::class.java) { parser.parse(pack().replace("\"draft\"", "\"wip\"")) }
+        assertTrue(e.message, e.message!!.contains("locales.ja"))
     }
 
     @Test

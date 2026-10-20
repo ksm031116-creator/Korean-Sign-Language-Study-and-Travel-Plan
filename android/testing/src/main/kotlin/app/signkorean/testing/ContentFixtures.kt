@@ -10,6 +10,7 @@ import app.signkorean.domain.content.ContentPack
 import app.signkorean.domain.content.PictogramId
 import app.signkorean.domain.content.Place
 import app.signkorean.domain.content.PlaceId
+import app.signkorean.domain.content.ReviewStatus
 import app.signkorean.domain.content.SignCard
 import app.signkorean.domain.location.Coordinate
 
@@ -69,6 +70,10 @@ object ContentFixtures {
 
     fun area(id: String = "myeongdong") = Area(AreaId(id), "명동", en("Myeongdong"), active = true)
 
-    fun pack(cards: List<SignCard> = emptyList(), places: List<Place> = emptyList(), areas: List<Area> = listOf(area())) =
-        ContentPack(version = "test", areas = areas, cards = cards, places = places)
+    fun pack(
+        cards: List<SignCard> = emptyList(),
+        places: List<Place> = emptyList(),
+        areas: List<Area> = listOf(area()),
+        locales: Map<LocaleTag, ReviewStatus> = mapOf(EN to ReviewStatus.Reviewed),
+    ) = ContentPack(version = "test", locales = locales, areas = areas, cards = cards, places = places)
 }

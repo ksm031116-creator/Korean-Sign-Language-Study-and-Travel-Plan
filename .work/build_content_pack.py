@@ -29,6 +29,8 @@ ASSETS = ROOT / 'android' / 'adapter' / 'src' / 'main' / 'assets' / 'content'
 PACK = ASSETS / 'content-pack.json'
 LOCK = ROOT / 'android' / 'content-id-lock.json'
 SCHEMA_VERSION = 1
+# 설명 언어와 검수 상태. ja 는 원어민 검수(Q-01) 전까지 draft 이며 출시 빌드 검사가 막는다 (설계서 §8.8).
+LOCALES = {'en': 'reviewed', 'ja': 'draft'}
 
 # 프로토타입 JS 를 그대로 실행해 window.* 값을 꺼낸다. 데이터를 두 번 적지 않기 위해서다.
 NODE_DUMP = r"""
@@ -148,12 +150,13 @@ def build(proto: dict) -> tuple[dict, list[Path]]:
             'isExample': bool(p.get('example')),
         })
 
-    body = {'areas': areas, 'cards': cards, 'places': places}
+    body = {'locales': LOCALES, 'areas': areas, 'cards': cards, 'places': places}
     # 내용이 같으면 버전도 같도록 내용 해시를 쓴다(생성 날짜를 쓰면 매번 diff 가 생긴다).
     version = hashlib.sha256(json.dumps(body, ensure_ascii=False, sort_keys=True).encode('utf-8')).hexdigest()[:12]
     pack = {
         'schemaVersion': SCHEMA_VERSION,
         'version': version,
+        'locales': LOCALES,
         'areas': areas,
         'cards': cards,
         'places': places,

@@ -1,5 +1,6 @@
 package app.signkorean.domain.content
 
+import app.signkorean.domain.common.LocaleTag
 import app.signkorean.domain.common.LocalizedText
 import app.signkorean.domain.location.Coordinate
 
@@ -98,10 +99,22 @@ sealed interface PhotoLicense {
     val noDerivatives: Boolean get() = this == KoglType3
 }
 
-/** 앱에 들어가는 콘텐츠 전체. [version] 은 팩 생성일 기반 문자열. */
+/** 언어별 콘텐츠 검수 상태. 원어민 검수 전에는 Draft 이고 출시 빌드에 들어갈 수 없다 (설계서 §8.8). */
+enum class ReviewStatus { Draft, Reviewed }
+
+/**
+ * 앱에 들어가는 콘텐츠 전체. [version] 은 내용 해시.
+ * [locales] 는 이 팩이 설명 언어로 제공하는 언어와 검수 상태다. 앱이 고를 수 있는 언어 목록은
+ * 코드가 아니라 이 값에서 온다(L10N-08: 새 언어를 코드 변경 없이 추가).
+ */
 data class ContentPack(
     val version: String,
+    val locales: Map<LocaleTag, ReviewStatus>,
     val areas: List<Area>,
     val cards: List<SignCard>,
     val places: List<Place>,
-)
+) {
+    /** 언어 선택 화면에 보여 줄 언어. 출시 빌드는 검수 완료 언어만, 디버그는 초안도 포함한다. */
+    fun selectableLocales(includeDrafts: Boolean): List<LocaleTag> =
+        locales.filter { (_, status) -> includeDrafts || status == ReviewStatus.Reviewed }.keys.toList()
+}

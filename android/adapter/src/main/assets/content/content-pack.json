@@ -1,6 +1,10 @@
 {
  "schemaVersion": 1,
- "version": "f697ba499549",
+ "version": "0d494671456c",
+ "locales": {
+  "en": "reviewed",
+  "ja": "draft"
+ },
  "areas": [
   {
    "id": "gyeongbokgung",

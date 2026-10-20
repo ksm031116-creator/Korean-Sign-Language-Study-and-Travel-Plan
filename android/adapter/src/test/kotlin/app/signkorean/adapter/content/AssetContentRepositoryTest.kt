@@ -22,7 +22,7 @@ class AssetContentRepositoryTest {
         """{"id":"$id","kind":"basic","group":"restroom","koText":"$koText","romanization":"r","reading":{},
            "meaning":{"en":"m"},"note":{"en":"n"},"pictogram":${pictogram?.let { "\"$it\"" }},"plateColor":"#2f6fb0","audio":null,"reviewed":true}"""
 
-    private fun pack(vararg cards: String) = """{"schemaVersion":1,"version":"v1","areas":[],"cards":[${cards.joinToString(",")}],"places":[]}"""
+    private fun pack(vararg cards: String) = """{"schemaVersion":1,"version":"v1","locales":{"en":"reviewed"},"areas":[],"cards":[${cards.joinToString(",")}],"places":[]}"""
 
     private val opens = AtomicInteger()
     private val reported = mutableListOf<ContentIssue>()

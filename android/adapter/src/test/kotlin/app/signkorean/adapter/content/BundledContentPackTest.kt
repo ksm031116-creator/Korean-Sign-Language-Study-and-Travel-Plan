@@ -1,5 +1,6 @@
 package app.signkorean.adapter.content
 
+import app.signkorean.domain.common.LocaleTag
 import app.signkorean.domain.content.CardKind
 import app.signkorean.domain.content.CardPlaceLinker
 import app.signkorean.domain.content.ContentIssue
@@ -7,6 +8,10 @@ import app.signkorean.domain.content.ContentPack
 import app.signkorean.domain.content.ContentValidator
 import app.signkorean.domain.content.PhotoLicense
 import app.signkorean.domain.content.Pictograms
+import app.signkorean.domain.content.ReviewStatus
+import app.signkorean.domain.locale.ContentLanguageAudit
+import app.signkorean.domain.locale.LanguageGap
+import app.signkorean.domain.locale.LanguagePolicy
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
@@ -37,6 +42,22 @@ class BundledContentPackTest {
     @Test
     fun `모든 카드가 활성이다 (C-04·05b)`() {
         assertEquals(emptyList<String>(), pack.cards.filterNot { it.active }.map { it.id.value })
+    }
+
+    @Test
+    fun `기준 언어 en 콘텐츠는 빠짐없다 (설계서 8장 8절)`() {
+        val enGaps = ContentLanguageAudit.audit(pack).gaps.filter { it.locale == LanguagePolicy.BASE }
+        assertEquals(emptyList<LanguageGap>(), enGaps)
+    }
+
+    @Test
+    fun `ja 는 원어민 검수 전이라 draft 로 표시되어 출시 검사에서 막힌다`() {
+        // Phase 20 에서 ja 콘텐츠와 검수(Q-01)가 끝나면 이 테스트를 "출시 가능"으로 뒤집는다.
+        val report = ContentLanguageAudit.audit(pack)
+        assertEquals(ReviewStatus.Draft, pack.locales[LocaleTag("ja")])
+        assertEquals(listOf(LocaleTag("ja")), report.draftLocales)
+        assertEquals(false, report.isReleasable)
+        assertEquals(listOf(LanguagePolicy.BASE), pack.selectableLocales(includeDrafts = false))
     }
 
     @Test

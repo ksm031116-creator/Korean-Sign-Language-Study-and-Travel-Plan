@@ -13,6 +13,7 @@ import app.signkorean.domain.content.PictogramId
 import app.signkorean.domain.content.Place
 import app.signkorean.domain.content.PlaceId
 import app.signkorean.domain.content.PlacePhoto
+import app.signkorean.domain.content.ReviewStatus
 import app.signkorean.domain.content.SignCard
 import app.signkorean.domain.location.Coordinate
 import kotlinx.serialization.SerializationException
@@ -46,11 +47,24 @@ class ContentPackParser {
             if (schema != SCHEMA_VERSION) fail("schemaVersion", "지원하지 않는 스키마 $schema (지원: $SCHEMA_VERSION)")
             ContentPack(
                 version = field("version").string(),
+                locales = field("locales").reviewStatuses(),
                 areas = field("areas").list { area() },
                 cards = field("cards").list { card() },
                 places = field("places").list { place() },
             )
         }
+    }
+
+    private fun Node.reviewStatuses(): Map<LocaleTag, ReviewStatus> {
+        val statuses = entries { tag, value ->
+            when (val v = value.string()) {
+                "reviewed" -> ReviewStatus.Reviewed
+                "draft" -> ReviewStatus.Draft
+                else -> fail(tag.value, "검수 상태는 reviewed 또는 draft 다: '$v'")
+            }
+        }
+        if (statuses.isEmpty()) fail("", "언어가 하나도 없다")
+        return statuses
     }
 
     private fun Node.area() = Area(
@@ -156,18 +170,20 @@ class ContentPackParser {
             return array.mapIndexed { i, e -> Node(e, "$path[$i]").item() }
         }
 
-        fun localized(): LocalizedText {
+        /** 언어 태그를 키로 하는 객체. 키가 BCP 47 이 아니면 거부한다. */
+        fun <T> entries(value: (LocaleTag, Node) -> T): Map<LocaleTag, T> {
             val obj = element as? JsonObject ?: failHere("언어별 객체가 아니다")
-            return LocalizedText(
-                obj.mapKeys { (tag, _) ->
-                    try {
-                        LocaleTag(tag)
-                    } catch (e: IllegalArgumentException) {
-                        failHere("언어 태그가 아니다: '$tag'")
-                    }
-                }.mapValues { (tag, value) -> Node(value, "$path.${tag.value}").string() },
-            )
+            return obj.entries.associate { (key, element) ->
+                val tag = try {
+                    LocaleTag(key)
+                } catch (e: IllegalArgumentException) {
+                    failHere("언어 태그가 아니다: '$key'")
+                }
+                tag to value(tag, Node(element, "$path.$key"))
+            }
         }
+
+        fun localized(): LocalizedText = LocalizedText(entries { _, node -> node.string() })
     }
 
     private companion object {
