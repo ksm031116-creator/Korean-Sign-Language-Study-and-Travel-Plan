@@ -21,7 +21,7 @@
 
 | 구분 | 수치 |
 |---|---|
-| 커밋 | 41개 (refactor 2 · feat 9 · fix 7 · docs 15 · chore 8) |
+| 커밋 | 54개 (refactor 2 · feat 14 · fix 11 · docs 16 · chore 9 · test 1 · ci 1) |
 | 요구사항 | FR 31 · NFR 10 · AT 18 · 화면 SC 20 · 화면 시나리오 UI 8 · 공통 규칙 UX 12 |
 | 등록 장소 | 49곳 (실존 공공·관광시설 45 + Example 4), 지역 8개, 장소 유형 12종 |
 | 학습 카드 | 135장 (장소 유형 간판 35 + 기초 표지판 100) |
@@ -205,6 +205,19 @@ Commons 요청이 한도에 걸려(HTTP 429) 수집 스크립트에 재시도 �
 
 ---
 
+### 3.12 발음 음성 생성과 Android Phase 1 — 10월 20일
+
+**발음 음성**: Gemini TTS(차분한 여성 목소리 Kore)로 카드 발음을 만들고, 직접 들을 수 없어 Gemini 로 다시 받아 적게 해 원래 단어와 대조한다. 무료 등급이 하루 10회라 매일 18:10 로컬 예약 작업이 이어서 만들고 검토해 커밋한다. 현재 135장 중 22장 검수 통과, 커피는 "코피"로 받아 적혀 사람 확인이 필요하다.
+
+**Phase 1 (계획 3 MD)**: 개발 도구가 없어 JDK 17·Android SDK·Gradle 을 사용자 폴더에 설치했다(사용자 동의, SDK 약관 동의). 계획대로 4개 모듈, 버전 카탈로그, Koin 조립, Konsist 아키텍처 규칙, Lint(번역 누락 = 오류), GitHub Actions 를 만들었다. 모든 단계를 테스트 먼저 → 실패 확인 → 구현 순서로 했다.
+
+- 완료 조건: AR-01~06 통과, 금지 import·하드코딩 문구를 넣은 임시 파일에서 규칙이 실패함을 확인
+- 결과: 테스트 41개 통과, 릴리스 APK 빌드, app Lint 경고 0
+- 코드 리뷰: 별도 에이전트 검토에서 4건(동시성 버그 1, 규칙 거짓 통과·실패 7가지, 설정 2)을 찾아 재현 테스트 후 수정 (BUGFIX_LOG "Android Phase 1 코드 리뷰")
+- 한국어 경로 때문에 생긴 빌드 환경 문제 2건(UTF-8 클래스패스, local.properties)을 기록했다
+
+---
+
 ## 4. 결정 기록
 
 | # | 결정 | 이유 | 버전 | 구분 |
@@ -239,7 +252,9 @@ Commons 요청이 한도에 걸려(HTTP 429) 수집 스크립트에 재시도 �
 | **v2.1 문서** (10-10) | `2ed72b9` docs: add bug fix log for the v2.1 restructure<br>`e0e0216` docs(prd): put trip planning first and move photos from signs to places |
 | **TourAPI 장소 사진** (10-12) | `73d377f` chore: ignore API key files<br>`16cab17` feat(tools): fetch place photos from TourAPI<br>`3114047` fix(tools): include the last place when reading data.js<br>`1ade628` feat(sc08): show TourAPI place photos with credits<br>`f354a18` fix(cards): draw sign plates for cards without a photo<br>`523eb2c` chore: rebuild single-file bundle<br>`83d0315` docs: record TourAPI place photo integration (PRD v2.3) |
 | **README** (10-12) | `63421a7` docs: add README<br>`7e02644` docs(dev-log): link README and refresh versions |
-| **설계·계획** (10-20) | `aa07e96` docs: add Android implementation design (hexagonal, DI, TDD, en/ja)<br>`83483de` docs: add Android implementation plan (21 phases, 61 MD)<br>docs: PRD v2.5 and design system colours — 이 문서를 갱신한 커밋 |
+| **발음 음성** (10-20) | `9f59eef` feat(tools): generate pronunciation audio with Gemini TTS<br>`09d4b81` feat(prototype): play pre-generated pronunciation audio<br>`70cf29f` chore: rebuild single-file bundle |
+| **Android Phase 1** (10-20) | `25120e8` feat(domain): scaffold Android project with clock, id and dispatcher ports<br>`b27a326` feat(adapter): add system clock and UUID id generator<br>`29e8734` feat(app): add app shell and Koin composition root<br>`a9a6423` test(arch): enforce hexagonal and i18n rules with Konsist<br>`ba9502a` ci: run tests, architecture rules, lint and release build<br>`86f7703` fix(testing): make SequentialIdGenerator and FixedClock thread-safe<br>`9994d8d` fix(arch): close false passes and false failures in architecture rules<br>`ccd56c1` fix(app): generate locale config and correct the per-app language note<br>`262e714` fix(ci): pin script line endings and stop duplicate CI runs<br>docs: record Phase 1 and its code review — 이 문서를 갱신한 커밋 |
+| **설계·계획** (10-20) | `aa07e96` docs: add Android implementation design (hexagonal, DI, TDD, en/ja)<br>`83483de` docs: add Android implementation plan (21 phases, 61 MD)<br>`c0918a0` docs: PRD v2.5 and design system colours |
 | **v2.4** (10-19) | `2fe4e1b` docs(prd): keep trip planning fully paid (revenue option C, v2.4)<br>`93c1077` feat(content): expand everyday street signs from 30 to 100<br>`1202449` docs: update sign counts after expanding basics to 100<br>`661c797` feat(tools): add Wikimedia Commons photos for places TourAPI lacks<br>`015fa9f` feat(places): show Commons photos with author and license<br>`a1af6d8` chore: rebuild single-file bundle<br>docs: record Commons photos and v2.4 in PRD, dev log and README — 이 문서를 갱신한 커밋 |
 | **v2.2 Tinder식 카드** (10-10) | `992bd89` refactor(learn): remove sign zoom screen (SC05)<br>`186a21e` feat(learn): tinder-style swipe card, right for "I know"<br>`c5107db` feat(learn): show what each swipe direction means<br>`e660080` docs(prd): tinder-style card, right for "I know" (v2.2)<br>`bf6ad6c` docs(bugfix-log): add issues caught while building the v2.2 card<br>`9b2f2c1` chore: rebuild single-file bundle |
 
