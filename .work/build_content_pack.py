@@ -36,6 +36,10 @@ AUDIO_SOURCE = PROTO / 'audio'                      # generate_tts.py 가 만든
 TTS_MANIFEST = ROOT / '.work' / 'tts_manifest.json'  # 청취 검사(전사) 결과
 AUDIO_CACHE = ROOT / '.work' / 'audio_cache.json'    # 원본 mp3 해시 → 변환 결과. 원본이 같으면 다시 변환하지 않는다
 AUDIO_BUDGET_BYTES = 10 * 1024 * 1024                # 전체 오디오 10MB 이하 (PRD §7.3, NFR10)
+# 변환 설정. 바꾸면 캐시 열쇠가 달라져 모든 음성을 다시 변환한다.
+FFMPEG_ARGS = ['-ac', '1', '-ar', '24000', '-c:a', 'aac', '-b:a', '40k',
+               '-map_metadata', '-1', '-fflags', '+bitexact', '-flags:a', '+bitexact']
+ENCODER_KEY = ' '.join(FFMPEG_ARGS)
 # 설명 언어와 검수 상태. ja 는 원어민 검수(Q-01) 전까지 draft 이며 출시 빌드 검사가 막는다 (설계서 §8.8).
 LOCALES = {'en': 'reviewed', 'ja': 'draft'}
 
@@ -139,17 +143,24 @@ def convert_audio(card_id: str, cache: dict, write: bool) -> dict:
     out = ASSETS / 'audio' / f'{card_id}.m4a'
     src_hash = sha256_file(src)
     entry = cache.get(card_id)
-    if entry and entry['source'] == src_hash and out.exists() and sha256_file(out) == entry['sha256']:
+    if (entry and entry['source'] == src_hash and entry.get('encoder') == ENCODER_KEY
+            and out.exists() and sha256_file(out) == entry['sha256']):
         return entry
     if not write:
         raise BuildError(f'{card_id}: 음성 변환이 최신이 아니다. 스크립트를 다시 실행하라')
     out.parent.mkdir(parents=True, exist_ok=True)
-    subprocess.run(['ffmpeg', '-y', '-loglevel', 'error', '-i', str(src), '-ac', '1', '-ar', '24000',
-                    '-c:a', 'aac', '-b:a', '40k', '-map_metadata', '-1', '-fflags', '+bitexact',
-                    '-flags:a', '+bitexact', str(out)], check=True)
-    probe = subprocess.run(['ffprobe', '-v', 'error', '-show_entries', 'format=duration', '-of', 'csv=p=0', str(out)],
-                           capture_output=True, check=True)
-    entry = {'source': src_hash, 'sha256': sha256_file(out), 'bytes': out.stat().st_size,
+    tmp = out.with_name(out.stem + '.tmp.m4a')  # 중간에 실패해도 반쯤 쓴 파일이 남지 않게
+    try:
+        subprocess.run(['ffmpeg', '-y', '-loglevel', 'error', '-i', str(src), *FFMPEG_ARGS, str(tmp)], check=True, capture_output=True)
+        probe = subprocess.run(['ffprobe', '-v', 'error', '-show_entries', 'format=duration', '-of', 'csv=p=0', str(tmp)],
+                               capture_output=True, check=True)
+    except FileNotFoundError:
+        raise BuildError('ffmpeg/ffprobe 를 찾을 수 없다. 음성 변환에 필요하다 (winget install Gyan.FFmpeg)')
+    except subprocess.CalledProcessError as e:
+        tmp.unlink(missing_ok=True)
+        raise BuildError(f'{card_id}: 음성 변환 실패: {e.stderr.decode("utf-8", "replace")[:300]}')
+    tmp.replace(out)
+    entry = {'source': src_hash, 'encoder': ENCODER_KEY, 'sha256': sha256_file(out), 'bytes': out.stat().st_size,
              'durationMs': round(float(probe.stdout.decode().strip()) * 1000)}
     cache[card_id] = entry
     return entry
@@ -308,6 +319,20 @@ def to_json(obj) -> str:
     return json.dumps(obj, ensure_ascii=False, indent=1) + '\n'
 
 
+def audio_up_to_date(pack: dict) -> bool:
+    """음성 폴더에 팩이 쓰는 파일만 있는지(남은 파일이 APK 에 실리지 않게)."""
+    folder = ASSETS / 'audio'
+    expected = {Path(c['audio']['path']).name for c in pack['cards'] if c['audio']}
+    present = {f.name for f in folder.glob('*')} if folder.is_dir() else set()
+    return present == expected
+
+
+def lock_view(data: dict) -> dict:
+    """잠금 검사에 필요한 ID·원문만. 음성 변환 같은 쓰기보다 먼저 검사하려고 따로 만든다."""
+    return {'cards': [{'id': c['id'], 'koText': c['word']} for c in data['cards']],
+            'places': [{'id': p['id'], 'koName': p['koName']} for p in data['places']]}
+
+
 def photos_up_to_date(photo_files: list[Path]) -> bool:
     """내장 사진이 원본과 같고, 팩이 쓰지 않는 사진 파일이 남아 있지 않은지."""
     folder = ASSETS / 'photos'
@@ -320,8 +345,11 @@ def main() -> int:
     args = sys.argv[1:]
     check_only = '--check' in args
     try:
-        pack, photo_files = build(dump_prototype(), write_audio=not check_only)
+        proto = dump_prototype()
         lock = load_lock(init='--init-lock' in args)
+        # ID 잠금을 먼저 본다. 잠금 위반이면 음성 변환·캐시·파일 삭제 같은 쓰기를 하지 않는다.
+        check_lock(lock_view(proto['data']), lock)
+        pack, photo_files = build(proto, write_audio=not check_only)
         new_lock = check_lock(pack, lock)
     except BuildError as e:
         print(f'실패: {e}', file=sys.stderr)
@@ -335,7 +363,7 @@ def main() -> int:
     if check_only:
         same = (PACK.exists() and PACK.read_text(encoding='utf-8') == pack_text
                 and LOCK.exists() and LOCK.read_text(encoding='utf-8') == lock_text
-                and photos_up_to_date(photo_files))
+                and photos_up_to_date(photo_files) and audio_up_to_date(pack))
         print('콘텐츠 팩이 최신이다' if same else '콘텐츠 팩이 프로토타입 데이터와 다르다. 스크립트를 다시 실행하라')
         return 0 if same else 1
 

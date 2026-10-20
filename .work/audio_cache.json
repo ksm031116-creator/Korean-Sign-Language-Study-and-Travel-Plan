@@ -1,132 +1,154 @@
 {
  "t-cafe-1": {
   "source": "d31d175e2d706564b6d7ee57a39c73cd63f2fd35a4cedd1fb3682fba27cf8107",
+  "encoder": "-ac 1 -ar 24000 -c:a aac -b:a 40k -map_metadata -1 -fflags +bitexact -flags:a +bitexact",
   "sha256": "ade2470b147895eb5643051515681af0d84f0e3276f3b466e52771586a70469f",
   "bytes": 7830,
   "durationMs": 839
  },
  "t-cafe-3": {
   "source": "b01414cb1d91f84ddca8d87b422ad3392b880377f56be0ff89cf3d6d929a0706",
+  "encoder": "-ac 1 -ar 24000 -c:a aac -b:a 40k -map_metadata -1 -fflags +bitexact -flags:a +bitexact",
   "sha256": "c84ac7deee9a72015e135305dfa859911550a69d57f6ca5549c0f500ca4d9f0e",
   "bytes": 5909,
   "durationMs": 891
  },
  "t-hanok-1": {
   "source": "c732adf5586b135bcffaed4b4d28bc9efe824a02ddf54a707a5967a6faf7ed43",
+  "encoder": "-ac 1 -ar 24000 -c:a aac -b:a 40k -map_metadata -1 -fflags +bitexact -flags:a +bitexact",
   "sha256": "13b576233f92b78d42e505c8c685b7d48eb7b4432d8c0b2bc80092b19448881d",
   "bytes": 11982,
   "durationMs": 2001
  },
  "t-hanok-2": {
   "source": "0d6b69041532472ef623f13f528c4e46e7d0a37b5526cd46c13328134dd80dd5",
+  "encoder": "-ac 1 -ar 24000 -c:a aac -b:a 40k -map_metadata -1 -fflags +bitexact -flags:a +bitexact",
   "sha256": "98ce79522f94e902fa9082870135cedf9a6e75394fdd6eca1222afa2c2c260c9",
   "bytes": 7246,
   "durationMs": 1121
  },
  "t-hanok-3": {
   "source": "fb83386c58ed48d19c2e462e8c6d41b288865880c808d6f7ee1ee5f52896da81",
+  "encoder": "-ac 1 -ar 24000 -c:a aac -b:a 40k -map_metadata -1 -fflags +bitexact -flags:a +bitexact",
   "sha256": "02bb57be8e9a2a4a00f518b1f6da7bccbb5177ec76d92cf6b66e827f3c2a5fb8",
   "bytes": 6661,
   "durationMs": 932
  },
  "t-market-1": {
   "source": "4b258bdc0c16cb2ebafe166bf1c5eab9021dd442eaecf236b2045ac50ee5933d",
+  "encoder": "-ac 1 -ar 24000 -c:a aac -b:a 40k -map_metadata -1 -fflags +bitexact -flags:a +bitexact",
   "sha256": "67003570946bd02ab6f0057be7d533420ae8812fe31835a4db90b0e4f73f8328",
   "bytes": 6182,
   "durationMs": 859
  },
  "t-market-2": {
   "source": "810f909b717c017c1f09648b8cc8062d079ac66e422eba489212bfa0ed8608e6",
+  "encoder": "-ac 1 -ar 24000 -c:a aac -b:a 40k -map_metadata -1 -fflags +bitexact -flags:a +bitexact",
   "sha256": "87c450bfd2b0e45fd561f4920d76fe8fd91e505895d1db0ce54dc339c885476a",
   "bytes": 8494,
   "durationMs": 1015
  },
  "t-market-3": {
   "source": "f31c20e185977ffe4ff902e59d66739945d56c96951b394811c26b8e4bff4dd9",
+  "encoder": "-ac 1 -ar 24000 -c:a aac -b:a 40k -map_metadata -1 -fflags +bitexact -flags:a +bitexact",
   "sha256": "ff1f8a21483bb2505c72af3a219e1ac535a57de57fe873b588a84b2afd671bf3",
   "bytes": 8820,
   "durationMs": 1309
  },
  "t-market-4": {
   "source": "b387e74ffce2961ed115392528c8a844b671be9d4696b324c0026aeccc97441a",
+  "encoder": "-ac 1 -ar 24000 -c:a aac -b:a 40k -map_metadata -1 -fflags +bitexact -flags:a +bitexact",
   "sha256": "0a7813a4f67f7a910e6f499822862a2e0106f0c9e866dabffd306aa4fcfdd74d",
   "bytes": 9406,
   "durationMs": 1203
  },
  "t-market-5": {
   "source": "7015f557a366f0b61767a60298883d2171d45b3f398f2c10e768df6c515390f3",
+  "encoder": "-ac 1 -ar 24000 -c:a aac -b:a 40k -map_metadata -1 -fflags +bitexact -flags:a +bitexact",
   "sha256": "da3495a21f6e776cc941f56d2484de0455bf8a2b2a50ba4c834bd5ca2be7ed43",
   "bytes": 10711,
   "durationMs": 1258
  },
  "t-museum-1": {
   "source": "0aca3fc07322b1b6111aac84a76c687d2a4b225a5d8b38f22f9e8c25aee5ee90",
+  "encoder": "-ac 1 -ar 24000 -c:a aac -b:a 40k -map_metadata -1 -fflags +bitexact -flags:a +bitexact",
   "sha256": "645f0c221a4034b4427f7afd0942cb1557d692e8e14859b3d94703cdabfa8bc7",
   "bytes": 8889,
   "durationMs": 1394
  },
  "t-museum-2": {
   "source": "5d3f8aa08231df3d06accf74f8472555f8ec58f9079520814b7dfd001fef3d21",
+  "encoder": "-ac 1 -ar 24000 -c:a aac -b:a 40k -map_metadata -1 -fflags +bitexact -flags:a +bitexact",
   "sha256": "669cb2881ca26282aefab7b7a9ee6721b8630fbd9fa0185c9663994219cff505",
   "bytes": 6969,
   "durationMs": 1036
  },
  "t-museum-3": {
   "source": "1259a9d3d09ffbdce68fff40601e3c2edc8f27786dee509844a0ca29163529e1",
+  "encoder": "-ac 1 -ar 24000 -c:a aac -b:a 40k -map_metadata -1 -fflags +bitexact -flags:a +bitexact",
   "sha256": "6e19b4d9b60c53723d9247677f3341a55e39cc7e8190322457d9510c5c369da4",
   "bytes": 9064,
   "durationMs": 1463
  },
  "t-palace-1": {
   "source": "e668db114b2e50a08d695bcc0008e7241a22c0961b0c6e4e5b4349025583392c",
+  "encoder": "-ac 1 -ar 24000 -c:a aac -b:a 40k -map_metadata -1 -fflags +bitexact -flags:a +bitexact",
   "sha256": "7d0548ffb9204a50cb1c02426c72ca4bb0937582fdac2b279acfb16642b3a8eb",
   "bytes": 8371,
   "durationMs": 1254
  },
  "t-palace-2": {
   "source": "dd4adeb1f8e7e386e1232bbd0c7c3536693e59d0a0902ad71cbb30bac7132dc3",
+  "encoder": "-ac 1 -ar 24000 -c:a aac -b:a 40k -map_metadata -1 -fflags +bitexact -flags:a +bitexact",
   "sha256": "3b504991198e013ac267ab209e4a0ea196beb2c09156025a9506cd750633df62",
   "bytes": 9448,
   "durationMs": 1404
  },
  "t-palace-3": {
   "source": "8bf89a46b4d78bc1f96ade1f8bb486f37e1ba69e628609d3ee88309e687f482e",
+  "encoder": "-ac 1 -ar 24000 -c:a aac -b:a 40k -map_metadata -1 -fflags +bitexact -flags:a +bitexact",
   "sha256": "b80c6140efa1f93f9d0d9caed0237d4d304719484d01a26d3bcfcf635c47a727",
   "bytes": 9935,
   "durationMs": 1528
  },
  "t-shopping-1": {
   "source": "c458649c892bb8215df99859f00b24a6e42eb45b39d356c20e1a75ed0701f2db",
+  "encoder": "-ac 1 -ar 24000 -c:a aac -b:a 40k -map_metadata -1 -fflags +bitexact -flags:a +bitexact",
   "sha256": "bdeb359c68cd934f3591432073393f3094f738f6eccaecd137235c04c0233b4c",
   "bytes": 8602,
   "durationMs": 1268
  },
  "t-shopping-2": {
   "source": "649c56e629ac78e17ff6338c6b76c67f53776f97af39cb7be39990f53449d531",
+  "encoder": "-ac 1 -ar 24000 -c:a aac -b:a 40k -map_metadata -1 -fflags +bitexact -flags:a +bitexact",
   "sha256": "56f9af98966096f379e608019bc68bcbd1b47f57513459b7cd6cd9722215f7e6",
   "bytes": 7639,
   "durationMs": 1208
  },
  "t-shopping-3": {
   "source": "d2402fb16c249ea6ea35317b19c0fa06c98bfba021eb9fa19c25055831cfc9b6",
+  "encoder": "-ac 1 -ar 24000 -c:a aac -b:a 40k -map_metadata -1 -fflags +bitexact -flags:a +bitexact",
   "sha256": "b802ae08dc7d941e6b4575638597b934de2defb88918fbf14f1d3a8db9572ec5",
   "bytes": 5745,
   "durationMs": 748
  },
  "t-street-1": {
   "source": "4819f3b0a0273383d6f6923b33b91c5912989acecfb4c4d5defe873848484ffa",
+  "encoder": "-ac 1 -ar 24000 -c:a aac -b:a 40k -map_metadata -1 -fflags +bitexact -flags:a +bitexact",
   "sha256": "b9c0d0c2429d36465d5ce99bc28844df62c44a140670e6e15e2b3dd83a874229",
   "bytes": 10385,
   "durationMs": 1130
  },
  "t-street-2": {
   "source": "220e8c7fc823dd376ccb4920f7ffce6d95a1a1d2c2f90ee9ea1b6f1f68588657",
+  "encoder": "-ac 1 -ar 24000 -c:a aac -b:a 40k -map_metadata -1 -fflags +bitexact -flags:a +bitexact",
   "sha256": "beb5f6aaf9cae04d0780973bdc0dec743771604b725d4ecc08941af3b3a7a387",
   "bytes": 6264,
   "durationMs": 1011
  },
  "t-street-3": {
   "source": "dd6e5ca836fa72e098905c063be7a86c646845e0ad525f0f1c75ac9634d258ab",
+  "encoder": "-ac 1 -ar 24000 -c:a aac -b:a 40k -map_metadata -1 -fflags +bitexact -flags:a +bitexact",
   "sha256": "f590c3dc4f448822b4804d00b6fb73b8a767e9184e8b2168b20cc8cfa44736aa",
   "bytes": 7784,
   "durationMs": 1210
