@@ -189,4 +189,18 @@ class SessionReducerTest {
         val s = SessionReducer.flip(start(3)).judge(Verdict.Know)
         assertEquals(Face.Front, s.face)
     }
+
+    @Test
+    fun `남은 복습은 이번에 보지 못한 출처 카드의 learning 도 센다 (프로토타입과 같음)`() {
+        val states = mapOf(CardId("b03") to CardStatus.Learning)
+        val s = start(3, states = states).judge(Verdict.Know)
+        assertEquals(1, SessionSummary.of(s).remainingReview)
+    }
+
+    @Test
+    fun `Undo 한 카드는 앞면으로 다시 보인다`() {
+        val s = SessionReducer.flip(start(3))
+        val undone = SessionReducer.undo(s.judge(Verdict.Know))!!.session
+        assertEquals(Face.Front, undone.face)
+    }
 }

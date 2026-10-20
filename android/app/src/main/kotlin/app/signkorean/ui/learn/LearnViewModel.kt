@@ -109,8 +109,8 @@ class LearnViewModel(
         _state.update { it.copy(saving = true, error = null) }
         viewModelScope.launch {
             val next: LearningSession? = when (action) {
-                is LearnAction.Judge -> (judge(current.decisionSeq, action.verdict) as? JudgeOutcome.Judged)?.session
-                LearnAction.Undo -> (undo(current.decisionSeq) as? UndoOutcome.Undone)?.session
+                is LearnAction.Judge -> (judge(current.id, current.decisionSeq, action.verdict) as? JudgeOutcome.Judged)?.session
+                LearnAction.Undo -> (undo(current.id, current.decisionSeq) as? UndoOutcome.Undone)?.session
                 else -> null
             }
             if (next == null) {

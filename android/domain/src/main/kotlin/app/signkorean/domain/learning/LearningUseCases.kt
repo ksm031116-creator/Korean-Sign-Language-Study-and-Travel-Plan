@@ -8,8 +8,11 @@ import kotlinx.coroutines.CancellationException
 sealed interface StartOutcome {
     data class Started(val session: LearningSession) : StartOutcome
 
-    /** 끝나지 않은 세션이 있다. SC20 확인 뒤 replaceUnfinished = true 로 다시 부른다 (L-16). */
+    /** 끝나지 않은 다른 세션이 있다. SC20 확인 뒤 replaceUnfinished = true 로 다시 부른다 (L-16). */
     data class NeedsConfirmation(val unfinished: LearningSession) : StartOutcome
+
+    /** 같은 출처·모드의 끝나지 않은 세션이 있다. 새로 만들지 않고 이어 한다(PRD §5.1: 새 카테고리·모드만 교체). */
+    data class Resumed(val session: LearningSession) : StartOutcome
 
     data object NoCards : StartOutcome
     data object NothingToReview : StartOutcome
@@ -29,14 +32,20 @@ class StartSession(
     suspend operator fun invoke(source: SessionSource, mode: Mode, cards: List<SignCard>, replaceUnfinished: Boolean): StartOutcome =
         try {
             tx.run {
-                val existing = sessions.current()
-                if (existing != null && !existing.finished && !replaceUnfinished) return@run StartOutcome.NeedsConfirmation(existing)
+                // 먼저 새 세션이 실제로 시작되는지 본다. 카드가 없는데 교체 확인부터 묻지 않는다.
                 when (val r = SessionFactory.start(SessionId(ids.next()), source, mode, cards, states.all())) {
                     StartResult.NoCards -> StartOutcome.NoCards
                     StartResult.NothingToReview -> StartOutcome.NothingToReview
                     is StartResult.Started -> {
-                        sessions.save(r.session)
-                        StartOutcome.Started(r.session)
+                        val existing = sessions.current()?.takeUnless { it.finished }
+                        when {
+                            existing != null && existing.isSameStart(source, mode) -> StartOutcome.Resumed(existing)
+                            existing != null && !replaceUnfinished -> StartOutcome.NeedsConfirmation(existing)
+                            else -> {
+                                sessions.save(r.session)
+                                StartOutcome.Started(r.session)
+                            }
+                        }
                     }
                 }
             }
@@ -74,11 +83,17 @@ class JudgeCard(
     private val tx: TransactionRunner,
     private val clock: Clock,
 ) {
-    suspend operator fun invoke(expectedSeq: Int, verdict: Verdict): JudgeOutcome =
+    /**
+     * [sessionId]·[expectedSeq] 는 화면이 본 세션과 순번이다. 둘 중 하나라도 다르면 이미 지난 입력이다
+     * (중복 탭, 또는 다른 세션의 화면이 남아 있는 경우). 순번 비교를 끝남 검사보다 먼저 해서,
+     * 마지막 카드의 두 번째 탭도 StaleInput 으로 무시되게 한다.
+     */
+    suspend operator fun invoke(sessionId: SessionId, expectedSeq: Int, verdict: Verdict): JudgeOutcome =
         try {
             tx.run {
-                val session = sessions.current()?.takeUnless { it.finished } ?: return@run JudgeOutcome.NoSession
-                if (session.decisionSeq != expectedSeq) return@run JudgeOutcome.StaleInput
+                val session = sessions.current() ?: return@run JudgeOutcome.NoSession
+                if (session.id != sessionId || session.decisionSeq != expectedSeq) return@run JudgeOutcome.StaleInput
+                if (session.finished) return@run JudgeOutcome.NoSession
                 val t = SessionReducer.judge(session, verdict, clock.now()) ?: return@run JudgeOutcome.NoSession
                 states.save(t.cardState)
                 sessions.save(t.session)
@@ -104,11 +119,11 @@ class UndoJudgement(
     private val states: LearningStateStore,
     private val tx: TransactionRunner,
 ) {
-    suspend operator fun invoke(expectedSeq: Int): UndoOutcome =
+    suspend operator fun invoke(sessionId: SessionId, expectedSeq: Int): UndoOutcome =
         try {
             tx.run {
                 val session = sessions.current() ?: return@run UndoOutcome.NothingToUndo
-                if (session.decisionSeq != expectedSeq) return@run UndoOutcome.StaleInput
+                if (session.id != sessionId || session.decisionSeq != expectedSeq) return@run UndoOutcome.StaleInput
                 val t = SessionReducer.undo(session) ?: return@run UndoOutcome.NothingToUndo
                 states.restore(t.restoredState)
                 sessions.save(t.session)

@@ -35,7 +35,7 @@ class LearningUseCasesTest {
     @Test
     fun `판정은 카드 상태와 세션을 한 트랜잭션으로 저장한다`() = runTest {
         val s = started()
-        val out = judge(s.decisionSeq, Verdict.Know) as JudgeOutcome.Judged
+        val out = judge(s.id, s.decisionSeq, Verdict.Know) as JudgeOutcome.Judged
         assertEquals(CardStatus.Known, states.all()[CardId("b01")])
         assertEquals(out.session, sessions.current())
         assertEquals(CardId("b02"), out.session.current)
@@ -44,7 +44,7 @@ class LearningUseCasesTest {
     @Test
     fun `L-09 같은 순번 판정 두 번은 한 번만 저장한다 (중복 탭)`() = runTest {
         val s = started()
-        val results = listOf(async { judge(s.decisionSeq, Verdict.Know) }, async { judge(s.decisionSeq, Verdict.Know) }).awaitAll()
+        val results = listOf(async { judge(s.id, s.decisionSeq, Verdict.Know) }, async { judge(s.id, s.decisionSeq, Verdict.Know) }).awaitAll()
         assertEquals(1, results.count { it is JudgeOutcome.Judged })
         assertEquals(1, results.count { it == JudgeOutcome.StaleInput })
         assertEquals(1, sessions.current()!!.decisions.size)
@@ -55,7 +55,7 @@ class LearningUseCasesTest {
     fun `L-18 오래된 순번은 StaleInput, 저장 0`() = runTest {
         started()
         val before = states.saveCount
-        assertEquals(JudgeOutcome.StaleInput, judge(expectedSeq = 7, verdict = Verdict.Know))
+        assertEquals(JudgeOutcome.StaleInput, judge(SessionId("s-1"), expectedSeq = 7, verdict = Verdict.Know))
         assertEquals(before, states.saveCount)
     }
 
@@ -63,7 +63,7 @@ class LearningUseCasesTest {
     fun `L-10 저장 실패면 세션·카드 상태가 그대로이고 같은 카드에 머문다`() = runTest {
         val s = started()
         sessions.failNextSave = true
-        assertEquals(JudgeOutcome.SaveFailed, judge(s.decisionSeq, Verdict.Know))
+        assertEquals(JudgeOutcome.SaveFailed, judge(s.id, s.decisionSeq, Verdict.Know))
         assertNull(states.all()[CardId("b01")], "카드 상태가 먼저 저장됐어도 트랜잭션이 되돌린다")
         assertEquals(s, sessions.current())
         assertEquals(CardId("b01"), sessions.current()!!.current)
@@ -72,9 +72,9 @@ class LearningUseCasesTest {
     @Test
     fun `L-12 카드 상태 저장 직후 죽어도 다시 시작하면 마지막 확정 판정까지만 남는다`() = runTest {
         val s = started()
-        val first = judge(s.decisionSeq, Verdict.Know) as JudgeOutcome.Judged
+        val first = judge(s.id, s.decisionSeq, Verdict.Know) as JudgeOutcome.Judged
         sessions.failNextSave = true // 두 번째 판정: 카드 상태는 쓰고 세션 쓰기에서 "죽음"
-        assertEquals(JudgeOutcome.SaveFailed, judge(first.session.decisionSeq, Verdict.DontKnow))
+        assertEquals(JudgeOutcome.SaveFailed, judge(first.session.id, first.session.decisionSeq, Verdict.DontKnow))
         val resumed = ResumeSession(sessions)()!!
         assertEquals(first.session, resumed)
         assertEquals(mapOf(CardId("b01") to CardStatus.Known), states.all())
@@ -82,18 +82,18 @@ class LearningUseCasesTest {
 
     @Test
     fun `세션이 없거나 끝났으면 판정하지 않는다`() = runTest {
-        assertEquals(JudgeOutcome.NoSession, judge(0, Verdict.Know))
+        assertEquals(JudgeOutcome.NoSession, judge(SessionId("none"), 0, Verdict.Know))
         var s = (start(SessionSource.Basics, Mode.All, cards.take(1), replaceUnfinished = false) as StartOutcome.Started).session
-        s = (judge(s.decisionSeq, Verdict.Know) as JudgeOutcome.Judged).session
+        s = (judge(s.id, s.decisionSeq, Verdict.Know) as JudgeOutcome.Judged).session
         assertTrue(s.finished)
-        assertEquals(JudgeOutcome.NoSession, judge(s.decisionSeq, Verdict.Know))
+        assertEquals(JudgeOutcome.NoSession, judge(s.id, s.decisionSeq, Verdict.Know), "끝난 세션의 최신 순번")
     }
 
     @Test
     fun `Undo 는 세션과 카드 상태를 함께 되돌린다`() = runTest {
         val s = started()
-        val j = judge(s.decisionSeq, Verdict.DontKnow) as JudgeOutcome.Judged
-        val u = undo(j.session.decisionSeq) as UndoOutcome.Undone
+        val j = judge(s.id, s.decisionSeq, Verdict.DontKnow) as JudgeOutcome.Judged
+        val u = undo(j.session.id, j.session.decisionSeq) as UndoOutcome.Undone
         assertEquals(CardId("b01"), u.session.current)
         assertEquals(emptyMap<CardId, CardStatus>(), states.all())
         assertEquals(u.session, sessions.current())
@@ -102,9 +102,9 @@ class LearningUseCasesTest {
     @Test
     fun `L-15 Undo 저장 중 실패하면 Undo 전 상태로 일관된다`() = runTest {
         val s = started()
-        val j = judge(s.decisionSeq, Verdict.DontKnow) as JudgeOutcome.Judged
+        val j = judge(s.id, s.decisionSeq, Verdict.DontKnow) as JudgeOutcome.Judged
         sessions.failNextSave = true
-        assertEquals(UndoOutcome.SaveFailed, undo(j.session.decisionSeq))
+        assertEquals(UndoOutcome.SaveFailed, undo(j.session.id, j.session.decisionSeq))
         assertEquals(j.session, sessions.current())
         assertEquals(CardStatus.Learning, states.all()[CardId("b01")])
     }
@@ -112,21 +112,21 @@ class LearningUseCasesTest {
     @Test
     fun `Undo 도 순번을 비교한다 (두 번 눌러도 한 번)`() = runTest {
         val s = started()
-        val j = judge(s.decisionSeq, Verdict.Know) as JudgeOutcome.Judged
-        assertTrue(undo(j.session.decisionSeq) is UndoOutcome.Undone)
-        assertEquals(UndoOutcome.StaleInput, undo(j.session.decisionSeq))
+        val j = judge(s.id, s.decisionSeq, Verdict.Know) as JudgeOutcome.Judged
+        assertTrue(undo(j.session.id, j.session.decisionSeq) is UndoOutcome.Undone)
+        assertEquals(UndoOutcome.StaleInput, undo(j.session.id, j.session.decisionSeq))
     }
 
     @Test
     fun `되돌릴 판정이 없으면 Nothing`() = runTest {
         val s = started()
-        assertEquals(UndoOutcome.NothingToUndo, undo(s.decisionSeq))
+        assertEquals(UndoOutcome.NothingToUndo, undo(s.id, s.decisionSeq))
     }
 
     @Test
     fun `L-16 끝나지 않은 세션이 있으면 확인을 요구하고, 취소하면 그대로다`() = runTest {
         val s = started()
-        val again = start(SessionSource.Basics, Mode.All, cards.reversed(), replaceUnfinished = false)
+        val again = start(SessionSource.Saved, Mode.All, cards.reversed(), replaceUnfinished = false)
         assertEquals(StartOutcome.NeedsConfirmation(s), again)
         assertEquals(s, sessions.current())
     }
@@ -134,8 +134,8 @@ class LearningUseCasesTest {
     @Test
     fun `L-16 확인하면 새 세션, 카드 상태는 유지`() = runTest {
         val s = started()
-        judge(s.decisionSeq, Verdict.Know)
-        val replaced = start(SessionSource.Basics, Mode.All, cards.reversed(), replaceUnfinished = true) as StartOutcome.Started
+        judge(s.id, s.decisionSeq, Verdict.Know)
+        val replaced = start(SessionSource.Saved, Mode.All, cards.reversed(), replaceUnfinished = true) as StartOutcome.Started
         assertEquals(CardId("b04"), replaced.session.current)
         assertEquals(CardStatus.Known, states.all()[CardId("b01")])
         assertEquals(replaced.session, sessions.current())
@@ -144,7 +144,7 @@ class LearningUseCasesTest {
     @Test
     fun `끝난 세션은 확인 없이 바꾼다`() = runTest {
         var s = (start(SessionSource.Basics, Mode.All, cards.take(1), replaceUnfinished = false) as StartOutcome.Started).session
-        s = (judge(s.decisionSeq, Verdict.Know) as JudgeOutcome.Judged).session
+        s = (judge(s.id, s.decisionSeq, Verdict.Know) as JudgeOutcome.Judged).session
         assertTrue(start(SessionSource.Basics, Mode.All, cards, replaceUnfinished = false) is StartOutcome.Started)
     }
 
@@ -166,7 +166,50 @@ class LearningUseCasesTest {
         assertNull(ResumeSession(sessions)())
         var s = (start(SessionSource.Basics, Mode.All, cards.take(1), replaceUnfinished = false) as StartOutcome.Started).session
         assertEquals(s, ResumeSession(sessions)())
-        s = (judge(s.decisionSeq, Verdict.Know) as JudgeOutcome.Judged).session
+        s = (judge(s.id, s.decisionSeq, Verdict.Know) as JudgeOutcome.Judged).session
         assertNull(ResumeSession(sessions)())
+    }
+
+    @Test
+    fun `다른 세션 화면에서 온 판정·Undo 는 순번이 같아도 무시한다 (리뷰 HIGH)`() = runTest {
+        val a = started()
+        val aJudged = (judge(a.id, a.decisionSeq, Verdict.Know) as JudgeOutcome.Judged).session
+        val b = (start(SessionSource.Saved, Mode.All, cards, replaceUnfinished = true) as StartOutcome.Started).session
+        val bJudged = (judge(b.id, b.decisionSeq, Verdict.Know) as JudgeOutcome.Judged).session
+        assertEquals(aJudged.decisionSeq, bJudged.decisionSeq, "두 세션의 순번이 같아지는 상황을 만든다")
+        assertEquals(UndoOutcome.StaleInput, undo(aJudged.id, aJudged.decisionSeq))
+        assertEquals(JudgeOutcome.StaleInput, judge(aJudged.id, aJudged.decisionSeq, Verdict.DontKnow))
+        assertEquals(bJudged, sessions.current())
+    }
+
+    @Test
+    fun `마지막 카드를 두 번 누르면 두 번째는 StaleInput (화면은 무시)`() = runTest {
+        val s = (start(SessionSource.Basics, Mode.All, cards.take(1), replaceUnfinished = false) as StartOutcome.Started).session
+        assertTrue(judge(s.id, s.decisionSeq, Verdict.Know) is JudgeOutcome.Judged)
+        assertEquals(JudgeOutcome.StaleInput, judge(s.id, s.decisionSeq, Verdict.Know))
+    }
+
+    @Test
+    fun `같은 출처·모드를 다시 고르면 확인 없이 이어 한다`() = runTest {
+        val s = started()
+        assertEquals(StartOutcome.Resumed(s), start(SessionSource.Basics, Mode.All, cards, replaceUnfinished = false))
+    }
+
+    @Test
+    fun `복습할 카드가 없으면 교체 확인부터 묻지 않는다`() = runTest {
+        started()
+        assertEquals(StartOutcome.NothingToReview, start(SessionSource.Saved, Mode.Review, cards, replaceUnfinished = false))
+    }
+
+    @Test
+    fun `L-09 저장소가 중간에 양보해도 같은 순번 판정은 한 번만 저장한다`() = runTest {
+        val slowStates = FakeLearningStateStore(yieldOnAccess = true)
+        val slowSessions = FakeSessionStore(yieldOnAccess = true)
+        val slowTx = FakeTransactionRunner(slowStates, slowSessions)
+        val s = (StartSession(slowSessions, slowStates, slowTx, SequentialIdGenerator("s"))(SessionSource.Basics, Mode.All, cards, false) as StartOutcome.Started).session
+        val slowJudge = JudgeCard(slowSessions, slowStates, slowTx, clock)
+        val results = (1..5).map { async { slowJudge(s.id, s.decisionSeq, Verdict.Know) } }.awaitAll()
+        assertEquals(1, results.count { it is JudgeOutcome.Judged })
+        assertEquals(1, slowStates.saveCount)
     }
 }

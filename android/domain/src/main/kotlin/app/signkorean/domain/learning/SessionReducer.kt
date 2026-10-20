@@ -37,12 +37,13 @@ object SessionFactory {
                 id = id,
                 source = source,
                 mode = mode,
+                cardIds = active,
                 queue = eligible.map { QueueEntry(it) },
                 decisions = emptyList(),
                 decisionSeq = 0,
                 face = Face.Front,
                 undo = null,
-                statuses = eligible.associateWith { statuses[it] ?: CardStatus.Unseen },
+                statuses = active.associateWith { statuses[it] ?: CardStatus.Unseen },
             ),
         )
     }
@@ -77,7 +78,7 @@ object SessionReducer {
             decisions = decisions,
             decisionSeq = s.decisionSeq + 1,
             face = Face.Front, // 다음 카드는 항상 앞면 (FR02, L-17)
-            undo = UndoSnapshot(card, s.statuses[card] ?: CardStatus.Unseen, s.queue, s.decisions, s.face),
+            undo = UndoSnapshot(card, s.statuses[card] ?: CardStatus.Unseen, s.queue, s.decisions),
             statuses = s.statuses + (card to status),
         )
         return JudgeTransition(next, CardState(card, status, now))
@@ -90,7 +91,7 @@ object SessionReducer {
             queue = u.queue,
             decisions = u.decisions,
             decisionSeq = s.decisionSeq + 1,
-            face = u.face,
+            face = Face.Front,
             undo = null,
             statuses = s.statuses + (u.card to u.previousStatus),
         )
@@ -116,7 +117,7 @@ data class SessionSummary(
     val knownDecisions: Int,
     val learningDecisions: Int,
     val uniqueCards: Int,
-    /** 이 세션 카드 중 지금 learning 인 카드 수(다음 Review 후보). */
+    /** 이 세션 출처 카드 중 지금 learning 인 카드 수(다음 Review 후보). 이번에 보지 못한 카드도 센다(프로토타입과 같음). */
     val remainingReview: Int,
 ) {
     companion object {
@@ -126,7 +127,7 @@ data class SessionSummary(
                 knownDecisions = s.decisions.count { it.verdict == Verdict.Know },
                 learningDecisions = s.decisions.count { it.verdict == Verdict.DontKnow },
                 uniqueCards = cards.size,
-                remainingReview = cards.count { statuses[it] == CardStatus.Learning },
+                remainingReview = s.cardIds.count { statuses[it] == CardStatus.Learning },
             )
         }
     }

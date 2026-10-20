@@ -43,13 +43,15 @@ data class QueueEntry(val card: CardId, val readyAt: Int = 0)
 
 data class Decision(val card: CardId, val verdict: Verdict)
 
-/** 직전 판정 1건을 되돌리기 위한 기록 (FR06). 상태·큐·집계를 함께 복구한다. */
+/**
+ * 직전 판정 1건을 되돌리기 위한 기록 (FR06). 상태·큐·집계를 함께 복구한다.
+ * 카드 면은 기록하지 않는다: 뒤집기는 저장하지 않는 화면 상태라, 되돌린 카드는 앞면으로 다시 보인다.
+ */
 data class UndoSnapshot(
     val card: CardId,
     val previousStatus: CardStatus,
     val queue: List<QueueEntry>,
     val decisions: List<Decision>,
-    val face: Face,
 )
 
 /**
@@ -60,9 +62,14 @@ data class LearningSession(
     val id: SessionId,
     val source: SessionSource,
     val mode: Mode,
+    /** 세션을 시작할 때 출처의 활성 카드 전부(출제 대상이 아니었던 카드 포함). 결과의 "남은 복습" 계산에 쓴다. */
+    val cardIds: List<CardId>,
     val queue: List<QueueEntry>,
     val decisions: List<Decision>,
-    /** 판정·Undo 마다 오른다. 화면이 본 순번과 저장 직전 순번을 비교해 중복 입력을 막는다 (AT01, NFR03). */
+    /**
+     * 판정·Undo 마다 오른다. 화면이 본 순번과 저장 직전 순번을 비교해 중복 입력을 막는다 (AT01, NFR03).
+     * 순번은 세션 안에서만 유일하므로 유스케이스는 세션 id 도 함께 비교한다.
+     */
     val decisionSeq: Int,
     val face: Face,
     val undo: UndoSnapshot?,
@@ -72,6 +79,8 @@ data class LearningSession(
     val finished: Boolean get() = decisions.size >= SessionRules.MAX_DECISIONS || queue.isEmpty()
 
     val current: CardId? get() = if (finished) null else queue.first().card
+
+    fun isSameStart(source: SessionSource, mode: Mode): Boolean = this.source == source && this.mode == mode
 
     /** 사이에 넣을 카드가 부족해 재출제 간격을 다 채우지 못하고 다시 보여 주는 중 ("Try again"). */
     val isTryAgain: Boolean get() = !finished && queue.first().readyAt > decisions.size
