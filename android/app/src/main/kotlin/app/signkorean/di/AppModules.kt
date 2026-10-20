@@ -26,6 +26,11 @@ import app.signkorean.domain.learning.StartSession
 import app.signkorean.domain.learning.TransactionRunner
 import app.signkorean.domain.learning.UndoJudgement
 import app.signkorean.domain.audio.AudioPlayer
+import app.signkorean.domain.bookmark.BookmarkStore
+import app.signkorean.domain.bookmark.ClearBookmarks
+import app.signkorean.domain.bookmark.SetBookmark
+import app.signkorean.domain.entitlement.Entitlement
+import app.signkorean.domain.entitlement.EntitlementSource
 import app.signkorean.domain.locale.CurrentLocale
 import app.signkorean.domain.onboarding.OnboardingStore
 import app.signkorean.domain.locale.ResolveAppLanguage
@@ -74,6 +79,11 @@ val learningModule = module {
     single<LearningStateStore> { get<RoomLearningStorage>().states }
     single<SessionStore> { get<RoomLearningStorage>().sessions }
     single<TransactionRunner> { get<RoomLearningStorage>().transactions }
+    single<BookmarkStore> { get<RoomLearningStorage>().bookmarks }
+    // 결제 권한은 Phase 12 에서 스토어 조회로 바뀐다. 그전에는 모두 무료다.
+    single<EntitlementSource> { EntitlementSource { Entitlement.Free } }
+    factory { SetBookmark(get(), get(), get(), get()) }
+    factory { ClearBookmarks(get()) }
     factory { StartSession(get(), get(), get(), get()) }
     factory { ResumeSession(get()) }
     factory { JudgeCard(get(), get(), get(), get()) }

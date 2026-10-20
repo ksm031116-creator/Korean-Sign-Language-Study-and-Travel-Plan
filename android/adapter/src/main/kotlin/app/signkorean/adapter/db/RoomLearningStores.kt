@@ -1,6 +1,8 @@
 package app.signkorean.adapter.db
 
 import androidx.room.withTransaction
+import app.signkorean.domain.bookmark.Bookmark
+import app.signkorean.domain.bookmark.BookmarkStore
 import app.signkorean.domain.content.AreaId
 import app.signkorean.domain.content.CardId
 import app.signkorean.domain.learning.CardState
@@ -21,6 +23,7 @@ import app.signkorean.domain.learning.Verdict
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import java.time.Instant
 
 /** 저장된 값을 읽지 못했다. 앱은 그 값을 버리고 계속 동작한다. 원인은 기록만 한다. */
 fun interface StorageProblemReporter {
@@ -207,6 +210,15 @@ internal object SessionCodec {
     private fun DecisionDto.toDecision() = Decision(CardId(card), VERDICTS.decode(verdict))
 }
 
+class RoomBookmarkStore(private val dao: BookmarkDao) : BookmarkStore {
+    override suspend fun all(): List<Bookmark> = dao.all().map { Bookmark(CardId(it.cardId), Instant.ofEpochMilli(it.createdAt)) }
+    override suspend fun count(): Int = dao.count()
+    override suspend fun contains(card: CardId): Boolean = dao.contains(card.value)
+    override suspend fun add(bookmark: Bookmark) = dao.add(BookmarkEntity(bookmark.card.value, bookmark.createdAt.toEpochMilli()))
+    override suspend fun remove(card: CardId) = dao.remove(card.value)
+    override suspend fun clear() = dao.clear()
+}
+
 /**
  * 앱 조립부가 Room 타입을 몰라도 되도록 포트만 내보낸다. 데이터베이스는 앱 하나에 하나다.
  */
@@ -214,6 +226,7 @@ class RoomLearningStorage private constructor(db: AppDatabase, reporter: Storage
     val states: LearningStateStore = RoomLearningStateStore(db.cardStateDao(), reporter)
     val sessions: SessionStore = RoomSessionStore(db.sessionDao(), reporter)
     val transactions: TransactionRunner = RoomTransactionRunner(db)
+    val bookmarks: BookmarkStore = RoomBookmarkStore(db.bookmarkDao())
 
     companion object {
         fun open(context: android.content.Context, reporter: StorageProblemReporter = LogcatStorageProblemReporter) =

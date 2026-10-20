@@ -1,10 +1,13 @@
 package app.signkorean.adapter.db
 
 import android.content.Context
+import androidx.room.AutoMigration
 import androidx.room.ColumnInfo
 import androidx.room.Dao
 import androidx.room.Database
 import androidx.room.Entity
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.PrimaryKey
 import androidx.room.Query
 import androidx.room.Room
@@ -42,6 +45,35 @@ data class SessionEntity(
     @ColumnInfo(name = "face") val face: String,
 )
 
+/** 카드 북마크 (설계서 §7.2). 카드 하나에 한 줄. */
+@Entity(tableName = "bookmark")
+data class BookmarkEntity(
+    @PrimaryKey @ColumnInfo(name = "card_id") val cardId: String,
+    @ColumnInfo(name = "created_at") val createdAt: Long,
+)
+
+@Dao
+interface BookmarkDao {
+    @Query("SELECT * FROM bookmark ORDER BY created_at DESC, card_id")
+    suspend fun all(): List<BookmarkEntity>
+
+    @Query("SELECT COUNT(*) FROM bookmark")
+    suspend fun count(): Int
+
+    @Query("SELECT EXISTS(SELECT 1 FROM bookmark WHERE card_id = :cardId)")
+    suspend fun contains(cardId: String): Boolean
+
+    /** 이미 있으면 그대로 둔다(처음 저장한 시각을 지킨다). */
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun add(entity: BookmarkEntity)
+
+    @Query("DELETE FROM bookmark WHERE card_id = :cardId")
+    suspend fun remove(cardId: String)
+
+    @Query("DELETE FROM bookmark")
+    suspend fun clear()
+}
+
 @Dao
 interface CardStateDao {
     @Query("SELECT * FROM card_state")
@@ -78,10 +110,17 @@ interface SessionDao {
  * 앱 데이터베이스. 스키마는 schemas/ 에 내보내고, 바꿀 때는 마이그레이션을 쓴다.
  * 파괴적 마이그레이션은 쓰지 않는다: 학습 기록이 사라진다 (설계서 §7.2).
  */
-@Database(entities = [CardStateEntity::class, SessionEntity::class], version = 1, exportSchema = true)
+@Database(
+    entities = [CardStateEntity::class, SessionEntity::class, BookmarkEntity::class],
+    version = 2,
+    exportSchema = true,
+    // v2: bookmark 표 추가(Phase 11). 표 추가는 자동 마이그레이션으로 충분하다. 기존 학습 기록은 그대로 남는다.
+    autoMigrations = [AutoMigration(from = 1, to = 2)],
+)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun cardStateDao(): CardStateDao
     abstract fun sessionDao(): SessionDao
+    abstract fun bookmarkDao(): BookmarkDao
 
     companion object {
         const val NAME = "sign-korean.db"
