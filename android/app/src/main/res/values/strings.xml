@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 기본(영어). 다른 언어 파일에 같은 키가 없으면 Lint MissingTranslation 오류로 빌드가 실패한다. -->
+<resources>
+    <string name="app_name" translatable="false">Sign Korean</string>
+    <string name="app_tagline">Read the city, one sign at a time.</string>
+</resources>

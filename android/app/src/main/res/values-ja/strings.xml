@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 일본어. 영어를 옮기지 않고 일본어 화자에게 자연스러운 말로 쓴다 (PRD §1.4). 원어민 검수 전 초안. -->
+<resources>
+    <string name="app_tagline">街の看板を、ひとつずつ読めるように。</string>
+</resources>
