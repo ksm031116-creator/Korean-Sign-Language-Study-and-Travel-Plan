@@ -45,6 +45,12 @@ class ContentValidatorTest {
     }
 
     @Test
+    fun `지역과 장소가 같은 ID 를 써도 중복이 아니다`() {
+        val result = validator.validate(pack(places = listOf(place("myeongdong", areaId = "myeongdong")), areas = listOf(area("myeongdong"))))
+        assertEquals(emptyList<ContentIssue>(), result.issues)
+    }
+
+    @Test
     fun `C-09 Example 장소는 이름이 Example 로 시작해야 한다`() {
         val marked = place("ok", name = "Example pharmacy · Seochon", isExample = true)
         val unmarked = place("bad", name = "Seochon Pharmacy", isExample = true)

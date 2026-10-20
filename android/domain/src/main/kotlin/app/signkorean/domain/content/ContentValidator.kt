@@ -48,10 +48,13 @@ class ContentValidator(private val knownPictograms: Set<PictogramId>) {
     fun validate(pack: ContentPack): ValidatedContent {
         val issues = mutableListOf<ContentIssue>()
 
-        (pack.cards.map { it.id.value } + pack.places.map { it.id.value } + pack.areas.map { it.id.value })
-            .groupingBy { it }.eachCount()
-            .filterValues { it > 1 }
-            .keys.forEach { issues += ContentIssue.DuplicateId(it) }
+        // ID 는 종류별 이름 공간이다. 지역 gyeongbokgung 과 장소 gyeongbokgung 은 서로 다른 값이다.
+        listOf(pack.cards.map { it.id.value }, pack.places.map { it.id.value }, pack.areas.map { it.id.value })
+            .forEach { ids ->
+                ids.groupingBy { it }.eachCount()
+                    .filterValues { it > 1 }
+                    .keys.forEach { issues += ContentIssue.DuplicateId(it) }
+            }
 
         pack.cards.groupBy { it.koText.trim() }
             .filterValues { it.size > 1 }
