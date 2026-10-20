@@ -1,20 +1,19 @@
 package app.signkorean
 
 import android.app.Application
+import android.content.pm.ApplicationInfo
 import android.util.Log
 import app.signkorean.di.appModules
+import app.signkorean.domain.common.AppDispatchers
 import app.signkorean.domain.content.ContentRepository
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
 
 class SignKoreanApplication : Application() {
-
-    /** 앱 프로세스와 수명이 같은 작업용. 화면 수명과 무관한 미리 읽기에만 쓴다. */
-    private val appScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
 
     override fun onCreate() {
         super.onCreate()
@@ -24,11 +23,20 @@ class SignKoreanApplication : Application() {
         }.koin
 
         // 콘텐츠 팩을 미리 읽어 첫 화면의 대기를 줄이고, 읽은 결과를 로그로 남긴다.
+        // 디버그 빌드에서는 팩을 못 읽으면 바로 죽여서 놓치지 않게 한다(출시 빌드는 화면의 오류 상태가 처리).
         val content = koin.get<ContentRepository>()
-        appScope.launch {
-            runCatching { content.load() }
-                .onSuccess { Log.i(TAG, "content ${it.version}: cards=${it.cards.size} places=${it.places.size} areas=${it.areas.size}") }
-                .onFailure { Log.e(TAG, "content pack failed to load", it) }
+        val dispatchers = koin.get<AppDispatchers>()
+        val debuggable = (applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE) != 0
+        CoroutineScope(SupervisorJob() + dispatchers.default).launch {
+            try {
+                val pack = content.load()
+                Log.i(TAG, "content ${pack.version}: cards=${pack.cards.size} places=${pack.places.size} areas=${pack.areas.size}")
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                Log.e(TAG, "content pack failed to load", e)
+                if (debuggable) throw IllegalStateException("content pack failed to load", e)
+            }
         }
     }
 
