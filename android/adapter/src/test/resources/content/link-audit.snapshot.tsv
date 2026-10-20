@@ -1,0 +1,136 @@
+# 카드별 연결 장소 (C-07). 바뀌면 사람이 검토한 뒤 -PupdateSnapshots=true 로 갱신한다.
+t-palace-1	매표소	place	gyeongbokgung, changdeokgung, jongmyo, deoksugung, changgyeonggung
+t-palace-2	입장료	place	gyeongbokgung, changdeokgung, jongmyo, deoksugung, changgyeonggung
+t-palace-3	관람 시간	place	gyeongbokgung, changdeokgung, jongmyo, deoksugung, changgyeonggung
+t-museum-1	박물관	place	folkmuseum, mmca, seoulmuseum, nmk, warmemorial
+t-museum-2	전시	place	folkmuseum, mmca, seoulmuseum, nmk, warmemorial
+t-museum-3	보관함	place	folkmuseum, mmca, seoulmuseum, nmk, warmemorial
+t-market-1	국밥	place	tongin, namdaemun, gwangjang, mangwon
+t-market-2	만두	place	tongin, namdaemun, gwangjang, mangwon
+t-market-3	칼국수	place	tongin, namdaemun, gwangjang, mangwon
+t-market-4	떡볶이	place	tongin, namdaemun, gwangjang, mangwon
+t-market-5	순대	place	tongin, namdaemun, gwangjang, mangwon
+t-cafe-1	카페	place	samcheong, seongsu-cafe, yeonnam, garosugil
+t-cafe-2	커피	place	samcheong, seongsu-cafe, yeonnam, garosugil
+t-cafe-3	포장	place	samcheong, seongsu-cafe, yeonnam, garosugil
+t-street-1	식당	place	myeongdong-food, euljiro, hongdae-street, itaewon
+t-street-2	분식	place	myeongdong-food, euljiro, hongdae-street, itaewon
+t-street-3	호프	place	myeongdong-food, euljiro, hongdae-street, itaewon
+t-shopping-1	백화점	place	shinsegae, lotte-main, thehyundai, coex
+t-shopping-2	면세점	place	shinsegae, lotte-main, thehyundai, coex
+t-shopping-3	할인	place	shinsegae, lotte-main, thehyundai, coex
+t-hanok-1	한복 대여	place	bukchon, insadong, ikseon
+t-hanok-2	공방	place	bukchon, insadong, ikseon
+t-hanok-3	찻집	place	bukchon, insadong, ikseon
+t-landmark-1	안내도	place	gwanghwamun, myeongdong-cathedral, ddp
+t-landmark-2	포토존	place	gwanghwamun, myeongdong-cathedral, ddp
+t-tower-1	전망대	place	namsan-tower, lotteworldtower
+t-tower-2	기념품	place	namsan-tower, lotteworldtower
+t-station-1	교통카드 충전	place	seoulstation, ttukseom, hongdae-station, yeouinaru, gangnam-station
+t-station-2	고객안내센터	place	seoulstation, ttukseom, hongdae-station, yeouinaru, gangnam-station
+t-park-1	산책로	place	cheonggyecheon, seoulforest, gyeongui-park, namsan-park, yeouido-park, olympicpark
+t-park-2	쉼터	place	cheonggyecheon, seoulforest, gyeongui-park, namsan-park, yeouido-park, olympicpark
+t-services-1	약국	place	seochon-ph
+t-services-2	병원	place	seongsu-ph
+t-services-3	은행	place	itaewon-bank
+t-services-4	환전	place	myeongdong-bank, itaewon-bank
+b01	화장실	basic	
+b02	남자 화장실	basic	
+b03	여자 화장실	basic	
+b04	장애인 화장실	basic	
+b05	수유실	basic	
+b06	미세요	basic	
+b07	당기세요	basic	
+b08	입구	basic	
+b09	출구	basic	
+b10	비상구	basic	
+b11	영업중	basic	
+b12	준비중	basic	
+b13	휴무	basic	
+b14	24시간	basic	
+b15	금연	basic	
+b16	촬영 금지	basic	
+b17	출입 금지	basic	
+b18	미끄럼 주의	basic	
+b19	머리 조심	basic	
+b20	지하철	basic	
+b21	버스 정류장	basic	
+b22	환승	basic	
+b23	승강장	basic	
+b24	계단	basic	
+b25	엘리베이터	basic	
+b26	편의점	basic	
+b27	현금인출기	basic	
+b28	와이파이	basic	
+b29	분실물 센터	basic	
+b30	우체국	basic	
+b31	공중 화장실	basic	
+b32	사용중	basic	
+b33	휴지통	basic	
+b34	기저귀 교환대	basic	
+b35	비데	basic	
+b36	흡연실	basic	
+b37	탈의실	basic	
+b38	음수대	basic	
+b39	남녀 공용	basic	
+b40	손 세정제	basic	
+b41	자동문	basic	
+b42	열림	basic	
+b43	닫힘	basic	
+b44	정문	basic	
+b45	후문	basic	
+b46	좌측 통행	basic	
+b47	우측 통행	basic	
+b48	직진	basic	
+b49	우회	basic	
+b50	회전문	basic	
+b51	비상계단	basic	
+b52	옥상	basic	
+b53	지하 1층	basic	
+b54	문 닫아 주세요	basic	
+b55	안내	basic	
+b56	영업시간	basic	
+b57	브레이크 타임	basic	
+b58	정기 휴무	basic	
+b59	연중무휴	basic	
+b60	오픈	basic	
+b61	마감	basic	
+b62	라스트 오더	basic	
+b63	점심시간	basic	
+b64	매진	basic	
+b65	임시 휴업	basic	
+b66	평일	basic	
+b67	위험	basic	
+b68	주차 금지	basic	
+b69	음식물 반입 금지	basic	
+b70	손대지 마세요	basic	
+b71	발밑 조심	basic	
+b72	공사중	basic	
+b73	반려동물 동반 금지	basic	
+b74	소화기	basic	
+b75	고장	basic	
+b76	화기 엄금	basic	
+b77	에스컬레이터	basic	
+b78	택시 타는 곳	basic	
+b79	내리는 문	basic	
+b80	노약자석	basic	
+b81	임산부 배려석	basic	
+b82	첫차	basic	
+b83	막차	basic	
+b84	급행	basic	
+b85	종점	basic	
+b86	방면	basic	
+b87	횡단보도	basic	
+b88	주차장	basic	
+b89	공항	basic	
+b90	하차	basic	
+b91	무료	basic	
+b92	셀프	basic	
+b93	계산대	basic	
+b94	영수증	basic	
+b95	휴대폰 충전	basic	
+b96	빨래방	basic	
+b97	미용실	basic	
+b98	경찰서	basic	
+b99	관광안내소	basic	
+b100	분리수거	basic	
