@@ -201,7 +201,7 @@ private fun PlaceCard(place: Place, areaColor: String, summary: PlaceSummary?, s
         // 카드마다 같은 "Reviews" 라 어느 장소인지 함께 읽힌다(RVW-17).
         val reviewsLabel = stringResource(R.string.reviews_for, place.name.text())
         QuietButton(stringResource(R.string.reviews_title), onClick = { onOpenReviews(place.id) }, modifier = Modifier.semantics { contentDescription = reviewsLabel })
-        PaidActions(paid, onUpgrade = { onAction(PlacesAction.Upgrade(it)) }, onAdd = { onAddToPlan(place.id) })
+        PaidActions(paid, onUpgrade = { onAction(PlacesAction.Upgrade(it)) }, onAdd = { onAddToPlan(place.id) }, placeName = place.name.text())
     }
 }
 
@@ -226,10 +226,12 @@ private fun PlaceTitle(place: Place) {
  */
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-private fun PaidActions(paid: Boolean, onUpgrade: (UpgradeFeature) -> Unit, onAdd: () -> Unit) {
+private fun PaidActions(paid: Boolean, onUpgrade: (UpgradeFeature) -> Unit, onAdd: () -> Unit, placeName: String = "") {
+    // 카드마다 같은 문구라 어느 장소인지 함께 읽힌다(PLN-M4).
+    val addLabel = stringResource(R.string.add_place_to, placeName)
     // 유료: Add to plan 은 SC15 를 연다. Route 는 경로 화면이 생기는 Phase 19 까지 그리지 않는다.
     if (paid) {
-        SecondaryButton(stringResource(R.string.lock_add_to_plan), onClick = onAdd)
+        SecondaryButton(stringResource(R.string.lock_add_to_plan), onClick = onAdd, modifier = Modifier.semantics { contentDescription = addLabel })
         return
     }
     FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -323,7 +325,7 @@ fun PlaceDetailContent(
         if (where.isNotEmpty()) Text(where, style = MaterialTheme.typography.labelLarge, color = t.primary)
         Text(place.address.text(), style = MaterialTheme.typography.bodyMedium, color = t.muted)
         SecondaryButton(stringResource(R.string.reviews_title), onClick = onOpenReviews)
-        PaidActions(state.paid, onUpgrade = { onAction(PlaceDetailAction.Upgrade(it)) }, onAdd = onAddToPlan)
+        PaidActions(state.paid, onUpgrade = { onAction(PlaceDetailAction.Upgrade(it)) }, onAdd = onAddToPlan, placeName = place.name.text())
 
         if (state.signs.isNotEmpty()) {
             Text(stringResource(R.string.place_signs), style = MaterialTheme.typography.titleMedium, modifier = Modifier.semantics { heading() })

@@ -82,7 +82,11 @@ class EntryViewModelStores {
 private const val WIDE_SCREEN_DP = 600
 
 /** 탭 없이 그리는 화면. */
-private val FULL_SCREEN = setOf(ScreenId.SC21)
+private val FULL_SCREEN = setOf(
+    ScreenId.SC21,
+    // 편집 중인 폼. 탭을 다시 눌러 입력이 확인 없이 사라지지 않게 탭을 숨긴다(UX02, Phase 17 리뷰 PLN-M5).
+    ScreenId.SC12,
+)
 
 /**
  * 앱의 최상위 셸. 루트 탭 Explore·Saved·Plan 과 화면 스택을 그린다.

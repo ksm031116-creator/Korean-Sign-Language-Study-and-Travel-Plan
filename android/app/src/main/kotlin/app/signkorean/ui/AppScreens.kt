@@ -140,6 +140,7 @@ fun AppScreen(route: Route, navigator: AppNavigator) {
                 onSaved = { id, created -> if (created && !arg.returnToSheet) navigator.replaceTop(Route(ScreenId.SC13, id.value)) else navigator.back() },
                 onDeleted = { navigator.selectTab(app.signkorean.navigation.RootTab.Plan) },
                 onClose = { navigator.back() },
+                onUpgrade = { navigator.push(Route(ScreenId.SC21, UpgradeFeature.Plan.arg)) },
             )
         }
         // SC13 인자: 여행 id, 또는 "여행 id|날짜"(그날을 열어 둔다).

@@ -11,6 +11,9 @@
     <string name="common_retry">Try again</string>
     <string name="common_undo">Undo</string>
     <string name="common_loading">Loading</string>
+    <string name="common_load_failed">Couldn\'t load this. Try again.</string>
+    <string name="common_ok">OK</string>
+    <string name="common_cancel">Cancel</string>
 
     <!-- 형식 (설계서 §8.5). 언어마다 어순이 달라 숫자를 이어 붙이지 않고 자리표시자 하나로 쓴다.
          format_date_short 는 java.time 패턴이다. -->
@@ -305,6 +308,8 @@
     <string name="picker_search">Search places</string>
     <string name="picker_added">Added</string>
     <string name="picker_add">Add</string>
+    <string name="picker_add_named">Add %1$s</string>
+    <string name="add_place_to">Add %1$s to plan</string>
 
 
     <!-- SC13 날짜별 일정 · SC16 방문 장소 · SC17 하루 출발 (Phase 18) -->

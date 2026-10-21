@@ -38,6 +38,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.relocation.BringIntoViewRequester
+import androidx.compose.foundation.relocation.bringIntoViewRequester
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
@@ -133,7 +137,7 @@ fun TripListContent(
         } else {
             item { PrimaryButton(stringResource(R.string.plan_new_trip), onClick = onNewTrip, modifier = Modifier.fillMaxWidth()) }
         }
-        if (state.trips.isEmpty() && !readOnly) {
+        if (state.trips.isEmpty() && !readOnly && !state.loadFailed) {
             item {
                 EmptyState(title = stringResource(R.string.plan_empty_title), body = stringResource(R.string.plan_empty_body)) {
                     SecondaryButton(stringResource(R.string.plan_sample), onClick = onSample, enabled = !state.busy)
@@ -165,6 +169,7 @@ fun TripFormScreen(
     onSaved: (TripId, created: Boolean) -> Unit,
     onDeleted: () -> Unit,
     onClose: () -> Unit,
+    onUpgrade: () -> Unit = {},
     viewModel: TripFormViewModel = koinViewModel { parametersOf(tripId) },
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -176,6 +181,7 @@ fun TripFormScreen(
                 is TripFormEffect.Saved -> onSaved(effect.id, effect.created)
                 TripFormEffect.Deleted -> onDeleted()
                 TripFormEffect.Close -> onClose()
+                TripFormEffect.Upgrade -> onUpgrade()
             }
         }
     }
@@ -185,7 +191,7 @@ fun TripFormScreen(
 private fun LocalDate.toPickerMillis(): Long = atStartOfDay().toInstant(ZoneOffset.UTC).toEpochMilli()
 private fun Long.toPickerDate(): LocalDate = Instant.ofEpochMilli(this).atZone(ZoneOffset.UTC).toLocalDate()
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun TripFormContent(state: TripFormUiState, onAction: (TripFormAction) -> Unit) {
     val t = SignKoreanTheme.tokens
@@ -193,15 +199,26 @@ fun TripFormContent(state: TripFormUiState, onAction: (TripFormAction) -> Unit) 
     if (state.loading) return
     var picking by rememberSaveable { mutableStateOf<String?>(null) }
     val titleFocus = remember { FocusRequester() }
-    // 저장 실패 시 첫 오류 칸으로 (UX07). 제목은 입력 칸에 초점, 날짜 오류는 알림 영역이 읽는다.
-    LaunchedEffect(state.focusError, state.titleError) {
-        if (state.focusError == TripField.Title && state.titleError != null) runCatching { titleFocus.requestFocus() }
+    val titleErrorView = remember { BringIntoViewRequester() }
+    val endErrorView = remember { BringIntoViewRequester() }
+    // 저장이 실패할 때마다(같은 오류여도) 첫 오류 칸을 화면 안으로 가져오고 제목이면 초점을 준다 (UX07, PLN-M3).
+    LaunchedEffect(state.errorShownCount) {
+        if (state.errorShownCount == 0) return@LaunchedEffect
+        when (state.focusError) {
+            TripField.Title -> {
+                runCatching { titleFocus.requestFocus() }
+                titleErrorView.bringIntoView()
+            }
+            TripField.End -> endErrorView.bringIntoView()
+            null -> Unit
+        }
     }
     if (state.confirmDiscard) {
         ConfirmDialog(
             title = stringResource(R.string.trip_discard_title), body = stringResource(R.string.trip_discard_body),
             confirm = stringResource(R.string.trip_discard), dismiss = stringResource(R.string.trip_keep),
             onConfirm = { onAction(TripFormAction.ConfirmDiscard) }, onDismiss = { onAction(TripFormAction.KeepEditing) },
+            destructive = true,
         )
     }
     if (state.confirmDelete) {
@@ -209,6 +226,7 @@ fun TripFormContent(state: TripFormUiState, onAction: (TripFormAction) -> Unit) 
             title = stringResource(R.string.trip_delete_title), body = stringResource(R.string.trip_delete_body),
             confirm = stringResource(R.string.trip_delete_confirm), dismiss = stringResource(R.string.trip_keep),
             onConfirm = { onAction(TripFormAction.ConfirmDelete) }, onDismiss = { onAction(TripFormAction.CancelDelete) },
+            destructive = true,
         )
     }
     picking?.let { which ->
@@ -220,9 +238,10 @@ fun TripFormContent(state: TripFormUiState, onAction: (TripFormAction) -> Unit) 
                 TextButton(onClick = {
                     picker.selectedDateMillis?.toPickerDate()?.let { onAction(if (which == "start") TripFormAction.Start(it) else TripFormAction.End(it)) }
                     picking = null
-                }) { Text(stringResource(R.string.trip_save)) }
+                }) { Text(stringResource(R.string.common_ok)) }
             },
-            dismissButton = { TextButton(onClick = { picking = null }) { Text(stringResource(R.string.trip_keep)) } },
+            // 날짜만 고른다. "Save" 는 여행 저장으로 읽힌다(PLN-L2).
+            dismissButton = { TextButton(onClick = { picking = null }) { Text(stringResource(R.string.common_cancel)) } },
         ) { DatePicker(picker) }
     }
     Column(
@@ -245,24 +264,24 @@ fun TripFormContent(state: TripFormUiState, onAction: (TripFormAction) -> Unit) 
             modifier = Modifier.fillMaxWidth().focusRequester(titleFocus).testTag(TripTags.TITLE)
                 .semantics { if (titleError != null) error(titleError) },
         )
-        titleError?.let { FieldError(it, TripTags.TITLE_ERROR) }
+        titleError?.let { FieldError(it, TripTags.TITLE_ERROR, Modifier.bringIntoViewRequester(titleErrorView)) }
         DateRow(stringResource(R.string.trip_start), formats.date(state.start)) { picking = "start" }
         DateRow(stringResource(R.string.trip_end), formats.date(state.end)) { picking = "end" }
-        state.endError?.let { FieldError(it.asString(), TripTags.END_ERROR) }
+        state.endError?.let { FieldError(it.asString(), TripTags.END_ERROR, Modifier.bringIntoViewRequester(endErrorView)) }
         state.message?.let { Text(it.asString(), color = t.danger) }
-        PrimaryButton(stringResource(R.string.trip_save), onClick = { onAction(TripFormAction.Save) }, enabled = !state.saving, modifier = Modifier.fillMaxWidth())
+        PrimaryButton(stringResource(R.string.trip_save), onClick = { onAction(TripFormAction.Save) }, enabled = !state.saving && !state.missing, modifier = Modifier.fillMaxWidth())
         if (state.editing) QuietButton(stringResource(R.string.trip_delete), onClick = { onAction(TripFormAction.Delete) })
     }
 }
 
 /** 필드 바로 아래 오류. 스크린리더가 바로 읽도록 알림 영역이다 (UX07, U-15). */
 @Composable
-private fun FieldError(text: String, tag: String) {
+private fun FieldError(text: String, tag: String, modifier: Modifier = Modifier) {
     Text(
         text,
         color = SignKoreanTheme.tokens.danger,
         style = MaterialTheme.typography.bodySmall,
-        modifier = Modifier.testTag(tag).semantics { liveRegion = LiveRegionMode.Assertive },
+        modifier = modifier.testTag(tag).semantics { liveRegion = LiveRegionMode.Assertive },
     )
 }
 
@@ -367,7 +386,15 @@ fun PlacePickerScreen(trip: TripId, date: LocalDate, onClose: () -> Unit, viewMo
                     if (r.place.isExample) StatusBadge(stringResource(R.string.collection_example), StatusTone.Neutral)
                 }
                 if (r.added) StatusBadge(stringResource(R.string.picker_added), StatusTone.Known)
-                else SecondaryButton(stringResource(R.string.picker_add), onClick = { viewModel.onAction(PlacePickerAction.Add(r.place.id)) })
+                else {
+                    val label = stringResource(R.string.picker_add_named, r.place.name.text())
+                    SecondaryButton(
+                        stringResource(R.string.picker_add),
+                        onClick = { viewModel.onAction(PlacePickerAction.Add(r.place.id)) },
+                        enabled = !state.busy,
+                        modifier = Modifier.semantics { contentDescription = label },
+                    )
+                }
             }
         }
     }

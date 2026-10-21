@@ -49,7 +49,14 @@ internal fun TripProblem.text(dates: List<LocalDate> = emptyList()): UiText = wh
 
 data class TripCardUi(val id: TripId, val title: String, val start: LocalDate, val end: LocalDate, val placeCount: Int)
 
-data class TripListUiState(val loading: Boolean = true, val trips: List<TripCardUi> = emptyList(), val busy: Boolean = false, val message: UiText? = null)
+data class TripListUiState(
+    val loading: Boolean = true,
+    val trips: List<TripCardUi> = emptyList(),
+    val busy: Boolean = false,
+    val message: UiText? = null,
+    /** 목록을 못 읽었다. 빈 상태·샘플을 보이지 않는다(있던 여행 위에 샘플을 또 만들지 않게, PLN-L8). */
+    val loadFailed: Boolean = false,
+)
 
 sealed interface TripListAction {
     data object Refresh : TripListAction
@@ -83,10 +90,10 @@ class TripListViewModel(
         } catch (e: CancellationException) {
             throw e
         } catch (_: Exception) {
-            _state.update { it.copy(loading = false, message = UiText.Res(R.string.common_save_failed)) }
+            _state.update { it.copy(loading = false, loadFailed = true, message = UiText.Res(R.string.common_load_failed)) }
             return
         }
-        _state.update { s -> s.copy(loading = false, trips = trips.map { TripCardUi(it.id, it.title, it.start, it.end, it.placeCount) }) }
+        _state.update { s -> s.copy(loading = false, loadFailed = false, message = null, trips = trips.map { TripCardUi(it.id, it.title, it.start, it.end, it.placeCount) }) }
     }
 
     fun onAction(action: TripListAction) {
@@ -99,13 +106,21 @@ class TripListViewModel(
     /** 프로토타입의 sample trip. 오늘 하루, 등록 장소 세 곳. 이름은 사용자가 나중에 고친다. */
     private suspend fun sample(title: String) {
         _state.update { it.copy(busy = true, message = null) }
+        // 장소부터 읽는다. 못 읽으면 빈 샘플 여행을 남기지 않고 안내한다(PLN-M2).
+        val places = try {
+            PlaceListing.visiblePlaces(content.load()).take(3)
+        } catch (e: CancellationException) {
+            throw e
+        } catch (_: Exception) {
+            _state.update { it.copy(busy = false, message = UiText.Res(R.string.common_load_failed)) }
+            return
+        }
         val today = clock.seoulToday()
         val made = editor.create(title, today, today)
         if (made !is TripResult.Ok) {
             _state.update { it.copy(busy = false, message = UiText.Res(R.string.common_save_failed)) }
             return
         }
-        val places = PlaceListing.visiblePlaces(content.load()).take(3)
         places.forEach { editor.addStop(made.trip.id, today, it.id.value) }
         load()
         _state.update { it.copy(busy = false) }
@@ -132,6 +147,10 @@ data class TripFormUiState(
     val confirmDiscard: Boolean = false,
     val confirmDelete: Boolean = false,
     val message: UiText? = null,
+    /** 저장이 실패해 오류를 보인 횟수. 같은 오류로 다시 저장해도 화면이 매번 오류로 스크롤·알린다(PLN-M3). */
+    val errorShownCount: Int = 0,
+    /** 편집할 여행이 없다. 저장할 수 없다(PLN-L10). */
+    val missing: Boolean = false,
 )
 
 sealed interface TripFormAction {
@@ -151,6 +170,9 @@ sealed interface TripFormEffect {
     data class Saved(val id: TripId, val created: Boolean) : TripFormEffect
     data object Deleted : TripFormEffect
     data object Close : TripFormEffect
+
+    /** 무료 상태라 바꿀 수 없다. SC21 을 연다(E-12, PLN-M7). */
+    data object Upgrade : TripFormEffect
 }
 
 /** SC12 여행 만들기·고치기 (FR17, UX02·07). Save 로만 확정한다. 편집 중 Back 은 확인(SC20). */
@@ -170,7 +192,7 @@ class TripFormViewModel(
         viewModelScope.launch {
             val trip = tripId?.let { runCatching { store.get(it) }.getOrNull() }
             _state.update {
-                if (trip == null) it.copy(loading = false, message = if (tripId != null) UiText.Res(R.string.trip_error_missing) else null)
+                if (trip == null) it.copy(loading = false, missing = tripId != null, message = if (tripId != null) UiText.Res(R.string.trip_error_missing) else null)
                 else it.copy(loading = false, title = trip.title, start = trip.start, end = trip.end)
             }
         }
@@ -186,7 +208,12 @@ class TripFormViewModel(
             }
             is TripFormAction.End -> _state.update { it.copy(end = action.date, endError = null, dirty = true) }
             TripFormAction.Save -> save()
-            TripFormAction.Back -> if (_state.value.dirty) _state.update { it.copy(confirmDiscard = true) } else close()
+            // 저장 중에는 떠나지 않는다. 이미 저장된 여행을 버렸다고 여기지 않게(PLN-L1).
+            TripFormAction.Back -> when {
+                _state.value.saving -> Unit
+                _state.value.dirty -> _state.update { it.copy(confirmDiscard = true) }
+                else -> close()
+            }
             TripFormAction.KeepEditing -> _state.update { it.copy(confirmDiscard = false) }
             TripFormAction.ConfirmDiscard -> close()
             TripFormAction.Delete -> _state.update { it.copy(confirmDelete = true) }
@@ -208,7 +235,7 @@ class TripFormViewModel(
 
     private fun save() {
         val s = _state.value
-        if (s.saving) return
+        if (s.saving || s.missing) return
         _state.update { it.copy(saving = true, message = null) }
         viewModelScope.launch {
             val r = if (tripId == null) editor.create(s.title, s.start, s.end) else editor.update(tripId, s.title, s.start, s.end)
@@ -217,16 +244,25 @@ class TripFormViewModel(
                     _state.update { it.copy(saving = false, dirty = false) }
                     _effects.send(TripFormEffect.Saved(r.trip.id, created = tripId == null))
                 }
-                is TripResult.Rejected -> {
-                    val field = if (r.problem == TripProblem.TitleBlank) TripField.Title else TripField.End
-                    _state.update {
-                        it.copy(
-                            saving = false,
-                            titleError = if (field == TripField.Title) r.problem.text() else null,
-                            endError = if (field == TripField.End) r.problem.text(r.dates) else null,
-                            focusError = field,
-                        )
+                is TripResult.Rejected -> when (r.problem) {
+                    TripProblem.PaidOnly -> {
+                        _state.update { it.copy(saving = false) }
+                        _effects.send(TripFormEffect.Upgrade)
                     }
+                    TripProblem.TitleBlank, TripProblem.EndBeforeStart, TripProblem.TooLong, TripProblem.StopsOutsideDates -> {
+                        val field = if (r.problem == TripProblem.TitleBlank) TripField.Title else TripField.End
+                        _state.update {
+                            it.copy(
+                                saving = false,
+                                titleError = if (field == TripField.Title) r.problem.text() else null,
+                                endError = if (field == TripField.End) r.problem.text(r.dates) else null,
+                                focusError = field,
+                                errorShownCount = it.errorShownCount + 1,
+                            )
+                        }
+                    }
+                    // 날짜 칸의 문제가 아니다. 일반 안내로 보인다(PLN-M7).
+                    else -> _state.update { it.copy(saving = false, message = r.problem.text(r.dates)) }
                 }
                 TripResult.SaveFailed -> _state.update { it.copy(saving = false, message = UiText.Res(R.string.common_save_failed)) }
             }
@@ -274,12 +310,27 @@ class AddToPlanViewModel(
         viewModelScope.launch { load() }
     }
 
+    /** 지난번에 본 여행들. 다시 읽었을 때 새로 생긴 여행(SC12 에서 방금 만든 것)을 고른다(PLN-M1, UI03). */
+    private var known: Set<TripId>? = null
+
     private suspend fun load() {
-        val trips = runCatching { store.all() }.getOrDefault(emptyList())
+        val trips = try {
+            store.all()
+        } catch (e: CancellationException) {
+            throw e
+        } catch (_: Exception) {
+            // 못 읽었다고 "여행 없음"으로 보이지 않는다(PLN-L5).
+            _state.update { it.copy(loading = false, message = UiText.Res(R.string.common_load_failed)) }
+            return
+        }
+        val before = known
+        known = trips.map { it.id }.toSet()
+        val created = if (before == null) null else trips.lastOrNull { it.id !in before }
         _state.update { s ->
-            val trip = trips.firstOrNull { it.id == s.selectedTrip } ?: trips.firstOrNull()
-            val date = s.selectedDate?.takeIf { d -> trip != null && !d.isBefore(trip.start) && !d.isAfter(trip.end) } ?: trip?.start
-            s.copy(loading = false, trips = trips, selectedTrip = trip?.id, selectedDate = date)
+            val trip = created ?: trips.firstOrNull { it.id == s.selectedTrip } ?: trips.firstOrNull()
+            val keepDate = created == null && trip != null && s.selectedDate?.let { d -> !d.isBefore(trip.start) && !d.isAfter(trip.end) } == true
+            // 다시 열면 지난 안내(중복 등)를 지운다(PLN-L4).
+            s.copy(loading = false, trips = trips, selectedTrip = trip?.id, selectedDate = if (keepDate) s.selectedDate else trip?.start, message = null)
         }
     }
 
@@ -323,6 +374,7 @@ data class PlacePickerUiState(
     val query: String = "",
     val results: List<PickPlaceUi> = emptyList(),
     val message: UiText? = null,
+    val busy: Boolean = false,
 )
 
 sealed interface PlacePickerAction {
@@ -358,8 +410,12 @@ class PlacePickerViewModel(
                 _state.update { it.copy(query = action.text) }
                 filter()
             }
-            is PlacePickerAction.Add -> viewModelScope.launch {
-                when (val r = editor.addStop(tripId, date, action.place.value)) {
+            // 빠른 두 번 탭이 "이미 있음" 오류로 보이지 않게 한 번에 하나(PLN-L6).
+            is PlacePickerAction.Add -> if (!_state.value.busy) viewModelScope.launch {
+                _state.update { it.copy(busy = true) }
+                val r = editor.addStop(tripId, date, action.place.value)
+                _state.update { it.copy(busy = false) }
+                when (r) {
                     is TripResult.Ok -> {
                         added = r.trip.day(date).stops.map { it.place }.toSet()
                         _state.update { it.copy(message = null) }
