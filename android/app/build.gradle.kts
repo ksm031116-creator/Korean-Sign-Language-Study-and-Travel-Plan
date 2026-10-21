@@ -75,6 +75,19 @@ kotlin {
     jvmToolchain(17)
 }
 
+// 스토어에 올리는 번들(bundleRelease)은 중계 서버 주소 없이 만들지 않는다(Phase 15 리뷰 RVW-07). 서버가 없으면 리뷰·평점·경로가
+// 모두 "연결되지 않음"인 앱이 출시된다. assembleRelease(CI 게이트의 릴리스 조립 검사)는 서버 없이도 만든다.
+val storeApiBaseUrl = (project.findProperty("apiBaseUrl") as String?).orEmpty().trim()
+val checkStoreRelease by tasks.registering {
+    group = "verification"
+    description = "스토어 번들에 중계 서버 주소가 들어가는지 확인한다 (RVW-07)."
+    val url = storeApiBaseUrl
+    doLast {
+        check(url.isNotEmpty()) { "스토어 번들에는 -PapiBaseUrl=https://... 이 필요하다. 서버 없이 출시하면 리뷰·경로가 모두 비어 있다 (RVW-07)." }
+    }
+}
+tasks.matching { it.name == "bundleRelease" }.configureEach { dependsOn(checkStoreRelease) }
+
 roborazzi {
     outputDir.set(file("src/test/screenshots"))
 }
