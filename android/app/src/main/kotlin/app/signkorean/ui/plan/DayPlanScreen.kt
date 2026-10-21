@@ -54,6 +54,7 @@ import app.signkorean.ui.designsystem.AppBottomSheet
 import app.signkorean.ui.designsystem.AppChip
 import app.signkorean.ui.designsystem.ConfirmDialog
 import app.signkorean.ui.designsystem.EmptyState
+import app.signkorean.ui.designsystem.ErrorState
 import app.signkorean.ui.designsystem.LockBadge
 import app.signkorean.ui.designsystem.PrimaryButton
 import app.signkorean.ui.designsystem.QuietButton
@@ -85,9 +86,10 @@ fun DayPlanScreen(
     viewModel: DayPlanViewModel = koinViewModel { parametersOf(trip, date) },
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
-    // SC14·SC12·SC21 에서 돌아오면 다시 읽는다.
+    // SC14·SC12·SC21 에서 돌아오면 다시 읽는다. 처음 열 때는 뷰모델이 이미 읽으므로 건너뛴다(DPV-L4).
+    var resumedOnce by rememberSaveable { mutableStateOf(false) }
     LifecycleResumeEffect(viewModel) {
-        viewModel.onAction(DayPlanAction.Refresh)
+        if (resumedOnce) viewModel.onAction(DayPlanAction.Refresh) else resumedOnce = true
         onPauseOrDispose { }
     }
     LaunchedEffect(viewModel) {
@@ -108,6 +110,13 @@ fun DayPlanContent(state: DayPlanUiState, onAction: (DayPlanAction) -> Unit, onC
     val formats = rememberAppFormats()
     if (state.loading) return
     val trip = state.trip
+    if (state.loadFailed || trip == null && !state.missing) {
+        Column(Modifier.fillMaxSize().padding(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            IconButton(onClick = onClose) { Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.action_back)) }
+            ErrorState(stringResource(R.string.day_load_failed), onRetry = { onAction(DayPlanAction.Refresh) })
+        }
+        return
+    }
     if (state.missing || trip == null) {
         Column(Modifier.fillMaxSize().padding(20.dp)) {
             IconButton(onClick = onClose) { Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.action_back)) }
@@ -125,7 +134,18 @@ fun DayPlanContent(state: DayPlanUiState, onAction: (DayPlanAction) -> Unit, onC
     state.editing?.let { stopId -> state.rows.firstOrNull { it.stop.id == stopId }?.let { StopSheet(it, state, onAction) } }
     if (state.startSheet) StartSheet(state, onAction)
 
-    LazyColumn(Modifier.fillMaxSize().background(t.paper), contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+    Column(Modifier.fillMaxSize().background(t.paper)) {
+    // 저장 실패 등 안내는 목록 밖에 고정한다. 아래로 스크롤해 있어도 보인다(DPV-M2).
+    state.message?.takeIf { state.editing == null && !state.startSheet }?.let {
+        Text(
+            it.asString(),
+            color = t.danger,
+            style = MaterialTheme.typography.bodyMedium,
+            modifier = Modifier.fillMaxWidth().background(t.dangerSoft).padding(horizontal = 20.dp, vertical = 10.dp)
+                .semantics { liveRegion = LiveRegionMode.Polite },
+        )
+    }
+    LazyColumn(Modifier.weight(1f).fillMaxWidth(), contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         item { IconButton(onClick = onClose) { Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.action_back)) } }
         item {
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -163,7 +183,7 @@ fun DayPlanContent(state: DayPlanUiState, onAction: (DayPlanAction) -> Unit, onC
                         val origin = when (val o = day.origin) {
                             null -> stringResource(R.string.day_no_origin)
                             is Origin.AtPlace -> stringResource(R.string.day_from, state.originPlace?.name?.text() ?: o.place.value)
-                            is Origin.AtCoordinate -> stringResource(R.string.day_from, o.label ?: "%.4f, %.4f".format(o.coordinate.lat, o.coordinate.lng))
+                            is Origin.AtCoordinate -> stringResource(R.string.day_from, o.label ?: String.format(java.util.Locale.ROOT, "%.4f, %.4f", o.coordinate.lat, o.coordinate.lng))
                         }
                         Text(origin, style = MaterialTheme.typography.bodyMedium, color = t.muted)
                     }
@@ -172,12 +192,11 @@ fun DayPlanContent(state: DayPlanUiState, onAction: (DayPlanAction) -> Unit, onC
             }
         }
         if (state.needsRecalculation) item { Notice(stringResource(R.string.day_recalc)) }
-        state.message?.let { item { Text(it.asString(), color = t.danger, modifier = Modifier.semantics { liveRegion = LiveRegionMode.Polite }) } }
         if (state.rows.isEmpty()) item { EmptyState(title = stringResource(R.string.day_empty), body = "") }
         itemsIndexed(state.rows, key = { _, r -> r.stop.id.value }) { i, row ->
-            StopRow(i, row, state.rows.size, state.readOnly, formats, onAction)
+            StopRow(i, row, state.rows.size, state.readOnly, state.busy, formats, onAction)
         }
-        if (!state.readOnly) item { SecondaryButton(stringResource(R.string.day_add_place), onClick = { onAction(DayPlanAction.AddPlace) }, modifier = Modifier.fillMaxWidth()) }
+        if (!state.readOnly) item { SecondaryButton(stringResource(R.string.day_add_place), onClick = { onAction(DayPlanAction.AddPlace) }, enabled = !state.busy, modifier = Modifier.fillMaxWidth()) }
         state.schedule?.takeIf { state.rows.isNotEmpty() }?.let { s ->
             item {
                 Column(
@@ -194,16 +213,20 @@ fun DayPlanContent(state: DayPlanUiState, onAction: (DayPlanAction) -> Unit, onC
                     )
                     // 허위 합계 대신 이유를 말한다 (FR20, UX04). 다음 날 도착·반올림 안내 (PRD §9.2).
                     if (s.incomplete) Text(stringResource(R.string.day_incomplete), style = MaterialTheme.typography.bodySmall, color = t.muted)
+                    state.rows.lastOrNull()?.timing?.leaveDay?.takeIf { it > 0 && end != null }?.let { d ->
+                        StatusBadge(stringResource(R.string.day_end_offset, pluralStringResource(R.plurals.day_plus_days, d, d)), StatusTone.Learning)
+                    }
                     if (s.nextDay) Text(stringResource(R.string.day_next_day), style = MaterialTheme.typography.bodySmall, color = t.danger)
                     if (s.roundingDiffers) Text(stringResource(R.string.day_rounding), style = MaterialTheme.typography.bodySmall, color = t.muted)
                 }
             }
         }
     }
+    }
 }
 
 @Composable
-private fun StopRow(index: Int, row: StopRowUi, count: Int, readOnly: Boolean, formats: AppFormats, onAction: (DayPlanAction) -> Unit) {
+private fun StopRow(index: Int, row: StopRowUi, count: Int, readOnly: Boolean, busy: Boolean, formats: AppFormats, onAction: (DayPlanAction) -> Unit) {
     val t = SignKoreanTheme.tokens
     val name = row.place?.name?.text() ?: row.stop.place.value
     Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
@@ -217,7 +240,7 @@ private fun StopRow(index: Int, row: StopRowUi, count: Int, readOnly: Boolean, f
         }
         Row(
             Modifier.fillMaxWidth().background(t.surface, RoundedCornerShape(14.dp))
-                .then(if (readOnly) Modifier else Modifier.clickable(role = Role.Button) { onAction(DayPlanAction.OpenStop(row.stop.id)) })
+                .then(if (readOnly) Modifier else Modifier.clickable(enabled = !busy, role = Role.Button, onClickLabel = stringResource(R.string.stop_open, name)) { onAction(DayPlanAction.OpenStop(row.stop.id)) })
                 .padding(12.dp),
             horizontalArrangement = Arrangement.spacedBy(10.dp),
             verticalAlignment = Alignment.CenterVertically,
@@ -232,7 +255,9 @@ private fun StopRow(index: Int, row: StopRowUi, count: Int, readOnly: Boolean, f
                 if (timing != null && arrive != null && leave != null) {
                     Row(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalAlignment = Alignment.CenterVertically) {
                         Text(stringResource(R.string.day_times, formats.time(arrive), formats.time(leave)), style = MaterialTheme.typography.bodyMedium)
-                        if (timing.arriveDay > 0) StatusBadge(stringResource(R.string.day_plus_days, timing.arriveDay), StatusTone.Learning)
+                        // 자정을 넘기면 도착·출발 각각 며칠 뒤인지 표시한다(DPV-M3).
+                        if (timing.arriveDay > 0) StatusBadge(stringResource(R.string.day_arrive_offset, pluralStringResource(R.plurals.day_plus_days, timing.arriveDay, timing.arriveDay)), StatusTone.Learning)
+                        if (timing.leaveDay > timing.arriveDay) StatusBadge(stringResource(R.string.day_leave_offset, pluralStringResource(R.plurals.day_plus_days, timing.leaveDay, timing.leaveDay)), StatusTone.Learning)
                     }
                 }
                 Text(
@@ -245,10 +270,10 @@ private fun StopRow(index: Int, row: StopRowUi, count: Int, readOnly: Boolean, f
             // 끌기 대신 위·아래 버튼으로 순서를 바꾼다. 스크린리더·키보드로도 된다(UX06).
             if (!readOnly) {
                 Column {
-                    IconButton(onClick = { onAction(DayPlanAction.MoveUp(row.stop.id)) }, enabled = index > 0) {
+                    IconButton(onClick = { onAction(DayPlanAction.MoveUp(row.stop.id)) }, enabled = !busy && index > 0) {
                         Icon(Icons.Filled.KeyboardArrowUp, contentDescription = stringResource(R.string.day_move_up, name))
                     }
-                    IconButton(onClick = { onAction(DayPlanAction.MoveDown(row.stop.id)) }, enabled = index < count - 1) {
+                    IconButton(onClick = { onAction(DayPlanAction.MoveDown(row.stop.id)) }, enabled = !busy && index < count - 1) {
                         Icon(Icons.Filled.KeyboardArrowDown, contentDescription = stringResource(R.string.day_move_down, name))
                     }
                 }
@@ -278,7 +303,7 @@ private fun StopSheet(row: StopRowUi, state: DayPlanUiState, onAction: (DayPlanA
         val error = state.stayError?.asString()
         OutlinedTextField(
             value = stay,
-            onValueChange = { stay = it },
+            onValueChange = { stay = it; onAction(DayPlanAction.StayEdited) },
             label = { Text(stringResource(R.string.stop_stay_label)) },
             singleLine = true,
             isError = error != null,
@@ -291,37 +316,55 @@ private fun StopSheet(row: StopRowUi, state: DayPlanUiState, onAction: (DayPlanA
         if (others.isNotEmpty()) {
             Text(stringResource(R.string.stop_move), style = MaterialTheme.typography.labelLarge)
             Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                others.forEach { d -> AppChip(formats.date(d), selected = false, onClick = { onAction(DayPlanAction.MoveTo(row.stop.id, d)) }) }
+                others.forEach { d -> AppChip(formats.date(d), selected = false, onClick = { if (!state.busy) onAction(DayPlanAction.MoveTo(row.stop.id, d)) }) }
             }
         }
         state.message?.let { Text(it.asString(), color = SignKoreanTheme.tokens.danger) }
-        QuietButton(stringResource(R.string.stop_remove), onClick = { onAction(DayPlanAction.Remove(row.stop.id)) })
+        QuietButton(stringResource(R.string.stop_remove), onClick = { onAction(DayPlanAction.Remove(row.stop.id)) }, enabled = !state.busy)
     }
 }
-
-/** SC17 하루 출발 시트: 출발 시각(OS 시간 선택기)과 출발지. 현재 위치·추천 출발점은 SC19 (Phase 19). */
+/**
+ * SC17 하루 출발 시트: 출발 시각(OS 시간 선택기)과 출발지. 출발지는 없음·지금 출발지·그날 일정에 없는
+ * 등록 장소 중에서 고른다(DPV-H2). 현재 위치·추천 출발점은 SC19.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun StartSheet(state: DayPlanUiState, onAction: (DayPlanAction) -> Unit) {
     val day = state.day ?: return
     val picker = rememberTimePickerState(initialHour = day.startTime.hour, initialMinute = day.startTime.minute)
-    var origin by rememberSaveable { mutableStateOf(day.origin == null) }
+    // 고른 것: NONE, CURRENT, 또는 등록 장소 id.
+    var choice by rememberSaveable { mutableStateOf(if (day.origin == null) NONE else CURRENT) }
     AppBottomSheet(title = stringResource(R.string.start_title), onDismiss = { onAction(DayPlanAction.CloseSheet) }) {
         Text(stringResource(R.string.start_time), style = MaterialTheme.typography.labelLarge)
         TimePicker(state = picker)
         Text(stringResource(R.string.start_origin), style = MaterialTheme.typography.labelLarge)
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            AppChip(stringResource(R.string.day_no_origin), selected = origin, onClick = { origin = true })
+        Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            AppChip(stringResource(R.string.day_no_origin), selected = choice == NONE, onClick = { choice = NONE })
             day.origin?.let { o ->
                 val label = when (o) {
                     is Origin.AtPlace -> state.originPlace?.name?.text() ?: o.place.value
                     is Origin.AtCoordinate -> o.label ?: stringResource(R.string.start_origin)
                 }
-                AppChip(label, selected = !origin, onClick = { origin = false })
+                AppChip(label, selected = choice == CURRENT, onClick = { choice = CURRENT })
+            }
+        }
+        val candidates = state.originCandidates.filter { p -> (day.origin as? Origin.AtPlace)?.place != p.id }
+        if (candidates.isNotEmpty()) {
+            Text(stringResource(R.string.start_suggest_places), style = MaterialTheme.typography.labelMedium, color = SignKoreanTheme.tokens.muted)
+            Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                candidates.forEach { p -> AppChip(p.name.text(), selected = choice == p.id.value, onClick = { choice = p.id.value }) }
             }
         }
         PrimaryButton(stringResource(R.string.start_apply), onClick = {
-            onAction(DayPlanAction.ApplyStart(LocalTime.of(picker.hour, picker.minute), if (origin) null else day.origin))
+            val origin = when (choice) {
+                NONE -> null
+                CURRENT -> day.origin
+                else -> Origin.AtPlace(app.signkorean.domain.content.PlaceId(choice))
+            }
+            onAction(DayPlanAction.ApplyStart(LocalTime.of(picker.hour, picker.minute), origin))
         }, enabled = !state.busy, modifier = Modifier.fillMaxWidth())
     }
 }
+
+private const val NONE = "\u0000none"
+private const val CURRENT = "\u0000current"

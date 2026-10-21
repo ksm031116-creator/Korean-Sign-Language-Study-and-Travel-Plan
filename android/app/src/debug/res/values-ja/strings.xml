@@ -289,7 +289,15 @@
     <string name="day_move_up">%1$s を上へ</string>
     <string name="day_move_down">%1$s を下へ</string>
     <string name="day_times">%1$s〜%2$s</string>
-    <string name="day_plus_days">+%1$d 日</string>
+    <plurals name="day_plus_days">
+        <item quantity="other">+%1$d 日</item>
+    </plurals>
+    <string name="day_arrive_offset">到着 %1$s</string>
+    <string name="day_leave_offset">出発 %1$s</string>
+    <string name="day_end_offset">終了 %1$s</string>
+    <string name="day_load_failed">この旅行を開けませんでした。</string>
+    <string name="stop_open">%1$s を編集</string>
+    <string name="start_suggest_places">登録された場所</string>
     <string name="day_stay">滞在 %1$s</string>
     <string name="day_leg">徒歩 %1$s</string>
     <string name="day_leg_unknown">徒歩時間は未計算です</string>

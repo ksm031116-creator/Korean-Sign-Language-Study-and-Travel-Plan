@@ -51,6 +51,8 @@ data class StopRowUi(
 data class DayPlanUiState(
     val loading: Boolean = true,
     val missing: Boolean = false,
+    /** 여행을 읽지 못했다. "여행 없음"과 다르다 — 다시 시도할 수 있다(DPV-H1). */
+    val loadFailed: Boolean = false,
     val trip: Trip? = null,
     val date: LocalDate? = null,
     val day: TripDay? = null,
@@ -59,6 +61,8 @@ data class DayPlanUiState(
     /** 무료 상태: 보기만 된다(E-12). 편집하려 하면 SC21. */
     val readOnly: Boolean = false,
     val originPlace: Place? = null,
+    /** SC17 출발지 후보: 그날 일정에 없는 등록 장소(DPV-H2). */
+    val originCandidates: List<Place> = emptyList(),
     val busy: Boolean = false,
     val message: UiText? = null,
     /** SC16 시트가 열린 장소. */
@@ -80,6 +84,8 @@ sealed interface DayPlanAction {
     data class MoveDown(val stop: StopId) : DayPlanAction
     data class OpenStop(val stop: StopId) : DayPlanAction
     data object CloseSheet : DayPlanAction
+    /** 체류 시간을 고쳐 쓰기 시작했다. 이전 오류를 지운다(DPV-L5). */
+    data object StayEdited : DayPlanAction
     data class SaveStay(val stop: StopId, val text: String) : DayPlanAction
     data class MoveTo(val stop: StopId, val date: LocalDate) : DayPlanAction
     data class Remove(val stop: StopId) : DayPlanAction
@@ -122,25 +128,37 @@ class DayPlanViewModel(
         viewModelScope.launch { load() }
     }
 
+    /** 권한을 못 읽으면 보기만 한다 — 편집을 열어 두지 않는다(DPV-L11). */
+    private suspend fun readOnly(): Boolean = try {
+        entitlement.current() != Entitlement.Paid
+    } catch (e: CancellationException) {
+        throw e
+    } catch (_: Exception) {
+        true
+    }
+
+    /** 그리기 세대. 늦게 끝난 이전 그리기가 새 화면을 덮지 않게 한다(DPV-M1). */
+    private var generation = 0
+
     private suspend fun load() {
         try {
-            val p = pack ?: content.load().also { pack = it }
+            if (pack == null) pack = content.load()
             val trip = store.get(tripId)
             if (trip == null) {
                 _state.update { it.copy(loading = false, missing = true) }
                 return
             }
-            val readOnly = entitlement.current() != Entitlement.Paid
-            show(trip, readOnly)
+            show(trip, readOnly())
         } catch (e: CancellationException) {
             throw e
         } catch (_: Exception) {
-            _state.update { it.copy(loading = false, message = UiText.Res(R.string.common_save_failed)) }
+            _state.update { it.copy(loading = false, loadFailed = it.trip == null, message = if (it.trip == null) null else UiText.Res(R.string.common_load_failed)) }
         }
     }
 
     private suspend fun show(trip: Trip, readOnly: Boolean = _state.value.readOnly) {
         val p = pack ?: return
+        val gen = ++generation
         val date = _state.value.date?.takeIf { d -> trip.days.any { it.date == d } } ?: trip.start
         val day = trip.day(date)
         val places = p.places.associateBy { it.id }
@@ -151,6 +169,7 @@ class DayPlanViewModel(
         } catch (_: Exception) {
             List(legCount(day)) { null }
         }
+        if (gen != generation) return
         val schedule = ScheduleCalculator.calculate(day.startTime, day.origin != null, day.stops.map { it.stayMinutes }, legSeconds)
         val rows = day.stops.mapIndexed { i, stop ->
             val legIndex = if (day.origin != null) i else i - 1
@@ -165,21 +184,28 @@ class DayPlanViewModel(
         }
         _state.update {
             it.copy(
-                loading = false, missing = false, trip = trip, date = date, day = day, rows = rows, schedule = schedule, readOnly = readOnly,
+                loading = false, missing = false, loadFailed = false, trip = trip, date = date, day = day, rows = rows, schedule = schedule, readOnly = readOnly,
                 originPlace = (day.origin as? Origin.AtPlace)?.let { o -> places[o.place] },
+                originCandidates = originCandidates(p, day),
             )
         }
     }
 
     fun onAction(action: DayPlanAction) {
+        if (action == DayPlanAction.Refresh) {
+            viewModelScope.launch { load() }
+            return
+        }
         val s = _state.value
         val date = s.date ?: return
         if (s.readOnly && action.isEdit()) {
             viewModelScope.launch { _effects.send(DayPlanEffect.Upgrade(UpgradeFeature.Plan)) }
             return
         }
+        // 날짜를 막 바꿔 화면의 줄이 아직 이전 날이면 그 줄에 대한 편집은 받지 않는다(DPV-M1).
+        if (action.isRowEdit() && s.day?.date != date) return
         when (action) {
-            DayPlanAction.Refresh -> viewModelScope.launch { load() }
+            DayPlanAction.Refresh -> Unit
             is DayPlanAction.SelectDate -> {
                 _state.update { it.copy(date = action.date, editing = null, message = null) }
                 s.trip?.let { t -> viewModelScope.launch { show(t) } }
@@ -187,6 +213,7 @@ class DayPlanViewModel(
             is DayPlanAction.MoveUp -> s.indexOf(action.stop)?.let { i -> if (i > 0) apply { editor.reorder(tripId, date, action.stop, i - 1) } }
             is DayPlanAction.MoveDown -> s.indexOf(action.stop)?.let { i -> if (i < s.rows.lastIndex) apply { editor.reorder(tripId, date, action.stop, i + 1) } }
             is DayPlanAction.OpenStop -> _state.update { it.copy(editing = action.stop, stayError = null, message = null) }
+            DayPlanAction.StayEdited -> if (s.stayError != null) _state.update { it.copy(stayError = null) }
             DayPlanAction.CloseSheet -> _state.update { it.copy(editing = null, startSheet = false, stayError = null) }
             is DayPlanAction.SaveStay -> {
                 val minutes = TripRules.parseStay(action.text)
@@ -199,7 +226,8 @@ class DayPlanViewModel(
             is DayPlanAction.MoveTo -> apply(closeSheet = true) { editor.moveStop(tripId, date, action.stop, action.date) }
             is DayPlanAction.Remove -> _state.update { it.copy(confirmRemove = action.stop) }
             DayPlanAction.CancelRemove -> _state.update { it.copy(confirmRemove = null) }
-            DayPlanAction.ConfirmRemove -> s.confirmRemove?.let { stop ->
+            // 진행 중이면 창을 그대로 둔다. 눌렀는데 아무 일 없이 닫히지 않게(DPV-M6).
+            DayPlanAction.ConfirmRemove -> if (!s.busy) s.confirmRemove?.let { stop ->
                 _state.update { it.copy(confirmRemove = null) }
                 apply(closeSheet = true) { editor.removeStop(tripId, date, stop) }
             }
@@ -214,8 +242,11 @@ class DayPlanViewModel(
         is DayPlanAction.MoveUp, is DayPlanAction.MoveDown, is DayPlanAction.OpenStop, is DayPlanAction.SaveStay,
         is DayPlanAction.MoveTo, is DayPlanAction.Remove, DayPlanAction.ConfirmRemove, DayPlanAction.OpenStart,
         is DayPlanAction.ApplyStart, DayPlanAction.AddPlace, DayPlanAction.EditTrip -> true
-        DayPlanAction.Refresh, is DayPlanAction.SelectDate, DayPlanAction.CloseSheet, DayPlanAction.CancelRemove -> false
+        DayPlanAction.Refresh, is DayPlanAction.SelectDate, DayPlanAction.CloseSheet, DayPlanAction.CancelRemove, DayPlanAction.StayEdited -> false
     }
+
+    /** 보이는 그날 줄을 대상으로 하는 편집. */
+    private fun DayPlanAction.isRowEdit(): Boolean = isEdit() && this != DayPlanAction.AddPlace && this != DayPlanAction.EditTrip
 
     private fun DayPlanUiState.indexOf(stop: StopId): Int? = rows.indexOfFirst { it.stop.id == stop }.takeIf { it >= 0 }
 
@@ -226,8 +257,13 @@ class DayPlanViewModel(
         viewModelScope.launch {
             when (val r = change()) {
                 is TripResult.Ok -> {
-                    _state.update { it.copy(busy = false, stayError = null, editing = if (closeSheet) null else it.editing, startSheet = if (closeSheet) false else it.startSheet) }
-                    show(r.trip)
+                    _state.update { it.copy(stayError = null, editing = if (closeSheet) null else it.editing, startSheet = if (closeSheet) false else it.startSheet) }
+                    // 새 시각을 그린 뒤에 풀어 준다. 그 사이 다른 편집이 옛 줄을 보고 들어오지 않게(DPV-M1).
+                    try {
+                        show(r.trip)
+                    } finally {
+                        _state.update { it.copy(busy = false) }
+                    }
                 }
                 is TripResult.Rejected -> {
                     if (r.problem == TripProblem.PaidOnly) _effects.send(DayPlanEffect.Upgrade(UpgradeFeature.Plan))
@@ -239,6 +275,6 @@ class DayPlanViewModel(
     }
 }
 
-/** SC17 의 출발지 후보: 그날 일정에 없는 등록 장소. 현재 위치·추천 출발점은 Phase 19 (SC19). */
+/** SC17 의 출발지 후보: 그날 일정에 없는 등록 장소. 현재 위치·추천 출발점은 SC19. */
 internal fun originCandidates(pack: ContentPack, day: TripDay): List<Place> =
     PlaceListing.visiblePlaces(pack).filter { p -> day.stops.none { it.place == p.id } }
