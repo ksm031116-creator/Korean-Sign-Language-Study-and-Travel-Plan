@@ -27,6 +27,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import app.signkorean.ui.reviews.ReviewsSheet
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -92,11 +96,13 @@ fun PlacesScreen(
             }
         }
     }
-    PlacesContent(state, viewModel::onAction, onClose)
+    var reviewsFor by rememberSaveable { mutableStateOf<String?>(null) }
+    PlacesContent(state, viewModel::onAction, onClose, onOpenReviews = { reviewsFor = it.value })
+    reviewsFor?.let { ReviewsSheet(PlaceId(it), onDismiss = { reviewsFor = null }) }
 }
 
 @Composable
-fun PlacesContent(state: PlacesUiState, onAction: (PlacesAction) -> Unit, onClose: () -> Unit) {
+fun PlacesContent(state: PlacesUiState, onAction: (PlacesAction) -> Unit, onClose: () -> Unit, onOpenReviews: (PlaceId) -> Unit = {}) {
     val t = SignKoreanTheme.tokens
     if (state.loading) return
     // 장소가 많은 유형(시장 등)도 보이는 카드의 사진만 받도록 지연 목록으로 그린다(Phase 14 리뷰 PLC-08).
@@ -130,7 +136,7 @@ fun PlacesContent(state: PlacesUiState, onAction: (PlacesAction) -> Unit, onClos
                             Text(group.area.name.text(), style = MaterialTheme.typography.titleMedium, modifier = Modifier.semantics { heading() })
                         }
                         items(group.places, key = { it.id.value }) { place ->
-                            PlaceCard(place, group.area.color, state.summaryFor(place.id), state.summary == SummaryState.Loading, state.paid, onAction)
+                            PlaceCard(place, group.area.color, state.summaryFor(place.id), state.summary == SummaryState.Loading, state.paid, onAction, onOpenReviews)
                         }
                     }
                 }
@@ -158,7 +164,7 @@ private fun SignStrip(card: SignCard, onPlay: () -> Unit) {
 }
 
 @Composable
-private fun PlaceCard(place: Place, areaColor: String, summary: PlaceSummary?, summaryLoading: Boolean, paid: Boolean, onAction: (PlacesAction) -> Unit) {
+private fun PlaceCard(place: Place, areaColor: String, summary: PlaceSummary?, summaryLoading: Boolean, paid: Boolean, onAction: (PlacesAction) -> Unit, onOpenReviews: (PlaceId) -> Unit) {
     val t = SignKoreanTheme.tokens
     val openLabel = stringResource(R.string.place_open, place.name.text())
     Column(
@@ -180,6 +186,8 @@ private fun PlaceCard(place: Place, areaColor: String, summary: PlaceSummary?, s
             summary.excerpt?.let { Text(it, style = MaterialTheme.typography.bodyMedium, maxLines = 3) }
         }
         Text(place.address.text(), style = MaterialTheme.typography.bodySmall, color = t.muted)
+        // 리뷰는 무료다(PRD §3.4). 자물쇠 없이 바로 연다.
+        QuietButton(stringResource(R.string.reviews_title), onClick = { onOpenReviews(place.id) })
         PaidActions(paid, onUpgrade = { onAction(PlacesAction.Upgrade(it)) })
     }
 }
@@ -236,11 +244,13 @@ fun PlaceDetailScreen(
             }
         }
     }
-    PlaceDetailContent(state, viewModel::onAction, onClose)
+    var reviewsOpen by rememberSaveable { mutableStateOf(false) }
+    PlaceDetailContent(state, viewModel::onAction, onClose, onOpenReviews = { reviewsOpen = true })
+    if (reviewsOpen) ReviewsSheet(place, onDismiss = { reviewsOpen = false })
 }
 
 @Composable
-fun PlaceDetailContent(state: PlaceDetailUiState, onAction: (PlaceDetailAction) -> Unit, onClose: () -> Unit) {
+fun PlaceDetailContent(state: PlaceDetailUiState, onAction: (PlaceDetailAction) -> Unit, onClose: () -> Unit, onOpenReviews: () -> Unit = {}) {
     val t = SignKoreanTheme.tokens
     if (state.loading) return
     if (state.confirmReplace) {
@@ -286,6 +296,7 @@ fun PlaceDetailContent(state: PlaceDetailUiState, onAction: (PlaceDetailAction) 
         val where = listOfNotNull(state.area?.name?.text(), state.typeLabel?.text()).filter { it.isNotBlank() }.joinToString(" · ")
         if (where.isNotEmpty()) Text(where, style = MaterialTheme.typography.labelLarge, color = t.primary)
         Text(place.address.text(), style = MaterialTheme.typography.bodyMedium, color = t.muted)
+        SecondaryButton(stringResource(R.string.reviews_title), onClick = onOpenReviews)
         PaidActions(state.paid, onUpgrade = { onAction(PlaceDetailAction.Upgrade(it)) })
 
         if (state.signs.isNotEmpty()) {

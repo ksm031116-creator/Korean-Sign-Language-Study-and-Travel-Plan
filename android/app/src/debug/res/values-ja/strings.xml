@@ -211,4 +211,21 @@
     <string name="place_open">%1$s を開く</string>
     <string name="lock_route">徒歩ルート</string>
     <string name="lock_add_to_plan">旅程に追加</string>
+
+    <string name="reviews_title">レビュー</string>
+    <string name="reviews_partial">%1$s のレビューの一部を表示しています。</string>
+    <string name="reviews_source">%1$s のレビュー</string>
+    <string name="reviews_in_english">英語のレビュー</string>
+    <string name="reviews_translated">翻訳</string>
+    <string name="reviews_show_original">原文を表示</string>
+    <string name="reviews_show_translation">翻訳を表示</string>
+    <string name="reviews_read_more">続きを読む</string>
+    <string name="reviews_read_less">閉じる</string>
+    <string name="reviews_rating">★ %1$d</string>
+    <string name="reviews_none">この場所のレビューはまだありません。</string>
+    <string name="reviews_language_unavailable">日本語と英語のレビューはありません。</string>
+    <string name="reviews_mismatch">レビューサービスでこの場所を特定できなかったため、レビューは表示していません。</string>
+    <string name="reviews_network">レビューを読み込めませんでした。</string>
+    <string name="reviews_not_connected">このバージョンでは、まだレビューを表示できません。</string>
+    <string name="reviews_open_source">元のページを開く</string>
 </resources>

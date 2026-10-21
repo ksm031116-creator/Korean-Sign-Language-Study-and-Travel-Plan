@@ -52,6 +52,14 @@ import app.signkorean.ui.plan.PlanGateViewModel
 import app.signkorean.ui.places.PlaceDetailViewModel
 import app.signkorean.ui.places.PlacesViewModel
 import app.signkorean.adapter.net.UnavailablePlaceSummaries
+import app.signkorean.adapter.net.UnavailableReviews
+import app.signkorean.adapter.net.ApiClient
+import app.signkorean.adapter.net.HttpPlaceSummaryProvider
+import app.signkorean.adapter.net.HttpReviewProvider
+import app.signkorean.BuildConfig
+import app.signkorean.domain.review.LoadReviews
+import app.signkorean.domain.review.ReviewProvider
+import app.signkorean.ui.reviews.ReviewsViewModel
 import app.signkorean.domain.place.PlaceSummaryProvider
 import app.signkorean.ui.upgrade.UpgradeViewModel
 import app.signkorean.domain.locale.CurrentLocale
@@ -93,9 +101,15 @@ val contentModule = module {
     single<ContentRepository> { AssetContentRepository(get(), get(), get(), get(), get()) }
 }
 
-/** 장소 (Phase 14). 리뷰 요약은 중계 서버가 생기기 전까지 "없음"이다(Phase 15 에서 HTTP). */
+/**
+ * 장소·리뷰 (Phase 14·15). 중계 서버 주소가 있으면 HTTP, 없으면 "연결되지 않음"이다 — 평점·리뷰를 지어내지 않는다.
+ * 디버그 빌드는 주소가 없을 때 표본 데이터로 덮어쓴다(variantModules).
+ */
 val placeModule = module {
-    single<PlaceSummaryProvider> { UnavailablePlaceSummaries }
+    single { ApiClient(BuildConfig.API_BASE_URL, io = get<AppDispatchers>().io) }
+    single<PlaceSummaryProvider> { if (BuildConfig.API_BASE_URL.isBlank()) UnavailablePlaceSummaries else HttpPlaceSummaryProvider(get()) }
+    single<ReviewProvider> { if (BuildConfig.API_BASE_URL.isBlank()) UnavailableReviews else HttpReviewProvider(get()) }
+    factory { LoadReviews(get()) }
 }
 
 /** 언어 (Phase 3). 앱 언어 저장은 AppCompat 하나만 한다 (설계서 §8.2). */
@@ -148,6 +162,7 @@ val uiModule = module {
     // 디버그 빌드의 모의 결제에만 다시 잠그기가 있다(variantModules). 릴리스는 null.
     viewModel { PlanGateViewModel(get(), getOrNull()) }
     viewModel { params -> PlacesViewModel(params.get(), get(), get(), get(), get(), get()) }
+    viewModel { params -> ReviewsViewModel(params.get(), get(), get(), get()) }
     viewModel { params -> PlaceDetailViewModel(params.get(), get(), get(), get(), get(), get(), get(), get(), get()) }
     viewModel { params -> CollectionViewModel(params.get(), get(), get(), get()) }
     viewModelOf(::AppGateViewModel)

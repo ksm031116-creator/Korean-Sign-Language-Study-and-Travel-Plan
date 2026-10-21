@@ -67,7 +67,7 @@ class ReviewsTest {
     fun `장소 이름·주소와 함께 리뷰를 불러오고, 실패하면 다시 시도한다`() = runTest {
         provider.answers[en] = ReviewResponse.Error(ReviewError.Timeout, null)
         val vm = vm()
-        assertEquals("Place gwangjang", vm.state.value.place?.name?.get(en))
+        assertEquals("Gwangjang Market", vm.state.value.place?.name?.get(en))
         assertEquals(ReviewState.NetworkFailure, vm.state.value.reviews)
         provider.answers[en] = ReviewResponse.Found(page)
         vm.onAction(ReviewsAction.Retry)

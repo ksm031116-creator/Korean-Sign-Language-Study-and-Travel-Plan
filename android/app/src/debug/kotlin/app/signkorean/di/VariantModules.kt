@@ -16,6 +16,12 @@ import app.signkorean.domain.place.PlaceListing
 import app.signkorean.domain.place.PlaceSummary
 import app.signkorean.domain.place.PlaceSummaryProvider
 import app.signkorean.domain.place.PlaceSummaryResult
+import app.signkorean.domain.content.PlaceId
+import app.signkorean.domain.review.Review
+import app.signkorean.domain.review.ReviewError
+import app.signkorean.domain.review.ReviewPage
+import app.signkorean.domain.review.ReviewProvider
+import app.signkorean.domain.review.ReviewResponse
 import kotlin.math.abs
 import org.koin.dsl.module
 import java.util.UUID
@@ -26,7 +32,8 @@ import java.util.UUID
  * 에뮬레이터 이미지에는 Play 스토어가 없고, 실결제는 Play Console 에 올린 빌드에서만 된다. 그래서 디버그 빌드는
  * 기본으로 모의 결제를 쓴다. 실기기에서 Play 결제를 시험하려면 `./gradlew installDebug -PrealBilling=true`.
  */
-val variantModules: List<Module> = listOf(sampleDataModule) + if (BuildConfig.SIMULATED_BILLING) {
+// 중계 서버 주소를 넣은 디버그 빌드는 실제 서버를 쓴다(표본으로 덮지 않는다).
+val variantModules: List<Module> = (if (BuildConfig.API_BASE_URL.isBlank()) listOf(sampleDataModule) else emptyList()) + if (BuildConfig.SIMULATED_BILLING) {
     listOf(
         module {
             single { SimulatedBillingGateway() }
@@ -51,6 +58,22 @@ val variantModules: List<Module> = listOf(sampleDataModule) + if (BuildConfig.SI
 // getter: 이 파일의 최상위 값은 위에서부터 초기화되므로, 위의 variantModules 가 읽을 때 아직 null 이 아니게.
 private val sampleDataModule get() = module {
     single<PlaceSummaryProvider> { SamplePlaceSummaries(get()) }
+    single<ReviewProvider> { SampleReviews }
+}
+
+/**
+ * 표본 리뷰. 영어만 있다 — 일본어 화면에서는 "영어 리뷰" 대체(L10N-10)가 보인다. 작성자 이름에 "Sample" 을 넣어
+ * 실제 리뷰로 보이지 않게 한다.
+ */
+object SampleReviews : ReviewProvider {
+    override suspend fun reviews(place: PlaceId, language: LocaleTag): ReviewResponse {
+        if (language.value != "en") return ReviewResponse.Error(ReviewError.NoData, sourceUrl = null)
+        val items = listOf(
+            Review("Sample reviewer A", 5, "Sample (debug build): easy to find from the station, and the sign above the door matched the card.", null, language, translated = false, originalText = null),
+            Review("Sample reviewer B", 4, "Sample (debug build): a provider translation of a Korean review.", null, language, translated = true, originalText = "샘플(디버그 빌드): 한국어 원문 리뷰입니다."),
+        )
+        return ReviewResponse.Found(ReviewPage(items, attribution = "Sample data (debug build)", sourceUrl = null, partial = true))
+    }
 }
 
 class SamplePlaceSummaries(private val content: ContentRepository) : PlaceSummaryProvider {

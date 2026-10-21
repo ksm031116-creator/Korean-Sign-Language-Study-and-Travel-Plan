@@ -239,6 +239,25 @@
     <string name="lock_route">Walking route</string>
     <string name="lock_add_to_plan">Add to plan</string>
 
+
+    <!-- 리뷰 (FR10·11). 출처·일부 목록 안내는 공급자 이름을 그대로 넣는다. 앱이 번역하지 않는다. -->
+    <string name="reviews_title">Reviews</string>
+    <string name="reviews_partial">Showing some reviews from %1$s.</string>
+    <string name="reviews_source">Reviews from %1$s.</string>
+    <string name="reviews_in_english">Reviews in English</string>
+    <string name="reviews_translated">Translated</string>
+    <string name="reviews_show_original">Show original</string>
+    <string name="reviews_show_translation">Show translation</string>
+    <string name="reviews_read_more">Read more</string>
+    <string name="reviews_read_less">Show less</string>
+    <string name="reviews_rating">★ %1$d</string>
+    <string name="reviews_none">No reviews for this place yet.</string>
+    <string name="reviews_language_unavailable">English reviews unavailable.</string>
+    <string name="reviews_mismatch">We couldn\'t match this place with the review service, so no reviews are shown.</string>
+    <string name="reviews_network">Couldn\'t load reviews.</string>
+    <string name="reviews_not_connected">Reviews aren\'t available in this version yet.</string>
+    <string name="reviews_open_source">Open the original page</string>
+
     <plurals name="places_count">
         <item quantity="one">%d place</item>
         <item quantity="other">%d places</item>

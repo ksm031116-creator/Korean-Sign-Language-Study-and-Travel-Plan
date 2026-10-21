@@ -12,3 +12,9 @@ import app.signkorean.domain.place.PlaceSummaryResult
 object UnavailablePlaceSummaries : PlaceSummaryProvider {
     override suspend fun summaries(card: CardId, language: LocaleTag) = PlaceSummaryResult.Unavailable
 }
+
+/** 중계 서버 주소가 없는 빌드의 리뷰 공급자. 리뷰를 지어내지 않고 "아직 연결되지 않음"으로 답한다. */
+object UnavailableReviews : app.signkorean.domain.review.ReviewProvider {
+    override suspend fun reviews(place: app.signkorean.domain.content.PlaceId, language: LocaleTag) =
+        app.signkorean.domain.review.ReviewResponse.Error(app.signkorean.domain.review.ReviewError.Unsupported, sourceUrl = null)
+}
