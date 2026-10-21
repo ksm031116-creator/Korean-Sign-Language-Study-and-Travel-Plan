@@ -292,3 +292,41 @@ class DayPlanViewModelTest {
         assertFalse(vm.state.value.busy)
     }
 }
+
+/** 경로가 모두 계산되면 "다시 계산" 안내를 끈다 (T-16, AT14). 일부라도 모르면 그대로 둔다. */
+@OptIn(ExperimentalCoroutinesApi::class)
+class DayPlanRecalculationTest {
+    private val clock = FixedClock(Instant.parse("2026-10-21T09:00:00Z"))
+    private val content = InMemoryContentRepository(ContentFixtures.pack(places = (1..3).map { ContentFixtures.place("p$it") }))
+    private val store = FakeTripStore()
+    private val editor = TripEditor(store, SequentialIdGenerator("id"), clock, content, { Entitlement.Paid })
+    private val d1 = LocalDate.of(2026, 11, 3)
+
+    @Before
+    fun setUp() = Dispatchers.setMain(UnconfinedTestDispatcher())
+
+    @After
+    fun tearDown() = Dispatchers.resetMain()
+
+    private suspend fun trip(): Trip {
+        val t = (editor.create("Autumn", d1, d1) as TripResult.Ok).trip
+        listOf("p1", "p2", "p3").forEach { editor.addStop(t.id, d1, it) }
+        return store.get(t.id)!!
+    }
+
+    @Test
+    fun `모든 구간을 알면 안내가 꺼지고 저장된다`() = runTest {
+        val t = trip()
+        val vm = DayPlanViewModel(t.id, null, store, editor, content, { _, day -> List(app.signkorean.domain.route.legCount(day)) { 120L } }, { Entitlement.Paid })
+        assertFalse(vm.state.value.needsRecalculation)
+        assertFalse(store.get(t.id)!!.day(d1).needsRecalculation)
+    }
+
+    @Test
+    fun `한 구간이라도 모르면 안내를 그대로 둔다`() = runTest {
+        val t = trip()
+        val vm = DayPlanViewModel(t.id, null, store, editor, content, { _, _ -> listOf(120L, null) }, { Entitlement.Paid })
+        assertTrue(vm.state.value.needsRecalculation)
+        assertTrue(store.get(t.id)!!.day(d1).needsRecalculation)
+    }
+}
