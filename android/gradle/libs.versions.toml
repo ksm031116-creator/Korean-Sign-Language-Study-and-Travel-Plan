@@ -19,6 +19,8 @@ ksp = "2.0.21-1.0.28"
 room = "2.6.1"
 datastore = "1.1.1"
 androidxTestCore = "1.6.1"
+# billing-ktx 는 Kotlin 2.2 표준 라이브러리를 끌어와 이 프로젝트의 Kotlin 2.0 컴파일러가 읽지 못한다. Java API 를 직접 감싼다.
+billing = "8.3.0"
 
 [libraries]
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
@@ -52,6 +54,7 @@ room-ktx = { module = "androidx.room:room-ktx", version.ref = "room" }
 room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
 room-testing = { module = "androidx.room:room-testing", version.ref = "room" }
 androidx-test-core = { module = "androidx.test:core", version.ref = "androidxTestCore" }
+play-billing = { module = "com.android.billingclient:billing", version.ref = "billing" }
 konsist = { module = "com.lemonappdev:konsist", version.ref = "konsist" }
 
 [plugins]

@@ -57,6 +57,8 @@ dependencies {
     implementation(libs.room.runtime)
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.room.ktx)
+    // 1회성 비소모성 상품 (설계서 §7.3). 결제 SDK 는 이 모듈 밖으로 나가지 않는다.
+    implementation(libs.play.billing)
     ksp(libs.room.compiler)
 
     // Robolectric 이 JUnit 4 러너만 지원하므로 Android 모듈의 단위 테스트는 JUnit 4 로 쓴다 (설계서 §9.1).
