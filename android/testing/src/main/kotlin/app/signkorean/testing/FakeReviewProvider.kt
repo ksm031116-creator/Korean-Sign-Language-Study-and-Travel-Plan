@@ -16,6 +16,8 @@ class FakeReviewProvider : ReviewProvider {
     val requests = mutableListOf<Pair<PlaceId, LocaleTag>>()
 
     @Volatile var throwNext = false
+    /** 응답 전 가상 시간 지연(ms). runTest 의 가상 시계로 흐른다. */
+    @Volatile var delayMs = 0L
     @Volatile var hold = false
     private var gate = CompletableDeferred<Unit>()
 
@@ -27,6 +29,7 @@ class FakeReviewProvider : ReviewProvider {
             gate.await()
             gate = CompletableDeferred()
         }
+        if (delayMs > 0) kotlinx.coroutines.delay(delayMs)
         if (throwNext) {
             throwNext = false
             throw IllegalStateException("provider crashed")

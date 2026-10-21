@@ -27,4 +27,15 @@ class ExternalLinksTest {
         assertFalse(ExternalLinks.isAllowed(""))
         assertFalse(ExternalLinks.isAllowed("not a url"))
     }
+
+    @Test
+    fun `RVW-21 대문자·포트·IPv6·백슬래시·호스트 없는 주소·IDN 회귀`() {
+        assertTrue(ExternalLinks.isAllowed("HTTPS://Place.Map.Kakao.com/1"))
+        assertFalse(ExternalLinks.isAllowed("https://place.map.kakao.com:8443/1"), "기본 포트가 아니면 막는다")
+        assertFalse(ExternalLinks.isAllowed("https://[::1]/kakao.com"))
+        assertFalse(ExternalLinks.isAllowed("https://evil.io\\@place.map.kakao.com/"))
+        assertFalse(ExternalLinks.isAllowed("https:place.map.kakao.com"))
+        assertFalse(ExternalLinks.isAllowed("https:///place.map.kakao.com"))
+        assertFalse(ExternalLinks.isAllowed("https://kаkao.com/1"), "키릴 문자 а 로 꾸민 주소")
+    }
 }

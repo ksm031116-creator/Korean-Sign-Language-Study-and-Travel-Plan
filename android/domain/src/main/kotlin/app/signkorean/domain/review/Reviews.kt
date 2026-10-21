@@ -3,6 +3,7 @@ package app.signkorean.domain.review
 import app.signkorean.domain.common.LocaleTag
 import app.signkorean.domain.content.PlaceId
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.withTimeoutOrNull
 import java.net.URI
 import java.time.Instant
 
@@ -67,14 +68,24 @@ sealed interface ReviewState {
  * 리뷰 불러오기 (설계서 §8.6). 사용자 언어 → 없으면 영어 한 번 더 → 없으면 "언어 없음" + 원문 링크.
  * 기계 번역으로 채우지 않는다(FR10·11).
  */
-class LoadReviews(private val provider: ReviewProvider) {
+class LoadReviews(private val provider: ReviewProvider, private val timeoutMs: Long = TIMEOUT_MS) {
 
-    suspend operator fun invoke(place: PlaceId, language: LocaleTag): ReviewState {
+    /** 두 번 묻더라도 전체가 [timeoutMs] 안에 끝난다(NFR02, Phase 15 리뷰 RVW-01). 넘기면 다시 시도할 수 있는 실패다. */
+    suspend operator fun invoke(place: PlaceId, language: LocaleTag): ReviewState =
+        withTimeoutOrNull(timeoutMs) { resolve(place, language) } ?: ReviewState.NetworkFailure
+
+    private suspend fun resolve(place: PlaceId, language: LocaleTag): ReviewState {
         val first = ask(place, language)
-        if (first is ReviewResponse.Error && first.error == ReviewError.NoData && language != ENGLISH) {
+        // 사용자 언어가 "없음" 오류로 오든 0건으로 오든 영어로 한 번 더 묻는다(RVW-04).
+        val nothingInLanguage = (first is ReviewResponse.Error && first.error == ReviewError.NoData) ||
+            (first is ReviewResponse.Found && first.page.items.isEmpty())
+        if (nothingInLanguage && language != ENGLISH) {
+            val firstSource = (first as? ReviewResponse.Error)?.sourceUrl ?: (first as? ReviewResponse.Found)?.page?.sourceUrl
             return when (val second = ask(place, ENGLISH)) {
-                is ReviewResponse.Found -> shown(second.page, ENGLISH, fallback = true)
-                is ReviewResponse.Error -> errorState(second, sourceUrl = second.sourceUrl ?: first.sourceUrl)
+                is ReviewResponse.Found ->
+                    if (second.page.items.isEmpty()) ReviewState.LanguageUnavailable(second.page.sourceUrl ?: firstSource)
+                    else ReviewState.Shown(second.page, ENGLISH, fallback = true)
+                is ReviewResponse.Error -> errorState(second, sourceUrl = second.sourceUrl ?: firstSource)
             }
         }
         return when (first) {
@@ -103,6 +114,7 @@ class LoadReviews(private val provider: ReviewProvider) {
 
     private companion object {
         val ENGLISH = LocaleTag("en")
+        const val TIMEOUT_MS = 8_000L
     }
 }
 
@@ -126,6 +138,8 @@ object ExternalLinks {
         }
         if (!uri.scheme.equals("https", ignoreCase = true)) return false
         if (uri.rawUserInfo != null) return false
+        // 기본 포트(443)만. 같은 도메인의 다른 포트는 다른 서비스일 수 있다(RVW-21).
+        if (uri.port != -1 && uri.port != 443) return false
         val host = uri.host?.lowercase() ?: return false
         return ALLOWED.any { host == it || host.endsWith(".$it") }
     }

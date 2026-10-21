@@ -27,15 +27,15 @@ class HttpProvidersTest {
     // android.jar 에는 JDK 의 HTTP 서버가 없어 소켓으로 최소 HTTP/1.1 서버를 만든다(한 요청 = 한 연결).
     private val server = ServerSocket(0, 50, InetAddress.getByName("127.0.0.1"))
     private val pool = Executors.newCachedThreadPool()
-    private var status = 200
-    private var body = "{}"
+    @Volatile private var status = 200
+    @Volatile private var body = "{}"
     // 켜면 서버가 답하지 않고 기다린다(sleep 없이). 클라이언트의 읽기 시간 제한을 실제 소켓으로 확인한다.
     @Volatile private var hang = false
     private val released = java.util.concurrent.CountDownLatch(1)
-    private var lastPath = ""
-    private var lastQuery: String? = null
-    private var lastAcceptLanguage: String? = null
-    private var lastRawPath = ""
+    @Volatile private var lastPath = ""
+    @Volatile private var lastQuery: String? = null
+    @Volatile private var lastAcceptLanguage: String? = null
+    @Volatile private var lastRawPath = ""
 
     init {
         pool.execute {
@@ -102,12 +102,12 @@ class HttpProvidersTest {
             "UPSTREAM_TIMEOUT" to ReviewError.Timeout,
             "RATE_LIMITED" to ReviewError.RateLimited,
             "UNSUPPORTED" to ReviewError.Unsupported,
-            "INVALID_INPUT" to ReviewError.Unsupported,
+            "INVALID_INPUT" to ReviewError.NotFound,
             "SOMETHING_NEW" to ReviewError.Network,
         )
         table.forEach { (code, expected) ->
             status = 404
-            body = """{"error":{"code":"$code","retryable":false,"source_url":"https://place.map.kakao.com/1"}}"""
+            body = """{"error":{"code":"$code","source_url":"https://place.map.kakao.com/1"}}"""
             val r = HttpReviewProvider(client).reviews(PlaceId("p"), LocaleTag("en")) as ReviewResponse.Error
             assertEquals(code, expected, r.error)
         }
@@ -150,5 +150,37 @@ class HttpProvidersTest {
         body = """{"items":[],"attribution":"x","availability":"full"}"""
         HttpReviewProvider(client).reviews(PlaceId("a b/c"), LocaleTag("en"))
         assertEquals("/v1/places/a%20b%2Fc/reviews", lastRawPath)
+    }
+
+    // ---------- Phase 15 리뷰 수정 ----------
+
+    @Test
+    fun `RVW-03 형식이 틀린 리뷰 하나는 건너뛰고 나머지를 보인다`() = runBlocking {
+        body = """{"items":[{"author":"A","text":""},{"author":"B","rating":4.6,"text":"Good"}],"attribution":"Kakao Map","availability":"partial"}"""
+        val r = HttpReviewProvider(client).reviews(PlaceId("p"), LocaleTag("en")) as ReviewResponse.Found
+        assertEquals(listOf("Good"), r.page.items.map { it.text })
+        assertEquals("소수 평점은 반올림", 5, r.page.items.single().rating)
+    }
+
+    @Test
+    fun `RVW-09 모르는 코드는 서버의 retryable 을 따른다`() = runBlocking {
+        status = 503
+        body = """{"error":{"code":"MAINTENANCE","retryable":false}}"""
+        assertEquals(ReviewError.Unsupported, (HttpReviewProvider(client).reviews(PlaceId("p"), LocaleTag("en")) as ReviewResponse.Error).error)
+        body = """{"error":{"code":"MAINTENANCE","retryable":true}}"""
+        assertEquals(ReviewError.Network, (HttpReviewProvider(client).reviews(PlaceId("p"), LocaleTag("en")) as ReviewResponse.Error).error)
+    }
+
+    @Test
+    fun `RVW-05 잘못된 서버 주소는 다시 시도해도 같으니 연결 안 됨으로`() = runBlocking {
+        val bad = ApiClient("api.example.com", timeoutMs = 500)
+        assertEquals(ReviewError.Unsupported, (HttpReviewProvider(bad).reviews(PlaceId("p"), LocaleTag("en")) as ReviewResponse.Error).error)
+    }
+
+    @Test
+    fun `오류 본문이 문자열이어도 결과로 끝난다(예외가 새지 않는다)`() = runBlocking {
+        status = 429
+        body = """{"error":"RATE_LIMITED"}"""
+        assertEquals(ReviewError.Network, (HttpReviewProvider(client).reviews(PlaceId("p"), LocaleTag("en")) as ReviewResponse.Error).error)
     }
 }

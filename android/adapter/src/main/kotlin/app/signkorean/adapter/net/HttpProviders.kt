@@ -13,7 +13,7 @@ import app.signkorean.domain.review.ReviewProvider
 import app.signkorean.domain.review.ReviewResponse
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.runInterruptible
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonNull
 import kotlinx.serialization.json.JsonObject
@@ -34,9 +34,13 @@ import java.time.Instant
 /** 중계 서버 응답. 성공은 본문, 실패는 서버 오류 코드 또는 연결 문제. */
 sealed interface ApiResult {
     data class Ok(val body: JsonObject) : ApiResult
-    data class ServerError(val code: String?, val sourceUrl: String?) : ApiResult
+    /** [retryable] 은 서버가 알려 준 재시도 가능 여부(PRD §10.3). 모르는 코드는 이 값을 따른다. */
+    data class ServerError(val code: String?, val sourceUrl: String?, val retryable: Boolean? = null) : ApiResult
     data object Timeout : ApiResult
     data object Network : ApiResult
+
+    /** 서버 주소가 잘못됐거나(형식·http) 이 빌드에서 쓸 수 없다. 다시 시도해도 같다(RVW-05). */
+    data object Misconfigured : ApiResult
 }
 
 /**
@@ -51,13 +55,18 @@ class ApiClient(
 ) {
     private val json = Json { ignoreUnknownKeys = true }
 
-    suspend fun get(pathSegments: List<String>, language: LocaleTag): ApiResult = withContext(io) {
+    // runInterruptible: 막힌 소켓 읽기도 코루틴 취소(시트 닫기, 8초 제한)로 끊는다(RVW-14).
+    suspend fun get(pathSegments: List<String>, language: LocaleTag): ApiResult = runInterruptible(io) {
         val path = pathSegments.joinToString("/") { segment(it) }
-        val url = URL("${baseUrl.trimEnd('/')}/$path?language=${URLEncoder.encode(language.value, "UTF-8")}")
+        // https 만(같은 기기의 루프백 테스트 서버는 예외). Android 9+ 는 평문 http 를 막아
+        // 영원히 "다시 시도" 로 보이게 된다(NFR05, RVW-05).
+        if (!baseUrl.startsWith("https://") && !LOOPBACK.matches(baseUrl)) return@runInterruptible ApiResult.Misconfigured
         val conn = try {
-            url.openConnection() as HttpURLConnection
+            URL("${baseUrl.trimEnd('/')}/$path?language=${URLEncoder.encode(language.value, "UTF-8")}").openConnection() as HttpURLConnection
+        } catch (_: java.net.MalformedURLException) {
+            return@runInterruptible ApiResult.Misconfigured
         } catch (_: IOException) {
-            return@withContext ApiResult.Network
+            return@runInterruptible ApiResult.Network
         }
         try {
             conn.connectTimeout = timeoutMs
@@ -67,20 +76,32 @@ class ApiClient(
             val status = conn.responseCode
             val text = (if (status in 200..299) conn.inputStream else conn.errorStream)?.bufferedReader()?.use { it.readText() }.orEmpty()
             val body = runCatching { json.parseToJsonElement(text).jsonObject }.getOrNull()
-                ?: return@withContext ApiResult.Network
+                ?: return@runInterruptible ApiResult.Network
             if (status in 200..299) {
                 ApiResult.Ok(body)
             } else {
-                val error = body["error"]?.takeUnless { it is JsonNull }?.jsonObject
-                ApiResult.ServerError(error?.string("code"), error?.string("source_url"))
+                // 오류 봉투가 약속과 다른 모양이어도(문자열 등) 예외를 밖으로 내지 않는다(RVW-11).
+                val error = runCatching { body["error"]?.takeUnless { it is JsonNull }?.jsonObject }.getOrNull()
+                ApiResult.ServerError(
+                    error?.string("code"),
+                    error?.string("source_url"),
+                    runCatching { error?.get("retryable")?.jsonPrimitive?.booleanOrNull }.getOrNull(),
+                )
             }
         } catch (_: SocketTimeoutException) {
             ApiResult.Timeout
+        } catch (_: java.net.UnknownServiceException) {
+            // 평문 http 차단 등. 이 빌드의 설정 문제다.
+            ApiResult.Misconfigured
         } catch (_: IOException) {
             ApiResult.Network
         } finally {
             conn.disconnect()
         }
+    }
+
+    private companion object {
+        val LOOPBACK = Regex("""http://(127\.0\.0\.1|localhost)(:\d+)?(/.*)?""")
     }
 
     /** 경로 조각 하나를 퍼센트 인코딩한다. URLEncoder 는 공백을 + 로 바꾸므로 URI 로 인코딩한다. */
@@ -94,13 +115,15 @@ object ApiErrorMapper {
         is ApiResult.Ok -> error("성공 응답은 오류가 아니다")
         ApiResult.Timeout -> ReviewError.Timeout
         ApiResult.Network -> ReviewError.Network
+        ApiResult.Misconfigured -> ReviewError.Unsupported
         is ApiResult.ServerError -> when (result.code) {
             "NO_DATA" -> ReviewError.NoData
-            "NOT_FOUND" -> ReviewError.NotFound
+            // 장소 ID 형식이 틀렸다 = 서버가 그 장소를 모른다(RVW-09).
+            "NOT_FOUND", "INVALID_INPUT" -> ReviewError.NotFound
             "UPSTREAM_TIMEOUT" -> ReviewError.Timeout
             "RATE_LIMITED" -> ReviewError.RateLimited
-            "UNSUPPORTED", "INVALID_INPUT" -> ReviewError.Unsupported
-            else -> ReviewError.Network
+            "UNSUPPORTED" -> ReviewError.Unsupported
+            else -> if (result.retryable == false) ReviewError.Unsupported else ReviewError.Network
         }
     }
 }
@@ -115,7 +138,9 @@ class HttpReviewProvider(private val client: ApiClient) : ReviewProvider {
         val body = result.body
         val page = runCatching {
             ReviewPage(
-                items = (body["items"]?.takeUnless { it is JsonNull }?.jsonArray ?: emptyList()).map { item(it.jsonObject, language) },
+                // 형식이 틀린 리뷰 하나 때문에 페이지 전체를 실패로 만들지 않는다(RVW-03).
+                items = (body["items"]?.takeUnless { it is JsonNull }?.jsonArray ?: emptyList())
+                    .mapNotNull { runCatching { item(it.jsonObject, language) }.getOrNull() },
                 attribution = body.string("attribution").orEmpty(),
                 sourceUrl = body.string("source_url"),
                 partial = body.string("availability") != "full",
@@ -126,7 +151,7 @@ class HttpReviewProvider(private val client: ApiClient) : ReviewProvider {
 
     private fun item(o: JsonObject, asked: LocaleTag) = Review(
         author = o.string("author"),
-        rating = o["rating"]?.takeUnless { it is JsonNull }?.jsonPrimitive?.intOrNull,
+        rating = o["rating"]?.takeUnless { it is JsonNull }?.jsonPrimitive?.doubleOrNull?.let { kotlin.math.round(it).toInt() },
         text = o.string("text") ?: error("리뷰 본문이 없다"),
         writtenAt = o.string("written_at")?.let { runCatching { Instant.parse(it) }.getOrNull() },
         language = o.string("language")?.let { runCatching { LocaleTag(it) }.getOrNull() } ?: asked,
