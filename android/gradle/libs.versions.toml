@@ -21,6 +21,8 @@ datastore = "1.1.1"
 androidxTestCore = "1.6.1"
 # billing-ktx 는 Kotlin 2.2 표준 라이브러리를 끌어와 이 프로젝트의 Kotlin 2.0 컴파일러가 읽지 못한다. Java API 를 직접 감싼다.
 billing = "8.3.0"
+# 장소 사진 (Phase 14). 2.7 은 Kotlin 2.0 표준 라이브러리를 써서 이 프로젝트의 컴파일러와 맞는다(billing-ktx 참고).
+coil = "2.7.0"
 
 [libraries]
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
@@ -54,6 +56,7 @@ room-ktx = { module = "androidx.room:room-ktx", version.ref = "room" }
 room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
 room-testing = { module = "androidx.room:room-testing", version.ref = "room" }
 androidx-test-core = { module = "androidx.test:core", version.ref = "androidxTestCore" }
+coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coil" }
 play-billing = { module = "com.android.billingclient:billing", version.ref = "billing" }
 konsist = { module = "com.lemonappdev:konsist", version.ref = "konsist" }
 

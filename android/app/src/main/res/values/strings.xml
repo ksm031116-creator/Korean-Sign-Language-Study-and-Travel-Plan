@@ -212,6 +212,32 @@
     <!-- 디버그 빌드의 모의 결제를 되돌리는 버튼. 릴리스에는 연결되지 않는다(조립이 없음). 개발자용이라 번역하지 않는다. -->
     <string name="debug_relock" translatable="false" tools:ignore="UnusedResources">Lock again (debug build)</string>
 
+
+    <!-- 장소 사진 출처 (C-10). 출처 이름은 콘텐츠 팩의 값 그대로다. -->
+    <string name="photo_credit_kogl1">%1$s · KOGL Type 1</string>
+    <string name="photo_credit_kogl3">%1$s · KOGL Type 3 (no changes)</string>
+    <string name="photo_credit_cc0">%1$s · CC0</string>
+    <string name="photo_credit_ccby">%1$s · CC BY %2$s · %3$s</string>
+    <string name="photo_none">No photo yet</string>
+    <string name="photo_failed">Couldn\'t load the photo.</string>
+
+    <!-- SC08 간판의 장소 목록 / SC07 장소 상세 -->
+    <string name="places_title">Where to see this sign</string>
+    <string name="places_none">No registered place shows this sign yet.</string>
+    <string name="places_missing">This sign is no longer available.</string>
+    <string name="places_summary_unavailable">Ratings and reviews aren\'t available right now.</string>
+    <string name="places_rating">★ %1$.1f</string>
+    <plurals name="reviews_count">
+        <item quantity="one">%d review</item>
+        <item quantity="other">%d reviews</item>
+    </plurals>
+    <string name="place_example_notice">This is an example of this kind of place, not a specific shop.</string>
+    <string name="place_signs">Signs you can see here</string>
+    <string name="place_practice">Practise these signs</string>
+    <string name="place_missing">This place is no longer available.</string>
+    <string name="lock_route">Walking route</string>
+    <string name="lock_add_to_plan">Add to plan</string>
+
     <plurals name="places_count">
         <item quantity="one">%d place</item>
         <item quantity="other">%d places</item>

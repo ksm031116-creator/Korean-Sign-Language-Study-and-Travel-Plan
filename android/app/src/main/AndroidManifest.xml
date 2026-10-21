@@ -2,6 +2,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <!-- 장소 사진(TourAPI·Wikimedia)을 내려받는다 (Phase 14). 리뷰·경로 API 도 이 권한을 쓴다. -->
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <!--
       allowBackup=false 만으로는 Android 12+ 의 기기 간 이전을 막지 못한다. 학습 기록·여행 계획은
       기기 안에만 두므로(PRD §10.4) dataExtractionRules 로 클라우드 백업과 기기 이전을 모두 제외한다.

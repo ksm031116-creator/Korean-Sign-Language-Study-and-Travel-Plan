@@ -37,6 +37,7 @@ import app.signkorean.ui.designsystem.EmptyState
 import app.signkorean.ui.designsystem.ErrorState
 import app.signkorean.ui.designsystem.PrimaryButton
 import app.signkorean.ui.designsystem.QuietButton
+import app.signkorean.domain.content.CardId
 import app.signkorean.ui.designsystem.SignKoreanTheme
 import app.signkorean.ui.designsystem.StatusBadge
 import app.signkorean.ui.designsystem.StatusTone
@@ -52,7 +53,7 @@ object SavedTags {
 
 /** SC09 Saved. */
 @Composable
-fun SavedScreen(onOpenLearn: () -> Unit, onUpgrade: () -> Unit = {}, viewModel: SavedViewModel = koinViewModel()) {
+fun SavedScreen(onOpenLearn: () -> Unit, onUpgrade: () -> Unit = {}, onOpenPlaces: (CardId) -> Unit = {}, viewModel: SavedViewModel = koinViewModel()) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     LifecycleResumeEffect(viewModel) {
         viewModel.onAction(SavedAction.Refresh)
@@ -65,11 +66,11 @@ fun SavedScreen(onOpenLearn: () -> Unit, onUpgrade: () -> Unit = {}, viewModel: 
             }
         }
     }
-    SavedContent(state, onUpgrade = onUpgrade, onAction = viewModel::onAction)
+    SavedContent(state, onUpgrade = onUpgrade, onOpenPlaces = onOpenPlaces, onAction = viewModel::onAction)
 }
 
 @Composable
-fun SavedContent(state: SavedUiState, onUpgrade: () -> Unit = {}, onAction: (SavedAction) -> Unit) {
+fun SavedContent(state: SavedUiState, onUpgrade: () -> Unit = {}, onOpenPlaces: (CardId) -> Unit = {}, onAction: (SavedAction) -> Unit) {
     val t = SignKoreanTheme.tokens
     if (state.loading) return
     if (state.confirmReplace) {
@@ -103,7 +104,7 @@ fun SavedContent(state: SavedUiState, onUpgrade: () -> Unit = {}, onAction: (Sav
             PrimaryButton(stringResource(R.string.saved_practice), onClick = { onAction(SavedAction.StartAll) }, enabled = !state.busy, modifier = Modifier.fillMaxWidth())
         }
         if (state.items.isEmpty()) Text(stringResource(R.string.saved_no_match), color = t.muted, style = MaterialTheme.typography.bodyMedium)
-        state.items.forEach { item -> SavedRow(item, state.playing == item.id, onAction) }
+        state.items.forEach { item -> SavedRow(item, state.playing == item.id, onAction, onOpenPlaces) }
     }
 }
 
@@ -133,7 +134,7 @@ private fun Filters(state: SavedUiState, onAction: (SavedAction) -> Unit) {
 }
 
 @Composable
-private fun SavedRow(item: SavedItem, playing: Boolean, onAction: (SavedAction) -> Unit) {
+private fun SavedRow(item: SavedItem, playing: Boolean, onAction: (SavedAction) -> Unit, onOpenPlaces: (CardId) -> Unit) {
     val t = SignKoreanTheme.tokens
     Column(
         Modifier.fillMaxWidth().background(t.surface, RoundedCornerShape(14.dp)).padding(14.dp).testTag(SavedTags.item(item.id.value)),
@@ -164,8 +165,9 @@ private fun SavedRow(item: SavedItem, playing: Boolean, onAction: (SavedAction) 
             Text(card.meaning.text(), style = MaterialTheme.typography.bodyLarge)
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 item.group?.let { Text(it.label.text(), style = MaterialTheme.typography.labelMedium, color = t.muted) }
-                if (item.placeCount > 0) {
-                    Text(pluralStringResource(R.plurals.places_count, item.placeCount, item.placeCount), style = MaterialTheme.typography.labelMedium, color = t.muted)
+                // 그 간판을 볼 수 있는 장소 목록(SC08)으로 간다 (PRD §14 SC09 → SC08). Basics 는 장소가 없어 그리지 않는다.
+                if (item.placeCount > 0 && !item.unavailable) {
+                    QuietButton(pluralStringResource(R.plurals.places_count, item.placeCount, item.placeCount), onClick = { onOpenPlaces(item.id) })
                 }
             }
         }

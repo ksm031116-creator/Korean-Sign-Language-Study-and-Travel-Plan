@@ -172,7 +172,7 @@ class PlacesViewModelTest {
         (1..5).forEach { bookmarks.add(Bookmark(CardId("x$it"), clock.now())) }
         val vm = detail()
         vm.onAction(PlaceDetailAction.ToggleBookmark)
-        assertEquals(PlaceDetailEffect.Upgrade(UpgradeFeature.Bookmark), vm.effects.tryReceive().getOrNull())
+        assertEquals(PlaceDetailEffect.Upgrade(UpgradeFeature.BookmarkLimit), vm.effects.tryReceive().getOrNull())
         assertEquals(PendingAction.SaveBookmark(CardId("t-market-1")), pending.peek())
         assertFalse(vm.state.value.selectedSaved)
         assertEquals(UiText.Res(R.string.bookmark_limit, listOf(5, 5)), vm.state.value.message)

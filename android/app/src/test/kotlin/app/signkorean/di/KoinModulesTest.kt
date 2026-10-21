@@ -38,6 +38,9 @@ class KoinModulesTest {
             definition<app.signkorean.ui.onboarding.FirstRunViewModel>(Boolean::class),
             // 앱 범위 코루틴은 조립부에서 바로 만든다(SupervisorJob + 기본 디스패처).
             definition<app.signkorean.domain.common.AppScope>(kotlinx.coroutines.CoroutineScope::class),
+            // SC08·SC07 의 카드·장소 ID (화면 인자).
+            definition<app.signkorean.ui.places.PlacesViewModel>(app.signkorean.domain.content.CardId::class),
+            definition<app.signkorean.ui.places.PlaceDetailViewModel>(app.signkorean.domain.content.PlaceId::class),
             // SC21 을 연 진입점(화면 인자).
             definition<app.signkorean.ui.upgrade.UpgradeViewModel>(app.signkorean.ui.upgrade.UpgradeFeature::class),
             // 다시 잠그기는 디버그 빌드의 모의 결제에만 있고(getOrNull), 릴리스에는 없다.

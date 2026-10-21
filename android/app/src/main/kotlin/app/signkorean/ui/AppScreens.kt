@@ -12,6 +12,10 @@ import app.signkorean.ui.learn.LearnScreen
 import app.signkorean.ui.learn.ResultScreen
 import app.signkorean.ui.saved.SavedScreen
 import app.signkorean.ui.plan.PlanScreen
+import app.signkorean.domain.content.CardId
+import app.signkorean.domain.content.PlaceId
+import app.signkorean.ui.places.PlaceDetailScreen
+import app.signkorean.ui.places.PlacesScreen
 import app.signkorean.ui.upgrade.UpgradeFeature
 import app.signkorean.ui.upgrade.UpgradeScreen
 
@@ -45,7 +49,7 @@ fun AppScreen(route: Route, navigator: AppNavigator) {
                 CollectionScreen(
                     source = source,
                     onOpenLearn = { navigator.push(Route(ScreenId.SC04)) },
-                    onOpenPlace = null, // SC07 은 Phase 14 에서 연다
+                    onOpenPlace = { id -> navigator.push(Route(ScreenId.SC07, id)) },
                     onBack = { navigator.back() },
                 )
             }
@@ -59,6 +63,7 @@ fun AppScreen(route: Route, navigator: AppNavigator) {
         ScreenId.SC09 -> SavedScreen(
             onOpenLearn = { navigator.push(Route(ScreenId.SC04)) },
             onUpgrade = { navigator.push(Route(ScreenId.SC21, UpgradeFeature.Bookmarks.arg)) },
+            onOpenPlaces = { card -> navigator.push(Route(ScreenId.SC08, card.value)) },
         )
         // 무료면 잠금 안내(U-09). 유료 여행 목록은 Phase 17 에서 만든다.
         ScreenId.SC11 -> PlanScreen(
@@ -66,6 +71,23 @@ fun AppScreen(route: Route, navigator: AppNavigator) {
             paidContent = { PlaceholderScreen(route) },
         )
         // 결제·복원·Not now 모두 호출한 화면으로 돌아간다. 이어서 할 동작은 보류 동작이 맡는다 (PRD §14.1).
+        // 간판의 장소 목록. Learn 아래 스와이프로 온다(FR09). 닫으면 같은 카드로 돌아간다.
+        ScreenId.SC08 -> route.arg?.let { card ->
+            PlacesScreen(
+                card = CardId(card),
+                onClose = { navigator.back() },
+                onOpenPlace = { id -> navigator.push(Route(ScreenId.SC07, id.value)) },
+                onUpgrade = { f -> navigator.push(Route(ScreenId.SC21, f.arg)) },
+            )
+        } ?: PlaceholderScreen(route)
+        ScreenId.SC07 -> route.arg?.let { place ->
+            PlaceDetailScreen(
+                place = PlaceId(place),
+                onClose = { navigator.back() },
+                onOpenLearn = { navigator.push(Route(ScreenId.SC04)) },
+                onUpgrade = { f -> navigator.push(Route(ScreenId.SC21, f.arg)) },
+            )
+        } ?: PlaceholderScreen(route)
         ScreenId.SC21 -> UpgradeScreen(UpgradeFeature.parse(route.arg), onClose = { navigator.back() })
         ScreenId.SC06 -> ResultScreen(
             onOpenLearn = { navigator.replaceTop(Route(ScreenId.SC04)) },

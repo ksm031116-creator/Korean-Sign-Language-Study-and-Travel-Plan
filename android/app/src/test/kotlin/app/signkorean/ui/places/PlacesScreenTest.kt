@@ -96,7 +96,8 @@ class PlacesScreenTest {
     @Test
     fun `C-09 SC08 의 Example 장소에는 Example 표시`() {
         rule.setContent { SignKoreanTheme { PlacesContent(placesState(), {}, {}) } }
-        rule.onNodeWithTag(PlacesTags.example(PlaceId("example-market"))).assertExists()
+        // 장소 카드 전체가 하나의 버튼으로 합쳐져 있어 배지는 합치기 전 트리에서 찾는다.
+        rule.onNodeWithTag(PlacesTags.example(PlaceId("example-market")), useUnmergedTree = true).assertExists()
     }
 
     @Test

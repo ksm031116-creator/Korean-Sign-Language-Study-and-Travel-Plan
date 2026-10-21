@@ -49,6 +49,10 @@ import app.signkorean.domain.common.AppScope
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import app.signkorean.ui.plan.PlanGateViewModel
+import app.signkorean.ui.places.PlaceDetailViewModel
+import app.signkorean.ui.places.PlacesViewModel
+import app.signkorean.adapter.net.UnavailablePlaceSummaries
+import app.signkorean.domain.place.PlaceSummaryProvider
 import app.signkorean.ui.upgrade.UpgradeViewModel
 import app.signkorean.domain.locale.CurrentLocale
 import app.signkorean.domain.onboarding.OnboardingStore
@@ -90,6 +94,11 @@ val contentModule = module {
 }
 
 /** 언어 (Phase 3). 앱 언어 저장은 AppCompat 하나만 한다 (설계서 §8.2). */
+/** 장소 (Phase 14). 리뷰 요약은 중계 서버가 생기기 전까지 "없음"이다(Phase 15 에서 HTTP). */
+val placeModule = module {
+    single<PlaceSummaryProvider> { UnavailablePlaceSummaries }
+}
+
 val localeModule = module {
     single<CurrentLocale> { AppCompatCurrentLocale(androidContext()) }
     factory { ResolveAppLanguage(get()) }
@@ -138,6 +147,8 @@ val uiModule = module {
     viewModel { params -> UpgradeViewModel(params.get(), get(), get(), get(), get(), get()) }
     // 디버그 빌드의 모의 결제에만 다시 잠그기가 있다(variantModules). 릴리스는 null.
     viewModel { PlanGateViewModel(get(), getOrNull()) }
+    viewModel { params -> PlacesViewModel(params.get(), get(), get(), get(), get(), get()) }
+    viewModel { params -> PlaceDetailViewModel(params.get(), get(), get(), get(), get(), get(), get(), get(), get()) }
     viewModel { params -> CollectionViewModel(params.get(), get(), get(), get()) }
     viewModelOf(::AppGateViewModel)
     viewModel {
@@ -148,4 +159,4 @@ val uiModule = module {
 }
 
 /** 앱이 시작할 때 올리는 모듈 전체. 기능이 늘면 여기에 모듈을 추가한다. */
-val appModules = listOf(platformModule, contentModule, localeModule, learningModule, entitlementModule, uiModule)
+val appModules = listOf(platformModule, contentModule, placeModule, localeModule, learningModule, entitlementModule, uiModule)
