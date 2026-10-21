@@ -139,7 +139,7 @@ fun PlacePhotoView(photo: PlacePhoto?, fallbackColor: String, modifier: Modifier
             credit,
             style = MaterialTheme.typography.labelSmall,
             color = if (source != null) t.primary else t.muted,
-            modifier = if (source != null) Modifier.clickable(role = Role.Button) { uri.openUri(source) } else Modifier,
+            modifier = if (source != null) Modifier.clickable(role = Role.Button) { runCatching { uri.openUri(source) } } else Modifier,
         )
     }
 }

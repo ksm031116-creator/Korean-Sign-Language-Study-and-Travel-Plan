@@ -18,7 +18,12 @@ android {
         versionName = "0.1.0"
         // 중계 서버(PRD §10.3) 주소. 서버가 준비되면 -PapiBaseUrl=https://... 로 넣는다. 비어 있으면 리뷰·평점은
         // "연결되지 않음"이다(릴리스) 또는 표본(디버그). 공급자 비밀키는 서버에 있고 앱에는 없다(설계서 원칙 13).
-        buildConfigField("String", "API_BASE_URL", "\"" + (project.findProperty("apiBaseUrl") ?: "") + "\"")
+        val apiBaseUrl = (project.findProperty("apiBaseUrl") as String?).orEmpty().trim()
+        // https 만 받는다(NFR05). 따옴표·역슬래시가 들어가면 BuildConfig 가 깨지므로 그것도 막는다(Phase 15 리뷰 RVW-05).
+        require(apiBaseUrl.isEmpty() || Regex("""https://[^"\\\s]+""").matches(apiBaseUrl)) {
+            "apiBaseUrl 은 https:// 로 시작하는 주소여야 한다: $apiBaseUrl"
+        }
+        buildConfigField("String", "API_BASE_URL", "\"$apiBaseUrl\"")
     }
 
     buildTypes {

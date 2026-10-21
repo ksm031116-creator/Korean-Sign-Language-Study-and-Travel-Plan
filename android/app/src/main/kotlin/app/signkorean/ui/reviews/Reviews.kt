@@ -14,6 +14,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.semantics.contentDescription
+import app.signkorean.ui.text.korean
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
@@ -69,6 +74,8 @@ data class ReviewsUiState(
 )
 
 sealed interface ReviewsAction {
+    /** 시트를 열었다. 지난번에 실패했으면 다시 불러온다(RVW-08). */
+    data object Opened : ReviewsAction
     data object Retry : ReviewsAction
     data class OpenLink(val url: String) : ReviewsAction
     data class ToggleOriginal(val index: Int) : ReviewsAction
@@ -121,6 +128,7 @@ class ReviewsViewModel(
     fun onAction(action: ReviewsAction) {
         when (action) {
             ReviewsAction.Retry -> fetch()
+            ReviewsAction.Opened -> if (_state.value.reviews == ReviewState.NetworkFailure) fetch()
             // 허용 목록의 주소만 연다 (UX08, U-16).
             is ReviewsAction.OpenLink -> if (ExternalLinks.isAllowed(action.url)) viewModelScope.launch { _effects.send(ReviewsEffect.OpenUrl(action.url)) }
             is ReviewsAction.ToggleOriginal -> _state.update { it.copy(showingOriginal = it.showingOriginal.toggle(action.index)) }
@@ -137,10 +145,12 @@ fun ReviewsSheet(place: PlaceId, onDismiss: () -> Unit) {
     val viewModel: ReviewsViewModel = koinViewModel(key = "reviews-${place.value}") { parametersOf(place) }
     val state by viewModel.state.collectAsStateWithLifecycle()
     val uri = LocalUriHandler.current
+    LaunchedEffect(Unit) { viewModel.onAction(ReviewsAction.Opened) }
     LaunchedEffect(viewModel) {
         for (effect in viewModel.effects) {
             when (effect) {
-                is ReviewsEffect.OpenUrl -> uri.openUri(effect.url)
+                // 열 앱이 없으면(브라우저 꺼짐·업무 프로필) 예외가 난다. 앱을 멈추지 않는다(RVW-06).
+                is ReviewsEffect.OpenUrl -> runCatching { uri.openUri(effect.url) }
             }
         }
     }
@@ -164,8 +174,9 @@ fun ReviewsContent(state: ReviewsUiState, onAction: (ReviewsAction) -> Unit) {
                 // 사용자 언어가 없어 영어로 보일 때 그 사실을 먼저 알린다 (L10N-10).
                 if (r.fallback) StatusBadge(stringResource(R.string.reviews_in_english), StatusTone.Neutral)
                 // 공급자가 준 일부 목록임을 밝힌다 (FR11).
+                val source = r.page.attribution.ifBlank { stringResource(R.string.reviews_provider_unknown) }
                 Text(
-                    stringResource(if (r.page.partial) R.string.reviews_partial else R.string.reviews_source, r.page.attribution),
+                    stringResource(if (r.page.partial) R.string.reviews_partial else R.string.reviews_source, source),
                     style = MaterialTheme.typography.labelMedium,
                     color = t.muted,
                 )
@@ -221,17 +232,25 @@ private fun ReviewItem(review: Review, showingOriginal: Boolean, expanded: Boole
             review.rating?.let { stringResource(R.string.reviews_rating, it) },
             review.writtenAt?.let { formats.date(it.atZone(SEOUL).toLocalDate()) },
         ).joinToString(" · ")
-        if (meta.isNotEmpty()) Text(meta, style = MaterialTheme.typography.labelMedium, color = t.muted)
+        // "★ 5" 는 스크린리더가 "black star 5" 로 읽는다. 뜻을 읽힌다(RVW-17).
+        val spoken = listOfNotNull(review.author, review.rating?.let { stringResource(R.string.reviews_rating_spoken, it) }).joinToString(", ")
+        if (meta.isNotEmpty()) Text(meta, style = MaterialTheme.typography.labelMedium, color = t.muted, modifier = Modifier.semantics { contentDescription = spoken })
         if (review.translated) StatusBadge(stringResource(R.string.reviews_translated), StatusTone.Neutral)
-        val text: String = review.originalText?.takeIf { showingOriginal } ?: review.text
+        val original = review.originalText?.takeIf { showingOriginal }
+        val text: String = original ?: review.text
+        // 글자 수가 아니라 실제로 넘쳤는지로 펼치기를 보인다. 한·중·일 문장과 큰 글꼴도 끝까지 읽을 수 있다(RVW-02).
+        var overflowing by remember(text) { mutableStateOf(false) }
+        val style = MaterialTheme.typography.bodyMedium
         Text(
             text,
-            style = MaterialTheme.typography.bodyMedium,
+            // 원문(한국어)은 한국어 글꼴로 그린다(설계서 §8.7, RVW-16).
+            style = if (original != null) style.korean() else style,
             maxLines = if (expanded) Int.MAX_VALUE else 4,
             overflow = TextOverflow.Ellipsis,
+            onTextLayout = { if (!expanded) overflowing = it.hasVisualOverflow },
         )
         Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-            if (text.length > LONG_REVIEW) {
+            if (overflowing || expanded) {
                 QuietButton(stringResource(if (expanded) R.string.reviews_read_less else R.string.reviews_read_more), onClick = { onAction(ReviewsAction.ToggleExpand(index)) })
             }
             if (review.translated && review.originalText != null) {
@@ -244,6 +263,4 @@ private fun ReviewItem(review: Review, showingOriginal: Boolean, expanded: Boole
     }
 }
 
-/** 네 줄을 넘길 만한 길이. 넘으면 펼치기 버튼을 보인다. */
-private const val LONG_REVIEW = 220
 private val SEOUL: ZoneId = ZoneId.of("Asia/Seoul")

@@ -187,7 +187,9 @@ private fun PlaceCard(place: Place, areaColor: String, summary: PlaceSummary?, s
         }
         Text(place.address.text(), style = MaterialTheme.typography.bodySmall, color = t.muted)
         // 리뷰는 무료다(PRD §3.4). 자물쇠 없이 바로 연다.
-        QuietButton(stringResource(R.string.reviews_title), onClick = { onOpenReviews(place.id) })
+        // 카드마다 같은 "Reviews" 라 어느 장소인지 함께 읽힌다(RVW-17).
+        val reviewsLabel = stringResource(R.string.reviews_for, place.name.text())
+        QuietButton(stringResource(R.string.reviews_title), onClick = { onOpenReviews(place.id) }, modifier = Modifier.semantics { contentDescription = reviewsLabel })
         PaidActions(paid, onUpgrade = { onAction(PlacesAction.Upgrade(it)) })
     }
 }

@@ -257,6 +257,9 @@
     <string name="reviews_network">Couldn\'t load reviews.</string>
     <string name="reviews_not_connected">Reviews aren\'t available in this version yet.</string>
     <string name="reviews_open_source">Open the original page</string>
+    <string name="reviews_provider_unknown">the review provider</string>
+    <string name="reviews_rating_spoken">Rated %1$d out of 5</string>
+    <string name="reviews_for">Reviews of %1$s</string>
 
     <plurals name="places_count">
         <item quantity="one">%d place</item>
