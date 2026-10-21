@@ -29,8 +29,18 @@ import app.signkorean.domain.audio.AudioPlayer
 import app.signkorean.domain.bookmark.BookmarkStore
 import app.signkorean.domain.bookmark.ClearBookmarks
 import app.signkorean.domain.bookmark.SetBookmark
-import app.signkorean.domain.entitlement.Entitlement
+import app.signkorean.ForegroundActivityTracker
+import app.signkorean.adapter.billing.ForegroundActivity
+import app.signkorean.adapter.billing.PlayBillingEntitlementGateway
+import app.signkorean.adapter.platform.AndroidNetworkMonitor
+import app.signkorean.adapter.prefs.DataStoreEntitlementCache
+import app.signkorean.domain.entitlement.EntitlementCache
+import app.signkorean.domain.entitlement.EntitlementGateway
 import app.signkorean.domain.entitlement.EntitlementSource
+import app.signkorean.domain.entitlement.Entitlements
+import app.signkorean.domain.entitlement.NetworkMonitor
+import app.signkorean.domain.learning.ResetLearning
+import org.koin.dsl.bind
 import app.signkorean.domain.locale.CurrentLocale
 import app.signkorean.domain.onboarding.OnboardingStore
 import app.signkorean.domain.locale.ResolveAppLanguage
@@ -81,16 +91,27 @@ val learningModule = module {
     single<SessionStore> { get<RoomLearningStorage>().sessions }
     single<TransactionRunner> { get<RoomLearningStorage>().transactions }
     single<BookmarkStore> { get<RoomLearningStorage>().bookmarks }
-    // 결제 권한은 Phase 12 에서 스토어 조회로 바뀐다. 그전에는 모두 무료다.
-    single<EntitlementSource> { EntitlementSource { Entitlement.Free } }
     factory { SetBookmark(get(), get(), get(), get()) }
     factory { ClearBookmarks(get()) }
     factory { StartSession(get(), get(), get(), get()) }
     factory { ResumeSession(get()) }
     factory { JudgeCard(get(), get(), get(), get()) }
     factory { UndoJudgement(get(), get(), get()) }
+    factory { ResetLearning(get(), get(), get()) }
     single<OnboardingStore> { DataStoreOnboardingStore.create(androidContext()) }
     single<AudioPlayer> { MediaPlayerAudioPlayer(androidContext()) }
+}
+
+/**
+ * 권한과 결제 (Phase 12, 설계서 §6.4). [Entitlements] 는 앱에 하나다. 권한 확인은 앱 시작과 전면 복귀 때
+ * SignKoreanApplication 이 부르고, 결제·복원 직후에는 Entitlements 가 스스로 반영한다.
+ */
+val entitlementModule = module {
+    single { ForegroundActivityTracker() } bind ForegroundActivity::class
+    single<EntitlementGateway> { PlayBillingEntitlementGateway(androidContext(), get(), Dispatchers.Main) }
+    single<EntitlementCache> { DataStoreEntitlementCache.create(androidContext()) }
+    single<NetworkMonitor> { AndroidNetworkMonitor(androidContext()) }
+    single { Entitlements(get(), get(), get()) } bind EntitlementSource::class
 }
 
 /** 화면 ViewModel. 화면은 koinViewModel() 로만 받는다 (AR-03). */
@@ -109,4 +130,4 @@ val uiModule = module {
 }
 
 /** 앱이 시작할 때 올리는 모듈 전체. 기능이 늘면 여기에 모듈을 추가한다. */
-val appModules = listOf(platformModule, contentModule, localeModule, learningModule, uiModule)
+val appModules = listOf(platformModule, contentModule, localeModule, learningModule, entitlementModule, uiModule)

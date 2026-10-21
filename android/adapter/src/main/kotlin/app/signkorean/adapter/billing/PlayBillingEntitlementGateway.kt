@@ -36,10 +36,14 @@ import kotlin.coroutines.resume
  * - 연결이 끊기면 다음 호출에서 지수 백오프로 다시 연결한다. 결제를 사용자 동작 없이 다시 시도하지는 않는다.
  * - 결제 화면이 열려 있지 않을 때 온 구매 갱신은 버린다. 앱 복귀 때의 확인(onResume)이 스토어 목록으로 다시 읽는다.
  */
+/** 결제 화면을 띄울 지금 화면의 Activity. 앱이 뒤에 있으면 null 이고 결제를 시작하지 않는다. 구현은 :app 이 한다. */
+fun interface ForegroundActivity {
+    fun current(): Activity?
+}
+
 class PlayBillingEntitlementGateway(
     context: Context,
-    /** 결제 화면을 띄울 지금의 Activity. 없으면(백그라운드) 결제를 시작하지 않는다. */
-    private val currentActivity: () -> Activity?,
+    private val foreground: ForegroundActivity,
     private val main: CoroutineDispatcher,
     private val productId: String = PRODUCT_ID,
 ) : EntitlementGateway {
@@ -83,7 +87,7 @@ class PlayBillingEntitlementGateway(
         val product = productDetails() ?: return PurchaseResult.Failed(FailReason.ProductUnavailable)
         val waiting = CompletableDeferred<PurchaseResult>()
         val launch = withContext(main) {
-            val activity = currentActivity() ?: return@withContext null
+            val activity = foreground.current() ?: return@withContext null
             inFlight = waiting
             val params = BillingFlowParams.newBuilder()
                 .setProductDetailsParamsList(

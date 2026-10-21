@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- AndroidNetworkMonitor: 오프라인이면 결제를 시도하지 않는다 (E-07). 앱 매니페스트에 병합된다.
+         결제 권한(com.android.vending.BILLING)은 Play Billing 라이브러리가 병합한다. -->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+</manifest>

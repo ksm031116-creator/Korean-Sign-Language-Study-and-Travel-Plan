@@ -6,6 +6,7 @@ import android.util.Log
 import app.signkorean.di.appModules
 import app.signkorean.domain.common.AppDispatchers
 import app.signkorean.domain.content.ContentRepository
+import app.signkorean.domain.entitlement.Entitlements
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
@@ -27,7 +28,16 @@ class SignKoreanApplication : Application() {
         val content = koin.get<ContentRepository>()
         val dispatchers = koin.get<AppDispatchers>()
         val debuggable = (applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE) != 0
-        CoroutineScope(SupervisorJob() + dispatchers.default).launch {
+        val scope = CoroutineScope(SupervisorJob() + dispatchers.default)
+
+        // 권한 확인: 앱 시작(첫 화면의 resume)과 전면 복귀마다 한 번 (설계서 §6.4, E-13).
+        // 확인 실패는 Entitlements 가 마지막 권한을 유지하는 것으로 처리한다.
+        val entitlements = koin.get<Entitlements>()
+        val tracker = koin.get<ForegroundActivityTracker>()
+        tracker.onResume = { scope.launch { entitlements.refresh() } }
+        registerActivityLifecycleCallbacks(tracker)
+
+        scope.launch {
             try {
                 val pack = content.load()
                 Log.i(TAG, "content ${pack.version}: cards=${pack.cards.size} places=${pack.places.size} areas=${pack.areas.size}")
