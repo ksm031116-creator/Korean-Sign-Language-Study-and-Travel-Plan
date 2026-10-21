@@ -15,9 +15,18 @@ data class AreaPlaces(val area: Area, val places: List<Place>)
 /** 콘텐츠 팩에서 장소 목록을 만든다. 연결 규칙은 [CardPlaceLinker] 하나만 쓴다 (C-01~03). */
 object PlaceListing {
 
+    /** 활성 지역의 장소. 장소 수·진입점·목록이 모두 이것을 써서 서로 어긋나지 않는다(Phase 14 리뷰 PLC-12). */
+    fun visiblePlaces(pack: ContentPack): List<Place> {
+        val active = pack.areas.filter { it.active }.map { it.id }.toSet()
+        return pack.places.filter { it.areaId in active }
+    }
+
+    /** 간판을 볼 수 있는 장소 수. Learn 의 아래 방향·Saved 의 "n places" 가 쓴다. */
+    fun count(pack: ContentPack, card: SignCard): Int = CardPlaceLinker.placesFor(card, visiblePlaces(pack)).size
+
     /** 간판을 볼 수 있는 장소. 팩의 지역 순서, 지역 안에서는 팩의 장소 순서. 비활성 지역은 뺀다. */
     fun forCard(pack: ContentPack, card: SignCard): List<AreaPlaces> {
-        val places = CardPlaceLinker.placesFor(card, pack.places)
+        val places = CardPlaceLinker.placesFor(card, visiblePlaces(pack))
         return pack.areas.filter { it.active }
             .map { area -> AreaPlaces(area, places.filter { it.areaId == area.id }) }
             .filter { it.places.isNotEmpty() }

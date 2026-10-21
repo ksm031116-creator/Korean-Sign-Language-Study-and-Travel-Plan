@@ -12,6 +12,7 @@ import app.signkorean.domain.bookmark.SetBookmark
 import app.signkorean.domain.content.AreaId
 import app.signkorean.domain.content.CardId
 import app.signkorean.domain.content.CardPlaceLinker
+import app.signkorean.domain.place.PlaceListing
 import app.signkorean.domain.content.ContentRepository
 import app.signkorean.domain.content.SignCard
 import app.signkorean.domain.content.SignGroup
@@ -130,7 +131,7 @@ class SavedViewModel(
                 val statuses = states.all()
                 val items = bookmarks.all().map { b ->
                     val card = pack.cards.firstOrNull { it.id == b.card }
-                    val places = card?.let { CardPlaceLinker.placesFor(it, pack.places) }.orEmpty()
+                    val places = card?.let { CardPlaceLinker.placesFor(it, PlaceListing.visiblePlaces(pack)) }.orEmpty()
                     SavedItem(
                         id = b.card,
                         card = card,

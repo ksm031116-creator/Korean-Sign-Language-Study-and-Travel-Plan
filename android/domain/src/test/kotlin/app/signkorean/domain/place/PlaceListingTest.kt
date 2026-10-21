@@ -54,6 +54,14 @@ class PlaceListingTest {
     }
 
     @Test
+    fun `장소 수도 비활성 지역을 빼고 센다 (진입점과 목록이 어긋나지 않게)`() {
+        val closed = pack.copy(areas = pack.areas.map { if (it.id.value == "mapo") it.copy(active = false) else it })
+        assertEquals(3, PlaceListing.count(pack, gukbap))
+        assertEquals(2, PlaceListing.count(closed, gukbap))
+        assertEquals(0, PlaceListing.count(pack, restroom))
+    }
+
+    @Test
     fun `장소의 간판은 연결 규칙을 따르고 활성 카드만`() {
         val place = pack.places.first { it.id.value == "gwangjang" }
         assertEquals(listOf(CardId("t-market-1")), PlaceListing.signsAt(pack, place).map { it.id })

@@ -20,6 +20,27 @@ class AppNavigatorTest {
     }
 
     @Test
+    fun `학습을 열 때 스택에 학습 화면이 이미 있으면 그 위와 함께 닫고 새로 연다`() {
+        nav.push(Route(ScreenId.SC03, "area:myeongdong"))
+        nav.openLearn()
+        val first = nav.state.value.current.id
+        nav.push(Route(ScreenId.SC08, "t-market-1"))
+        nav.push(Route(ScreenId.SC07, "gwangjang"))
+        nav.openLearn() // SC07 의 Practise these signs
+        assertEquals(listOf(Route(ScreenId.SC02), Route(ScreenId.SC03, "area:myeongdong"), Route(ScreenId.SC04)), routes())
+        assertNotEquals("새 항목이라 새 ViewModel 을 받는다", first, nav.state.value.current.id)
+        assertTrue(nav.back())
+        assertEquals(Route(ScreenId.SC03, "area:myeongdong"), current())
+    }
+
+    @Test
+    fun `학습 화면이 없으면 그냥 위에 연다`() {
+        nav.push(Route(ScreenId.SC03, "basics"))
+        nav.openLearn()
+        assertEquals(listOf(Route(ScreenId.SC02), Route(ScreenId.SC03, "basics"), Route(ScreenId.SC04)), routes())
+    }
+
+    @Test
     fun `push 한 화면에서 Back 은 한 단계 돌아간다`() {
         nav.push(Route(ScreenId.SC03, "myeongdong"))
         nav.push(Route(ScreenId.SC04, "area:myeongdong"))

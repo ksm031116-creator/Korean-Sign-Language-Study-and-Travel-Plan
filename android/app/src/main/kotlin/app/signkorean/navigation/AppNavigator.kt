@@ -92,6 +92,18 @@ class AppNavigator {
         }
     }
 
+    /**
+     * 학습 화면(SC04)을 연다. 지금 탭 스택에 SC04 가 이미 있으면 그 위의 화면과 함께 닫고 새로 연다.
+     * 그대로 하나 더 쌓으면 아래에 남은 SC04 가 교체 전 세션을 보인다(Phase 14 리뷰 PLC-04).
+     */
+    fun openLearn() {
+        _state.update { s ->
+            val at = s.stack.indexOfFirst { it.route.screen == ScreenId.SC04 }
+            val base = if (at > 0) s.stack.take(at) else s.stack
+            s.copy(stacks = s.stacks + (s.tab to base + entry(Route(ScreenId.SC04))))
+        }
+    }
+
     /** 한 단계 뒤로. 앱을 떠나야 하면 false. */
     fun back(): Boolean {
         var moved = false

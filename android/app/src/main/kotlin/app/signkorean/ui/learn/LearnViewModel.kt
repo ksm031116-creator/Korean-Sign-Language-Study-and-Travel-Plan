@@ -9,7 +9,7 @@ import app.signkorean.domain.bookmark.BookmarkStore
 import app.signkorean.domain.bookmark.SetBookmark
 import app.signkorean.domain.audio.PlaybackState
 import app.signkorean.domain.content.CardId
-import app.signkorean.domain.content.CardPlaceLinker
+import app.signkorean.domain.place.PlaceListing
 import app.signkorean.domain.content.ContentPack
 import app.signkorean.domain.content.ContentRepository
 import app.signkorean.domain.content.SignCard
@@ -341,7 +341,7 @@ class LearnViewModel(
             loading = false,
             card = card,
             face = s.face,
-            hasPlaces = card != null && p != null && CardPlaceLinker.hasPlaces(card, p.places),
+            hasPlaces = card != null && p != null && PlaceListing.count(p, card) > 0,
             decisions = s.decisions.size,
             seq = s.decisionSeq,
             isTryAgain = s.isTryAgain,

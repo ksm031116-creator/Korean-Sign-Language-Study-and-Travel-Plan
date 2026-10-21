@@ -38,7 +38,7 @@ fun AppScreen(route: Route, navigator: AppNavigator) {
         ScreenId.SC02 -> ExploreScreen(
             onOpenBasics = { navigator.push(Route(ScreenId.SC03, CollectionArg.BASICS)) },
             onOpenArea = { id -> navigator.push(Route(ScreenId.SC03, CollectionArg.area(id))) },
-            onResume = { navigator.push(Route(ScreenId.SC04)) },
+            onResume = { navigator.openLearn() },
             onOpenSettings = null, // SC10 은 Phase 20 에서 연다
         )
         ScreenId.SC03 -> {
@@ -48,7 +48,7 @@ fun AppScreen(route: Route, navigator: AppNavigator) {
             } else {
                 CollectionScreen(
                     source = source,
-                    onOpenLearn = { navigator.push(Route(ScreenId.SC04)) },
+                    onOpenLearn = { navigator.openLearn() },
                     onOpenPlace = { id -> navigator.push(Route(ScreenId.SC07, id)) },
                     onBack = { navigator.back() },
                 )
@@ -61,7 +61,7 @@ fun AppScreen(route: Route, navigator: AppNavigator) {
             onBookmarkLimit = { navigator.push(Route(ScreenId.SC21, UpgradeFeature.BookmarkLimit.arg)) },
         )
         ScreenId.SC09 -> SavedScreen(
-            onOpenLearn = { navigator.push(Route(ScreenId.SC04)) },
+            onOpenLearn = { navigator.openLearn() },
             onUpgrade = { navigator.push(Route(ScreenId.SC21, UpgradeFeature.Bookmarks.arg)) },
             onOpenPlaces = { card -> navigator.push(Route(ScreenId.SC08, card.value)) },
         )
@@ -70,7 +70,6 @@ fun AppScreen(route: Route, navigator: AppNavigator) {
             onUpgrade = { navigator.push(Route(ScreenId.SC21, UpgradeFeature.Plan.arg)) },
             paidContent = { PlaceholderScreen(route) },
         )
-        // 결제·복원·Not now 모두 호출한 화면으로 돌아간다. 이어서 할 동작은 보류 동작이 맡는다 (PRD §14.1).
         // 간판의 장소 목록. Learn 아래 스와이프로 온다(FR09). 닫으면 같은 카드로 돌아간다.
         ScreenId.SC08 -> route.arg?.let { card ->
             PlacesScreen(
@@ -84,10 +83,11 @@ fun AppScreen(route: Route, navigator: AppNavigator) {
             PlaceDetailScreen(
                 place = PlaceId(place),
                 onClose = { navigator.back() },
-                onOpenLearn = { navigator.push(Route(ScreenId.SC04)) },
+                onOpenLearn = { navigator.openLearn() },
                 onUpgrade = { f -> navigator.push(Route(ScreenId.SC21, f.arg)) },
             )
         } ?: PlaceholderScreen(route)
+        // 결제·복원·Not now 모두 호출한 화면으로 돌아간다. 이어서 할 동작은 보류 동작이 맡는다 (PRD §14.1).
         ScreenId.SC21 -> UpgradeScreen(UpgradeFeature.parse(route.arg), onClose = { navigator.back() })
         ScreenId.SC06 -> ResultScreen(
             onOpenLearn = { navigator.replaceTop(Route(ScreenId.SC04)) },

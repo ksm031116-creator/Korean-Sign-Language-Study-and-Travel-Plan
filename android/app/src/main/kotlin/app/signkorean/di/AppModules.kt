@@ -93,12 +93,12 @@ val contentModule = module {
     single<ContentRepository> { AssetContentRepository(get(), get(), get(), get(), get()) }
 }
 
-/** 언어 (Phase 3). 앱 언어 저장은 AppCompat 하나만 한다 (설계서 §8.2). */
 /** 장소 (Phase 14). 리뷰 요약은 중계 서버가 생기기 전까지 "없음"이다(Phase 15 에서 HTTP). */
 val placeModule = module {
     single<PlaceSummaryProvider> { UnavailablePlaceSummaries }
 }
 
+/** 언어 (Phase 3). 앱 언어 저장은 AppCompat 하나만 한다 (설계서 §8.2). */
 val localeModule = module {
     single<CurrentLocale> { AppCompatCurrentLocale(androidContext()) }
     factory { ResolveAppLanguage(get()) }
