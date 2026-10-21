@@ -42,6 +42,8 @@ FFMPEG_ARGS = ['-ac', '1', '-ar', '24000', '-c:a', 'aac', '-b:a', '40k',
 ENCODER_KEY = ' '.join(FFMPEG_ARGS)
 # 설명 언어와 검수 상태. ja 는 원어민 검수(Q-01) 전까지 draft 이며 출시 빌드 검사가 막는다 (설계서 §8.8).
 LOCALES = {'en': 'reviewed', 'ja': 'draft'}
+# 일본어 콘텐츠 원본 (Phase 20 D2). 직역이 아닌 현지화 초안이며 검수 전까지 ja 는 draft 다.
+JA_SOURCE = PROTO / 'data_ja.json'
 
 # 기초 표지판 분류의 한국어 이름. 프로토타입 데이터에는 영어 이름만 있다.
 BASIC_GROUP_KO = {
@@ -166,6 +168,28 @@ def convert_audio(card_id: str, cache: dict, write: bool) -> dict:
     return entry
 
 
+def apply_ja(areas: list, groups: list, cards: list, places: list, ja: dict) -> None:
+    """일본어 값을 각 항목에 넣는다. 원본에 없는 항목·모르는 ID 는 실패한다 — 새 카드·장소는 일본어도 함께 적는다."""
+    def table(kind: str, items: list) -> dict:
+        source = ja.get(kind, {})
+        ids = {i['id'] for i in items}
+        missing, unknown = sorted(ids - source.keys()), sorted(source.keys() - ids)
+        if missing or unknown:
+            raise BuildError(f'data_ja.json {kind}: 빠짐 {missing} / 모르는 ID {unknown}')
+        return source
+    for a in areas:
+        t = table('areas', areas)[a['id']]
+        a['name']['ja'], a['tag']['ja'], a['description']['ja'] = t['name'], t['tag'], t['description']
+    for g in groups:
+        g['label']['ja'] = table('groups', groups)[g['id']]
+    for c in cards:
+        t = table('cards', cards)[c['id']]
+        c['reading']['ja'], c['meaning']['ja'], c['note']['ja'] = t['reading'], t['meaning'], t['note']
+    for p in places:
+        t = table('places', places)[p['id']]
+        p['name']['ja'], p['address']['ja'] = t['name'], t['address']
+
+
 def build(proto: dict, write_audio: bool = False) -> tuple[dict, list[Path]]:
     data, tour, commons = proto['data'], proto['tour'], proto['commons']
     bundled = {c['id']: c for c in json.loads((PROTO / 'assets' / 'credits.json').read_text(encoding='utf-8'))}
@@ -220,6 +244,7 @@ def build(proto: dict, write_audio: bool = False) -> tuple[dict, list[Path]]:
             'isExample': bool(p.get('example')),
         })
 
+    apply_ja(areas, groups, cards, places, json.loads(JA_SOURCE.read_text(encoding='utf-8')))
     body = {'locales': LOCALES, 'areas': areas, 'groups': groups, 'cards': cards, 'places': places}
     # 내용이 같으면 버전도 같도록 내용 해시를 쓴다(생성 날짜를 쓰면 매번 diff 가 생긴다).
     version = hashlib.sha256(json.dumps(body, ensure_ascii=False, sort_keys=True).encode('utf-8')).hexdigest()[:12]

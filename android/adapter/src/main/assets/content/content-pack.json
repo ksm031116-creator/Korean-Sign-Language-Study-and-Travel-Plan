@@ -1,6 +1,6 @@
 {
  "schemaVersion": 1,
- "version": "c3ea9b215850",
+ "version": "20e52ae63ec4",
  "locales": {
   "en": "reviewed",
   "ja": "draft"
@@ -10,13 +10,16 @@
    "id": "gyeongbokgung",
    "koName": "경복궁·서촌",
    "name": {
-    "en": "Gyeongbokgung & Seochon"
+    "en": "Gyeongbokgung & Seochon",
+    "ja": "景福宮・西村"
    },
    "tag": {
-    "en": "History & quiet lanes"
+    "en": "History & quiet lanes",
+    "ja": "歴史と静かな路地"
    },
    "description": {
-    "en": "Palace courtyards, museum halls and the slow lanes of Seochon and Samcheong-dong."
+    "en": "Palace courtyards, museum halls and the slow lanes of Seochon and Samcheong-dong.",
+    "ja": "王宮の中庭、博物館、そして西村・三清洞のゆったりした路地。"
    },
    "color": "#2f6f5e",
    "active": true
@@ -25,13 +28,16 @@
    "id": "myeongdong",
    "koName": "명동·남대문",
    "name": {
-    "en": "Myeongdong & Namdaemun"
+    "en": "Myeongdong & Namdaemun",
+    "ja": "明洞・南大門"
    },
    "tag": {
-    "en": "Food & shopping"
+    "en": "Food & shopping",
+    "ja": "グルメとショッピング"
    },
    "description": {
-    "en": "A dense grid of shops, street food and the oldest market in the city."
+    "en": "A dense grid of shops, street food and the oldest market in the city.",
+    "ja": "お店と屋台がぎっしり並ぶ街並みと、ソウルでいちばん古い市場。"
    },
    "color": "#b8554a",
    "active": true
@@ -40,13 +46,16 @@
    "id": "ddp",
    "koName": "동대문·을지로",
    "name": {
-    "en": "Dongdaemun & Euljiro"
+    "en": "Dongdaemun & Euljiro",
+    "ja": "東大門・乙支路"
    },
    "tag": {
-    "en": "Design & night walks"
+    "en": "Design & night walks",
+    "ja": "デザインと夜歩き"
    },
    "description": {
-    "en": "Curved architecture, fabric markets and the printing alleys of Euljiro."
+    "en": "Curved architecture, fabric markets and the printing alleys of Euljiro.",
+    "ja": "曲線の建築、生地市場、乙支路の印刷路地。"
    },
    "color": "#4a5b8c",
    "active": true
@@ -55,13 +64,16 @@
    "id": "seongsu",
    "koName": "성수·서울숲",
    "name": {
-    "en": "Seongsu & Seoul Forest"
+    "en": "Seongsu & Seoul Forest",
+    "ja": "聖水・ソウルの森"
    },
    "tag": {
-    "en": "Cafés & parks"
+    "en": "Cafés & parks",
+    "ja": "カフェと公園"
    },
    "description": {
-    "en": "Converted factories, a long green park and the city’s busiest café street."
+    "en": "Converted factories, a long green park and the city’s busiest café street.",
+    "ja": "工場を改装した建物、細長い緑の公園、ソウル屈指のカフェ通り。"
    },
    "color": "#6b8e3d",
    "active": true
@@ -70,13 +82,16 @@
    "id": "hongdae",
    "koName": "홍대·연남",
    "name": {
-    "en": "Hongdae & Yeonnam"
+    "en": "Hongdae & Yeonnam",
+    "ja": "弘大・延南"
    },
    "tag": {
-    "en": "Youth & late nights"
+    "en": "Youth & late nights",
+    "ja": "若者と夜の街"
    },
    "description": {
-    "en": "Music venues, student streets and a converted railway park."
+    "en": "Music venues, student streets and a converted railway park.",
+    "ja": "ライブハウス、学生街、線路跡を生かした公園。"
    },
    "color": "#9c5a9e",
    "active": true
@@ -85,13 +100,16 @@
    "id": "yongsan",
    "koName": "용산·이태원",
    "name": {
-    "en": "Yongsan & Itaewon"
+    "en": "Yongsan & Itaewon",
+    "ja": "龍山・梨泰院"
    },
    "tag": {
-    "en": "Museums & global food"
+    "en": "Museums & global food",
+    "ja": "博物館と世界のグルメ"
    },
    "description": {
-    "en": "The national museum, a war memorial, and the most international street in Seoul."
+    "en": "The national museum, a war memorial, and the most international street in Seoul.",
+    "ja": "国立中央博物館、戦争記念館、ソウルでいちばん国際色豊かな通り。"
    },
    "color": "#c07a2c",
    "active": true
@@ -100,13 +118,16 @@
    "id": "yeouido",
    "koName": "여의도·한강",
    "name": {
-    "en": "Yeouido & the Han River"
+    "en": "Yeouido & the Han River",
+    "ja": "汝矣島・漢江"
    },
    "tag": {
-    "en": "River & skyline"
+    "en": "River & skyline",
+    "ja": "川辺とスカイライン"
    },
    "description": {
-    "en": "Riverside parks, a department store and the city’s financial district."
+    "en": "Riverside parks, a department store and the city’s financial district.",
+    "ja": "川沿いの公園、百貨店、ソウルの金融街。"
    },
    "color": "#2f7f94",
    "active": true
@@ -115,13 +136,16 @@
    "id": "gangnam",
    "koName": "강남·잠실",
    "name": {
-    "en": "Gangnam & Jamsil"
+    "en": "Gangnam & Jamsil",
+    "ja": "江南・蚕室"
    },
    "tag": {
-    "en": "Towers & malls"
+    "en": "Towers & malls",
+    "ja": "高層ビルとモール"
    },
    "description": {
-    "en": "Underground malls, an observation tower and a large Olympic park."
+    "en": "Underground malls, an observation tower and a large Olympic park.",
+    "ja": "地下モール、展望タワー、広いオリンピック公園。"
    },
    "color": "#5b4b8a",
    "active": true
@@ -133,7 +157,8 @@
    "kind": "basic",
    "koLabel": "화장실·시설",
    "label": {
-    "en": "Restrooms & facilities"
+    "en": "Restrooms & facilities",
+    "ja": "トイレ・設備"
    },
    "color": "#2f6fb0"
   },
@@ -142,7 +167,8 @@
    "kind": "basic",
    "koLabel": "문·방향",
    "label": {
-    "en": "Doors & direction"
+    "en": "Doors & direction",
+    "ja": "ドア・方向"
    },
    "color": "#3a7d44"
   },
@@ -151,7 +177,8 @@
    "kind": "basic",
    "koLabel": "영업시간",
    "label": {
-    "en": "Opening hours"
+    "en": "Opening hours",
+    "ja": "営業時間"
    },
    "color": "#b9772a"
   },
@@ -160,7 +187,8 @@
    "kind": "basic",
    "koLabel": "주의·금지",
    "label": {
-    "en": "Warnings & bans"
+    "en": "Warnings & bans",
+    "ja": "注意・禁止"
    },
    "color": "#c0392b"
   },
@@ -169,7 +197,8 @@
    "kind": "basic",
    "koLabel": "교통·이동",
    "label": {
-    "en": "Transit & moving around"
+    "en": "Transit & moving around",
+    "ja": "交通・移動"
    },
    "color": "#1f6f78"
   },
@@ -178,7 +207,8 @@
    "kind": "basic",
    "koLabel": "생활 서비스",
    "label": {
-    "en": "Everyday services"
+    "en": "Everyday services",
+    "ja": "生活サービス"
    },
    "color": "#5b4b8a"
   },
@@ -187,7 +217,8 @@
    "kind": "place",
    "koLabel": "고궁·유적",
    "label": {
-    "en": "Palace & heritage site"
+    "en": "Palace & heritage site",
+    "ja": "古宮・史跡"
    },
    "color": "#2f6f5e"
   },
@@ -196,7 +227,8 @@
    "kind": "place",
    "koLabel": "박물관·미술관",
    "label": {
-    "en": "Museum & gallery"
+    "en": "Museum & gallery",
+    "ja": "博物館・美術館"
    },
    "color": "#4a5b8c"
   },
@@ -205,7 +237,8 @@
    "kind": "place",
    "koLabel": "전통시장",
    "label": {
-    "en": "Traditional market"
+    "en": "Traditional market",
+    "ja": "伝統市場"
    },
    "color": "#b8554a"
   },
@@ -214,7 +247,8 @@
    "kind": "place",
    "koLabel": "카페거리",
    "label": {
-    "en": "Café street"
+    "en": "Café street",
+    "ja": "カフェ通り"
    },
    "color": "#8c6239"
   },
@@ -223,7 +257,8 @@
    "kind": "place",
    "koLabel": "먹자골목·상점가",
    "label": {
-    "en": "Food street & shops"
+    "en": "Food street & shops",
+    "ja": "グルメ横丁・商店街"
    },
    "color": "#a8492f"
   },
@@ -232,7 +267,8 @@
    "kind": "place",
    "koLabel": "백화점·쇼핑몰",
    "label": {
-    "en": "Department store & mall"
+    "en": "Department store & mall",
+    "ja": "百貨店・ショッピングモール"
    },
    "color": "#9c5a9e"
   },
@@ -241,7 +277,8 @@
    "kind": "place",
    "koLabel": "한옥마을·공방거리",
    "label": {
-    "en": "Hanok village & craft street"
+    "en": "Hanok village & craft street",
+    "ja": "韓屋村・工房通り"
    },
    "color": "#7a6a3a"
   },
@@ -250,7 +287,8 @@
    "kind": "place",
    "koLabel": "랜드마크·광장",
    "label": {
-    "en": "Landmark & plaza"
+    "en": "Landmark & plaza",
+    "ja": "ランドマーク・広場"
    },
    "color": "#3d6f8f"
   },
@@ -259,7 +297,8 @@
    "kind": "place",
    "koLabel": "전망대",
    "label": {
-    "en": "Observation tower"
+    "en": "Observation tower",
+    "ja": "展望台"
    },
    "color": "#2f7f94"
   },
@@ -268,7 +307,8 @@
    "kind": "place",
    "koLabel": "역·터미널",
    "label": {
-    "en": "Station & terminal"
+    "en": "Station & terminal",
+    "ja": "駅・ターミナル"
    },
    "color": "#1f6f78"
   },
@@ -277,7 +317,8 @@
    "kind": "place",
    "koLabel": "공원·한강",
    "label": {
-    "en": "Park & riverside"
+    "en": "Park & riverside",
+    "ja": "公園・漢江"
    },
    "color": "#6b8e3d"
   },
@@ -286,7 +327,8 @@
    "kind": "place",
    "koLabel": "약국·병원·은행",
    "label": {
-    "en": "Pharmacy, clinic & bank"
+    "en": "Pharmacy, clinic & bank",
+    "ja": "薬局・病院・銀行"
    },
    "color": "#3a7d44"
   }
@@ -298,12 +340,16 @@
    "group": "palace",
    "koText": "매표소",
    "romanization": "mapyoso",
-   "reading": {},
+   "reading": {
+    "ja": "メピョソ"
+   },
    "meaning": {
-    "en": "Ticket office"
+    "en": "Ticket office",
+    "ja": "チケット売り場"
    },
    "note": {
-    "en": "Where you buy the entry ticket. The same word appears at towers and terminals."
+    "en": "Where you buy the entry ticket. The same word appears at towers and terminals.",
+    "ja": "入場券を買う窓口。タワーやターミナルでも同じ言葉を見かけます。"
    },
    "pictogram": null,
    "plateColor": "#2f6f5e",
@@ -321,12 +367,16 @@
    "group": "palace",
    "koText": "입장료",
    "romanization": "ipjangnyo",
-   "reading": {},
+   "reading": {
+    "ja": "イプチャンニョ"
+   },
    "meaning": {
-    "en": "Admission fee"
+    "en": "Admission fee",
+    "ja": "入場料"
    },
    "note": {
-    "en": "무료 next to it means free entry."
+    "en": "무료 next to it means free entry.",
+    "ja": "横に 무료 とあれば入場無料です。"
    },
    "pictogram": null,
    "plateColor": "#2f6f5e",
@@ -344,12 +394,16 @@
    "group": "palace",
    "koText": "관람 시간",
    "romanization": "gwallam sigan",
-   "reading": {},
+   "reading": {
+    "ja": "クァルラム シガン"
+   },
    "meaning": {
-    "en": "Opening hours"
+    "en": "Opening hours",
+    "ja": "観覧時間"
    },
    "note": {
-    "en": "관람 is viewing. You will see it at museums too."
+    "en": "관람 is viewing. You will see it at museums too.",
+    "ja": "관람 は「観覧」。博物館でも見かけます。"
    },
    "pictogram": null,
    "plateColor": "#2f6f5e",
@@ -367,12 +421,16 @@
    "group": "museum",
    "koText": "박물관",
    "romanization": "bangmulgwan",
-   "reading": {},
+   "reading": {
+    "ja": "パンムルグァン"
+   },
    "meaning": {
-    "en": "Museum"
+    "en": "Museum",
+    "ja": "博物館"
    },
    "note": {
-    "en": "관 at the end means a public hall or building."
+    "en": "관 at the end means a public hall or building.",
+    "ja": "最後の 관 は「館」。公共の建物によく付きます。"
    },
    "pictogram": null,
    "plateColor": "#4a5b8c",
@@ -390,12 +448,16 @@
    "group": "museum",
    "koText": "전시",
    "romanization": "jeonsi",
-   "reading": {},
+   "reading": {
+    "ja": "チョンシ"
+   },
    "meaning": {
-    "en": "Exhibition"
+    "en": "Exhibition",
+    "ja": "展示"
    },
    "note": {
-    "en": "기획 전시 is a special exhibition."
+    "en": "기획 전시 is a special exhibition.",
+    "ja": "기획 전시 は企画展です。"
    },
    "pictogram": null,
    "plateColor": "#4a5b8c",
@@ -413,12 +475,16 @@
    "group": "museum",
    "koText": "보관함",
    "romanization": "bogwamham",
-   "reading": {},
+   "reading": {
+    "ja": "ポグァナム"
+   },
    "meaning": {
-    "en": "Lockers"
+    "en": "Lockers",
+    "ja": "ロッカー"
    },
    "note": {
-    "en": "Leave your bag before going in."
+    "en": "Leave your bag before going in.",
+    "ja": "入る前に荷物を預ける場所です。"
    },
    "pictogram": null,
    "plateColor": "#4a5b8c",
@@ -436,12 +502,16 @@
    "group": "market",
    "koText": "국밥",
    "romanization": "gukbap",
-   "reading": {},
+   "reading": {
+    "ja": "クッパ"
+   },
    "meaning": {
-    "en": "Rice and soup"
+    "en": "Rice and soup",
+    "ja": "クッパ(スープご飯)"
    },
    "note": {
-    "en": "A cheap, filling market meal. The word is on dozens of stalls."
+    "en": "A cheap, filling market meal. The word is on dozens of stalls.",
+    "ja": "安くてお腹いっぱいになる市場ごはん。たくさんの店先で見かけます。"
    },
    "pictogram": null,
    "plateColor": "#b8554a",
@@ -459,12 +529,16 @@
    "group": "market",
    "koText": "만두",
    "romanization": "mandu",
-   "reading": {},
+   "reading": {
+    "ja": "マンドゥ"
+   },
    "meaning": {
-    "en": "Dumplings"
+    "en": "Dumplings",
+    "ja": "餃子"
    },
    "note": {
-    "en": "Steamed or fried, sold by the plate."
+    "en": "Steamed or fried, sold by the plate.",
+    "ja": "蒸しも焼きもあり、皿単位で売られています。"
    },
    "pictogram": null,
    "plateColor": "#b8554a",
@@ -482,12 +556,16 @@
    "group": "market",
    "koText": "칼국수",
    "romanization": "kalguksu",
-   "reading": {},
+   "reading": {
+    "ja": "カルグクス"
+   },
    "meaning": {
-    "en": "Knife-cut noodles"
+    "en": "Knife-cut noodles",
+    "ja": "手打ちうどん"
    },
    "note": {
-    "en": "A hand-cut noodle soup, common in market alleys."
+    "en": "A hand-cut noodle soup, common in market alleys.",
+    "ja": "包丁で切った麺のスープ。市場の路地の定番です。"
    },
    "pictogram": null,
    "plateColor": "#b8554a",
@@ -505,12 +583,16 @@
    "group": "market",
    "koText": "떡볶이",
    "romanization": "tteokbokki",
-   "reading": {},
+   "reading": {
+    "ja": "トッポッキ"
+   },
    "meaning": {
-    "en": "Spicy rice cakes"
+    "en": "Spicy rice cakes",
+    "ja": "トッポッキ(甘辛餅)"
    },
    "note": {
-    "en": "The most common street food sign in the country."
+    "en": "The most common street food sign in the country.",
+    "ja": "韓国でいちばんよく見る屋台の看板です。"
    },
    "pictogram": null,
    "plateColor": "#b8554a",
@@ -528,12 +610,16 @@
    "group": "market",
    "koText": "순대",
    "romanization": "sundae",
-   "reading": {},
+   "reading": {
+    "ja": "スンデ"
+   },
    "meaning": {
-    "en": "Blood sausage"
+    "en": "Blood sausage",
+    "ja": "スンデ(韓国式腸詰め)"
    },
    "note": {
-    "en": "Often sold at the same stall as 떡볶이."
+    "en": "Often sold at the same stall as 떡볶이.",
+    "ja": "トッポッキと同じ屋台で売られることが多いです。"
    },
    "pictogram": null,
    "plateColor": "#b8554a",
@@ -551,12 +637,16 @@
    "group": "cafe",
    "koText": "카페",
    "romanization": "kape",
-   "reading": {},
+   "reading": {
+    "ja": "カペ"
+   },
    "meaning": {
-    "en": "Café"
+    "en": "Café",
+    "ja": "カフェ"
    },
    "note": {
-    "en": "A loanword — read it aloud and you will hear it."
+    "en": "A loanword — read it aloud and you will hear it.",
+    "ja": "外来語。声に出して読むと意味がわかります。"
    },
    "pictogram": null,
    "plateColor": "#8c6239",
@@ -574,12 +664,16 @@
    "group": "cafe",
    "koText": "커피",
    "romanization": "keopi",
-   "reading": {},
+   "reading": {
+    "ja": "コピ"
+   },
    "meaning": {
-    "en": "Coffee"
+    "en": "Coffee",
+    "ja": "コーヒー"
    },
    "note": {
-    "en": "Another loanword you can decode on sight."
+    "en": "Another loanword you can decode on sight.",
+    "ja": "これも外来語。見ただけで読み解けます。"
    },
    "pictogram": null,
    "plateColor": "#8c6239",
@@ -592,12 +686,16 @@
    "group": "cafe",
    "koText": "포장",
    "romanization": "pojang",
-   "reading": {},
+   "reading": {
+    "ja": "ポジャン"
+   },
    "meaning": {
-    "en": "Takeout"
+    "en": "Takeout",
+    "ja": "テイクアウト"
    },
    "note": {
-    "en": "Also used at restaurants for food to go."
+    "en": "Also used at restaurants for food to go.",
+    "ja": "食堂で料理を持ち帰るときにも使います。"
    },
    "pictogram": null,
    "plateColor": "#8c6239",
@@ -615,12 +713,16 @@
    "group": "street",
    "koText": "식당",
    "romanization": "sikdang",
-   "reading": {},
+   "reading": {
+    "ja": "シクタン"
+   },
    "meaning": {
-    "en": "Restaurant"
+    "en": "Restaurant",
+    "ja": "食堂"
    },
    "note": {
-    "en": "The plain, general word for an eating place."
+    "en": "The plain, general word for an eating place.",
+    "ja": "飲食店を指すいちばん一般的な言葉です。"
    },
    "pictogram": null,
    "plateColor": "#a8492f",
@@ -638,12 +740,16 @@
    "group": "street",
    "koText": "분식",
    "romanization": "bunsik",
-   "reading": {},
+   "reading": {
+    "ja": "プンシク"
+   },
    "meaning": {
-    "en": "Snack food"
+    "en": "Snack food",
+    "ja": "軽食(粉食)"
    },
    "note": {
-    "en": "Cheap, quick Korean snacks — kimbap, ramyeon, fried bites."
+    "en": "Cheap, quick Korean snacks — kimbap, ramyeon, fried bites.",
+    "ja": "キンパ、ラーメン、揚げ物など手軽な韓国の軽食。"
    },
    "pictogram": null,
    "plateColor": "#a8492f",
@@ -661,12 +767,16 @@
    "group": "street",
    "koText": "호프",
    "romanization": "hopeu",
-   "reading": {},
+   "reading": {
+    "ja": "ホプ"
+   },
    "meaning": {
-    "en": "Beer pub"
+    "en": "Beer pub",
+    "ja": "ビアホール"
    },
    "note": {
-    "en": "From the German Hof. Usually paired with 치킨 on the same sign."
+    "en": "From the German Hof. Usually paired with 치킨 on the same sign.",
+    "ja": "ドイツ語の Hof から。同じ看板に 치킨 が並ぶことが多いです。"
    },
    "pictogram": null,
    "plateColor": "#a8492f",
@@ -684,12 +794,16 @@
    "group": "shopping",
    "koText": "백화점",
    "romanization": "baekhwajeom",
-   "reading": {},
+   "reading": {
+    "ja": "ペッカジョム"
+   },
    "meaning": {
-    "en": "Department store"
+    "en": "Department store",
+    "ja": "百貨店"
    },
    "note": {
-    "en": "점 at the end means shop."
+    "en": "점 at the end means shop.",
+    "ja": "最後の 점 は「店」。"
    },
    "pictogram": null,
    "plateColor": "#9c5a9e",
@@ -707,12 +821,16 @@
    "group": "shopping",
    "koText": "면세점",
    "romanization": "myeonsejeom",
-   "reading": {},
+   "reading": {
+    "ja": "ミョンセジョム"
+   },
    "meaning": {
-    "en": "Duty free"
+    "en": "Duty free",
+    "ja": "免税店"
    },
    "note": {
-    "en": "면세 means tax exempt."
+    "en": "면세 means tax exempt.",
+    "ja": "면세 は「免税」。"
    },
    "pictogram": null,
    "plateColor": "#9c5a9e",
@@ -730,12 +848,16 @@
    "group": "shopping",
    "koText": "할인",
    "romanization": "harin",
-   "reading": {},
+   "reading": {
+    "ja": "ハリン"
+   },
    "meaning": {
-    "en": "Discount"
+    "en": "Discount",
+    "ja": "割引"
    },
    "note": {
-    "en": "세일 is also used on the same signs."
+    "en": "세일 is also used on the same signs.",
+    "ja": "同じ看板に 세일(セール)もよく使われます。"
    },
    "pictogram": null,
    "plateColor": "#9c5a9e",
@@ -753,12 +875,16 @@
    "group": "hanok",
    "koText": "한복 대여",
    "romanization": "hanbok daeyeo",
-   "reading": {},
+   "reading": {
+    "ja": "ハンボク テヨ"
+   },
    "meaning": {
-    "en": "Hanbok rental"
+    "en": "Hanbok rental",
+    "ja": "韓服レンタル"
    },
    "note": {
-    "en": "대여 means rental. Wearing hanbok gets you free palace entry."
+    "en": "대여 means rental. Wearing hanbok gets you free palace entry.",
+    "ja": "대여 は「貸与」。韓服を着ると古宮の入場が無料になります。"
    },
    "pictogram": null,
    "plateColor": "#7a6a3a",
@@ -776,12 +902,16 @@
    "group": "hanok",
    "koText": "공방",
    "romanization": "gongbang",
-   "reading": {},
+   "reading": {
+    "ja": "コンバン"
+   },
    "meaning": {
-    "en": "Craft workshop"
+    "en": "Craft workshop",
+    "ja": "工房"
    },
    "note": {
-    "en": "A small studio where things are made and sold."
+    "en": "A small studio where things are made and sold.",
+    "ja": "ものを作って売る小さなアトリエです。"
    },
    "pictogram": null,
    "plateColor": "#7a6a3a",
@@ -799,12 +929,16 @@
    "group": "hanok",
    "koText": "찻집",
    "romanization": "chatjip",
-   "reading": {},
+   "reading": {
+    "ja": "チャッチプ"
+   },
    "meaning": {
-    "en": "Tea house"
+    "en": "Tea house",
+    "ja": "茶房(お茶の店)"
    },
    "note": {
-    "en": "집 at the end means house or shop."
+    "en": "집 at the end means house or shop.",
+    "ja": "最後の 집 は「家・店」。"
    },
    "pictogram": null,
    "plateColor": "#7a6a3a",
@@ -822,12 +956,16 @@
    "group": "landmark",
    "koText": "안내도",
    "romanization": "annaedo",
-   "reading": {},
+   "reading": {
+    "ja": "アンネド"
+   },
    "meaning": {
-    "en": "Area map"
+    "en": "Area map",
+    "ja": "案内図"
    },
    "note": {
-    "en": "The board showing where everything is. 도 means map or drawing."
+    "en": "The board showing where everything is. 도 means map or drawing.",
+    "ja": "周辺の地図を示す案内板。도 は「図」。"
    },
    "pictogram": null,
    "plateColor": "#3d6f8f",
@@ -840,12 +978,16 @@
    "group": "landmark",
    "koText": "포토존",
    "romanization": "potojon",
-   "reading": {},
+   "reading": {
+    "ja": "ポトジョン"
+   },
    "meaning": {
-    "en": "Photo spot"
+    "en": "Photo spot",
+    "ja": "フォトスポット"
    },
    "note": {
-    "en": "A Konglish loanword — marks the spot with the best view."
+    "en": "A Konglish loanword — marks the spot with the best view.",
+    "ja": "韓国製英語。いちばん景色のいい撮影場所の目印です。"
    },
    "pictogram": null,
    "plateColor": "#3d6f8f",
@@ -858,12 +1000,16 @@
    "group": "tower",
    "koText": "전망대",
    "romanization": "jeonmangdae",
-   "reading": {},
+   "reading": {
+    "ja": "チョンマンデ"
+   },
    "meaning": {
-    "en": "Observation deck"
+    "en": "Observation deck",
+    "ja": "展望台"
    },
    "note": {
-    "en": "The reason you queued for the lift."
+    "en": "The reason you queued for the lift.",
+    "ja": "エレベーターに並んだ目的地です。"
    },
    "pictogram": null,
    "plateColor": "#2f7f94",
@@ -876,12 +1022,16 @@
    "group": "tower",
    "koText": "기념품",
    "romanization": "ginyeompum",
-   "reading": {},
+   "reading": {
+    "ja": "キニョムプム"
+   },
    "meaning": {
-    "en": "Souvenirs"
+    "en": "Souvenirs",
+    "ja": "おみやげ(記念品)"
    },
    "note": {
-    "en": "기념 means commemoration."
+    "en": "기념 means commemoration.",
+    "ja": "기념 は「記念」。"
    },
    "pictogram": null,
    "plateColor": "#2f7f94",
@@ -894,12 +1044,16 @@
    "group": "station",
    "koText": "교통카드 충전",
    "romanization": "gyotongkadeu chungjeon",
-   "reading": {},
+   "reading": {
+    "ja": "キョトンカドゥ チュンジョン"
+   },
    "meaning": {
-    "en": "Transit card top-up"
+    "en": "Transit card top-up",
+    "ja": "交通カードのチャージ"
    },
    "note": {
-    "en": "Machines that reload T-money cards."
+    "en": "Machines that reload T-money cards.",
+    "ja": "T-money カードに入金する機械です。"
    },
    "pictogram": null,
    "plateColor": "#1f6f78",
@@ -912,12 +1066,16 @@
    "group": "station",
    "koText": "고객안내센터",
    "romanization": "gogaek annae senteo",
-   "reading": {},
+   "reading": {
+    "ja": "コゲガンネセント"
+   },
    "meaning": {
-    "en": "Customer service center"
+    "en": "Customer service center",
+    "ja": "お客様案内センター"
    },
    "note": {
-    "en": "Ask here for route help or lost items."
+    "en": "Ask here for route help or lost items.",
+    "ja": "乗り換えの相談や忘れ物はここで聞きます。"
    },
    "pictogram": null,
    "plateColor": "#1f6f78",
@@ -930,12 +1088,16 @@
    "group": "park",
    "koText": "산책로",
    "romanization": "sanchaengno",
-   "reading": {},
+   "reading": {
+    "ja": "サンチェンノ"
+   },
    "meaning": {
-    "en": "Walking path"
+    "en": "Walking path",
+    "ja": "散策路"
    },
    "note": {
-    "en": "로 at the end means road or path."
+    "en": "로 at the end means road or path.",
+    "ja": "最後の 로 は「路」。"
    },
    "pictogram": null,
    "plateColor": "#6b8e3d",
@@ -948,12 +1110,16 @@
    "group": "park",
    "koText": "쉼터",
    "romanization": "swimteo",
-   "reading": {},
+   "reading": {
+    "ja": "シュィムト"
+   },
    "meaning": {
-    "en": "Rest area"
+    "en": "Rest area",
+    "ja": "休憩所"
    },
    "note": {
-    "en": "Benches and shade. 쉼 means rest."
+    "en": "Benches and shade. 쉼 means rest.",
+    "ja": "ベンチと日陰があります。쉼 は「休み」。"
    },
    "pictogram": null,
    "plateColor": "#6b8e3d",
@@ -966,12 +1132,16 @@
    "group": "services",
    "koText": "약국",
    "romanization": "yakguk",
-   "reading": {},
+   "reading": {
+    "ja": "ヤックク"
+   },
    "meaning": {
-    "en": "Pharmacy"
+    "en": "Pharmacy",
+    "ja": "薬局"
    },
    "note": {
-    "en": "Usually with a green cross outside."
+    "en": "Usually with a green cross outside.",
+    "ja": "たいてい外に緑の十字があります。"
    },
    "pictogram": "pharmacy",
    "plateColor": "#3a7d44",
@@ -984,12 +1154,16 @@
    "group": "services",
    "koText": "병원",
    "romanization": "byeongwon",
-   "reading": {},
+   "reading": {
+    "ja": "ピョンウォン"
+   },
    "meaning": {
-    "en": "Clinic / hospital"
+    "en": "Clinic / hospital",
+    "ja": "病院・クリニック"
    },
    "note": {
-    "en": "치과 is dental, 내과 is internal medicine."
+    "en": "치과 is dental, 내과 is internal medicine.",
+    "ja": "치과 は歯科、내과 は内科です。"
    },
    "pictogram": null,
    "plateColor": "#3a7d44",
@@ -1002,12 +1176,16 @@
    "group": "services",
    "koText": "은행",
    "romanization": "eunhaeng",
-   "reading": {},
+   "reading": {
+    "ja": "ウネン"
+   },
    "meaning": {
-    "en": "Bank"
+    "en": "Bank",
+    "ja": "銀行"
    },
    "note": {
-    "en": "ATMs are labelled ATM or 현금인출기."
+    "en": "ATMs are labelled ATM or 현금인출기.",
+    "ja": "ATM は ATM または 현금인출기 と表示されます。"
    },
    "pictogram": null,
    "plateColor": "#3a7d44",
@@ -1020,12 +1198,16 @@
    "group": "services",
    "koText": "환전",
    "romanization": "hwanjeon",
-   "reading": {},
+   "reading": {
+    "ja": "ファンジョン"
+   },
    "meaning": {
-    "en": "Currency exchange"
+    "en": "Currency exchange",
+    "ja": "両替"
    },
    "note": {
-    "en": "Useful near markets and tourist streets."
+    "en": "Useful near markets and tourist streets.",
+    "ja": "市場や観光通りの近くで役立ちます。"
    },
    "pictogram": null,
    "plateColor": "#3a7d44",
@@ -1038,12 +1220,16 @@
    "group": "restroom",
    "koText": "화장실",
    "romanization": "hwajangsil",
-   "reading": {},
+   "reading": {
+    "ja": "ファジャンシル"
+   },
    "meaning": {
-    "en": "Restroom"
+    "en": "Restroom",
+    "ja": "トイレ"
    },
    "note": {
-    "en": "The word itself. Everything else on a restroom door is a variation of this."
+    "en": "The word itself. Everything else on a restroom door is a variation of this.",
+    "ja": "この言葉そのもの。トイレのドアの表示はどれもこの言葉の仲間です。"
    },
    "pictogram": "restroom",
    "plateColor": "#2f6fb0",
@@ -1056,12 +1242,16 @@
    "group": "restroom",
    "koText": "남자 화장실",
    "romanization": "namja hwajangsil",
-   "reading": {},
+   "reading": {
+    "ja": "ナムジャ ファジャンシル"
+   },
    "meaning": {
-    "en": "Men’s restroom"
+    "en": "Men’s restroom",
+    "ja": "男性用トイレ"
    },
    "note": {
-    "en": "남자 means man. Often shown with a blue plate or figure."
+    "en": "남자 means man. Often shown with a blue plate or figure.",
+    "ja": "남자 は「男性」。青い表示や人の形で示されることが多いです。"
    },
    "pictogram": "men",
    "plateColor": "#2f6fb0",
@@ -1074,12 +1264,16 @@
    "group": "restroom",
    "koText": "여자 화장실",
    "romanization": "yeoja hwajangsil",
-   "reading": {},
+   "reading": {
+    "ja": "ヨジャ ファジャンシル"
+   },
    "meaning": {
-    "en": "Women’s restroom"
+    "en": "Women’s restroom",
+    "ja": "女性用トイレ"
    },
    "note": {
-    "en": "여자 means woman. Often shown with a red plate or figure."
+    "en": "여자 means woman. Often shown with a red plate or figure.",
+    "ja": "여자 は「女性」。赤い表示や人の形で示されることが多いです。"
    },
    "pictogram": "women",
    "plateColor": "#2f6fb0",
@@ -1092,12 +1286,16 @@
    "group": "restroom",
    "koText": "장애인 화장실",
    "romanization": "jangaein hwajangsil",
-   "reading": {},
+   "reading": {
+    "ja": "チャンエイン ファジャンシル"
+   },
    "meaning": {
-    "en": "Accessible restroom"
+    "en": "Accessible restroom",
+    "ja": "多目的トイレ"
    },
    "note": {
-    "en": "Marked separately in stations, museums and larger cafés."
+    "en": "Marked separately in stations, museums and larger cafés.",
+    "ja": "駅、博物館、大きなカフェでは別に表示されています。"
    },
    "pictogram": "accessible",
    "plateColor": "#2f6fb0",
@@ -1110,12 +1308,16 @@
    "group": "restroom",
    "koText": "수유실",
    "romanization": "suyusil",
-   "reading": {},
+   "reading": {
+    "ja": "スユシル"
+   },
    "meaning": {
-    "en": "Nursing room"
+    "en": "Nursing room",
+    "ja": "授乳室"
    },
    "note": {
-    "en": "Common in department stores and large stations."
+    "en": "Common in department stores and large stations.",
+    "ja": "百貨店や大きな駅によくあります。"
    },
    "pictogram": null,
    "plateColor": "#2f6fb0",
@@ -1128,12 +1330,16 @@
    "group": "door",
    "koText": "미세요",
    "romanization": "miseyo",
-   "reading": {},
+   "reading": {
+    "ja": "ミセヨ"
+   },
    "meaning": {
-    "en": "Push"
+    "en": "Push",
+    "ja": "押す"
    },
    "note": {
-    "en": "On the door you are about to walk into. Push, don’t pull."
+    "en": "On the door you are about to walk into. Push, don’t pull.",
+    "ja": "これから通るドアに書いてあります。引かずに押してください。"
    },
    "pictogram": null,
    "plateColor": "#3a7d44",
@@ -1146,12 +1352,16 @@
    "group": "door",
    "koText": "당기세요",
    "romanization": "danggiseyo",
-   "reading": {},
+   "reading": {
+    "ja": "タンギセヨ"
+   },
    "meaning": {
-    "en": "Pull"
+    "en": "Pull",
+    "ja": "引く"
    },
    "note": {
-    "en": "The other half of every Korean door."
+    "en": "The other half of every Korean door.",
+    "ja": "韓国のドアのもう片方の表示です。"
    },
    "pictogram": null,
    "plateColor": "#3a7d44",
@@ -1164,12 +1374,16 @@
    "group": "door",
    "koText": "입구",
    "romanization": "ipgu",
-   "reading": {},
+   "reading": {
+    "ja": "イプク"
+   },
    "meaning": {
-    "en": "Entrance"
+    "en": "Entrance",
+    "ja": "入口"
    },
    "note": {
-    "en": "입 is enter, 구 is opening. The pair shows up on buildings and stations."
+    "en": "입 is enter, 구 is opening. The pair shows up on buildings and stations.",
+    "ja": "입 は「入」、구 は「口」。建物や駅でペアで見かけます。"
    },
    "pictogram": null,
    "plateColor": "#3a7d44",
@@ -1182,12 +1396,16 @@
    "group": "door",
    "koText": "출구",
    "romanization": "chulgu",
-   "reading": {},
+   "reading": {
+    "ja": "チュルグ"
+   },
    "meaning": {
-    "en": "Exit"
+    "en": "Exit",
+    "ja": "出口"
    },
    "note": {
-    "en": "Subway exits are numbered: 3번 출구 is Exit 3."
+    "en": "Subway exits are numbered: 3번 출구 is Exit 3.",
+    "ja": "地下鉄の出口は番号付き。3번 출구 は3番出口です。"
    },
    "pictogram": "exit",
    "plateColor": "#3a7d44",
@@ -1200,12 +1418,16 @@
    "group": "door",
    "koText": "비상구",
    "romanization": "bisanggu",
-   "reading": {},
+   "reading": {
+    "ja": "ピサング"
+   },
    "meaning": {
-    "en": "Emergency exit"
+    "en": "Emergency exit",
+    "ja": "非常口"
    },
    "note": {
-    "en": "Always on the green running-figure sign."
+    "en": "Always on the green running-figure sign.",
+    "ja": "いつも緑の走る人の表示と一緒です。"
    },
    "pictogram": "exit",
    "plateColor": "#3a7d44",
@@ -1218,12 +1440,16 @@
    "group": "hours",
    "koText": "영업중",
    "romanization": "yeongeopjung",
-   "reading": {},
+   "reading": {
+    "ja": "ヨンオプチュン"
+   },
    "meaning": {
-    "en": "Open for business"
+    "en": "Open for business",
+    "ja": "営業中"
    },
    "note": {
-    "en": "Hung on the door while the shop is serving."
+    "en": "Hung on the door while the shop is serving.",
+    "ja": "お店が営業している間、ドアに掛かっています。"
    },
    "pictogram": null,
    "plateColor": "#b9772a",
@@ -1236,12 +1462,16 @@
    "group": "hours",
    "koText": "준비중",
    "romanization": "junbijung",
-   "reading": {},
+   "reading": {
+    "ja": "チュンビジュン"
+   },
    "meaning": {
-    "en": "Preparing / not open yet"
+    "en": "Preparing / not open yet",
+    "ja": "準備中"
    },
    "note": {
-    "en": "The shop exists and is staffed — it just isn’t serving you yet."
+    "en": "The shop exists and is staffed — it just isn’t serving you yet.",
+    "ja": "お店も店員もいますが、まだ営業していません。"
    },
    "pictogram": null,
    "plateColor": "#b9772a",
@@ -1254,12 +1484,16 @@
    "group": "hours",
    "koText": "휴무",
    "romanization": "hyumu",
-   "reading": {},
+   "reading": {
+    "ja": "ヒュム"
+   },
    "meaning": {
-    "en": "Closed (day off)"
+    "en": "Closed (day off)",
+    "ja": "休業日"
    },
    "note": {
-    "en": "금일 휴무 means closed today."
+    "en": "금일 휴무 means closed today.",
+    "ja": "금일 휴무 は「本日休業」です。"
    },
    "pictogram": null,
    "plateColor": "#b9772a",
@@ -1272,12 +1506,16 @@
    "group": "hours",
    "koText": "24시간",
    "romanization": "isipsa sigan",
-   "reading": {},
+   "reading": {
+    "ja": "イシプサ シガン"
+   },
    "meaning": {
-    "en": "Open 24 hours"
+    "en": "Open 24 hours",
+    "ja": "24時間営業"
    },
    "note": {
-    "en": "Convenience stores, saunas and some cafés."
+    "en": "Convenience stores, saunas and some cafés.",
+    "ja": "コンビニ、サウナ、一部のカフェ。"
    },
    "pictogram": null,
    "plateColor": "#b9772a",
@@ -1290,12 +1528,16 @@
    "group": "warning",
    "koText": "금연",
    "romanization": "geumyeon",
-   "reading": {},
+   "reading": {
+    "ja": "クミョン"
+   },
    "meaning": {
-    "en": "No smoking"
+    "en": "No smoking",
+    "ja": "禁煙"
    },
    "note": {
-    "en": "금 is to forbid. You will see it on 금지 signs too."
+    "en": "금 is to forbid. You will see it on 금지 signs too.",
+    "ja": "금 は「禁」。금지(禁止)の看板でも見かけます。"
    },
    "pictogram": "noSmoking",
    "plateColor": "#c0392b",
@@ -1308,12 +1550,16 @@
    "group": "warning",
    "koText": "촬영 금지",
    "romanization": "chwaryeong geumji",
-   "reading": {},
+   "reading": {
+    "ja": "チュァリョン クムジ"
+   },
    "meaning": {
-    "en": "No photography"
+    "en": "No photography",
+    "ja": "撮影禁止"
    },
    "note": {
-    "en": "Museums, some shops, and parts of palaces."
+    "en": "Museums, some shops, and parts of palaces.",
+    "ja": "博物館、一部のお店、古宮の一部。"
    },
    "pictogram": "noPhoto",
    "plateColor": "#c0392b",
@@ -1326,12 +1572,16 @@
    "group": "warning",
    "koText": "출입 금지",
    "romanization": "churip geumji",
-   "reading": {},
+   "reading": {
+    "ja": "チュリプ クムジ"
+   },
    "meaning": {
-    "en": "No entry"
+    "en": "No entry",
+    "ja": "立入禁止"
    },
    "note": {
-    "en": "Staff-only doors and closed-off areas."
+    "en": "Staff-only doors and closed-off areas.",
+    "ja": "関係者専用のドアや閉鎖された場所。"
    },
    "pictogram": null,
    "plateColor": "#c0392b",
@@ -1344,12 +1594,16 @@
    "group": "warning",
    "koText": "미끄럼 주의",
    "romanization": "mikkeureom juui",
-   "reading": {},
+   "reading": {
+    "ja": "ミックロム チュイ"
+   },
    "meaning": {
-    "en": "Caution: slippery"
+    "en": "Caution: slippery",
+    "ja": "滑りやすいので注意"
    },
    "note": {
-    "en": "주의 means caution. It pairs with many other words."
+    "en": "주의 means caution. It pairs with many other words.",
+    "ja": "주의 は「注意」。ほかの言葉ともよく組み合わさります。"
    },
    "pictogram": null,
    "plateColor": "#c0392b",
@@ -1362,12 +1616,16 @@
    "group": "warning",
    "koText": "머리 조심",
    "romanization": "meori josim",
-   "reading": {},
+   "reading": {
+    "ja": "モリ チョシム"
+   },
    "meaning": {
-    "en": "Mind your head"
+    "en": "Mind your head",
+    "ja": "頭上注意"
    },
    "note": {
-    "en": "Low doorways in older buildings and markets."
+    "en": "Low doorways in older buildings and markets.",
+    "ja": "古い建物や市場の低い入口にあります。"
    },
    "pictogram": null,
    "plateColor": "#c0392b",
@@ -1380,12 +1638,16 @@
    "group": "transit",
    "koText": "지하철",
    "romanization": "jihacheol",
-   "reading": {},
+   "reading": {
+    "ja": "チハチョル"
+   },
    "meaning": {
-    "en": "Subway"
+    "en": "Subway",
+    "ja": "地下鉄"
    },
    "note": {
-    "en": "지하 is underground, 철 is rail."
+    "en": "지하 is underground, 철 is rail.",
+    "ja": "지하 は「地下」、철 は「鉄」。"
    },
    "pictogram": "subway",
    "plateColor": "#1f6f78",
@@ -1398,12 +1660,16 @@
    "group": "transit",
    "koText": "버스 정류장",
    "romanization": "beoseu jeongnyujang",
-   "reading": {},
+   "reading": {
+    "ja": "ポス チョンニュジャン"
+   },
    "meaning": {
-    "en": "Bus stop"
+    "en": "Bus stop",
+    "ja": "バス停"
    },
    "note": {
-    "en": "정류장 is the stop itself."
+    "en": "정류장 is the stop itself.",
+    "ja": "정류장 は「停留場」。"
    },
    "pictogram": "bus",
    "plateColor": "#1f6f78",
@@ -1416,12 +1682,16 @@
    "group": "transit",
    "koText": "환승",
    "romanization": "hwanseung",
-   "reading": {},
+   "reading": {
+    "ja": "ファンスン"
+   },
    "meaning": {
-    "en": "Transfer"
+    "en": "Transfer",
+    "ja": "乗り換え"
    },
    "note": {
-    "en": "On subway platforms where lines meet."
+    "en": "On subway platforms where lines meet.",
+    "ja": "路線が交わる地下鉄のホームで見かけます。"
    },
    "pictogram": null,
    "plateColor": "#1f6f78",
@@ -1434,12 +1704,16 @@
    "group": "transit",
    "koText": "승강장",
    "romanization": "seunggangjang",
-   "reading": {},
+   "reading": {
+    "ja": "スンガンジャン"
+   },
    "meaning": {
-    "en": "Platform"
+    "en": "Platform",
+    "ja": "ホーム(乗り場)"
    },
    "note": {
-    "en": "Follow it to reach the train."
+    "en": "Follow it to reach the train.",
+    "ja": "これをたどると電車に乗れます。"
    },
    "pictogram": null,
    "plateColor": "#1f6f78",
@@ -1452,12 +1726,16 @@
    "group": "transit",
    "koText": "계단",
    "romanization": "gyedan",
-   "reading": {},
+   "reading": {
+    "ja": "ケダン"
+   },
    "meaning": {
-    "en": "Stairs"
+    "en": "Stairs",
+    "ja": "階段"
    },
    "note": {
-    "en": "Paired with 엘리베이터 and 에스컬레이터 on station signs."
+    "en": "Paired with 엘리베이터 and 에스컬레이터 on station signs.",
+    "ja": "駅では 엘리베이터、에스컬레이터 と並んで表示されます。"
    },
    "pictogram": "stairs",
    "plateColor": "#1f6f78",
@@ -1470,12 +1748,16 @@
    "group": "transit",
    "koText": "엘리베이터",
    "romanization": "ellibeiteo",
-   "reading": {},
+   "reading": {
+    "ja": "エルリベイト"
+   },
    "meaning": {
-    "en": "Elevator"
+    "en": "Elevator",
+    "ja": "エレベーター"
    },
    "note": {
-    "en": "A loanword — read it aloud and you will hear it."
+    "en": "A loanword — read it aloud and you will hear it.",
+    "ja": "外来語。声に出して読むと意味がわかります。"
    },
    "pictogram": "elevator",
    "plateColor": "#1f6f78",
@@ -1488,12 +1770,16 @@
    "group": "service",
    "koText": "편의점",
    "romanization": "pyeonuijeom",
-   "reading": {},
+   "reading": {
+    "ja": "ピョニジョム"
+   },
    "meaning": {
-    "en": "Convenience store"
+    "en": "Convenience store",
+    "ja": "コンビニ"
    },
    "note": {
-    "en": "편의 means convenience, 점 means shop."
+    "en": "편의 means convenience, 점 means shop.",
+    "ja": "편의 は「便宜」、점 は「店」。"
    },
    "pictogram": null,
    "plateColor": "#5b4b8a",
@@ -1506,12 +1792,16 @@
    "group": "service",
    "koText": "현금인출기",
    "romanization": "hyeongeum inchulgi",
-   "reading": {},
+   "reading": {
+    "ja": "ヒョングミンチュルギ"
+   },
    "meaning": {
-    "en": "Cash machine (ATM)"
+    "en": "Cash machine (ATM)",
+    "ja": "ATM(現金引き出し機)"
    },
    "note": {
-    "en": "Often labelled ATM as well."
+    "en": "Often labelled ATM as well.",
+    "ja": "ATM とも表示されています。"
    },
    "pictogram": null,
    "plateColor": "#5b4b8a",
@@ -1524,12 +1814,16 @@
    "group": "service",
    "koText": "와이파이",
    "romanization": "waipai",
-   "reading": {},
+   "reading": {
+    "ja": "ワイパイ"
+   },
    "meaning": {
-    "en": "Wi-Fi"
+    "en": "Wi-Fi",
+    "ja": "Wi-Fi"
    },
    "note": {
-    "en": "무료 와이파이 means free Wi-Fi."
+    "en": "무료 와이파이 means free Wi-Fi.",
+    "ja": "무료 와이파이 は「無料Wi-Fi」です。"
    },
    "pictogram": "wifi",
    "plateColor": "#5b4b8a",
@@ -1542,12 +1836,16 @@
    "group": "service",
    "koText": "분실물 센터",
    "romanization": "bunsilmul senteo",
-   "reading": {},
+   "reading": {
+    "ja": "プンシルムル セント"
+   },
    "meaning": {
-    "en": "Lost and found"
+    "en": "Lost and found",
+    "ja": "遺失物センター"
    },
    "note": {
-    "en": "In stations, malls and museums."
+    "en": "In stations, malls and museums.",
+    "ja": "駅、モール、博物館にあります。"
    },
    "pictogram": null,
    "plateColor": "#5b4b8a",
@@ -1560,12 +1858,16 @@
    "group": "service",
    "koText": "우체국",
    "romanization": "ucheguk",
-   "reading": {},
+   "reading": {
+    "ja": "ウチェグク"
+   },
    "meaning": {
-    "en": "Post office"
+    "en": "Post office",
+    "ja": "郵便局"
    },
    "note": {
-    "en": "Red and white branding across the country."
+    "en": "Red and white branding across the country.",
+    "ja": "全国どこでも赤と白のデザインです。"
    },
    "pictogram": null,
    "plateColor": "#5b4b8a",
@@ -1578,12 +1880,16 @@
    "group": "restroom",
    "koText": "공중 화장실",
    "romanization": "gongjung hwajangsil",
-   "reading": {},
+   "reading": {
+    "ja": "コンジュン ファジャンシル"
+   },
    "meaning": {
-    "en": "Public restroom"
+    "en": "Public restroom",
+    "ja": "公衆トイレ"
    },
    "note": {
-    "en": "Free to use. Parks, stations and tourist streets point to the nearest one."
+    "en": "Free to use. Parks, stations and tourist streets point to the nearest one.",
+    "ja": "無料で使えます。公園や駅、観光通りでは最寄りの場所を案内しています。"
    },
    "pictogram": "restroom",
    "plateColor": "#2f6fb0",
@@ -1596,12 +1902,16 @@
    "group": "restroom",
    "koText": "사용중",
    "romanization": "sayongjung",
-   "reading": {},
+   "reading": {
+    "ja": "サヨンジュン"
+   },
    "meaning": {
-    "en": "Occupied"
+    "en": "Occupied",
+    "ja": "使用中"
    },
    "note": {
-    "en": "On restroom and fitting-room doors. 중 means in the middle of."
+    "en": "On restroom and fitting-room doors. 중 means in the middle of.",
+    "ja": "トイレや試着室のドアに。중 は「〜中」。"
    },
    "pictogram": null,
    "plateColor": "#2f6fb0",
@@ -1614,12 +1924,16 @@
    "group": "restroom",
    "koText": "휴지통",
    "romanization": "hyujitong",
-   "reading": {},
+   "reading": {
+    "ja": "ヒュジトン"
+   },
    "meaning": {
-    "en": "Waste bin"
+    "en": "Waste bin",
+    "ja": "ごみ箱"
    },
    "note": {
-    "en": "In many restrooms the sign asks you to put paper in the bin, not the toilet."
+    "en": "In many restrooms the sign asks you to put paper in the bin, not the toilet.",
+    "ja": "トイレでは紙を便器ではなくごみ箱に捨てるよう求める表示がよくあります。"
    },
    "pictogram": null,
    "plateColor": "#2f6fb0",
@@ -1632,12 +1946,16 @@
    "group": "restroom",
    "koText": "기저귀 교환대",
    "romanization": "gijeogwi gyohwandae",
-   "reading": {},
+   "reading": {
+    "ja": "キジョグィ キョファンデ"
+   },
    "meaning": {
-    "en": "Baby changing table"
+    "en": "Baby changing table",
+    "ja": "おむつ交換台"
    },
    "note": {
-    "en": "Found in both men’s and women’s restrooms in newer buildings."
+    "en": "Found in both men’s and women’s restrooms in newer buildings.",
+    "ja": "新しい建物では男性用・女性用どちらのトイレにもあります。"
    },
    "pictogram": null,
    "plateColor": "#2f6fb0",
@@ -1650,12 +1968,16 @@
    "group": "restroom",
    "koText": "비데",
    "romanization": "bide",
-   "reading": {},
+   "reading": {
+    "ja": "ピデ"
+   },
    "meaning": {
-    "en": "Bidet"
+    "en": "Bidet",
+    "ja": "温水洗浄便座"
    },
    "note": {
-    "en": "Most Korean toilets have one. The buttons are labelled in Korean too."
+    "en": "Most Korean toilets have one. The buttons are labelled in Korean too.",
+    "ja": "韓国のトイレの多くに付いています。ボタンも韓国語表示です。"
    },
    "pictogram": null,
    "plateColor": "#2f6fb0",
@@ -1668,12 +1990,16 @@
    "group": "restroom",
    "koText": "흡연실",
    "romanization": "heubyeonsil",
-   "reading": {},
+   "reading": {
+    "ja": "フビョンシル"
+   },
    "meaning": {
-    "en": "Smoking room"
+    "en": "Smoking room",
+    "ja": "喫煙室"
    },
    "note": {
-    "en": "Smoking is only allowed in these rooms or marked zones."
+    "en": "Smoking is only allowed in these rooms or marked zones.",
+    "ja": "喫煙はこの部屋か表示された場所だけでできます。"
    },
    "pictogram": null,
    "plateColor": "#2f6fb0",
@@ -1686,12 +2012,16 @@
    "group": "restroom",
    "koText": "탈의실",
    "romanization": "taruisil",
-   "reading": {},
+   "reading": {
+    "ja": "タリシル"
+   },
    "meaning": {
-    "en": "Changing room"
+    "en": "Changing room",
+    "ja": "更衣室・試着室"
    },
    "note": {
-    "en": "In shops, gyms and swimming pools. 실 at the end means room."
+    "en": "In shops, gyms and swimming pools. 실 at the end means room.",
+    "ja": "お店、ジム、プールに。最後の 실 は「室」。"
    },
    "pictogram": null,
    "plateColor": "#2f6fb0",
@@ -1704,12 +2034,16 @@
    "group": "restroom",
    "koText": "음수대",
    "romanization": "eumsudae",
-   "reading": {},
+   "reading": {
+    "ja": "ウムスデ"
+   },
    "meaning": {
-    "en": "Drinking fountain"
+    "en": "Drinking fountain",
+    "ja": "水飲み場"
    },
    "note": {
-    "en": "Free drinking water in parks and public buildings."
+    "en": "Free drinking water in parks and public buildings.",
+    "ja": "公園や公共施設で無料の飲み水が飲めます。"
    },
    "pictogram": null,
    "plateColor": "#2f6fb0",
@@ -1722,12 +2056,16 @@
    "group": "restroom",
    "koText": "남녀 공용",
    "romanization": "namnyeo gongyong",
-   "reading": {},
+   "reading": {
+    "ja": "ナムニョ コンヨン"
+   },
    "meaning": {
-    "en": "Unisex"
+    "en": "Unisex",
+    "ja": "男女共用"
    },
    "note": {
-    "en": "One restroom shared by men and women, common in small cafés."
+    "en": "One restroom shared by men and women, common in small cafés.",
+    "ja": "男女で使うひとつのトイレ。小さなカフェによくあります。"
    },
    "pictogram": null,
    "plateColor": "#2f6fb0",
@@ -1740,12 +2078,16 @@
    "group": "restroom",
    "koText": "손 세정제",
    "romanization": "son sejeongje",
-   "reading": {},
+   "reading": {
+    "ja": "ソン セジョンジェ"
+   },
    "meaning": {
-    "en": "Hand sanitizer"
+    "en": "Hand sanitizer",
+    "ja": "手指消毒剤"
    },
    "note": {
-    "en": "By lifts, entrances and counters."
+    "en": "By lifts, entrances and counters.",
+    "ja": "エレベーター、入口、カウンターのそばにあります。"
    },
    "pictogram": null,
    "plateColor": "#2f6fb0",
@@ -1758,12 +2100,16 @@
    "group": "door",
    "koText": "자동문",
    "romanization": "jadongmun",
-   "reading": {},
+   "reading": {
+    "ja": "チャドンムン"
+   },
    "meaning": {
-    "en": "Automatic door"
+    "en": "Automatic door",
+    "ja": "自動ドア"
    },
    "note": {
-    "en": "Wait for it to open. 문 means door."
+    "en": "Wait for it to open. 문 means door.",
+    "ja": "開くのを待ちましょう。문 は「門・ドア」。"
    },
    "pictogram": null,
    "plateColor": "#3a7d44",
@@ -1776,12 +2122,16 @@
    "group": "door",
    "koText": "열림",
    "romanization": "yeollim",
-   "reading": {},
+   "reading": {
+    "ja": "ヨルリム"
+   },
    "meaning": {
-    "en": "Open (button)"
+    "en": "Open (button)",
+    "ja": "開(ボタン)"
    },
    "note": {
-    "en": "On lift buttons, next to 닫힘."
+    "en": "On lift buttons, next to 닫힘.",
+    "ja": "エレベーターのボタン。닫힘 の隣にあります。"
    },
    "pictogram": null,
    "plateColor": "#3a7d44",
@@ -1794,12 +2144,16 @@
    "group": "door",
    "koText": "닫힘",
    "romanization": "dachim",
-   "reading": {},
+   "reading": {
+    "ja": "タチム"
+   },
    "meaning": {
-    "en": "Close (button)"
+    "en": "Close (button)",
+    "ja": "閉(ボタン)"
    },
    "note": {
-    "en": "The other lift button. Press 열림 if someone is still coming."
+    "en": "The other lift button. Press 열림 if someone is still coming.",
+    "ja": "もう一方のボタン。まだ人が来ていたら 열림 を押しましょう。"
    },
    "pictogram": null,
    "plateColor": "#3a7d44",
@@ -1812,12 +2166,16 @@
    "group": "door",
    "koText": "정문",
    "romanization": "jeongmun",
-   "reading": {},
+   "reading": {
+    "ja": "チョンムン"
+   },
    "meaning": {
-    "en": "Main gate"
+    "en": "Main gate",
+    "ja": "正門"
    },
    "note": {
-    "en": "The front entrance of a palace, school or park."
+    "en": "The front entrance of a palace, school or park.",
+    "ja": "古宮、学校、公園の正面入口。"
    },
    "pictogram": null,
    "plateColor": "#3a7d44",
@@ -1830,12 +2188,16 @@
    "group": "door",
    "koText": "후문",
    "romanization": "humun",
-   "reading": {},
+   "reading": {
+    "ja": "フムン"
+   },
    "meaning": {
-    "en": "Back gate"
+    "en": "Back gate",
+    "ja": "裏門"
    },
    "note": {
-    "en": "Often closer to the subway than the main gate."
+    "en": "Often closer to the subway than the main gate.",
+    "ja": "正門より地下鉄に近いことがよくあります。"
    },
    "pictogram": null,
    "plateColor": "#3a7d44",
@@ -1848,12 +2210,16 @@
    "group": "door",
    "koText": "좌측 통행",
    "romanization": "jwacheuk tonghaeng",
-   "reading": {},
+   "reading": {
+    "ja": "チュァチュク トンヘン"
+   },
    "meaning": {
-    "en": "Keep left"
+    "en": "Keep left",
+    "ja": "左側通行"
    },
    "note": {
-    "en": "On some stairs and corridors. 좌 is left."
+    "en": "On some stairs and corridors. 좌 is left.",
+    "ja": "一部の階段や通路で。좌 は「左」。"
    },
    "pictogram": null,
    "plateColor": "#3a7d44",
@@ -1866,12 +2232,16 @@
    "group": "door",
    "koText": "우측 통행",
    "romanization": "ucheuk tonghaeng",
-   "reading": {},
+   "reading": {
+    "ja": "ウチュク トンヘン"
+   },
    "meaning": {
-    "en": "Keep right"
+    "en": "Keep right",
+    "ja": "右側通行"
    },
    "note": {
-    "en": "The usual rule in stations. 우 is right."
+    "en": "The usual rule in stations. 우 is right.",
+    "ja": "駅ではふつうこちら。우 は「右」。"
    },
    "pictogram": null,
    "plateColor": "#3a7d44",
@@ -1884,12 +2254,16 @@
    "group": "door",
    "koText": "직진",
    "romanization": "jikjin",
-   "reading": {},
+   "reading": {
+    "ja": "チクチン"
+   },
    "meaning": {
-    "en": "Go straight"
+    "en": "Go straight",
+    "ja": "直進"
    },
    "note": {
-    "en": "On arrows in stations and malls."
+    "en": "On arrows in stations and malls.",
+    "ja": "駅やモールの矢印に書かれています。"
    },
    "pictogram": null,
    "plateColor": "#3a7d44",
@@ -1902,12 +2276,16 @@
    "group": "door",
    "koText": "우회",
    "romanization": "uhoe",
-   "reading": {},
+   "reading": {
+    "ja": "ウフェ"
+   },
    "meaning": {
-    "en": "Detour"
+    "en": "Detour",
+    "ja": "迂回"
    },
    "note": {
-    "en": "The usual way is blocked. Follow the arrow around."
+    "en": "The usual way is blocked. Follow the arrow around.",
+    "ja": "いつもの道がふさがっています。矢印に沿って回りましょう。"
    },
    "pictogram": null,
    "plateColor": "#3a7d44",
@@ -1920,12 +2298,16 @@
    "group": "door",
    "koText": "회전문",
    "romanization": "hoejeonmun",
-   "reading": {},
+   "reading": {
+    "ja": "フェジョンムン"
+   },
    "meaning": {
-    "en": "Revolving door"
+    "en": "Revolving door",
+    "ja": "回転ドア"
    },
    "note": {
-    "en": "Hotels and department stores. A side door is usually next to it."
+    "en": "Hotels and department stores. A side door is usually next to it.",
+    "ja": "ホテルや百貨店に。たいてい隣に普通のドアがあります。"
    },
    "pictogram": null,
    "plateColor": "#3a7d44",
@@ -1938,12 +2320,16 @@
    "group": "door",
    "koText": "비상계단",
    "romanization": "bisang gyedan",
-   "reading": {},
+   "reading": {
+    "ja": "ピサンゲダン"
+   },
    "meaning": {
-    "en": "Emergency stairs"
+    "en": "Emergency stairs",
+    "ja": "非常階段"
    },
    "note": {
-    "en": "비상 means emergency, the same word as in 비상구."
+    "en": "비상 means emergency, the same word as in 비상구.",
+    "ja": "비상 は「非常」。비상구 と同じ言葉です。"
    },
    "pictogram": "stairs",
    "plateColor": "#3a7d44",
@@ -1956,12 +2342,16 @@
    "group": "door",
    "koText": "옥상",
    "romanization": "oksang",
-   "reading": {},
+   "reading": {
+    "ja": "オクサン"
+   },
    "meaning": {
-    "en": "Rooftop"
+    "en": "Rooftop",
+    "ja": "屋上"
    },
    "note": {
-    "en": "On lift buttons and stairwell signs. Some rooftops are cafés or gardens."
+    "en": "On lift buttons and stairwell signs. Some rooftops are cafés or gardens.",
+    "ja": "エレベーターのボタンや階段の表示に。屋上がカフェや庭園のことも。"
    },
    "pictogram": null,
    "plateColor": "#3a7d44",
@@ -1974,12 +2364,16 @@
    "group": "door",
    "koText": "지하 1층",
    "romanization": "jiha il-cheung",
-   "reading": {},
+   "reading": {
+    "ja": "チハ イルチュン"
+   },
    "meaning": {
-    "en": "Basement level 1"
+    "en": "Basement level 1",
+    "ja": "地下1階"
    },
    "note": {
-    "en": "층 means floor. Lifts show it as B1."
+    "en": "층 means floor. Lifts show it as B1.",
+    "ja": "층 は「階」。エレベーターでは B1 と表示されます。"
    },
    "pictogram": null,
    "plateColor": "#3a7d44",
@@ -1992,12 +2386,16 @@
    "group": "door",
    "koText": "문 닫아 주세요",
    "romanization": "mun dada juseyo",
-   "reading": {},
+   "reading": {
+    "ja": "ムン タダ ジュセヨ"
+   },
    "meaning": {
-    "en": "Please close the door"
+    "en": "Please close the door",
+    "ja": "ドアを閉めてください"
    },
    "note": {
-    "en": "On doors that let the heating or cooling out."
+    "en": "On doors that let the heating or cooling out.",
+    "ja": "冷暖房が逃げてしまうドアに貼ってあります。"
    },
    "pictogram": null,
    "plateColor": "#3a7d44",
@@ -2010,12 +2408,16 @@
    "group": "door",
    "koText": "안내",
    "romanization": "annae",
-   "reading": {},
+   "reading": {
+    "ja": "アンネ"
+   },
    "meaning": {
-    "en": "Information"
+    "en": "Information",
+    "ja": "案内"
    },
    "note": {
-    "en": "A desk or board where you can ask the way."
+    "en": "A desk or board where you can ask the way.",
+    "ja": "道を尋ねられるカウンターや案内板。"
    },
    "pictogram": null,
    "plateColor": "#3a7d44",
@@ -2028,12 +2430,16 @@
    "group": "hours",
    "koText": "영업시간",
    "romanization": "yeongeop sigan",
-   "reading": {},
+   "reading": {
+    "ja": "ヨンオプシガン"
+   },
    "meaning": {
-    "en": "Business hours"
+    "en": "Business hours",
+    "ja": "営業時間"
    },
    "note": {
-    "en": "Followed by the times, for example 11:00~21:00."
+    "en": "Followed by the times, for example 11:00~21:00.",
+    "ja": "続けて時間が書かれます。例: 11:00~21:00。"
    },
    "pictogram": null,
    "plateColor": "#b9772a",
@@ -2046,12 +2452,16 @@
    "group": "hours",
    "koText": "브레이크 타임",
    "romanization": "beureikeu taim",
-   "reading": {},
+   "reading": {
+    "ja": "ブレイク タイム"
+   },
    "meaning": {
-    "en": "Break time"
+    "en": "Break time",
+    "ja": "休憩時間(ブレイクタイム)"
    },
    "note": {
-    "en": "Many restaurants close between lunch and dinner, often 15:00~17:00."
+    "en": "Many restaurants close between lunch and dinner, often 15:00~17:00.",
+    "ja": "昼と夜の間、たとえば15:00〜17:00に閉める飲食店が多いです。"
    },
    "pictogram": null,
    "plateColor": "#b9772a",
@@ -2064,12 +2474,16 @@
    "group": "hours",
    "koText": "정기 휴무",
    "romanization": "jeonggi hyumu",
-   "reading": {},
+   "reading": {
+    "ja": "チョンギ ヒュム"
+   },
    "meaning": {
-    "en": "Regular closing day"
+    "en": "Regular closing day",
+    "ja": "定休日"
    },
    "note": {
-    "en": "매주 월요일 정기 휴무 means closed every Monday."
+    "en": "매주 월요일 정기 휴무 means closed every Monday.",
+    "ja": "매주 월요일 정기 휴무 は「毎週月曜定休」です。"
    },
    "pictogram": null,
    "plateColor": "#b9772a",
@@ -2082,12 +2496,16 @@
    "group": "hours",
    "koText": "연중무휴",
    "romanization": "yeonjung muhyu",
-   "reading": {},
+   "reading": {
+    "ja": "ヨンジュンムヒュ"
+   },
    "meaning": {
-    "en": "Open every day of the year"
+    "en": "Open every day of the year",
+    "ja": "年中無休"
    },
    "note": {
-    "en": "No day off at all."
+    "en": "No day off at all.",
+    "ja": "休みの日がまったくありません。"
    },
    "pictogram": null,
    "plateColor": "#b9772a",
@@ -2100,12 +2518,16 @@
    "group": "hours",
    "koText": "오픈",
    "romanization": "opeun",
-   "reading": {},
+   "reading": {
+    "ja": "オプン"
+   },
    "meaning": {
-    "en": "Open"
+    "en": "Open",
+    "ja": "オープン"
    },
    "note": {
-    "en": "A loanword used on new shops, often with a date: 10월 오픈."
+    "en": "A loanword used on new shops, often with a date: 10월 오픈.",
+    "ja": "新しいお店に使う外来語。日付付きのことも: 10월 오픈。"
    },
    "pictogram": null,
    "plateColor": "#b9772a",
@@ -2118,12 +2540,16 @@
    "group": "hours",
    "koText": "마감",
    "romanization": "magam",
-   "reading": {},
+   "reading": {
+    "ja": "マガム"
+   },
    "meaning": {
-    "en": "Closing / last entry"
+    "en": "Closing / last entry",
+    "ja": "締め切り・最終入場"
    },
    "note": {
-    "en": "입장 마감 means last admission."
+    "en": "입장 마감 means last admission.",
+    "ja": "입장 마감 は「入場終了」です。"
    },
    "pictogram": null,
    "plateColor": "#b9772a",
@@ -2136,12 +2562,16 @@
    "group": "hours",
    "koText": "라스트 오더",
    "romanization": "raseuteu odeo",
-   "reading": {},
+   "reading": {
+    "ja": "ラストゥ オド"
+   },
    "meaning": {
-    "en": "Last order"
+    "en": "Last order",
+    "ja": "ラストオーダー"
    },
    "note": {
-    "en": "The kitchen stops taking orders after this time."
+    "en": "The kitchen stops taking orders after this time.",
+    "ja": "この時間を過ぎると注文を受け付けません。"
    },
    "pictogram": null,
    "plateColor": "#b9772a",
@@ -2154,12 +2584,16 @@
    "group": "hours",
    "koText": "점심시간",
    "romanization": "jeomsim sigan",
-   "reading": {},
+   "reading": {
+    "ja": "チョムシムシガン"
+   },
    "meaning": {
-    "en": "Lunch break"
+    "en": "Lunch break",
+    "ja": "昼休み"
    },
    "note": {
-    "en": "Banks, post offices and clinics may pause service."
+    "en": "Banks, post offices and clinics may pause service.",
+    "ja": "銀行、郵便局、クリニックは窓口を一時止めることがあります。"
    },
    "pictogram": null,
    "plateColor": "#b9772a",
@@ -2172,12 +2606,16 @@
    "group": "hours",
    "koText": "매진",
    "romanization": "maejin",
-   "reading": {},
+   "reading": {
+    "ja": "メジン"
+   },
    "meaning": {
-    "en": "Sold out"
+    "en": "Sold out",
+    "ja": "売り切れ"
    },
    "note": {
-    "en": "On ticket windows and food stalls."
+    "en": "On ticket windows and food stalls.",
+    "ja": "チケット窓口や屋台で。"
    },
    "pictogram": null,
    "plateColor": "#b9772a",
@@ -2190,12 +2628,16 @@
    "group": "hours",
    "koText": "임시 휴업",
    "romanization": "imsi hyueop",
-   "reading": {},
+   "reading": {
+    "ja": "イムシ ヒュオプ"
+   },
    "meaning": {
-    "en": "Temporarily closed"
+    "en": "Temporarily closed",
+    "ja": "臨時休業"
    },
    "note": {
-    "en": "The shop is closed for a while, not for good."
+    "en": "The shop is closed for a while, not for good.",
+    "ja": "しばらく休んでいるだけで、閉店ではありません。"
    },
    "pictogram": null,
    "plateColor": "#b9772a",
@@ -2208,12 +2650,16 @@
    "group": "hours",
    "koText": "평일",
    "romanization": "pyeongil",
-   "reading": {},
+   "reading": {
+    "ja": "ピョンイル"
+   },
    "meaning": {
-    "en": "Weekdays"
+    "en": "Weekdays",
+    "ja": "平日"
    },
    "note": {
-    "en": "Opposite of 주말 (weekend). Hours often differ between them."
+    "en": "Opposite of 주말 (weekend). Hours often differ between them.",
+    "ja": "反対は 주말(週末)。営業時間が違うことがよくあります。"
    },
    "pictogram": null,
    "plateColor": "#b9772a",
@@ -2226,12 +2672,16 @@
    "group": "warning",
    "koText": "위험",
    "romanization": "wiheom",
-   "reading": {},
+   "reading": {
+    "ja": "ウィホム"
+   },
    "meaning": {
-    "en": "Danger"
+    "en": "Danger",
+    "ja": "危険"
    },
    "note": {
-    "en": "Usually on a red or yellow sign. Stay back."
+    "en": "Usually on a red or yellow sign. Stay back.",
+    "ja": "たいてい赤か黄色の看板。近づかないでください。"
    },
    "pictogram": null,
    "plateColor": "#c0392b",
@@ -2244,12 +2694,16 @@
    "group": "warning",
    "koText": "주차 금지",
    "romanization": "jucha geumji",
-   "reading": {},
+   "reading": {
+    "ja": "チュチャ クムジ"
+   },
    "meaning": {
-    "en": "No parking"
+    "en": "No parking",
+    "ja": "駐車禁止"
    },
    "note": {
-    "en": "금지 again — anything followed by it is forbidden."
+    "en": "금지 again — anything followed by it is forbidden.",
+    "ja": "また 금지。後ろに付くものは禁止です。"
    },
    "pictogram": null,
    "plateColor": "#c0392b",
@@ -2262,12 +2716,16 @@
    "group": "warning",
    "koText": "음식물 반입 금지",
    "romanization": "eumsingmul banip geumji",
-   "reading": {},
+   "reading": {
+    "ja": "ウムシンムル パニプ クムジ"
+   },
    "meaning": {
-    "en": "No food or drink inside"
+    "en": "No food or drink inside",
+    "ja": "飲食物持ち込み禁止"
    },
    "note": {
-    "en": "반입 means bringing in. Common at museums and theatres."
+    "en": "반입 means bringing in. Common at museums and theatres.",
+    "ja": "반입 は「搬入・持ち込み」。博物館や劇場でよく見かけます。"
    },
    "pictogram": null,
    "plateColor": "#c0392b",
@@ -2280,12 +2738,16 @@
    "group": "warning",
    "koText": "손대지 마세요",
    "romanization": "sondaeji maseyo",
-   "reading": {},
+   "reading": {
+    "ja": "ソンデジ マセヨ"
+   },
    "meaning": {
-    "en": "Do not touch"
+    "en": "Do not touch",
+    "ja": "触らないでください"
    },
    "note": {
-    "en": "On exhibits and shop displays."
+    "en": "On exhibits and shop displays.",
+    "ja": "展示品やお店のディスプレイに。"
    },
    "pictogram": null,
    "plateColor": "#c0392b",
@@ -2298,12 +2760,16 @@
    "group": "warning",
    "koText": "발밑 조심",
    "romanization": "balmit josim",
-   "reading": {},
+   "reading": {
+    "ja": "パルミッ チョシム"
+   },
    "meaning": {
-    "en": "Watch your step"
+    "en": "Watch your step",
+    "ja": "足元注意"
    },
    "note": {
-    "en": "발밑 is under your feet. Gaps, steps and uneven floors."
+    "en": "발밑 is under your feet. Gaps, steps and uneven floors.",
+    "ja": "발밑 は「足元」。すき間、段差、でこぼこの床に。"
    },
    "pictogram": null,
    "plateColor": "#c0392b",
@@ -2316,12 +2782,16 @@
    "group": "warning",
    "koText": "공사중",
    "romanization": "gongsajung",
-   "reading": {},
+   "reading": {
+    "ja": "コンサジュン"
+   },
    "meaning": {
-    "en": "Under construction"
+    "en": "Under construction",
+    "ja": "工事中"
    },
    "note": {
-    "en": "Expect detours or closed exits."
+    "en": "Expect detours or closed exits.",
+    "ja": "迂回や出口の閉鎖があるかもしれません。"
    },
    "pictogram": null,
    "plateColor": "#c0392b",
@@ -2334,12 +2804,16 @@
    "group": "warning",
    "koText": "반려동물 동반 금지",
    "romanization": "ballyeodongmul dongban geumji",
-   "reading": {},
+   "reading": {
+    "ja": "パルリョドンムル トンバン クムジ"
+   },
    "meaning": {
-    "en": "No pets"
+    "en": "No pets",
+    "ja": "ペット同伴禁止"
    },
    "note": {
-    "en": "반려동물 is a companion animal."
+    "en": "반려동물 is a companion animal.",
+    "ja": "반려동물 は「伴侶動物(ペット)」。"
    },
    "pictogram": null,
    "plateColor": "#c0392b",
@@ -2352,12 +2826,16 @@
    "group": "warning",
    "koText": "소화기",
    "romanization": "sohwagi",
-   "reading": {},
+   "reading": {
+    "ja": "ソファギ"
+   },
    "meaning": {
-    "en": "Fire extinguisher"
+    "en": "Fire extinguisher",
+    "ja": "消火器"
    },
    "note": {
-    "en": "Red cabinets in stations and corridors."
+    "en": "Red cabinets in stations and corridors.",
+    "ja": "駅や廊下の赤いボックスに入っています。"
    },
    "pictogram": null,
    "plateColor": "#c0392b",
@@ -2370,12 +2848,16 @@
    "group": "warning",
    "koText": "고장",
    "romanization": "gojang",
-   "reading": {},
+   "reading": {
+    "ja": "コジャン"
+   },
    "meaning": {
-    "en": "Out of order"
+    "en": "Out of order",
+    "ja": "故障"
    },
    "note": {
-    "en": "On lifts, ticket machines and vending machines."
+    "en": "On lifts, ticket machines and vending machines.",
+    "ja": "エレベーター、券売機、自販機に。"
    },
    "pictogram": null,
    "plateColor": "#c0392b",
@@ -2388,12 +2870,16 @@
    "group": "warning",
    "koText": "화기 엄금",
    "romanization": "hwagi eomgeum",
-   "reading": {},
+   "reading": {
+    "ja": "ファギ オムグム"
+   },
    "meaning": {
-    "en": "No open flames"
+    "en": "No open flames",
+    "ja": "火気厳禁"
    },
    "note": {
-    "en": "A stronger form of no fire, near fuel or gas."
+    "en": "A stronger form of no fire, near fuel or gas.",
+    "ja": "燃料やガスの近くにある、より強い禁止表示です。"
    },
    "pictogram": null,
    "plateColor": "#c0392b",
@@ -2406,12 +2892,16 @@
    "group": "transit",
    "koText": "에스컬레이터",
    "romanization": "eseukeolleiteo",
-   "reading": {},
+   "reading": {
+    "ja": "エスコルレイト"
+   },
    "meaning": {
-    "en": "Escalator"
+    "en": "Escalator",
+    "ja": "エスカレーター"
    },
    "note": {
-    "en": "A loanword. Stand still or walk carefully."
+    "en": "A loanword. Stand still or walk carefully.",
+    "ja": "外来語。立ち止まるか、気をつけて歩きましょう。"
    },
    "pictogram": "escalator",
    "plateColor": "#1f6f78",
@@ -2424,12 +2914,16 @@
    "group": "transit",
    "koText": "택시 타는 곳",
    "romanization": "taeksi taneun got",
-   "reading": {},
+   "reading": {
+    "ja": "テクシ タヌン ゴッ"
+   },
    "meaning": {
-    "en": "Taxi stand"
+    "en": "Taxi stand",
+    "ja": "タクシー乗り場"
    },
    "note": {
-    "en": "타는 곳 means where you board."
+    "en": "타는 곳 means where you board.",
+    "ja": "타는 곳 は「乗る所」。"
    },
    "pictogram": null,
    "plateColor": "#1f6f78",
@@ -2442,12 +2936,16 @@
    "group": "transit",
    "koText": "내리는 문",
    "romanization": "naerineun mun",
-   "reading": {},
+   "reading": {
+    "ja": "ネリヌン ムン"
+   },
    "meaning": {
-    "en": "Exit doors (this side)"
+    "en": "Exit doors (this side)",
+    "ja": "降りる側のドア"
    },
    "note": {
-    "en": "The subway screen shows which side the doors will open."
+    "en": "The subway screen shows which side the doors will open.",
+    "ja": "地下鉄の画面にどちら側のドアが開くか表示されます。"
    },
    "pictogram": null,
    "plateColor": "#1f6f78",
@@ -2460,12 +2958,16 @@
    "group": "transit",
    "koText": "노약자석",
    "romanization": "noyakjaseok",
-   "reading": {},
+   "reading": {
+    "ja": "ノヤクチャソク"
+   },
    "meaning": {
-    "en": "Priority seating"
+    "en": "Priority seating",
+    "ja": "優先席"
    },
    "note": {
-    "en": "For older people, pregnant women and people with disabilities."
+    "en": "For older people, pregnant women and people with disabilities.",
+    "ja": "お年寄り、妊婦、障害のある方のための席です。"
    },
    "pictogram": null,
    "plateColor": "#1f6f78",
@@ -2478,12 +2980,16 @@
    "group": "transit",
    "koText": "임산부 배려석",
    "romanization": "imsanbu baeryeoseok",
-   "reading": {},
+   "reading": {
+    "ja": "イムサンブ ペリョソク"
+   },
    "meaning": {
-    "en": "Seat for pregnant women"
+    "en": "Seat for pregnant women",
+    "ja": "妊婦優先席"
    },
    "note": {
-    "en": "Pink seats on Seoul subways. Leave them empty."
+    "en": "Pink seats on Seoul subways. Leave them empty.",
+    "ja": "ソウルの地下鉄のピンクの席。空けておきましょう。"
    },
    "pictogram": null,
    "plateColor": "#1f6f78",
@@ -2496,12 +3002,16 @@
    "group": "transit",
    "koText": "첫차",
    "romanization": "cheotcha",
-   "reading": {},
+   "reading": {
+    "ja": "チョッチャ"
+   },
    "meaning": {
-    "en": "First train / bus"
+    "en": "First train / bus",
+    "ja": "始発"
    },
    "note": {
-    "en": "차 means vehicle."
+    "en": "차 means vehicle.",
+    "ja": "차 は「車」。"
    },
    "pictogram": null,
    "plateColor": "#1f6f78",
@@ -2514,12 +3024,16 @@
    "group": "transit",
    "koText": "막차",
    "romanization": "makcha",
-   "reading": {},
+   "reading": {
+    "ja": "マクチャ"
+   },
    "meaning": {
-    "en": "Last train / bus"
+    "en": "Last train / bus",
+    "ja": "終電・終バス"
    },
    "note": {
-    "en": "Check it before a late night out."
+    "en": "Check it before a late night out.",
+    "ja": "夜遅く出かける前に確認しましょう。"
    },
    "pictogram": null,
    "plateColor": "#1f6f78",
@@ -2532,12 +3046,16 @@
    "group": "transit",
    "koText": "급행",
    "romanization": "geupaeng",
-   "reading": {},
+   "reading": {
+    "ja": "クペン"
+   },
    "meaning": {
-    "en": "Express"
+    "en": "Express",
+    "ja": "急行"
    },
    "note": {
-    "en": "Stops at fewer stations. Some lines run both."
+    "en": "Stops at fewer stations. Some lines run both.",
+    "ja": "止まる駅が少なめ。急行と各停の両方が走る路線もあります。"
    },
    "pictogram": null,
    "plateColor": "#1f6f78",
@@ -2550,12 +3068,16 @@
    "group": "transit",
    "koText": "종점",
    "romanization": "jongjeom",
-   "reading": {},
+   "reading": {
+    "ja": "チョンジョム"
+   },
    "meaning": {
-    "en": "Last stop"
+    "en": "Last stop",
+    "ja": "終点"
    },
    "note": {
-    "en": "Everyone gets off here."
+    "en": "Everyone gets off here.",
+    "ja": "ここで全員降ります。"
    },
    "pictogram": null,
    "plateColor": "#1f6f78",
@@ -2568,12 +3090,16 @@
    "group": "transit",
    "koText": "방면",
    "romanization": "bangmyeon",
-   "reading": {},
+   "reading": {
+    "ja": "パンミョン"
+   },
    "meaning": {
-    "en": "Bound for"
+    "en": "Bound for",
+    "ja": "〜方面"
    },
    "note": {
-    "en": "시청 방면 means toward City Hall. Pick the platform by it."
+    "en": "시청 방면 means toward City Hall. Pick the platform by it.",
+    "ja": "시청 방면 は「市庁方面」。これでホームを選びます。"
    },
    "pictogram": null,
    "plateColor": "#1f6f78",
@@ -2586,12 +3112,16 @@
    "group": "transit",
    "koText": "횡단보도",
    "romanization": "hoengdan bodo",
-   "reading": {},
+   "reading": {
+    "ja": "フェンダンボド"
+   },
    "meaning": {
-    "en": "Pedestrian crossing"
+    "en": "Pedestrian crossing",
+    "ja": "横断歩道"
    },
    "note": {
-    "en": "Painted stripes on the road."
+    "en": "Painted stripes on the road.",
+    "ja": "道路に描かれたしま模様です。"
    },
    "pictogram": null,
    "plateColor": "#1f6f78",
@@ -2604,12 +3134,16 @@
    "group": "transit",
    "koText": "주차장",
    "romanization": "juchajang",
-   "reading": {},
+   "reading": {
+    "ja": "チュチャジャン"
+   },
    "meaning": {
-    "en": "Car park"
+    "en": "Car park",
+    "ja": "駐車場"
    },
    "note": {
-    "en": "장 at the end means place."
+    "en": "장 at the end means place.",
+    "ja": "最後の 장 は「場」。"
    },
    "pictogram": null,
    "plateColor": "#1f6f78",
@@ -2622,12 +3156,16 @@
    "group": "transit",
    "koText": "공항",
    "romanization": "gonghang",
-   "reading": {},
+   "reading": {
+    "ja": "コンハン"
+   },
    "meaning": {
-    "en": "Airport"
+    "en": "Airport",
+    "ja": "空港"
    },
    "note": {
-    "en": "On airport railroad and bus signs."
+    "en": "On airport railroad and bus signs.",
+    "ja": "空港鉄道やバスの表示に。"
    },
    "pictogram": null,
    "plateColor": "#1f6f78",
@@ -2640,12 +3178,16 @@
    "group": "transit",
    "koText": "하차",
    "romanization": "hacha",
-   "reading": {},
+   "reading": {
+    "ja": "ハチャ"
+   },
    "meaning": {
-    "en": "Get off"
+    "en": "Get off",
+    "ja": "降車"
    },
    "note": {
-    "en": "Bus card readers at the back door say 하차. Tap again when you get off."
+    "en": "Bus card readers at the back door say 하차. Tap again when you get off.",
+    "ja": "バスの後ろのドアのカード読み取り機。降りるときにもう一度タッチします。"
    },
    "pictogram": null,
    "plateColor": "#1f6f78",
@@ -2658,12 +3200,16 @@
    "group": "service",
    "koText": "무료",
    "romanization": "muryo",
-   "reading": {},
+   "reading": {
+    "ja": "ムリョ"
+   },
    "meaning": {
-    "en": "Free of charge"
+    "en": "Free of charge",
+    "ja": "無料"
    },
    "note": {
-    "en": "무 means without. 무료 입장 is free entry."
+    "en": "무 means without. 무료 입장 is free entry.",
+    "ja": "무 は「無」。무료 입장 は入場無料です。"
    },
    "pictogram": null,
    "plateColor": "#5b4b8a",
@@ -2676,12 +3222,16 @@
    "group": "service",
    "koText": "셀프",
    "romanization": "selpeu",
-   "reading": {},
+   "reading": {
+    "ja": "セルプ"
+   },
    "meaning": {
-    "en": "Self-service"
+    "en": "Self-service",
+    "ja": "セルフサービス"
    },
    "note": {
-    "en": "Water, side dishes or returning trays are up to you."
+    "en": "Water, side dishes or returning trays are up to you.",
+    "ja": "水、おかず、トレーの返却はお客さんがします。"
    },
    "pictogram": null,
    "plateColor": "#5b4b8a",
@@ -2694,12 +3244,16 @@
    "group": "service",
    "koText": "계산대",
    "romanization": "gyesandae",
-   "reading": {},
+   "reading": {
+    "ja": "ケサンデ"
+   },
    "meaning": {
-    "en": "Checkout"
+    "en": "Checkout",
+    "ja": "レジ(会計)"
    },
    "note": {
-    "en": "Where you pay. 계산 means paying the bill."
+    "en": "Where you pay. 계산 means paying the bill.",
+    "ja": "支払う場所。계산 は「会計」。"
    },
    "pictogram": null,
    "plateColor": "#5b4b8a",
@@ -2712,12 +3266,16 @@
    "group": "service",
    "koText": "영수증",
    "romanization": "yeongsujeung",
-   "reading": {},
+   "reading": {
+    "ja": "ヨンスジュン"
+   },
    "meaning": {
-    "en": "Receipt"
+    "en": "Receipt",
+    "ja": "領収書・レシート"
    },
    "note": {
-    "en": "Machines ask if you want one printed."
+    "en": "Machines ask if you want one printed.",
+    "ja": "機械が印刷するか聞いてきます。"
    },
    "pictogram": null,
    "plateColor": "#5b4b8a",
@@ -2730,12 +3288,16 @@
    "group": "service",
    "koText": "휴대폰 충전",
    "romanization": "hyudaepon chungjeon",
-   "reading": {},
+   "reading": {
+    "ja": "ヒュデポン チュンジョン"
+   },
    "meaning": {
-    "en": "Phone charging"
+    "en": "Phone charging",
+    "ja": "スマホの充電"
    },
    "note": {
-    "en": "Charging stations in cafés, stations and malls."
+    "en": "Charging stations in cafés, stations and malls.",
+    "ja": "カフェ、駅、モールに充電スタンドがあります。"
    },
    "pictogram": null,
    "plateColor": "#5b4b8a",
@@ -2748,12 +3310,16 @@
    "group": "service",
    "koText": "빨래방",
    "romanization": "ppallaebang",
-   "reading": {},
+   "reading": {
+    "ja": "パルレバン"
+   },
    "meaning": {
-    "en": "Laundromat"
+    "en": "Laundromat",
+    "ja": "コインランドリー"
    },
    "note": {
-    "en": "Coin-operated, often open 24 hours."
+    "en": "Coin-operated, often open 24 hours.",
+    "ja": "コイン式で、24時間営業のことが多いです。"
    },
    "pictogram": null,
    "plateColor": "#5b4b8a",
@@ -2766,12 +3332,16 @@
    "group": "service",
    "koText": "미용실",
    "romanization": "miyongsil",
-   "reading": {},
+   "reading": {
+    "ja": "ミヨンシル"
+   },
    "meaning": {
-    "en": "Hair salon"
+    "en": "Hair salon",
+    "ja": "美容室"
    },
    "note": {
-    "en": "You will see one on almost every block."
+    "en": "You will see one on almost every block.",
+    "ja": "ほぼどの通りにもあります。"
    },
    "pictogram": null,
    "plateColor": "#5b4b8a",
@@ -2784,12 +3354,16 @@
    "group": "service",
    "koText": "경찰서",
    "romanization": "gyeongchalseo",
-   "reading": {},
+   "reading": {
+    "ja": "キョンチャルソ"
+   },
    "meaning": {
-    "en": "Police station"
+    "en": "Police station",
+    "ja": "警察署"
    },
    "note": {
-    "en": "Smaller local posts are called 파출소 or 지구대."
+    "en": "Smaller local posts are called 파출소 or 지구대.",
+    "ja": "小さな交番は 파출소 や 지구대 と呼ばれます。"
    },
    "pictogram": null,
    "plateColor": "#5b4b8a",
@@ -2802,12 +3376,16 @@
    "group": "service",
    "koText": "관광안내소",
    "romanization": "gwangwang annaeso",
-   "reading": {},
+   "reading": {
+    "ja": "クァングァンアンネソ"
+   },
    "meaning": {
-    "en": "Tourist information"
+    "en": "Tourist information",
+    "ja": "観光案内所"
    },
    "note": {
-    "en": "Maps and help in English. Look for the i sign."
+    "en": "Maps and help in English. Look for the i sign.",
+    "ja": "地図や案内があり、日本語が通じることもあります。i のマークが目印です。"
    },
    "pictogram": null,
    "plateColor": "#5b4b8a",
@@ -2820,12 +3398,16 @@
    "group": "service",
    "koText": "분리수거",
    "romanization": "bullisugeo",
-   "reading": {},
+   "reading": {
+    "ja": "プルリスゴ"
+   },
    "meaning": {
-    "en": "Recycling"
+    "en": "Recycling",
+    "ja": "分別回収"
    },
    "note": {
-    "en": "Bins are split by type: 일반 (general), 플라스틱, 캔, 종이."
+    "en": "Bins are split by type: 일반 (general), 플라스틱, 캔, 종이.",
+    "ja": "種類ごとに分かれています: 일반(一般)、플라스틱、캔、종이。"
    },
    "pictogram": null,
    "plateColor": "#5b4b8a",
@@ -2840,10 +3422,12 @@
    "typeId": "palace",
    "koName": "경복궁",
    "name": {
-    "en": "Gyeongbokgung Palace"
+    "en": "Gyeongbokgung Palace",
+    "ja": "景福宮"
    },
    "address": {
-    "en": "161 Sajik-ro, Jongno-gu, Seoul"
+    "en": "161 Sajik-ro, Jongno-gu, Seoul",
+    "ja": "ソウル特別市 鍾路区 社稷路161"
    },
    "lat": 37.5796,
    "lng": 126.977,
@@ -2864,10 +3448,12 @@
    "typeId": "palace",
    "koName": "창덕궁",
    "name": {
-    "en": "Changdeokgung Palace"
+    "en": "Changdeokgung Palace",
+    "ja": "昌徳宮"
    },
    "address": {
-    "en": "99 Yulgok-ro, Jongno-gu, Seoul"
+    "en": "99 Yulgok-ro, Jongno-gu, Seoul",
+    "ja": "ソウル特別市 鍾路区 栗谷路99"
    },
    "lat": 37.5794,
    "lng": 126.991,
@@ -2888,10 +3474,12 @@
    "typeId": "palace",
    "koName": "종묘",
    "name": {
-    "en": "Jongmyo Shrine"
+    "en": "Jongmyo Shrine",
+    "ja": "宗廟"
    },
    "address": {
-    "en": "157 Jong-ro, Jongno-gu, Seoul"
+    "en": "157 Jong-ro, Jongno-gu, Seoul",
+    "ja": "ソウル特別市 鍾路区 鍾路157"
    },
    "lat": 37.5745,
    "lng": 126.994,
@@ -2912,10 +3500,12 @@
    "typeId": "museum",
    "koName": "국립민속박물관",
    "name": {
-    "en": "National Folk Museum of Korea"
+    "en": "National Folk Museum of Korea",
+    "ja": "国立民俗博物館"
    },
    "address": {
-    "en": "37 Samcheong-ro, Jongno-gu, Seoul"
+    "en": "37 Samcheong-ro, Jongno-gu, Seoul",
+    "ja": "ソウル特別市 鍾路区 三清路37"
    },
    "lat": 37.5814,
    "lng": 126.9793,
@@ -2936,10 +3526,12 @@
    "typeId": "museum",
    "koName": "국립현대미술관 서울",
    "name": {
-    "en": "MMCA Seoul"
+    "en": "MMCA Seoul",
+    "ja": "国立現代美術館 ソウル館"
    },
    "address": {
-    "en": "30 Samcheong-ro, Jongno-gu, Seoul"
+    "en": "30 Samcheong-ro, Jongno-gu, Seoul",
+    "ja": "ソウル特別市 鍾路区 三清路30"
    },
    "lat": 37.5785,
    "lng": 126.98,
@@ -2960,10 +3552,12 @@
    "typeId": "hanok",
    "koName": "북촌한옥마을",
    "name": {
-    "en": "Bukchon Hanok Village"
+    "en": "Bukchon Hanok Village",
+    "ja": "北村韓屋村"
    },
    "address": {
-    "en": "37 Gyedong-gil, Jongno-gu, Seoul"
+    "en": "37 Gyedong-gil, Jongno-gu, Seoul",
+    "ja": "ソウル特別市 鍾路区 桂洞キル37"
    },
    "lat": 37.5826,
    "lng": 126.983,
@@ -2984,10 +3578,12 @@
    "typeId": "cafe",
    "koName": "삼청동길",
    "name": {
-    "en": "Samcheong-dong Street"
+    "en": "Samcheong-dong Street",
+    "ja": "三清洞通り"
    },
    "address": {
-    "en": "Samcheong-dong, Jongno-gu, Seoul"
+    "en": "Samcheong-dong, Jongno-gu, Seoul",
+    "ja": "ソウル特別市 鍾路区 三清洞"
    },
    "lat": 37.584,
    "lng": 126.982,
@@ -3010,10 +3606,12 @@
    "typeId": "market",
    "koName": "통인시장",
    "name": {
-    "en": "Tongin Market"
+    "en": "Tongin Market",
+    "ja": "通仁市場"
    },
    "address": {
-    "en": "18 Jahamun-ro 15-gil, Jongno-gu, Seoul"
+    "en": "18 Jahamun-ro 15-gil, Jongno-gu, Seoul",
+    "ja": "ソウル特別市 鍾路区 紫霞門路15キル18"
    },
    "lat": 37.58,
    "lng": 126.97,
@@ -3034,10 +3632,12 @@
    "typeId": "hanok",
    "koName": "인사동",
    "name": {
-    "en": "Insadong Street"
+    "en": "Insadong Street",
+    "ja": "仁寺洞"
    },
    "address": {
-    "en": "Insadong-gil, Jongno-gu, Seoul"
+    "en": "Insadong-gil, Jongno-gu, Seoul",
+    "ja": "ソウル特別市 鍾路区 仁寺洞キル"
    },
    "lat": 37.574,
    "lng": 126.985,
@@ -3058,10 +3658,12 @@
    "typeId": "landmark",
    "koName": "광화문광장",
    "name": {
-    "en": "Gwanghwamun Square"
+    "en": "Gwanghwamun Square",
+    "ja": "光化門広場"
    },
    "address": {
-    "en": "172 Sejong-daero, Jongno-gu, Seoul"
+    "en": "172 Sejong-daero, Jongno-gu, Seoul",
+    "ja": "ソウル特別市 鍾路区 世宗大路172"
    },
    "lat": 37.572,
    "lng": 126.9769,
@@ -3082,10 +3684,12 @@
    "typeId": "services",
    "koName": "서촌 약국",
    "name": {
-    "en": "Example pharmacy · Seochon"
+    "en": "Example pharmacy · Seochon",
+    "ja": "薬局の例 · 西村"
    },
    "address": {
-    "en": "Example place near Gyeongbokgung"
+    "en": "Example place near Gyeongbokgung",
+    "ja": "景福宮近くの例の場所"
    },
    "lat": 37.579,
    "lng": 126.97,
@@ -3101,10 +3705,12 @@
    "typeId": "landmark",
    "koName": "명동성당",
    "name": {
-    "en": "Myeongdong Cathedral"
+    "en": "Myeongdong Cathedral",
+    "ja": "明洞聖堂"
    },
    "address": {
-    "en": "74 Myeongdong-gil, Jung-gu, Seoul"
+    "en": "74 Myeongdong-gil, Jung-gu, Seoul",
+    "ja": "ソウル特別市 中区 明洞キル74"
    },
    "lat": 37.5633,
    "lng": 126.9872,
@@ -3127,10 +3733,12 @@
    "typeId": "market",
    "koName": "남대문시장",
    "name": {
-    "en": "Namdaemun Market"
+    "en": "Namdaemun Market",
+    "ja": "南大門市場"
    },
    "address": {
-    "en": "21 Namdaemunsijang 4-gil, Jung-gu, Seoul"
+    "en": "21 Namdaemunsijang 4-gil, Jung-gu, Seoul",
+    "ja": "ソウル特別市 中区 南大門市場4キル21"
    },
    "lat": 37.5591,
    "lng": 126.9772,
@@ -3151,10 +3759,12 @@
    "typeId": "shopping",
    "koName": "신세계백화점 본점",
    "name": {
-    "en": "Shinsegae Department Store Main"
+    "en": "Shinsegae Department Store Main",
+    "ja": "新世界百貨店 本店"
    },
    "address": {
-    "en": "63 Sogong-ro, Jung-gu, Seoul"
+    "en": "63 Sogong-ro, Jung-gu, Seoul",
+    "ja": "ソウル特別市 中区 小公路63"
    },
    "lat": 37.561,
    "lng": 126.981,
@@ -3177,10 +3787,12 @@
    "typeId": "shopping",
    "koName": "롯데백화점 본점",
    "name": {
-    "en": "Lotte Department Store Main"
+    "en": "Lotte Department Store Main",
+    "ja": "ロッテ百貨店 本店"
    },
    "address": {
-    "en": "81 Namdaemun-ro, Jung-gu, Seoul"
+    "en": "81 Namdaemun-ro, Jung-gu, Seoul",
+    "ja": "ソウル特別市 中区 南大門路81"
    },
    "lat": 37.565,
    "lng": 126.982,
@@ -3201,10 +3813,12 @@
    "typeId": "palace",
    "koName": "덕수궁",
    "name": {
-    "en": "Deoksugung Palace"
+    "en": "Deoksugung Palace",
+    "ja": "徳寿宮"
    },
    "address": {
-    "en": "99 Sejong-daero, Jung-gu, Seoul"
+    "en": "99 Sejong-daero, Jung-gu, Seoul",
+    "ja": "ソウル特別市 中区 世宗大路99"
    },
    "lat": 37.5658,
    "lng": 126.9751,
@@ -3225,10 +3839,12 @@
    "typeId": "station",
    "koName": "서울역",
    "name": {
-    "en": "Seoul Station"
+    "en": "Seoul Station",
+    "ja": "ソウル駅"
    },
    "address": {
-    "en": "405 Hangang-daero, Jung-gu, Seoul"
+    "en": "405 Hangang-daero, Jung-gu, Seoul",
+    "ja": "ソウル特別市 中区 漢江大路405"
    },
    "lat": 37.5547,
    "lng": 126.9707,
@@ -3251,10 +3867,12 @@
    "typeId": "tower",
    "koName": "남산서울타워",
    "name": {
-    "en": "N Seoul Tower"
+    "en": "N Seoul Tower",
+    "ja": "Nソウルタワー"
    },
    "address": {
-    "en": "105 Namsangongwon-gil, Yongsan-gu, Seoul"
+    "en": "105 Namsangongwon-gil, Yongsan-gu, Seoul",
+    "ja": "ソウル特別市 龍山区 南山公園キル105"
    },
    "lat": 37.5512,
    "lng": 126.9882,
@@ -3277,10 +3895,12 @@
    "typeId": "services",
    "koName": "명동 환전소",
    "name": {
-    "en": "Example exchange booth · Myeongdong"
+    "en": "Example exchange booth · Myeongdong",
+    "ja": "両替所の例 · 明洞"
    },
    "address": {
-    "en": "Example place in Myeongdong"
+    "en": "Example place in Myeongdong",
+    "ja": "明洞の例の場所"
    },
    "lat": 37.564,
    "lng": 126.986,
@@ -3296,10 +3916,12 @@
    "typeId": "street",
    "koName": "명동 먹자골목",
    "name": {
-    "en": "Myeongdong Street Food Alley"
+    "en": "Myeongdong Street Food Alley",
+    "ja": "明洞屋台通り"
    },
    "address": {
-    "en": "Myeongdong-gil, Jung-gu, Seoul"
+    "en": "Myeongdong-gil, Jung-gu, Seoul",
+    "ja": "ソウル特別市 中区 明洞キル"
    },
    "lat": 37.5636,
    "lng": 126.985,
@@ -3322,10 +3944,12 @@
    "typeId": "landmark",
    "koName": "동대문디자인플라자",
    "name": {
-    "en": "Dongdaemun Design Plaza"
+    "en": "Dongdaemun Design Plaza",
+    "ja": "東大門デザインプラザ"
    },
    "address": {
-    "en": "281 Eulji-ro, Jung-gu, Seoul"
+    "en": "281 Eulji-ro, Jung-gu, Seoul",
+    "ja": "ソウル特別市 中区 乙支路281"
    },
    "lat": 37.5669,
    "lng": 127.0094,
@@ -3346,10 +3970,12 @@
    "typeId": "market",
    "koName": "광장시장",
    "name": {
-    "en": "Gwangjang Market"
+    "en": "Gwangjang Market",
+    "ja": "広蔵市場"
    },
    "address": {
-    "en": "88 Changgyeonggung-ro, Jongno-gu, Seoul"
+    "en": "88 Changgyeonggung-ro, Jongno-gu, Seoul",
+    "ja": "ソウル特別市 鍾路区 昌慶宮路88"
    },
    "lat": 37.5701,
    "lng": 126.9996,
@@ -3370,10 +3996,12 @@
    "typeId": "park",
    "koName": "청계천",
    "name": {
-    "en": "Cheonggyecheon Stream"
+    "en": "Cheonggyecheon Stream",
+    "ja": "清渓川"
    },
    "address": {
-    "en": "Cheonggyecheon-ro, Jung-gu, Seoul"
+    "en": "Cheonggyecheon-ro, Jung-gu, Seoul",
+    "ja": "ソウル特別市 中区 清渓川路"
    },
    "lat": 37.5692,
    "lng": 126.9784,
@@ -3396,10 +4024,12 @@
    "typeId": "street",
    "koName": "을지로 인쇄골목",
    "name": {
-    "en": "Euljiro Printing Alleys"
+    "en": "Euljiro Printing Alleys",
+    "ja": "乙支路印刷路地"
    },
    "address": {
-    "en": "Euljiro 3-ga, Jung-gu, Seoul"
+    "en": "Euljiro 3-ga, Jung-gu, Seoul",
+    "ja": "ソウル特別市 中区 乙支路3街"
    },
    "lat": 37.566,
    "lng": 126.991,
@@ -3413,10 +4043,12 @@
    "typeId": "hanok",
    "koName": "익선동",
    "name": {
-    "en": "Ikseon-dong Hanok Street"
+    "en": "Ikseon-dong Hanok Street",
+    "ja": "益善洞韓屋通り"
    },
    "address": {
-    "en": "Ikseon-dong, Jongno-gu, Seoul"
+    "en": "Ikseon-dong, Jongno-gu, Seoul",
+    "ja": "ソウル特別市 鍾路区 益善洞"
    },
    "lat": 37.574,
    "lng": 126.99,
@@ -3437,10 +4069,12 @@
    "typeId": "palace",
    "koName": "창경궁",
    "name": {
-    "en": "Changgyeonggung Palace"
+    "en": "Changgyeonggung Palace",
+    "ja": "昌慶宮"
    },
    "address": {
-    "en": "185 Changgyeonggung-ro, Jongno-gu, Seoul"
+    "en": "185 Changgyeonggung-ro, Jongno-gu, Seoul",
+    "ja": "ソウル特別市 鍾路区 昌慶宮路185"
    },
    "lat": 37.5783,
    "lng": 126.995,
@@ -3461,10 +4095,12 @@
    "typeId": "museum",
    "koName": "서울역사박물관",
    "name": {
-    "en": "Seoul Museum of History"
+    "en": "Seoul Museum of History",
+    "ja": "ソウル歴史博物館"
    },
    "address": {
-    "en": "55 Saemunan-ro, Jongno-gu, Seoul"
+    "en": "55 Saemunan-ro, Jongno-gu, Seoul",
+    "ja": "ソウル特別市 鍾路区 セムナン路55"
    },
    "lat": 37.5704,
    "lng": 126.97,
@@ -3485,10 +4121,12 @@
    "typeId": "park",
    "koName": "서울숲",
    "name": {
-    "en": "Seoul Forest"
+    "en": "Seoul Forest",
+    "ja": "ソウルの森"
    },
    "address": {
-    "en": "273 Ttukseom-ro, Seongdong-gu, Seoul"
+    "en": "273 Ttukseom-ro, Seongdong-gu, Seoul",
+    "ja": "ソウル特別市 城東区 纛島路273"
    },
    "lat": 37.5444,
    "lng": 127.0374,
@@ -3509,10 +4147,12 @@
    "typeId": "cafe",
    "koName": "성수동 카페거리",
    "name": {
-    "en": "Seongsu Café Street"
+    "en": "Seongsu Café Street",
+    "ja": "聖水洞カフェ通り"
    },
    "address": {
-    "en": "Seongsui-ro, Seongdong-gu, Seoul"
+    "en": "Seongsui-ro, Seongdong-gu, Seoul",
+    "ja": "ソウル特別市 城東区 聖水二路"
    },
    "lat": 37.5445,
    "lng": 127.0557,
@@ -3533,10 +4173,12 @@
    "typeId": "services",
    "koName": "성수 병원",
    "name": {
-    "en": "Example clinic · Seongsu"
+    "en": "Example clinic · Seongsu",
+    "ja": "クリニックの例 · 聖水"
    },
    "address": {
-    "en": "Example place near Seoul Forest"
+    "en": "Example place near Seoul Forest",
+    "ja": "ソウルの森近くの例の場所"
    },
    "lat": 37.545,
    "lng": 127.05,
@@ -3552,10 +4194,12 @@
    "typeId": "station",
    "koName": "뚝섬역",
    "name": {
-    "en": "Ttukseom Station"
+    "en": "Ttukseom Station",
+    "ja": "トゥクソム駅"
    },
    "address": {
-    "en": "Seongsui-ro, Seongdong-gu, Seoul"
+    "en": "Seongsui-ro, Seongdong-gu, Seoul",
+    "ja": "ソウル特別市 城東区 聖水二路"
    },
    "lat": 37.5471,
    "lng": 127.0474,
@@ -3576,10 +4220,12 @@
    "typeId": "station",
    "koName": "홍대입구역",
    "name": {
-    "en": "Hongik Univ. Station"
+    "en": "Hongik Univ. Station",
+    "ja": "弘大入口駅"
    },
    "address": {
-    "en": "Yanghwa-ro, Mapo-gu, Seoul"
+    "en": "Yanghwa-ro, Mapo-gu, Seoul",
+    "ja": "ソウル特別市 麻浦区 楊花路"
    },
    "lat": 37.5572,
    "lng": 126.9254,
@@ -3600,10 +4246,12 @@
    "typeId": "cafe",
    "koName": "연남동 카페거리",
    "name": {
-    "en": "Yeonnam-dong Café Street"
+    "en": "Yeonnam-dong Café Street",
+    "ja": "延南洞カフェ通り"
    },
    "address": {
-    "en": "Yeonnam-dong, Mapo-gu, Seoul"
+    "en": "Yeonnam-dong, Mapo-gu, Seoul",
+    "ja": "ソウル特別市 麻浦区 延南洞"
    },
    "lat": 37.56,
    "lng": 126.925,
@@ -3617,10 +4265,12 @@
    "typeId": "park",
    "koName": "경의선숲길",
    "name": {
-    "en": "Gyeongui Line Forest Park"
+    "en": "Gyeongui Line Forest Park",
+    "ja": "京義線森の道"
    },
    "address": {
-    "en": "Yeonnam-dong, Mapo-gu, Seoul"
+    "en": "Yeonnam-dong, Mapo-gu, Seoul",
+    "ja": "ソウル特別市 麻浦区 延南洞"
    },
    "lat": 37.561,
    "lng": 126.927,
@@ -3641,10 +4291,12 @@
    "typeId": "market",
    "koName": "망원시장",
    "name": {
-    "en": "Mangwon Market"
+    "en": "Mangwon Market",
+    "ja": "望遠市場"
    },
    "address": {
-    "en": "14 Poeun-ro 8-gil, Mapo-gu, Seoul"
+    "en": "14 Poeun-ro 8-gil, Mapo-gu, Seoul",
+    "ja": "ソウル特別市 麻浦区 圃隠路8キル14"
    },
    "lat": 37.556,
    "lng": 126.905,
@@ -3665,10 +4317,12 @@
    "typeId": "street",
    "koName": "홍대 걷고싶은거리",
    "name": {
-    "en": "Hongdae Walking Street"
+    "en": "Hongdae Walking Street",
+    "ja": "弘大 歩きたい通り"
    },
    "address": {
-    "en": "Eoulmadang-ro, Mapo-gu, Seoul"
+    "en": "Eoulmadang-ro, Mapo-gu, Seoul",
+    "ja": "ソウル特別市 麻浦区 オウルマダン路"
    },
    "lat": 37.554,
    "lng": 126.923,
@@ -3689,10 +4343,12 @@
    "typeId": "museum",
    "koName": "국립중앙박물관",
    "name": {
-    "en": "National Museum of Korea"
+    "en": "National Museum of Korea",
+    "ja": "国立中央博物館"
    },
    "address": {
-    "en": "137 Seobinggo-ro, Yongsan-gu, Seoul"
+    "en": "137 Seobinggo-ro, Yongsan-gu, Seoul",
+    "ja": "ソウル特別市 龍山区 西氷庫路137"
    },
    "lat": 37.524,
    "lng": 126.9803,
@@ -3713,10 +4369,12 @@
    "typeId": "museum",
    "koName": "전쟁기념관",
    "name": {
-    "en": "War Memorial of Korea"
+    "en": "War Memorial of Korea",
+    "ja": "戦争記念館"
    },
    "address": {
-    "en": "29 Itaewon-ro, Yongsan-gu, Seoul"
+    "en": "29 Itaewon-ro, Yongsan-gu, Seoul",
+    "ja": "ソウル特別市 龍山区 梨泰院路29"
    },
    "lat": 37.5365,
    "lng": 126.977,
@@ -3737,10 +4395,12 @@
    "typeId": "street",
    "koName": "이태원 거리",
    "name": {
-    "en": "Itaewon Street"
+    "en": "Itaewon Street",
+    "ja": "梨泰院通り"
    },
    "address": {
-    "en": "Itaewon-ro, Yongsan-gu, Seoul"
+    "en": "Itaewon-ro, Yongsan-gu, Seoul",
+    "ja": "ソウル特別市 龍山区 梨泰院路"
    },
    "lat": 37.5345,
    "lng": 126.9946,
@@ -3763,10 +4423,12 @@
    "typeId": "park",
    "koName": "남산공원",
    "name": {
-    "en": "Namsan Park"
+    "en": "Namsan Park",
+    "ja": "南山公園"
    },
    "address": {
-    "en": "Samil-daero, Jung-gu, Seoul"
+    "en": "Samil-daero, Jung-gu, Seoul",
+    "ja": "ソウル特別市 中区 三一大路"
    },
    "lat": 37.5512,
    "lng": 126.991,
@@ -3787,10 +4449,12 @@
    "typeId": "services",
    "koName": "이태원 은행",
    "name": {
-    "en": "Example bank branch · Itaewon"
+    "en": "Example bank branch · Itaewon",
+    "ja": "銀行支店の例 · 梨泰院"
    },
    "address": {
-    "en": "Example place in Itaewon"
+    "en": "Example place in Itaewon",
+    "ja": "梨泰院の例の場所"
    },
    "lat": 37.534,
    "lng": 126.995,
@@ -3807,10 +4471,12 @@
    "typeId": "park",
    "koName": "여의도한강공원",
    "name": {
-    "en": "Yeouido Hangang Park"
+    "en": "Yeouido Hangang Park",
+    "ja": "汝矣島漢江公園"
    },
    "address": {
-    "en": "330 Yeouidong-ro, Yeongdeungpo-gu, Seoul"
+    "en": "330 Yeouidong-ro, Yeongdeungpo-gu, Seoul",
+    "ja": "ソウル特別市 永登浦区 汝矣東路330"
    },
    "lat": 37.5285,
    "lng": 126.934,
@@ -3831,10 +4497,12 @@
    "typeId": "shopping",
    "koName": "더현대 서울",
    "name": {
-    "en": "The Hyundai Seoul"
+    "en": "The Hyundai Seoul",
+    "ja": "ザ・現代ソウル"
    },
    "address": {
-    "en": "108 Yeoui-daero, Yeongdeungpo-gu, Seoul"
+    "en": "108 Yeoui-daero, Yeongdeungpo-gu, Seoul",
+    "ja": "ソウル特別市 永登浦区 汝矣大路108"
    },
    "lat": 37.5259,
    "lng": 126.9285,
@@ -3855,10 +4523,12 @@
    "typeId": "station",
    "koName": "여의나루역",
    "name": {
-    "en": "Yeouinaru Station"
+    "en": "Yeouinaru Station",
+    "ja": "汝矣ナル駅"
    },
    "address": {
-    "en": "Yeouidong-ro, Yeongdeungpo-gu, Seoul"
+    "en": "Yeouidong-ro, Yeongdeungpo-gu, Seoul",
+    "ja": "ソウル特別市 永登浦区 汝矣東路"
    },
    "lat": 37.527,
    "lng": 126.9325,
@@ -3879,10 +4549,12 @@
    "typeId": "shopping",
    "koName": "코엑스몰",
    "name": {
-    "en": "COEX Mall"
+    "en": "COEX Mall",
+    "ja": "COEXモール"
    },
    "address": {
-    "en": "513 Yeongdong-daero, Gangnam-gu, Seoul"
+    "en": "513 Yeongdong-daero, Gangnam-gu, Seoul",
+    "ja": "ソウル特別市 江南区 永東大路513"
    },
    "lat": 37.5126,
    "lng": 127.0589,
@@ -3905,10 +4577,12 @@
    "typeId": "tower",
    "koName": "롯데월드타워",
    "name": {
-    "en": "Lotte World Tower"
+    "en": "Lotte World Tower",
+    "ja": "ロッテワールドタワー"
    },
    "address": {
-    "en": "300 Olympic-ro, Songpa-gu, Seoul"
+    "en": "300 Olympic-ro, Songpa-gu, Seoul",
+    "ja": "ソウル特別市 松坡区 オリンピック路300"
    },
    "lat": 37.5125,
    "lng": 127.1025,
@@ -3929,10 +4603,12 @@
    "typeId": "park",
    "koName": "올림픽공원",
    "name": {
-    "en": "Olympic Park"
+    "en": "Olympic Park",
+    "ja": "オリンピック公園"
    },
    "address": {
-    "en": "424 Olympic-ro, Songpa-gu, Seoul"
+    "en": "424 Olympic-ro, Songpa-gu, Seoul",
+    "ja": "ソウル特別市 松坡区 オリンピック路424"
    },
    "lat": 37.5202,
    "lng": 127.1216,
@@ -3953,10 +4629,12 @@
    "typeId": "station",
    "koName": "강남역",
    "name": {
-    "en": "Gangnam Station"
+    "en": "Gangnam Station",
+    "ja": "江南駅"
    },
    "address": {
-    "en": "Gangnam-daero, Gangnam-gu, Seoul"
+    "en": "Gangnam-daero, Gangnam-gu, Seoul",
+    "ja": "ソウル特別市 江南区 江南大路"
    },
    "lat": 37.4979,
    "lng": 127.0276,
@@ -3977,10 +4655,12 @@
    "typeId": "cafe",
    "koName": "가로수길",
    "name": {
-    "en": "Garosu-gil"
+    "en": "Garosu-gil",
+    "ja": "カロスキル"
    },
    "address": {
-    "en": "Sinsa-dong, Gangnam-gu, Seoul"
+    "en": "Sinsa-dong, Gangnam-gu, Seoul",
+    "ja": "ソウル特別市 江南区 新沙洞"
    },
    "lat": 37.5205,
    "lng": 127.023,
