@@ -45,7 +45,13 @@ class FakeBookmarkStore(
         items.remove(card)
     }
 
-    override suspend fun clear() = items.clear()
+    override suspend fun clear() {
+        if (failNextWrite) {
+            failNextWrite = false
+            throw FakeStorageException("bookmark clear")
+        }
+        items.clear()
+    }
 
     override fun snapshot(): Any = items.toMap()
 

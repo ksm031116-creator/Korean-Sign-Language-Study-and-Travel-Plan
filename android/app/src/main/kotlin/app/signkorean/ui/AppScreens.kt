@@ -81,7 +81,7 @@ fun AppScreen(route: Route, navigator: AppNavigator) {
             onOpenBasics = { navigator.push(Route(ScreenId.SC03, CollectionArg.BASICS)) },
             onOpenArea = { id -> navigator.push(Route(ScreenId.SC03, CollectionArg.area(id))) },
             onResume = { navigator.openLearn() },
-            onOpenSettings = null, // SC10 은 Phase 20 에서 연다
+            onOpenSettings = { navigator.push(Route(ScreenId.SC10)) },
         )
         ScreenId.SC03 -> {
             val source = CollectionArg.parse(route.arg)
@@ -168,9 +168,11 @@ fun AppScreen(route: Route, navigator: AppNavigator) {
                 onOpenPicker = { id, d -> navigator.push(Route(ScreenId.SC14, TripDayArg.of(id, d))) },
                 onEditTrip = { id -> navigator.push(Route(ScreenId.SC12, TripFormArg.edit(id))) },
                 onOpenMap = { id, d -> navigator.push(Route(ScreenId.SC18, MapArg.day(id, d))) },
+                onOpenLearn = { navigator.openLearn() },
                 onUpgrade = { f -> navigator.push(Route(ScreenId.SC21, f.arg)) },
             )
         } ?: PlaceholderScreen(route)
+        ScreenId.SC10 -> app.signkorean.ui.settings.SettingsScreen(onClose = { navigator.back() })
         ScreenId.SC18 -> MapArg.parse(route.arg)?.let { target ->
             app.signkorean.ui.map.MapScreen(target, onClose = { navigator.back() }, onUpgrade = { f -> navigator.push(Route(ScreenId.SC21, f.arg)) })
         } ?: PlaceholderScreen(route)

@@ -151,6 +151,7 @@ val learningModule = module {
     single { TripEditor(get(), get(), get(), get(), get()) }
     // 일정의 구간 시간은 경로 공급자에서 온다. 모르면 Incomplete 로 보인다(FR20).
     single<DayLegs> { get<DayRoutePlanner>() }
+    factory { app.signkorean.domain.trip.StudyCards(get()) }
     factory { SetBookmark(get(), get(), get(), get()) }
     factory { ClearBookmarks(get()) }
     factory { StartSession(get(), get(), get(), get()) }
@@ -196,6 +197,11 @@ val uiModule = module {
     viewModel { params -> DayPlanViewModel(params.get(), params.getOrNull(), get(), get(), get(), get(), get()) }
     viewModel { params -> MapViewModel(params.get(), get(), get(), get(), get(), get(), get()) }
     viewModelOf(::OriginPickerViewModel)
+    viewModel { params -> app.signkorean.ui.plan.DayStudyViewModel(params.get(), params.get(), get(), get(), get(), get(), get()) }
+    viewModel {
+        val debuggable = (androidContext().applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE) != 0
+        app.signkorean.ui.settings.SettingsViewModel(get(), get(), get(), get(), get(), get(), includeDraftLanguages = debuggable, relock = getOrNull())
+    }
     viewModel { params -> PlaceDetailViewModel(params.get(), get(), get(), get(), get(), get(), get(), get(), get()) }
     viewModel { params -> CollectionViewModel(params.get(), get(), get(), get()) }
     viewModelOf(::AppGateViewModel)

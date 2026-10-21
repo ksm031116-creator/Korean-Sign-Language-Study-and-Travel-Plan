@@ -405,4 +405,43 @@
     <string name="origin_places">Registered places</string>
     <string name="origin_empty">No places match.</string>
     <string name="start_find">Search or use my location</string>
+    <!-- Study this day · SC10 설정 (Phase 20) -->
+    <string name="study_title">Study this day</string>
+    <string name="study_body">Practise the signs you\'ll see at today\'s places, in visiting order.</string>
+    <plurals name="study_count">
+        <item quantity="one">%d sign for this day</item>
+        <item quantity="other">%d signs for this day</item>
+    </plurals>
+    <string name="study_no_cards">No study cards. The places on this day have no signs yet.</string>
+    <string name="study_start">Start</string>
+    <string name="settings_title">Settings</string>
+    <string name="settings_open">Settings</string>
+    <string name="settings_language">App language</string>
+    <string name="settings_purchase">Purchase</string>
+    <string name="settings_paid">Trip planning is unlocked on this account.</string>
+    <string name="settings_free">Free version. Trip planning, routes and unlimited bookmarks need the one-time purchase.</string>
+    <string name="settings_status_unknown">Couldn\'t check the purchase right now.</string>
+    <string name="settings_learning">Learning</string>
+    <string name="settings_reset_learning">Reset learning record</string>
+    <string name="settings_reset_title">Reset your learning record?</string>
+    <string name="settings_reset_body">All I know and Don\'t know marks and any unfinished practice will be cleared. Bookmarks, trips and your purchase stay.</string>
+    <string name="settings_reset_confirm">Reset</string>
+    <string name="settings_reset_done">Learning record reset.</string>
+    <string name="settings_clear_bookmarks">Clear bookmarks</string>
+    <string name="settings_clear_title">Clear all bookmarks?</string>
+    <string name="settings_clear_body">Your saved signs will be removed. Learning record, trips and your purchase stay.</string>
+    <string name="settings_clear_confirm">Clear</string>
+    <string name="settings_bookmarks_cleared">Bookmarks cleared.</string>
+    <string name="settings_cancel">Cancel</string>
+    <string name="settings_coach_reset">Show the swipe guide again</string>
+    <string name="settings_coach_reset_done">The swipe guide will show on your next practice.</string>
+    <string name="settings_about">About</string>
+    <string name="settings_audio_title">Pronunciation audio</string>
+    <string name="settings_audio_body">Recordings by native Korean speakers. Signs without a recording show the romanization only.</string>
+    <string name="settings_privacy_title">Privacy</string>
+    <string name="settings_privacy_body">Your learning record, bookmarks and trips stay on this device. Your location is read only when you choose \"Use my current location\" and is saved only if you apply it as a day\'s start.</string>
+    <string name="settings_photos_title">Photo credits</string>
+    <string name="settings_photos_body">Place photos come from the Korea Tourism Organization (KOGL Type 3) and Wikimedia Commons. Each photo shows its source and licence.</string>
+    <string name="settings_legal_jp">Notation based on the Act on Specified Commercial Transactions</string>
+    <string name="settings_legal_jp_body">This notice will be published before the Japanese release.</string>
 </resources>

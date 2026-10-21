@@ -131,7 +131,8 @@ class DayStudyViewModelTest {
         assertEquals(1, vm.state.value.learningCount)
         vm.onAction(DayStudyAction.SetMode(Mode.Review))
         vm.onAction(DayStudyAction.Start)
-        assertEquals(listOf("m2"), sessions.current()!!.cardIds.map { it.value })
+        // cardIds 는 출처의 카드 전부, 출제 대기열은 learning 만(FR05).
+        assertEquals(listOf("m2"), sessions.current()!!.queue.map { it.card.value })
     }
 
     @Test

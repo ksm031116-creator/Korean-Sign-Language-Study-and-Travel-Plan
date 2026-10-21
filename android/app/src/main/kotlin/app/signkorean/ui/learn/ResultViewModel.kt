@@ -8,7 +8,6 @@ import app.signkorean.domain.learning.LearningSession
 import app.signkorean.domain.learning.Mode
 import app.signkorean.domain.learning.SessionStore
 import app.signkorean.domain.learning.SessionSummary
-import app.signkorean.domain.learning.SourceCards
 import app.signkorean.domain.learning.StartOutcome
 import app.signkorean.domain.learning.StartSession
 import app.signkorean.ui.text.UiText
@@ -47,6 +46,8 @@ class ResultViewModel(
     private val content: ContentRepository,
     private val sessions: SessionStore,
     private val start: StartSession,
+    // 일정의 날(Study this day)은 지금 일정의 카드로 다시 한다(T-14).
+    private val studyCards: app.signkorean.domain.trip.StudyCards,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(ResultUiState())
@@ -97,7 +98,7 @@ class ResultViewModel(
         _state.update { it.copy(busy = true, message = null) }
         viewModelScope.launch {
             val outcome = try {
-                start(source, mode, SourceCards.of(content.load(), source), replaceUnfinished = true)
+                start(source, mode, studyCards.of(content.load(), source), replaceUnfinished = true)
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {

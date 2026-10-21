@@ -85,6 +85,7 @@ fun DayPlanScreen(
     onEditTrip: (TripId) -> Unit,
     onUpgrade: (UpgradeFeature) -> Unit,
     onOpenMap: (TripId, LocalDate) -> Unit = { _, _ -> },
+    onOpenLearn: () -> Unit = {},
     viewModel: DayPlanViewModel = koinViewModel { parametersOf(trip, date) },
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -104,11 +105,16 @@ fun DayPlanScreen(
             }
         }
     }
-    DayPlanContent(state, viewModel::onAction, onClose)
+    DayPlanContent(state, viewModel::onAction, onClose, studySection = { d, revision -> DayStudySection(trip, d, revision, onOpenLearn, onUpgrade) })
 }
 
 @Composable
-fun DayPlanContent(state: DayPlanUiState, onAction: (DayPlanAction) -> Unit, onClose: () -> Unit) {
+fun DayPlanContent(
+    state: DayPlanUiState,
+    onAction: (DayPlanAction) -> Unit,
+    onClose: () -> Unit,
+    studySection: @Composable (LocalDate, Int) -> Unit = { _, _ -> },
+) {
     val t = SignKoreanTheme.tokens
     val formats = rememberAppFormats()
     if (state.loading) return
@@ -231,6 +237,8 @@ fun DayPlanContent(state: DayPlanUiState, onAction: (DayPlanAction) -> Unit, onC
                 }
             }
         }
+        // Study this day (FR21). 그날 장소의 간판을 방문 순서대로.
+        if (state.day != null) item(key = "study-" + state.day.date) { studySection(state.day.date, state.day.revision) }
     }
     }
 }

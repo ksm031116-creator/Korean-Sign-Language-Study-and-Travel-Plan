@@ -366,4 +366,42 @@
     <string name="origin_places">登録された場所</string>
     <string name="origin_empty">一致する場所はありません。</string>
     <string name="start_find">検索または現在地</string>
+    <!-- この日を学ぶ · SC10 設定 (Phase 20) -->
+    <string name="study_title">この日を学ぶ</string>
+    <string name="study_body">この日に訪れる場所の看板を、訪問順に練習します。</string>
+    <plurals name="study_count">
+        <item quantity="other">この日の看板 %d 枚</item>
+    </plurals>
+    <string name="study_no_cards">学習カードがありません。この日の場所にはまだ看板がありません。</string>
+    <string name="study_start">始める</string>
+    <string name="settings_title">設定</string>
+    <string name="settings_open">設定</string>
+    <string name="settings_language">アプリの言語</string>
+    <string name="settings_purchase">購入</string>
+    <string name="settings_paid">このアカウントでは旅行プランが使えます。</string>
+    <string name="settings_free">無料版です。旅行プラン・ルート・ブックマーク無制限は買い切りの購入で使えます。</string>
+    <string name="settings_status_unknown">いまは購入状況を確認できません。</string>
+    <string name="settings_learning">学習</string>
+    <string name="settings_reset_learning">学習記録をリセット</string>
+    <string name="settings_reset_title">学習記録をリセットしますか?</string>
+    <string name="settings_reset_body">「知ってる」「知らない」の記録と途中の練習を消します。ブックマーク・旅行・購入はそのままです。</string>
+    <string name="settings_reset_confirm">リセット</string>
+    <string name="settings_reset_done">学習記録をリセットしました。</string>
+    <string name="settings_clear_bookmarks">ブックマークを消去</string>
+    <string name="settings_clear_title">ブックマークをすべて消しますか?</string>
+    <string name="settings_clear_body">保存した看板を消します。学習記録・旅行・購入はそのままです。</string>
+    <string name="settings_clear_confirm">消去</string>
+    <string name="settings_bookmarks_cleared">ブックマークを消しました。</string>
+    <string name="settings_cancel">キャンセル</string>
+    <string name="settings_coach_reset">スワイプの案内をもう一度表示</string>
+    <string name="settings_coach_reset_done">次の練習でスワイプの案内を表示します。</string>
+    <string name="settings_about">このアプリについて</string>
+    <string name="settings_audio_title">発音の音声</string>
+    <string name="settings_audio_body">韓国語ネイティブ話者の録音です。録音のない看板はローマ字表記だけを表示します。</string>
+    <string name="settings_privacy_title">プライバシー</string>
+    <string name="settings_privacy_body">学習記録・ブックマーク・旅行はこの端末にだけ保存します。現在地は「現在地を使う」を選んだときだけ読み取り、その日の出発地として適用したときだけ保存します。</string>
+    <string name="settings_photos_title">写真の出典</string>
+    <string name="settings_photos_body">場所の写真は韓国観光公社(公共ヌリ第3類型)と Wikimedia Commons のものです。各写真に出典とライセンスを表示します。</string>
+    <string name="settings_legal_jp">特定商取引法に基づく表記</string>
+    <string name="settings_legal_jp_body">日本語版の公開前に掲載します。</string>
 </resources>
