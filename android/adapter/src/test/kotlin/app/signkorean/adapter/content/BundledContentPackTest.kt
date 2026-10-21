@@ -51,6 +51,19 @@ class BundledContentPackTest {
     }
 
     @Test
+    fun `L10N ja 콘텐츠 초안이 빠짐없다 - 카드 뜻·설명·카타카나, 장소·지역 이름 (Phase 20 D2)`() {
+        val jaGaps = ContentLanguageAudit.audit(pack).gaps.filter { it.locale == LocaleTag("ja") }
+        assertEquals(emptyList<LanguageGap>(), jaGaps)
+        val ja = LocaleTag("ja")
+        assertEquals(emptyList<String>(), pack.cards.filter { it.reading[ja].isNullOrBlank() }.map { it.id.value })
+        // 카타카나 읽기는 카타카나·공백만이다(로마자·한글이 섞이지 않게).
+        val katakana = Regex("[\u30A0-\u30FF ]+")
+        assertEquals(emptyList<String>(), pack.cards.filterNot { katakana.matches(it.reading[ja].orEmpty()) }.map { it.id.value })
+        assertEquals(emptyList<String>(), pack.places.filter { it.name[ja].isNullOrBlank() }.map { it.id.value })
+        assertEquals(emptyList<String>(), pack.areas.filter { it.name[ja].isNullOrBlank() }.map { it.id.value })
+    }
+
+    @Test
     fun `ja 는 원어민 검수 전이라 draft 로 표시되어 출시 검사에서 막힌다`() {
         // Phase 20 에서 ja 콘텐츠와 검수(Q-01)가 끝나면 이 테스트를 "출시 가능"으로 뒤집는다.
         val report = ContentLanguageAudit.audit(pack)
