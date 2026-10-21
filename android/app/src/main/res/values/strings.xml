@@ -407,7 +407,7 @@
     <string name="start_find">Search or use my location</string>
     <!-- Study this day · SC10 설정 (Phase 20) -->
     <string name="study_title">Study this day</string>
-    <string name="study_body">Practise the signs you\'ll see at today\'s places, in visiting order.</string>
+    <string name="study_body">Practise the signs you\'ll see at this day\'s places, in visiting order.</string>
     <plurals name="study_count">
         <item quantity="one">%d sign for this day</item>
         <item quantity="other">%d signs for this day</item>

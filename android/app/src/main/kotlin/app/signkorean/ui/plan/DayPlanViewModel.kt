@@ -230,7 +230,8 @@ class DayPlanViewModel(
                 originPlace = (day.origin as? Origin.AtPlace)?.let { o -> places[o.place] },
                 originCandidates = originCandidates(p, day),
                 routing = routing,
-                routeAttributions = if (routing) it.routeAttributions else attributions,
+                // 받는 중에는 비운다. 다른 날의 출처가 남지 않게.
+                routeAttributions = attributions,
             )
         }
     }

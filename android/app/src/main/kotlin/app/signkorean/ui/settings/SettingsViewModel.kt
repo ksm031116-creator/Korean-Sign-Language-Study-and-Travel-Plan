@@ -152,7 +152,15 @@ class SettingsViewModel(
             }
             SettingsAction.Relock -> relock?.let { r ->
                 viewModelScope.launch {
-                    r.relock()
+                    val ok = try {
+                        r.relock()
+                        true
+                    } catch (e: CancellationException) {
+                        throw e
+                    } catch (_: Exception) {
+                        false
+                    }
+                    if (!ok) _state.update { it.copy(message = UiText.Res(R.string.common_save_failed)) }
                     refreshEntitlement()
                 }
             }

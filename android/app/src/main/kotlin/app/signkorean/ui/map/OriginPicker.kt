@@ -21,6 +21,7 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.Role
@@ -61,7 +62,9 @@ fun OriginPicker(onPicked: (Origin, String) -> Unit, viewModel: OriginPickerView
         if (result.isNotEmpty()) viewModel.onAction(OriginPickerAction.PermissionResult(granted = result.values.any { it }))
     }
     // 닫히면 위치 읽기를 멈춘다. 다시 열었을 때 고르지 않은 현재 위치가 저절로 들어가지 않게(ORG-M6).
-    DisposableEffect(viewModel) { onDispose { viewModel.onAction(OriginPickerAction.Reset) } }
+    // 회전(구성 변경)으로 사라질 때는 그대로 둔다 — 뷰모델이 살아남아 이어서 위치를 받는다.
+    val activity = LocalContext.current.findActivity()
+    DisposableEffect(viewModel) { onDispose { if (activity?.isChangingConfigurations != true) viewModel.onAction(OriginPickerAction.Reset) } }
     LaunchedEffect(viewModel) {
         for (effect in viewModel.effects) {
             when (effect) {
@@ -135,4 +138,10 @@ fun OriginPicker(onPicked: (Origin, String) -> Unit, viewModel: OriginPickerView
         }
         if (state.loadFailed) Text(stringResource(R.string.common_load_failed), color = t.danger)
     }
+}
+
+private tailrec fun android.content.Context.findActivity(): android.app.Activity? = when (this) {
+    is android.app.Activity -> this
+    is android.content.ContextWrapper -> baseContext.findActivity()
+    else -> null
 }

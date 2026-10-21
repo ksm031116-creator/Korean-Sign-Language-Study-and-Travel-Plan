@@ -113,7 +113,7 @@ object SchematicMapRenderer : MapRenderer {
             }
             Column(Modifier.align(Alignment.TopEnd).padding(6.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 MapControl("+", stringResource(R.string.map_zoom_in)) { zoom = (zoom * 1.6f).coerceAtMost(MAX_ZOOM) }
-                MapControl("−", stringResource(R.string.map_zoom_out)) { zoom = (zoom / 1.6f).coerceAtLeast(1f); if (zoom == 1f) pan = Offset.Zero }
+                MapControl("−", stringResource(R.string.map_zoom_out)) { zoom /= 1.6f; if (zoom < 1.01f) { zoom = 1f; pan = Offset.Zero } }
                 MapControl("⤢", stringResource(R.string.map_fit)) { zoom = 1f; pan = Offset.Zero }
             }
         }

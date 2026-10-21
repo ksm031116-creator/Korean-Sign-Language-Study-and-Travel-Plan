@@ -78,6 +78,11 @@ fun DayStudyContent(state: DayStudyUiState, onAction: (DayStudyAction) -> Unit) 
             LockBadge(stringResource(R.string.study_title), onClick = { onAction(DayStudyAction.Start) })
             return@Column
         }
+        if (state.loadFailed) {
+            Text(stringResource(R.string.common_load_failed), style = MaterialTheme.typography.bodyMedium, color = t.danger, modifier = Modifier.semantics { liveRegion = LiveRegionMode.Polite })
+            app.signkorean.ui.designsystem.QuietButton(stringResource(R.string.common_retry), onClick = { onAction(DayStudyAction.Refresh) })
+            return@Column
+        }
         if (state.noCards) {
             // T-15: 지어내지 않고 이유를 말한다.
             Text(stringResource(R.string.study_no_cards), style = MaterialTheme.typography.bodyMedium, color = t.muted)

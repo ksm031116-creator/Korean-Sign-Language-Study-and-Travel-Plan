@@ -38,10 +38,12 @@ data class DayStudyUiState(
     val busy: Boolean = false,
     /** 끝나지 않은 다른 세션이 있어 교체를 묻는 중(SC20). */
     val confirmReplace: Boolean = false,
+    /** 읽지 못했다. "카드 없음"과 다르다 — 다시 시도할 수 있다(STY-M2). */
+    val loadFailed: Boolean = false,
     val message: UiText? = null,
 ) {
     /** 그날 장소에 카드가 없다(T-15). */
-    val noCards: Boolean get() = !loading && cardCount == 0
+    val noCards: Boolean get() = !loading && !loadFailed && cardCount == 0
     val canReview: Boolean get() = learningCount > 0
 }
 
@@ -105,7 +107,7 @@ class DayStudyViewModel(
             val learning = cards.count { statuses[it.id] == CardStatus.Learning }
             _state.update {
                 it.copy(
-                    loading = false, locked = locked, cardCount = cards.size, learningCount = learning,
+                    loading = false, loadFailed = false, locked = locked, cardCount = cards.size, learningCount = learning,
                     // 복습할 카드가 없어졌으면 All 로 돌린다.
                     mode = if (learning == 0) Mode.All else it.mode,
                 )
@@ -114,7 +116,7 @@ class DayStudyViewModel(
             throw e
         } catch (_: Exception) {
             cards = emptyList()
-            _state.update { it.copy(loading = false, cardCount = 0, message = UiText.Res(R.string.common_load_failed)) }
+            _state.update { it.copy(loading = false, loadFailed = true, cardCount = 0) }
         }
     }
 
@@ -144,6 +146,9 @@ class DayStudyViewModel(
         _state.update { it.copy(busy = true, confirmReplace = false, message = null) }
         viewModelScope.launch {
             val outcome = try {
+                // 시작할 때 지금 일정을 다시 읽는다. 방금 바꾼 일정이 아직 화면 숫자에 반영되기 전이어도 새 세션은 바뀐 일정을 쓴다(T-14).
+                val day = trips.get(tripId)?.days?.firstOrNull { it.date == date }
+                cards = day?.let { TripStudy.cards(content.load(), it) }.orEmpty()
                 start(TripStudy.source(tripId, date), s.mode, cards, replaceUnfinished = replace)
             } catch (e: CancellationException) {
                 throw e

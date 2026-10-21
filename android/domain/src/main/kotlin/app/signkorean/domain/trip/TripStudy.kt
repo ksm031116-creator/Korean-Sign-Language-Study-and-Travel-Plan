@@ -13,7 +13,8 @@ import java.time.LocalDate
  */
 object TripStudy {
     fun cards(pack: ContentPack, day: TripDay): List<SignCard> {
-        val places = pack.places.associateBy { it.id }
+        // 경로와 같은 기준: 활성 지역의 장소만(STY-L2).
+        val places = PlaceListing.visiblePlaces(pack).associateBy { it.id }
         return day.stops.mapNotNull { places[it.place] }
             .flatMap { PlaceListing.signsAt(pack, it) }
             .distinctBy { it.id }

@@ -40,6 +40,9 @@ sealed interface ResultAction {
 sealed interface ResultEffect {
     data object OpenLearn : ResultEffect
     data object Close : ResultEffect
+
+    /** 유료 기능(일정 학습)을 무료 상태에서 다시 하려 했다 → SC21. */
+    data class Upgrade(val feature: app.signkorean.ui.upgrade.UpgradeFeature) : ResultEffect
 }
 
 class ResultViewModel(
@@ -48,6 +51,7 @@ class ResultViewModel(
     private val start: StartSession,
     // 일정의 날(Study this day)은 지금 일정의 카드로 다시 한다(T-14).
     private val studyCards: app.signkorean.domain.trip.StudyCards,
+    private val entitlement: app.signkorean.domain.entitlement.EntitlementSource,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(ResultUiState())
@@ -95,6 +99,24 @@ class ResultViewModel(
     /** 같은 출처로 새 세션. 결과 화면의 세션은 끝났으므로 교체 확인이 필요 없다. */
     private fun restart(mode: Mode) {
         val source = session?.source ?: return
+        if (source is app.signkorean.domain.learning.SessionSource.TripDay) {
+            // Study this day 는 유료다. 무료가 됐으면 다시 열지 않는다(STY-L1).
+            viewModelScope.launch {
+                val paid = try {
+                    entitlement.current() == app.signkorean.domain.entitlement.Entitlement.Paid
+                } catch (e: CancellationException) {
+                    throw e
+                } catch (_: Exception) {
+                    false
+                }
+                if (paid) startAgain(source, mode) else _effects.send(ResultEffect.Upgrade(app.signkorean.ui.upgrade.UpgradeFeature.Plan))
+            }
+            return
+        }
+        startAgain(source, mode)
+    }
+
+    private fun startAgain(source: app.signkorean.domain.learning.SessionSource, mode: Mode) {
         _state.update { it.copy(busy = true, message = null) }
         viewModelScope.launch {
             val outcome = try {

@@ -42,13 +42,18 @@ object ResultTags {
 
 /** SC06 학습 결과 (FR08). */
 @Composable
-fun ResultScreen(onOpenLearn: () -> Unit, onClose: () -> Unit, viewModel: ResultViewModel = koinViewModel()) {
+fun ResultScreen(
+    onOpenLearn: () -> Unit,
+    onClose: () -> Unit,
+    onUpgrade: (app.signkorean.ui.upgrade.UpgradeFeature) -> Unit = {},
+    viewModel: ResultViewModel = koinViewModel()) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     LaunchedEffect(viewModel) {
         for (effect in viewModel.effects) {
             when (effect) {
                 ResultEffect.OpenLearn -> onOpenLearn()
                 ResultEffect.Close -> onClose()
+                is ResultEffect.Upgrade -> onUpgrade(effect.feature)
             }
         }
     }

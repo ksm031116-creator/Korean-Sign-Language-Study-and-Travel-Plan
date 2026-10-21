@@ -184,6 +184,7 @@ fun AppScreen(route: Route, navigator: AppNavigator) {
         ScreenId.SC06 -> ResultScreen(
             onOpenLearn = { navigator.replaceTop(Route(ScreenId.SC04)) },
             onClose = { navigator.back() },
+            onUpgrade = { f -> navigator.push(Route(ScreenId.SC21, f.arg)) },
         )
         else -> PlaceholderScreen(route)
     }
