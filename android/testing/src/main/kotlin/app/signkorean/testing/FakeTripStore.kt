@@ -93,7 +93,8 @@ class TripStoreContract(private val store: TripStore) {
     suspend fun listIsOrderedByStart() {
         store.save(sample("late", d1.plusDays(10)))
         store.save(sample("early", d1))
-        expect(store.all().map { it.id.value } == listOf("early", "late")) { "목록은 시작일 순서여야 한다: ${store.all().map { it.id }}" }
+        val order = store.all().map { it.id.value }
+        expect(order == listOf("early", "late")) { "목록은 시작일 순서여야 한다: $order" }
         store.delete(TripId("late"))
         store.delete(TripId("early"))
     }
