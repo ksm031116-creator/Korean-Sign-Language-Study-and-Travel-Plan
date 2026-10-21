@@ -136,3 +136,25 @@ class UndoJudgement(
             UndoOutcome.SaveFailed
         }
 }
+
+/**
+ * 학습 기록 초기화 (FR16, E-10). 카드 상태와 세션을 한 트랜잭션으로 지운다.
+ * 북마크·구매 권한은 다른 저장소에 있어 여기서 닿지 않는다. 확인은 화면(SC20)이 받는다.
+ */
+class ResetLearning(
+    private val states: LearningStateStore,
+    private val sessions: SessionStore,
+    private val tx: TransactionRunner,
+) {
+    suspend operator fun invoke(): Boolean = try {
+        tx.run {
+            states.clear()
+            sessions.clear()
+        }
+        true
+    } catch (e: CancellationException) {
+        throw e
+    } catch (e: Exception) {
+        false
+    }
+}
