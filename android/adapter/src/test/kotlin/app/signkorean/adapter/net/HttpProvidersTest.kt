@@ -227,8 +227,21 @@ class HttpProvidersTest {
     }
 
     @Test
-    fun `경로 응답이 비었거나 형식이 틀리면 지어내지 않고 실패`() = runBlocking {
+    fun `경로 응답이 비었거나 형식이 틀리면 지어내지 않고 실패 - 연결 문제가 아니라 미지원으로(RTE-L)`() = runBlocking {
         body = """{"distance_m":1200}"""
-        assertEquals(RouteResult.Failed(RouteFailure.Network), HttpRouteProvider(client).route(RouteRequest(Coordinate(37.5, 127.0), Coordinate(37.51, 127.01))))
+        assertEquals(RouteResult.Failed(RouteFailure.Unsupported), HttpRouteProvider(client).route(RouteRequest(Coordinate(37.5, 127.0), Coordinate(37.51, 127.01))))
+    }
+
+    @Test
+    fun `RTE-L 거리에 소수점이 붙어도 읽는다`() = runBlocking {
+        body = """{"distance_m":1234.6,"duration_s":900,"path":[[37.57,126.99],[37.575,126.985]],"attribution":"Kakao Map"}"""
+        val r = HttpRouteProvider(client).route(RouteRequest(Coordinate(37.57, 126.99), Coordinate(37.575, 126.985))) as RouteResult.Found
+        assertEquals(1235, r.route.distanceMeters)
+    }
+
+    @Test
+    fun `RTE-L 출처 표기가 없는 경로는 보이지 않는다`() = runBlocking {
+        body = """{"distance_m":1200,"duration_s":900,"path":[[37.57,126.99],[37.575,126.985]]}"""
+        assertEquals(RouteResult.Failed(RouteFailure.Unsupported), HttpRouteProvider(client).route(RouteRequest(Coordinate(37.57, 126.99), Coordinate(37.575, 126.985))))
     }
 }

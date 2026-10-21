@@ -198,4 +198,45 @@ class MapViewModelTest {
         assertFalse(vm.state.value.loadFailed)
         assertEquals(3, vm.state.value.points.size)
     }
+
+    // ---------- Phase 19 리뷰 수정 ----------
+
+    @Test
+    fun `MAP-M3 잠긴 상태에서 다시 읽어도 SC21 을 또 열지 않는다(뒤로 가기 반복 방지)`() = runTest {
+        entitlement = Entitlement.Free
+        val vm = vm(MapTarget.ToPlace(PlaceId("p2")))
+        assertEquals(1, vm.effects.drain().size)
+        vm.onAction(MapAction.Refresh)
+        assertTrue(vm.effects.drain().isEmpty())
+        assertTrue(vm.state.value.locked)
+        // 결제하고 돌아오면 잠금이 풀린다.
+        entitlement = Entitlement.Paid
+        vm.onAction(MapAction.Refresh)
+        assertFalse(vm.state.value.locked)
+    }
+
+    @Test
+    fun `MAP-M2 계산할 때마다 일정이 바뀌면 이전 revision 결과를 보이지 않는다(T-07)`() = runTest {
+        val t = trip("p1", "p2")
+        // 실패는 기억하지 않으므로 다시 물을 때마다 일정이 또 바뀐다.
+        var edits = 0
+        val restless = object : RouteProvider {
+            override suspend fun route(request: RouteRequest): RouteResult {
+                edits++
+                editor.setStart(t.id, d1, LocalTime.of(9, edits), null)
+                return RouteResult.Failed(RouteFailure.Network)
+            }
+        }
+        val s = vm(MapTarget.Day(t.id, d1), restless).state.value
+        assertTrue(s.loadFailed)
+        assertTrue(s.legs.isEmpty())
+    }
+
+    @Test
+    fun `한 장소 경로 실패는 이유와 함께`() = runTest {
+        provider.failAll = RouteFailure.NoRoute
+        val vm = vm(MapTarget.ToPlace(PlaceId("p2")))
+        vm.onAction(MapAction.OriginChosen(Origin.AtPlace(PlaceId("p1"))))
+        assertEquals(RouteFailure.NoRoute, vm.state.value.legs.single().failure)
+    }
 }

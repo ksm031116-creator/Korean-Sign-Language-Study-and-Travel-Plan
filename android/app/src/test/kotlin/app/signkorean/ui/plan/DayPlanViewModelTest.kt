@@ -278,18 +278,85 @@ class DayPlanViewModelTest {
     fun `DPV-M6 진행 중 삭제 확인은 창을 닫지 않는다`() = runTest {
         val t = trip()
         val gate = kotlinx.coroutines.CompletableDeferred<Unit>()
-        var hold = false
-        val slow = DayLegs { _, day -> if (hold) gate.await(); List(app.signkorean.domain.route.legCount(day)) { null } }
-        val vm = DayPlanViewModel(t.id, null, store, editor, content, slow, { entitlement })
+        val vm = vm(t.id)
         val first = vm.state.value.rows[0].stop.id
-        hold = true
-        vm.onAction(DayPlanAction.MoveDown(first)) // 저장 뒤 그리기가 멈춰 busy 가 남는다
+        store.holdNextSave = gate
+        vm.onAction(DayPlanAction.MoveDown(first)) // 저장이 멈춰 busy 가 남는다
         assertTrue(vm.state.value.busy)
         vm.onAction(DayPlanAction.Remove(first))
         vm.onAction(DayPlanAction.ConfirmRemove)
         assertEquals(first, vm.state.value.confirmRemove)
         gate.complete(Unit)
         assertFalse(vm.state.value.busy)
+    }
+
+    // ---------- Phase 19 리뷰 수정 ----------
+
+    @Test
+    fun `DPH-H1 경로를 기다리는 동안에도 일정은 바로 보이고 편집할 수 있다`() = runTest {
+        val t = trip()
+        val gate = kotlinx.coroutines.CompletableDeferred<Unit>()
+        val slow = object : DayLegs {
+            override suspend fun legs(trip: TripId, day: TripDay): List<Long?> {
+                gate.await()
+                return List(app.signkorean.domain.route.legCount(day)) { 60L }
+            }
+        }
+        val vm = DayPlanViewModel(t.id, null, store, editor, content, slow, { entitlement })
+        assertFalse(vm.state.value.loading)
+        assertEquals(2, vm.state.value.rows.size)
+        assertTrue(vm.state.value.routing)
+        vm.onAction(DayPlanAction.MoveDown(vm.state.value.rows[0].stop.id))
+        assertFalse(vm.state.value.busy)
+        assertEquals(listOf("p2", "p1"), vm.state.value.rows.map { it.stop.place.value })
+        gate.complete(Unit)
+        assertFalse(vm.state.value.routing)
+        assertEquals(1, vm.state.value.rows[1].legBefore)
+    }
+
+    @Test
+    fun `DPH-H2 다른 날로 옮긴 직후 그날을 고르면 옮긴 장소가 보인다`() = runTest {
+        val t = trip(days = 2)
+        val vm = vm(t.id)
+        val moved = vm.state.value.rows[0].stop.id
+        vm.onAction(DayPlanAction.MoveTo(moved, d1.plusDays(1)))
+        vm.onAction(DayPlanAction.SelectDate(d1.plusDays(1)))
+        assertEquals(listOf(moved), vm.state.value.rows.map { it.stop.id })
+    }
+
+    @Test
+    fun `DPH-H2 저장 중에는 날짜·출발·여행 편집·지도를 받지 않는다`() = runTest {
+        val t = trip(days = 2)
+        val vm = vm(t.id)
+        store.holdNextSave = kotlinx.coroutines.CompletableDeferred()
+        vm.onAction(DayPlanAction.MoveDown(vm.state.value.rows[0].stop.id))
+        assertTrue(vm.state.value.busy)
+        vm.onAction(DayPlanAction.SelectDate(d1.plusDays(1)))
+        vm.onAction(DayPlanAction.OpenStart)
+        assertEquals(d1, vm.state.value.date)
+        assertFalse(vm.state.value.startSheet)
+    }
+
+    @Test
+    fun `DPH-Q 무료(보기만)면 경로 공급자에 묻지 않는다`() = runTest {
+        val t = trip()
+        entitlement = Entitlement.Free
+        var asked = 0
+        val counting = DayLegs { _, day -> asked++; List(app.signkorean.domain.route.legCount(day)) { 60L } }
+        val vm = DayPlanViewModel(t.id, null, store, editor, content, counting, { entitlement })
+        assertTrue(vm.state.value.readOnly)
+        assertEquals(0, asked)
+    }
+
+    @Test
+    fun `DPH-M5 경로 출처 표기를 일정에도 보인다(디버그 표본 포함)`() = runTest {
+        val t = trip()
+        val labelled = object : DayLegs {
+            override suspend fun legs(trip: TripId, day: TripDay) = List(app.signkorean.domain.route.legCount(day)) { 60L }
+            override suspend fun times(trip: TripId, day: TripDay) = app.signkorean.domain.route.LegTimes(legs(trip, day), listOf("Sample routes"))
+        }
+        val vm = DayPlanViewModel(t.id, null, store, editor, content, labelled, { entitlement })
+        assertEquals(listOf("Sample routes"), vm.state.value.routeAttributions)
     }
 }
 

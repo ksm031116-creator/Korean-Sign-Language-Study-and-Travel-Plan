@@ -17,7 +17,8 @@ class ExternalMapLinkTest {
     @Test
     fun `도보 길찾기 링크는 카카오맵이고 허용 목록을 통과한다`() {
         val url = ExternalMapLink.walk("Seoul Station", from, "Gyeongbokgung", to)
-        assertTrue(url.startsWith("https://map.kakao.com/link/from/"))
+        // 도보 길찾기로 연다(FR14). /link/from/../to/.. 는 기본 수단(대개 자동차)으로 열린다.
+        assertTrue(url.startsWith("https://map.kakao.com/link/by/walk/"), url)
         assertTrue(ExternalLinks.isAllowed(url))
         assertTrue("37.554700,126.970700" in url && "37.579600,126.977000" in url)
     }

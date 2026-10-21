@@ -28,7 +28,14 @@ class FakeTripStore : TripStore {
         return trips[id]
     }
 
+    /** 값을 넣으면 다음 저장이 그것이 완료될 때까지 멈춘다(저장 중 상태 재현). */
+    @Volatile var holdNextSave: kotlinx.coroutines.CompletableDeferred<Unit>? = null
+
     override suspend fun save(trip: Trip) {
+        holdNextSave?.let {
+            holdNextSave = null
+            it.await()
+        }
         if (failNextSave) {
             failNextSave = false
             throw FakeStorageException("trip")

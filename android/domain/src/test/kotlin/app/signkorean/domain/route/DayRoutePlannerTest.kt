@@ -10,6 +10,7 @@ import app.signkorean.domain.trip.TripStop
 import app.signkorean.testing.ContentFixtures
 import app.signkorean.testing.FakeRouteProvider
 import app.signkorean.testing.InMemoryContentRepository
+import kotlinx.coroutines.async
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -117,5 +118,56 @@ class DayRoutePlannerTest {
         assertTrue(ok.route.distanceMeters > 0 && ok.route.path.size >= 2)
         provider.failAll = RouteFailure.Unsupported
         assertEquals(RouteResult.Failed(RouteFailure.Unsupported), planner.single(a.coordinate, c.coordinate))
+    }
+
+    // ---------- Phase 19 리뷰 수정 ----------
+
+    @Test
+    fun `RTE-H1 known 은 묻지 않고 이미 계산한 구간만 돌려준다`() = runTest {
+        assertEquals(listOf<Long?>(null, null), planner.known(trip, day("a", "b", "c")))
+        assertTrue(provider.requests.isEmpty())
+        planner.legs(trip, day("a", "b"))
+        val before = provider.requests.size
+        assertEquals(listOf(provider.seconds(a.coordinate, b.coordinate), null), planner.known(trip, day("a", "b", "c")))
+        assertEquals(before, provider.requests.size)
+    }
+
+    @Test
+    fun `RTE-H1 구간 하나가 응답하지 않으면 그 구간만 Timeout, 나머지는 계산된다`() = runTest {
+        val stuck = object : RouteProvider {
+            override suspend fun route(request: RouteRequest): RouteResult =
+                if (request.origin == b.coordinate) kotlinx.coroutines.awaitCancellation() else provider.route(request)
+        }
+        val p = DayRoutePlanner(stuck, InMemoryContentRepository(pack), legTimeoutMillis = 1_000)
+        val plan = p.plan(trip, day("a", "b", "c"))
+        assertTrue(plan.routes[0] != null)
+        assertEquals(RouteFailure.Timeout, plan.failures[1])
+    }
+
+    @Test
+    fun `RTE-L 같은 구간을 동시에 물으면 공급자에는 한 번만 묻는다`() = runTest {
+        val gate = kotlinx.coroutines.CompletableDeferred<Unit>()
+        var calls = 0
+        val slow = object : RouteProvider {
+            override suspend fun route(request: RouteRequest): RouteResult {
+                calls++
+                gate.await()
+                return provider.route(request)
+            }
+        }
+        val p = DayRoutePlanner(slow, InMemoryContentRepository(pack))
+        val first = async { p.single(a.coordinate, b.coordinate) }
+        val second = async { p.single(a.coordinate, b.coordinate) }
+        kotlinx.coroutines.yield()
+        gate.complete(Unit)
+        assertEquals(first.await(), second.await())
+        assertEquals(1, calls)
+    }
+
+    @Test
+    fun `RTE-M5 출처 표기를 구간 시간과 함께 돌려준다`() = runTest {
+        val times = planner.times(trip, day("a", "b"))
+        assertEquals(listOf(provider.seconds(a.coordinate, b.coordinate)), times.legs)
+        assertEquals(listOf("Fake routes"), times.attributions)
     }
 }

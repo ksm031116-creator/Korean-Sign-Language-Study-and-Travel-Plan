@@ -112,4 +112,19 @@ class OriginPickerViewModelTest {
         assertNull(vm.state.value.problem)
         assertEquals(listOf<OriginPickerEffect>(OriginPickerEffect.Picked(Origin.AtCoordinate(here, null))), vm.effects.drain())
     }
+
+    @Test
+    fun `ORG-M6 찾는 중에 닫으면 위치 읽기를 멈추고 나중에 저절로 고르지 않는다`() = runTest {
+        val gate = kotlinx.coroutines.CompletableDeferred<LocationResult>()
+        val slow = object : app.signkorean.domain.location.LocationProvider {
+            override suspend fun current(): LocationResult = gate.await()
+        }
+        val vm = OriginPickerViewModel(content, slow)
+        vm.onAction(OriginPickerAction.PermissionResult(granted = true))
+        assertTrue(vm.state.value.locating)
+        vm.onAction(OriginPickerAction.Reset)
+        assertFalse(vm.state.value.locating)
+        gate.complete(LocationResult.Found(Coordinate(37.57, 126.99)))
+        assertTrue(vm.effects.drain().isEmpty())
+    }
 }
