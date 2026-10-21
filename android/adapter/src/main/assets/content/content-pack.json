@@ -1,6 +1,6 @@
 {
  "schemaVersion": 1,
- "version": "6d5390d2cb60",
+ "version": "6549fff4440e",
  "locales": {
   "en": "reviewed",
   "ja": "draft"
@@ -1063,7 +1063,7 @@
    },
    "note": {
     "en": "Machines that reload T-money cards.",
-    "ja": "충전 は「充電」の字でチャージのこと。日本の Suica のチャージ機に当たり、T-money をチャージできます。"
+    "ja": "충전 はチャージのこと。日本の Suica のチャージ機に当たり、T-money をチャージできます。"
    },
    "pictogram": null,
    "plateColor": "#1f6f78",

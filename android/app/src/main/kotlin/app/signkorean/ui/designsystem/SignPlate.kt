@@ -21,6 +21,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
@@ -188,17 +189,25 @@ private fun PlateFrame(
 @Composable
 private fun PlateWord(koText: String, size: TextUnit, singleLine: Boolean = false) {
     // 한 줄 판(목록 미리보기)은 넘치면 글자를 줄여 판 안에 맞춘다. 잘린 글자는 다른 단어로 읽힌다(기기 확인에서 발견).
-    var fitted by remember(koText, size) { mutableStateOf(size) }
+    // 맞는 크기가 정해질 때까지 그리지 않는다. 줄어드는 과정이 보이지 않게(최종 리뷰).
+    val fontScale = androidx.compose.ui.platform.LocalDensity.current.fontScale
+    var fitted by remember(koText, size, fontScale) { mutableStateOf(size) }
+    var ready by remember(koText, size, fontScale) { mutableStateOf(!singleLine) }
     KoreanText(
         text = koText,
         maxLines = if (singleLine) 1 else Int.MAX_VALUE,
-        onTextLayout = { layout -> if (singleLine && layout.hasVisualOverflow && fitted.value > 9f) fitted = (fitted.value * 0.9f).sp },
+        onTextLayout = { layout ->
+            if (singleLine && layout.hasVisualOverflow && fitted.value > MIN_PLATE_SP) fitted = maxOf(MIN_PLATE_SP, fitted.value * 0.9f).sp else ready = true
+        },
         style = MaterialTheme.typography.headlineSmall.copy(
             color = Color.White,
             fontWeight = FontWeight.ExtraBold,
             fontSize = fitted,
             textAlign = TextAlign.Center,
         ),
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth().drawWithContent { if (ready) drawContent() },
     )
 }
+
+/** 한 줄 판 글자의 최소 크기. 이보다 줄여도 넘치는 단어는 잘린다(지금 콘텐츠에는 없다). */
+private const val MIN_PLATE_SP = 9f

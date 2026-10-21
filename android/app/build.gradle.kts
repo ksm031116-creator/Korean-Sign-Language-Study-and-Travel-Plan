@@ -83,10 +83,11 @@ val checkStoreRelease by tasks.registering {
     description = "스토어 번들에 중계 서버 주소가 들어가는지 확인한다 (RVW-07)."
     val url = storeApiBaseUrl
     doLast {
-        check(url.isNotEmpty()) { "스토어 번들에는 -PapiBaseUrl=https://... 이 필요하다. 서버 없이 출시하면 리뷰·경로가 모두 비어 있다 (RVW-07)." }
+        check(url.isNotEmpty()) { "-PapiBaseUrl=https://... is required for store bundles (RVW-07). 스토어 번들에는 -PapiBaseUrl=https://... 이 필요하다. 서버 없이 출시하면 리뷰·경로가 모두 비어 있다 (RVW-07)." }
     }
 }
-tasks.matching { it.name == "bundleRelease" }.configureEach { dependsOn(checkStoreRelease) }
+// bundleRelease 와 그 하위 작업(packageReleaseBundle·signReleaseBundle)을 직접 불러도 걸리게 한다.
+tasks.matching { it.name == "bundleRelease" || it.name.endsWith("ReleaseBundle") }.configureEach { dependsOn(checkStoreRelease) }
 
 roborazzi {
     outputDir.set(file("src/test/screenshots"))

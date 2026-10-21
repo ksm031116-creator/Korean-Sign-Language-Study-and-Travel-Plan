@@ -60,6 +60,8 @@ interface MapRenderer {
 object SchematicMapRenderer : MapRenderer {
 
     private const val MAX_ZOOM = 8f
+    private val CONTROL_SIZE = 48.dp
+    private val CONTROL_PADDING = 6.dp
 
     @Composable
     override fun Render(points: List<MapPoint>, legs: List<MapLegUi>, selected: Int, onSelectLeg: (Int) -> Unit, modifier: Modifier) {
@@ -70,7 +72,8 @@ object SchematicMapRenderer : MapRenderer {
         var pan by remember { mutableStateOf(Offset.Zero) }
         val coords = points.mapNotNull { it.coordinate } + legs.flatMap { it.route?.path.orEmpty() }
         val description = stringResource(R.string.map_schematic)
-        val controlsPx = with(androidx.compose.ui.platform.LocalDensity.current) { 56.dp.toPx() }
+        // 오른쪽 버튼 열 너비(IconButton 48dp + 좌우 여백 6dp). 점·선이 그 아래에 숨지 않게 비운다.
+        val controlsPx = with(androidx.compose.ui.platform.LocalDensity.current) { (CONTROL_SIZE + CONTROL_PADDING * 2).toPx() }
         Box(modifier.fillMaxWidth().height(300.dp).clip(RoundedCornerShape(14.dp)).background(t.surface)) {
             if (coords.isNotEmpty()) {
                 val bounds = Bounds.of(coords)
@@ -112,7 +115,7 @@ object SchematicMapRenderer : MapRenderer {
                     }
                 }
             }
-            Column(Modifier.align(Alignment.TopEnd).padding(6.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            Column(Modifier.align(Alignment.TopEnd).padding(CONTROL_PADDING), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 MapControl("+", stringResource(R.string.map_zoom_in)) { zoom = (zoom * 1.6f).coerceAtMost(MAX_ZOOM) }
                 MapControl("−", stringResource(R.string.map_zoom_out)) { zoom /= 1.6f; if (zoom < 1.01f) { zoom = 1f; pan = Offset.Zero } }
                 MapControl("⤢", stringResource(R.string.map_fit)) { zoom = 1f; pan = Offset.Zero }
