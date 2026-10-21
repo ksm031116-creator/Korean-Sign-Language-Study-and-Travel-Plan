@@ -108,7 +108,7 @@ val learningModule = module {
  */
 val entitlementModule = module {
     single { ForegroundActivityTracker() } bind ForegroundActivity::class
-    single<EntitlementGateway> { PlayBillingEntitlementGateway(androidContext(), get(), Dispatchers.Main) }
+    single { PlayBillingEntitlementGateway(androidContext(), get(), get<AppDispatchers>().main) } bind EntitlementGateway::class
     single<EntitlementCache> { DataStoreEntitlementCache.create(androidContext()) }
     single<NetworkMonitor> { AndroidNetworkMonitor(androidContext()) }
     single { Entitlements(get(), get(), get()) } bind EntitlementSource::class

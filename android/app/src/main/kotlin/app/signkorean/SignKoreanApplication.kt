@@ -6,6 +6,7 @@ import android.util.Log
 import app.signkorean.di.appModules
 import app.signkorean.domain.common.AppDispatchers
 import app.signkorean.domain.content.ContentRepository
+import app.signkorean.adapter.billing.PlayBillingEntitlementGateway
 import app.signkorean.domain.entitlement.Entitlements
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
@@ -30,12 +31,15 @@ class SignKoreanApplication : Application() {
         val debuggable = (applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE) != 0
         val scope = CoroutineScope(SupervisorJob() + dispatchers.default)
 
-        // 권한 확인: 앱 시작(첫 화면의 resume)과 전면 복귀마다 한 번 (설계서 §6.4, E-13).
-        // 확인 실패는 Entitlements 가 마지막 권한을 유지하는 것으로 처리한다.
+        // 권한 확인: 앱 시작과 다른 앱에서 돌아올 때 한 번씩 (설계서 §6.4, E-13). 앱이 앞에 있는 동안
+        // 결제 화면 밖에서 구매가 바뀌면(대기 결제 완료) 그때도 확인한다. 실패하면 마지막 권한을 유지한다.
         val entitlements = koin.get<Entitlements>()
-        val tracker = koin.get<ForegroundActivityTracker>()
-        tracker.onResume = { scope.launch { entitlements.refresh() } }
-        registerActivityLifecycleCallbacks(tracker)
+        val refresh = { scope.launch { entitlements.refresh() }; Unit }
+        koin.get<ForegroundActivityTracker>().also {
+            it.onForeground = refresh
+            registerActivityLifecycleCallbacks(it)
+        }
+        koin.get<PlayBillingEntitlementGateway>().onStoreChanged = refresh
 
         scope.launch {
             try {
