@@ -46,6 +46,9 @@ sealed interface OriginPickerAction {
     data object ConfirmExplain : OriginPickerAction
     data object DismissExplain : OriginPickerAction
     data class PermissionResult(val granted: Boolean) : OriginPickerAction
+
+    /** 피커가 화면에서 사라졌다. 위치 읽기를 멈추고 늦게 온 결과를 버린다(ORG-M6). */
+    data object Reset : OriginPickerAction
 }
 
 sealed interface OriginPickerEffect {
@@ -95,6 +98,12 @@ class OriginPickerViewModel(
                 _state.update { it.copy(explaining = false) }
                 send(OriginPickerEffect.RequestPermission)
             }
+            OriginPickerAction.Reset -> {
+                locateJob?.cancel()
+                locateJob = null
+                while (_effects.tryReceive().isSuccess) Unit
+                _state.update { it.copy(locating = false, explaining = false) }
+            }
             is OriginPickerAction.PermissionResult -> if (!action.granted) {
                 _state.update { it.copy(problem = StartLocationProblem.Denied) }
             } else {
@@ -103,10 +112,12 @@ class OriginPickerViewModel(
         }
     }
 
+    private var locateJob: kotlinx.coroutines.Job? = null
+
     private fun locate() {
         if (_state.value.locating) return
         _state.update { it.copy(locating = true, problem = null) }
-        viewModelScope.launch {
+        locateJob = viewModelScope.launch {
             when (val r = StartLocations.locate(location)) {
                 is StartLocation.Found -> {
                     _state.update { it.copy(locating = false) }

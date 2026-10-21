@@ -218,17 +218,19 @@ class HttpRouteProvider(private val client: ApiClient) : RouteProvider {
             put("mode", "walk")
         }.toString()
         return when (val r = client.post(listOf("v1", "routes"), body)) {
+            // 형식이 계약과 다르면 연결 문제가 아니다. 다시 해도 같으므로 미지원으로 본다. 출처 표기가 없는 경로는 보이지 않는다.
             is ApiResult.Ok -> runCatching {
                 val o = r.body
+                val attribution = requireNotNull(o.string("attribution"))
                 RouteResult.Found(
                     Route(
-                        distanceMeters = o["distance_m"]!!.jsonPrimitive.intOrNull!!,
-                        durationSeconds = o["duration_s"]!!.jsonPrimitive.longOrNull!!,
+                        distanceMeters = Math.round(o["distance_m"]!!.jsonPrimitive.doubleOrNull!!).toInt(),
+                        durationSeconds = Math.round(o["duration_s"]!!.jsonPrimitive.doubleOrNull!!),
                         path = o["path"]!!.jsonArray.map { p -> p.jsonArray.let { Coordinate(it[0].jsonPrimitive.doubleOrNull!!, it[1].jsonPrimitive.doubleOrNull!!) } },
-                        attribution = o.string("attribution").orEmpty(),
+                        attribution = attribution,
                     ),
                 )
-            }.getOrElse { RouteResult.Failed(RouteFailure.Network) }
+            }.getOrElse { RouteResult.Failed(RouteFailure.Unsupported) }
             ApiResult.Timeout -> RouteResult.Failed(RouteFailure.Timeout)
             ApiResult.Network -> RouteResult.Failed(RouteFailure.Network)
             ApiResult.Misconfigured -> RouteResult.Failed(RouteFailure.Unsupported)

@@ -444,4 +444,7 @@
     <string name="settings_photos_body">Place photos come from the Korea Tourism Organization (KOGL Type 3) and Wikimedia Commons. Each photo shows its source and licence.</string>
     <string name="settings_legal_jp">Notation based on the Act on Specified Commercial Transactions</string>
     <string name="settings_legal_jp_body">This notice will be published before the Japanese release.</string>
+    <string name="map_calculating">Calculating the walking route…</string>
+    <string name="day_routing">Updating walking times…</string>
+    <string name="day_route_source">Walking times: %1$s</string>
 </resources>

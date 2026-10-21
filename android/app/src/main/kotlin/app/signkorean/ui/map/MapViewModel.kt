@@ -110,7 +110,7 @@ class MapViewModel(
     private var job: Job? = null
 
     init {
-        reload()
+        reload(announceLock = true)
     }
 
     fun onAction(action: MapAction) {
@@ -142,16 +142,21 @@ class MapViewModel(
         return url.takeIf { ExternalLinks.isAllowed(it) }
     }
 
-    private fun reload() {
+    /**
+     * [announceLock]: 잠겨 있으면 SC21 을 연다. 처음 열 때만 그렇다 — SC21 에서 돌아와 다시 읽을 때마다 열면
+     * 뒤로 가기로 빠져나갈 수 없다(MAP-M3).
+     */
+    private fun reload(announceLock: Boolean = false) {
         job?.cancel()
         job = viewModelScope.launch {
             _state.update { it.copy(busy = true) }
             try {
                 if (!paid()) {
                     _state.update { it.copy(loading = false, locked = true, busy = false) }
-                    _effects.send(MapEffect.Upgrade(UpgradeFeature.Route))
+                    if (announceLock) _effects.send(MapEffect.Upgrade(UpgradeFeature.Route))
                     return@launch
                 }
+                _state.update { it.copy(locked = false) }
                 when (target) {
                     is MapTarget.Day -> loadDay(target)
                     is MapTarget.ToPlace -> loadPlace(target)
@@ -177,8 +182,8 @@ class MapViewModel(
 
     private suspend fun loadDay(t: MapTarget.Day) {
         val places = places()
-        // 계산 뒤 그날을 다시 읽어 revision 이 같을 때만 보인다. 계속 바뀌면 몇 번만 다시 하고 마지막 것을 보인다.
-        repeat(MAX_ATTEMPTS) { attempt ->
+        // 계산 뒤 그날을 다시 읽어 revision 이 같을 때만 보인다. 계속 바뀌면 옛 결과를 보이지 않고 다시 시도를 안내한다(T-07).
+        repeat(MAX_ATTEMPTS) {
             val trip = store.get(t.trip)
             val day = trip?.days?.firstOrNull { it.date == t.date }
             if (trip == null || day == null) {
@@ -187,13 +192,13 @@ class MapViewModel(
             }
             val plan = planner.plan(trip.id, day)
             val now = store.get(t.trip)?.days?.firstOrNull { it.date == t.date }
-            val current = now != null && now.revision == plan.revision
-            if (current || attempt == MAX_ATTEMPTS - 1) {
+            if (now != null && now.revision == plan.revision) {
                 showDay(trip.title, day, plan, places)
-                if (current && plan.complete) editor.markRoutesCalculated(t.trip, t.date, plan.revision)
+                if (plan.complete) editor.markRoutesCalculated(t.trip, t.date, plan.revision)
                 return
             }
         }
+        _state.update { it.copy(loading = false, busy = false, loadFailed = true, legs = emptyList()) }
     }
 
     private fun showDay(title: String, day: TripDay, plan: DayRoutePlan, places: Map<PlaceId, Place>) {

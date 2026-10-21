@@ -11,8 +11,9 @@ import java.util.Locale
 object ExternalMapLink {
     private const val BASE = "https://map.kakao.com/link"
 
+    /** 도보 길찾기(FR14). `/link/from/../to/..` 는 앱의 기본 수단(대개 자동차)으로 열리므로 쓰지 않는다. */
     fun walk(fromName: String, from: Coordinate, toName: String, to: Coordinate): String =
-        "$BASE/from/${point(fromName, from)}/to/${point(toName, to)}"
+        "$BASE/by/walk/${point(fromName, from)}/${point(toName, to)}"
 
     fun place(name: String, at: Coordinate): String = "$BASE/map/${point(name, at)}"
 

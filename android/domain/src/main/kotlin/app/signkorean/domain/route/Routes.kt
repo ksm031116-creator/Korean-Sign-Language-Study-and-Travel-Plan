@@ -8,6 +8,15 @@ import app.signkorean.domain.trip.Origin
 import app.signkorean.domain.trip.TripDay
 import app.signkorean.domain.trip.TripId
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
@@ -55,20 +64,37 @@ object RouteFreshness {
 /**
  * 하루 경로 계산 (설계서 §6.5). 구간(출발 → 도착 좌표, 방향 있음)마다 성공한 결과를 기억해서, 순서를 바꾸면
  * 새로 생긴 구간만 묻는다(NFR08, M-06). 실패는 기억하지 않는다 — 다시 연결되면 다시 묻는다(T-16, AT14).
- * 앱에 하나만 두고 프로세스 동안 기억한다.
+ * 구간은 동시에 묻고, 구간마다 [legTimeoutMillis] 를 넘기면 그 구간만 Timeout 이다(NFR02). 같은 구간을 동시에 물으면
+ * 공급자에는 한 번만 묻는다. 앱에 하나만 두고 프로세스 동안 기억한다.
  */
 class DayRoutePlanner(
     private val provider: RouteProvider,
     private val content: ContentRepository,
+    private val legTimeoutMillis: Long = LEG_TIMEOUT_MILLIS,
 ) : DayLegs {
     private val cache = mutableMapOf<RouteRequest, Route>()
+    private val inflight = mutableMapOf<RouteRequest, CompletableDeferred<RouteResult>>()
     private val lock = Mutex()
 
     override suspend fun legs(trip: TripId, day: TripDay): List<Long?> = plan(trip, day).legs
 
+    override suspend fun times(trip: TripId, day: TripDay): LegTimes {
+        val plan = plan(trip, day)
+        return LegTimes(plan.legs, plan.routes.mapNotNull { it?.attribution?.takeIf(String::isNotBlank) }.distinct())
+    }
+
+    override suspend fun known(trip: TripId, day: TripDay): List<Long?> {
+        val points = endpoints(day)
+        return lock.withLock {
+            points.zipWithNext { from, to -> if (from == null || to == null) null else cache[RouteRequest(from, to)]?.durationSeconds }
+        }
+    }
+
     suspend fun plan(trip: TripId, day: TripDay): DayRoutePlan {
         val points = endpoints(day)
-        val results = points.zipWithNext { from, to -> if (from == null || to == null) null else single(from, to) }
+        val results = coroutineScope {
+            points.zipWithNext { from, to -> async { if (from == null || to == null) null else single(from, to) } }.awaitAll()
+        }
         val routes = results.map { (it as? RouteResult.Found)?.route }
         return DayRoutePlan(day.revision, routes.map { it?.durationSeconds }, routes, results.map { (it as? RouteResult.Failed)?.reason })
     }
@@ -76,10 +102,38 @@ class DayRoutePlanner(
     /** 한 장소까지의 경로(SC18 단일 경로). 실패하면 이유를 그대로 돌려준다(FR15). */
     suspend fun single(origin: Coordinate, destination: Coordinate): RouteResult {
         val request = RouteRequest(origin, destination)
-        lock.withLock { cache[request] }?.let { return RouteResult.Found(it) }
-        val result = ask(request)
-        if (result is RouteResult.Found) lock.withLock { cache[request] = result.route }
-        return result
+        var owner = false
+        val pending = lock.withLock {
+            cache[request]?.let { return RouteResult.Found(it) }
+            inflight[request] ?: CompletableDeferred<RouteResult>().also {
+                inflight[request] = it
+                owner = true
+            }
+        }
+        if (!owner) {
+            return try {
+                pending.await()
+            } catch (e: CancellationException) {
+                // 먼저 물은 쪽이 취소됐다. 내가 살아 있으면 직접 묻는다.
+                currentCoroutineContext().ensureActive()
+                single(origin, destination)
+            }
+        }
+        try {
+            val result = withTimeoutOrNull(legTimeoutMillis) { ask(request) } ?: RouteResult.Failed(RouteFailure.Timeout)
+            withContext(NonCancellable) {
+                lock.withLock {
+                    if (result is RouteResult.Found) cache[request] = result.route
+                    inflight.remove(request)
+                }
+            }
+            pending.complete(result)
+            return result
+        } catch (e: Throwable) {
+            withContext(NonCancellable) { lock.withLock { inflight.remove(request) } }
+            pending.completeExceptionally(e)
+            throw e
+        }
     }
 
     private suspend fun ask(request: RouteRequest): RouteResult = try {
@@ -110,5 +164,10 @@ class DayRoutePlanner(
             is Origin.AtCoordinate -> listOf(o.coordinate)
         }
         return origin + day.stops.map { at(it.place) }
+    }
+
+    companion object {
+        /** ApiClient 의 연결·읽기 제한(각 8초)보다 조금 길게. */
+        const val LEG_TIMEOUT_MILLIS = 10_000L
     }
 }

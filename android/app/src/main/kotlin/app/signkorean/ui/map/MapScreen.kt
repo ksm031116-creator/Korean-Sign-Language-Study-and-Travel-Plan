@@ -119,7 +119,10 @@ fun MapContent(
         }
         subtitle?.let { Text(it, style = MaterialTheme.typography.bodyMedium, color = t.muted) }
         when {
-            state.loading -> return@Column
+            state.loading -> {
+                Text(stringResource(R.string.map_calculating), style = MaterialTheme.typography.bodyMedium, color = t.muted, modifier = Modifier.semantics { liveRegion = LiveRegionMode.Polite })
+                return@Column
+            }
             state.locked -> {
                 LockBadge(stringResource(R.string.lock_route), onClick = { onUpgrade(UpgradeFeature.Route) })
                 return@Column
@@ -134,6 +137,7 @@ fun MapContent(
             }
         }
         renderer.Render(state.points, state.legs, state.selected, { onAction(MapAction.SelectLeg(it)) }, Modifier)
+        if (state.busy) Text(stringResource(R.string.map_calculating), style = MaterialTheme.typography.labelMedium, color = t.muted, modifier = Modifier.semantics { liveRegion = LiveRegionMode.Polite })
         Text(stringResource(R.string.map_schematic), style = MaterialTheme.typography.labelMedium, color = t.muted)
         // 경로 공급자 출처 표기 (구현 계획 Phase 19 D2).
         if (state.attributions.isNotEmpty()) {

@@ -31,6 +31,7 @@ import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextStyle
@@ -81,7 +82,8 @@ object SchematicMapRenderer : MapRenderer {
                                 nearestLeg(legs, points, project, tap)?.let(onSelectLeg)
                             }
                         }
-                        .pointerInput(zoom) { detectDragGestures { change, drag -> change.consume(); if (zoom > 1f) pan += drag } },
+                        // 확대했을 때만 끌기를 받는다. 아니면 화면 세로 스크롤을 막지 않는다.
+                        .then(if (zoom > 1f) Modifier.pointerInput(zoom) { detectDragGestures { change, drag -> change.consume(); pan += drag } } else Modifier),
                 ) {
                     val project = bounds.projector(size.width, size.height, zoom, pan)
                     legs.forEachIndexed { i, leg ->
@@ -99,8 +101,13 @@ object SchematicMapRenderer : MapRenderer {
                         val origin = point.number == null
                         drawCircle(if (origin) t.accent else t.primary, radius = 30f, center = p)
                         drawCircle(t.surface, radius = 30f, center = p, style = Stroke(width = 5f))
-                        val label = measurer.measure(if (origin) "S" else point.number.toString(), TextStyle(color = onMarker, fontSize = 13.sp, fontWeight = FontWeight.Bold))
-                        drawText(label, topLeft = Offset(p.x - label.size.width / 2f, p.y - label.size.height / 2f))
+                        if (origin) {
+                            // 출발지는 글자 없이 가운데 점(언어와 무관).
+                            drawCircle(onMarker, radius = 9f, center = p)
+                        } else {
+                            val label = measurer.measure(point.number.toString(), TextStyle(color = onMarker, fontSize = 13.sp, fontWeight = FontWeight.Bold))
+                            drawText(label, topLeft = Offset(p.x - label.size.width / 2f, p.y - label.size.height / 2f))
+                        }
                     }
                 }
             }
@@ -116,7 +123,7 @@ object SchematicMapRenderer : MapRenderer {
     private fun MapControl(symbol: String, label: String, onClick: () -> Unit) {
         val t = SignKoreanTheme.tokens
         IconButton(onClick = onClick, modifier = Modifier.background(t.paper, RoundedCornerShape(10.dp)).semantics { contentDescription = label }) {
-            Text(symbol, style = MaterialTheme.typography.titleMedium, color = t.ink)
+            Text(symbol, style = MaterialTheme.typography.titleMedium, color = t.ink, modifier = Modifier.clearAndSetSemantics { })
         }
     }
 
@@ -124,7 +131,8 @@ object SchematicMapRenderer : MapRenderer {
         var best: Int? = null
         var bestDistance = 48f
         legs.forEachIndexed { i, leg ->
-            val path = leg.route?.path ?: listOfNotNull(points.getOrNull(leg.from)?.coordinate, points.getOrNull(leg.to)?.coordinate)
+            // 선을 그린 구간만 누를 수 있다. 실패 구간은 아래 목록에서 고른다.
+            val path = leg.route?.path ?: return@forEachIndexed
             path.map(project).zipWithNext { a, b -> segmentDistance(tap, a, b) }.minOrNull()?.let { d ->
                 if (d < bestDistance) {
                     bestDistance = d

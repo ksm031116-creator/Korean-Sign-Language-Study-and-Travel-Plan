@@ -404,4 +404,7 @@
     <string name="settings_photos_body">場所の写真は韓国観光公社(公共ヌリ第3類型)と Wikimedia Commons のものです。各写真に出典とライセンスを表示します。</string>
     <string name="settings_legal_jp">特定商取引法に基づく表記</string>
     <string name="settings_legal_jp_body">日本語版の公開前に掲載します。</string>
+    <string name="map_calculating">徒歩ルートを計算しています…</string>
+    <string name="day_routing">徒歩時間を更新しています…</string>
+    <string name="day_route_source">徒歩時間: %1$s</string>
 </resources>

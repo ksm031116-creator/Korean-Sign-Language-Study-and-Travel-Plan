@@ -17,6 +17,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -56,8 +57,11 @@ fun OriginPicker(onPicked: (Origin, String) -> Unit, viewModel: OriginPickerView
     val t = SignKoreanTheme.tokens
     val currentLabel = stringResource(R.string.origin_current)
     val permission = rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { result ->
-        viewModel.onAction(OriginPickerAction.PermissionResult(granted = result.values.any { it }))
+        // 요청이 취소돼 결과가 비면(구성 변경 등) 거부로 보지 않는다.
+        if (result.isNotEmpty()) viewModel.onAction(OriginPickerAction.PermissionResult(granted = result.values.any { it }))
     }
+    // 닫히면 위치 읽기를 멈춘다. 다시 열었을 때 고르지 않은 현재 위치가 저절로 들어가지 않게(ORG-M6).
+    DisposableEffect(viewModel) { onDispose { viewModel.onAction(OriginPickerAction.Reset) } }
     LaunchedEffect(viewModel) {
         for (effect in viewModel.effects) {
             when (effect) {

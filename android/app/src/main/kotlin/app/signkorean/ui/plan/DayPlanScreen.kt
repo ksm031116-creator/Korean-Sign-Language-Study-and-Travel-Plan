@@ -162,7 +162,7 @@ fun DayPlanContent(
                     Text(trip.title, style = MaterialTheme.typography.headlineSmall, modifier = Modifier.semantics { heading() })
                     Text(stringResource(R.string.trip_dates, formats.date(trip.start), formats.date(trip.end)), style = MaterialTheme.typography.bodyMedium, color = t.muted)
                 }
-                if (!state.readOnly) QuietButton(stringResource(R.string.day_edit_trip), onClick = { onAction(DayPlanAction.EditTrip) })
+                if (!state.readOnly) QuietButton(stringResource(R.string.day_edit_trip), onClick = { onAction(DayPlanAction.EditTrip) }, enabled = !state.busy)
             }
         }
         if (state.readOnly) {
@@ -196,7 +196,7 @@ fun DayPlanContent(
                         }
                         Text(origin, style = MaterialTheme.typography.bodyMedium, color = t.muted)
                     }
-                    if (!state.readOnly) QuietButton(stringResource(R.string.day_edit_start), onClick = { onAction(DayPlanAction.OpenStart) })
+                    if (!state.readOnly) QuietButton(stringResource(R.string.day_edit_start), onClick = { onAction(DayPlanAction.OpenStart) }, enabled = !state.busy)
                 }
             }
         }
@@ -204,9 +204,10 @@ fun DayPlanContent(
         if (state.rows.isNotEmpty()) {
             item {
                 if (state.readOnly) LockBadge(stringResource(R.string.lock_route), onClick = { onAction(DayPlanAction.OpenMap) })
-                else SecondaryButton(stringResource(R.string.map_open), onClick = { onAction(DayPlanAction.OpenMap) }, modifier = Modifier.fillMaxWidth())
+                else SecondaryButton(stringResource(R.string.map_open), onClick = { onAction(DayPlanAction.OpenMap) }, enabled = !state.busy, modifier = Modifier.fillMaxWidth())
             }
         }
+        if (state.routing) item { Text(stringResource(R.string.day_routing), style = MaterialTheme.typography.labelMedium, color = t.muted, modifier = Modifier.semantics { liveRegion = LiveRegionMode.Polite }) }
         if (state.needsRecalculation) item { Notice(stringResource(R.string.day_recalc)) }
         if (state.rows.isEmpty()) item { EmptyState(title = stringResource(R.string.day_empty), body = "") }
         itemsIndexed(state.rows, key = { _, r -> r.stop.id.value }) { i, row ->
@@ -234,6 +235,8 @@ fun DayPlanContent(
                     }
                     if (s.nextDay) Text(stringResource(R.string.day_next_day), style = MaterialTheme.typography.bodySmall, color = t.danger)
                     if (s.roundingDiffers) Text(stringResource(R.string.day_rounding), style = MaterialTheme.typography.bodySmall, color = t.muted)
+                    // 구간 시간의 출처. 디버그 표본이면 "Sample" 이라고 적혀 있다(DPH-M5).
+                    if (state.routeAttributions.isNotEmpty()) Text(stringResource(R.string.day_route_source, state.routeAttributions.joinToString(", ")), style = MaterialTheme.typography.bodySmall, color = t.muted)
                 }
             }
         }
@@ -352,12 +355,14 @@ private fun StartSheet(state: DayPlanUiState, onAction: (DayPlanAction) -> Unit)
     val picker = rememberTimePickerState(initialHour = day.startTime.hour, initialMinute = day.startTime.minute)
     // 고른 것: NONE, CURRENT, PICKED(SC19 에서 찾은 것), 또는 등록 장소 id.
     var choice by rememberSaveable { mutableStateOf(if (day.origin == null) NONE else CURRENT) }
-    var picked by remember { mutableStateOf<Pair<Origin, String>?>(null) }
+    // SC19 에서 고른 출발지. 회전해도 남도록 문자열로 저장한다.
+    var pickedSaved by rememberSaveable { mutableStateOf<String?>(null) }
+    val picked = pickedSaved?.let(::decodePicked)
     var searching by rememberSaveable { mutableStateOf(false) }
     AppBottomSheet(title = stringResource(if (searching) R.string.origin_title else R.string.start_title), onDismiss = { onAction(DayPlanAction.CloseSheet) }) {
         if (searching) {
             app.signkorean.ui.map.OriginPicker(onPicked = { origin, label ->
-                picked = origin to label
+                pickedSaved = encodePicked(origin, label)
                 choice = PICKED
                 searching = false
             })
@@ -386,6 +391,8 @@ private fun StartSheet(state: DayPlanUiState, onAction: (DayPlanAction) -> Unit)
             }
         }
         QuietButton(stringResource(R.string.start_find), onClick = { searching = true })
+        // Apply 가 거절·실패하면 시트 안에서 알린다(시트가 열려 있으면 화면 배너는 숨는다).
+        state.message?.let { Text(it.asString(), color = SignKoreanTheme.tokens.danger, modifier = Modifier.semantics { liveRegion = LiveRegionMode.Polite }) }
         PrimaryButton(stringResource(R.string.start_apply), onClick = {
             val origin = when (choice) {
                 NONE -> null
@@ -401,3 +408,18 @@ private fun StartSheet(state: DayPlanUiState, onAction: (DayPlanAction) -> Unit)
 private const val NONE = "\u0000none"
 private const val CURRENT = "\u0000current"
 private const val PICKED = "\u0000picked"
+
+/** SC19 에서 고른 출발지를 rememberSaveable 에 넣을 문자열로. 이름(label)은 마지막 필드라 구분자가 들어가도 된다. */
+internal fun encodePicked(origin: Origin, label: String): String = when (origin) {
+    is Origin.AtPlace -> "place\u0001${origin.place.value}\u0001$label"
+    is Origin.AtCoordinate -> "coord\u0001${origin.coordinate.lat}\u0001${origin.coordinate.lng}\u0001${origin.label.orEmpty()}\u0001$label"
+}
+
+internal fun decodePicked(saved: String): Pair<Origin, String>? = runCatching {
+    val f = saved.split('\u0001')
+    when (f[0]) {
+        "place" -> Origin.AtPlace(app.signkorean.domain.content.PlaceId(f[1])) to f.drop(2).joinToString("\u0001")
+        "coord" -> Origin.AtCoordinate(app.signkorean.domain.location.Coordinate(f[1].toDouble(), f[2].toDouble()), f[3].ifEmpty { null }) to f.drop(4).joinToString("\u0001")
+        else -> null
+    }
+}.getOrNull()

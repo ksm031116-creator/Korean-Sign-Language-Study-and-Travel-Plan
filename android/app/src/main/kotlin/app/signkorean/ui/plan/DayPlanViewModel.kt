@@ -28,6 +28,7 @@ import app.signkorean.domain.trip.TripStore
 import app.signkorean.ui.text.UiText
 import app.signkorean.ui.upgrade.UpgradeFeature
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -71,6 +72,10 @@ data class DayPlanUiState(
     val confirmRemove: StopId? = null,
     /** SC17 시트. */
     val startSheet: Boolean = false,
+    /** 경로를 받는 중. 일정은 이미 보이고 편집할 수 있다(DPH-H1). */
+    val routing: Boolean = false,
+    /** 구간 시간의 출처 표기(디버그 표본이면 그렇게 적혀 있다, DPH-M5). */
+    val routeAttributions: List<String> = emptyList(),
 ) {
     /** 일정이 바뀌어 경로를 다시 계산해야 한다(T-16, AT14). 경로 화면이 다시 계산하면 꺼진다(Phase 19). */
     val needsRecalculation: Boolean get() = day?.needsRecalculation == true && day.stops.size + (if (day.origin != null) 1 else 0) > 1
@@ -160,27 +165,53 @@ class DayPlanViewModel(
         }
     }
 
+    private var routeJob: Job? = null
+
+    /** 마지막으로 그린(저장 성공한) 여행. 날짜를 바꿀 때 옛 스냅샷을 쓰지 않게 한다(DPH-H2). */
+    private var latestTrip: Trip? = null
+
+    /**
+     * 먼저 이미 아는 구간으로 바로 그리고(NFR02, UX02), 경로는 따로 받아 끝나면 다시 그린다(DPH-H1).
+     * 보기만(무료)이면 경로 공급자에 묻지 않는다 — 경로는 유료 기능이다(UX09).
+     */
     private suspend fun show(trip: Trip, readOnly: Boolean = _state.value.readOnly) {
         val p = pack ?: return
+        latestTrip = trip
         val gen = ++generation
+        routeJob?.cancel()
         val date = _state.value.date?.takeIf { d -> trip.days.any { it.date == d } } ?: trip.start
-        var day = trip.day(date)
+        val day = trip.day(date)
+        val known = safeLegs(day) { legs.known(trip.id, day) }
+        if (gen != generation) return
+        val ask = !readOnly && legCount(day) > 0
+        render(p, trip, date, day, known, readOnly, routing = ask, attributions = emptyList())
+        if (!ask) return
+        routeJob = viewModelScope.launch {
+            var attributions = emptyList<String>()
+            val full = safeLegs(day) { legs.times(trip.id, day).also { attributions = it.attributions }.legs }
+            if (gen != generation) return@launch
+            var shown = day
+            // 모든 구간을 공급자가 계산했으면 "다시 계산" 표시를 끈다. 그 사이 일정이 바뀌었으면(revision 다름) 끄지 않는다(T-07·16).
+            if (day.needsRecalculation && full.isNotEmpty() && full.none { it == null } && editor.markRoutesCalculated(trip.id, date, day.revision)) {
+                shown = day.copy(needsRecalculation = false)
+            }
+            if (gen != generation) return@launch
+            render(p, trip, date, shown, full, readOnly, routing = false, attributions = attributions)
+        }
+    }
+
+    private suspend fun safeLegs(day: TripDay, read: suspend () -> List<Long?>): List<Long?> = try {
+        read().takeIf { it.size == legCount(day) } ?: List(legCount(day)) { null }
+    } catch (e: CancellationException) {
+        throw e
+    } catch (_: Exception) {
+        List(legCount(day)) { null }
+    }
+
+    private fun render(
+        p: ContentPack, trip: Trip, date: LocalDate, day: TripDay, legSeconds: List<Long?>, readOnly: Boolean, routing: Boolean, attributions: List<String>,
+    ) {
         val places = p.places.associateBy { it.id }
-        val legSeconds = try {
-            legs.legs(trip.id, day).takeIf { it.size == legCount(day) } ?: List(legCount(day)) { null }
-        } catch (e: CancellationException) {
-            throw e
-        } catch (_: Exception) {
-            List(legCount(day)) { null }
-        }
-        if (gen != generation) return
-        // 모든 구간을 공급자가 계산했으면 "다시 계산" 표시를 끈다. 그 사이 일정이 바뀌었으면(revision 다름) 끄지 않는다(T-07·16).
-        if (!readOnly && day.needsRecalculation && legSeconds.isNotEmpty() && legSeconds.none { it == null } &&
-            editor.markRoutesCalculated(trip.id, date, day.revision)
-        ) {
-            day = day.copy(needsRecalculation = false)
-        }
-        if (gen != generation) return
         val schedule = ScheduleCalculator.calculate(day.startTime, day.origin != null, day.stops.map { it.stayMinutes }, legSeconds)
         val rows = day.stops.mapIndexed { i, stop ->
             val legIndex = if (day.origin != null) i else i - 1
@@ -198,6 +229,8 @@ class DayPlanViewModel(
                 loading = false, missing = false, loadFailed = false, trip = trip, date = date, day = day, rows = rows, schedule = schedule, readOnly = readOnly,
                 originPlace = (day.origin as? Origin.AtPlace)?.let { o -> places[o.place] },
                 originCandidates = originCandidates(p, day),
+                routing = routing,
+                routeAttributions = if (routing) it.routeAttributions else attributions,
             )
         }
     }
@@ -213,13 +246,25 @@ class DayPlanViewModel(
             viewModelScope.launch { _effects.send(DayPlanEffect.Upgrade(UpgradeFeature.Plan)) }
             return
         }
+        // 저장 중에는 화면을 바꾸는 동작을 받지 않는다. 저장 결과가 옛 화면에 덮이지 않게(DPH-H2).
+        if (s.busy && action.changesScreen()) return
         // 날짜를 막 바꿔 화면의 줄이 아직 이전 날이면 그 줄에 대한 편집은 받지 않는다(DPV-M1).
         if (action.isRowEdit() && s.day?.date != date) return
         when (action) {
             DayPlanAction.Refresh -> Unit
             is DayPlanAction.SelectDate -> {
                 _state.update { it.copy(date = action.date, editing = null, message = null) }
-                s.trip?.let { t -> viewModelScope.launch { show(t) } }
+                // 저장소의 최신 여행으로 그린다. 못 읽으면 마지막으로 저장에 성공한 여행(DPH-H2).
+                viewModelScope.launch {
+                    val fresh = try {
+                        store.get(tripId)
+                    } catch (e: CancellationException) {
+                        throw e
+                    } catch (_: Exception) {
+                        null
+                    }
+                    (fresh ?: latestTrip ?: s.trip)?.let { show(it) }
+                }
             }
             is DayPlanAction.MoveUp -> s.indexOf(action.stop)?.let { i -> if (i > 0) apply { editor.reorder(tripId, date, action.stop, i - 1) } }
             is DayPlanAction.MoveDown -> s.indexOf(action.stop)?.let { i -> if (i < s.rows.lastIndex) apply { editor.reorder(tripId, date, action.stop, i + 1) } }
@@ -259,6 +304,10 @@ class DayPlanViewModel(
         DayPlanAction.Refresh, is DayPlanAction.SelectDate, DayPlanAction.CloseSheet, DayPlanAction.CancelRemove, DayPlanAction.StayEdited, DayPlanAction.OpenMap -> false
     }
 
+    private fun DayPlanAction.changesScreen(): Boolean =
+        this is DayPlanAction.SelectDate || this == DayPlanAction.OpenStart || this == DayPlanAction.EditTrip ||
+            this == DayPlanAction.OpenMap || this == DayPlanAction.AddPlace || this is DayPlanAction.OpenStop
+
     /** 보이는 그날 줄을 대상으로 하는 편집. */
     private fun DayPlanAction.isRowEdit(): Boolean = isEdit() && this != DayPlanAction.AddPlace && this != DayPlanAction.EditTrip
 
@@ -272,7 +321,7 @@ class DayPlanViewModel(
             when (val r = change()) {
                 is TripResult.Ok -> {
                     _state.update { it.copy(stayError = null, editing = if (closeSheet) null else it.editing, startSheet = if (closeSheet) false else it.startSheet) }
-                    // 새 시각을 그린 뒤에 풀어 준다. 그 사이 다른 편집이 옛 줄을 보고 들어오지 않게(DPV-M1).
+                    // 새 일정을 그린 뒤에 풀어 준다(경로는 기다리지 않는다). 그 사이 다른 편집이 옛 줄을 보고 들어오지 않게(DPV-M1).
                     try {
                         show(r.trip)
                     } finally {
