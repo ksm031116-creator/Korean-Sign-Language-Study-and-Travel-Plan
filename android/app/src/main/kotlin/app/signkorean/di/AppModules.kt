@@ -51,6 +51,10 @@ import app.signkorean.domain.common.AppScope
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import app.signkorean.ui.plan.PlanGateViewModel
+import app.signkorean.ui.plan.AddToPlanViewModel
+import app.signkorean.ui.plan.PlacePickerViewModel
+import app.signkorean.ui.plan.TripFormViewModel
+import app.signkorean.ui.plan.TripListViewModel
 import app.signkorean.ui.places.PlaceDetailViewModel
 import app.signkorean.ui.places.PlacesViewModel
 import app.signkorean.adapter.net.UnavailablePlaceSummaries
@@ -168,6 +172,10 @@ val uiModule = module {
     viewModel { PlanGateViewModel(get(), getOrNull()) }
     viewModel { params -> PlacesViewModel(params.get(), get(), get(), get(), get(), get()) }
     viewModel { params -> ReviewsViewModel(params.get(), get(), get(), get()) }
+    viewModelOf(::TripListViewModel)
+    viewModel { params -> TripFormViewModel(params.getOrNull(), get(), get(), get()) }
+    viewModel { params -> AddToPlanViewModel(params.get(), get(), get()) }
+    viewModel { params -> PlacePickerViewModel(params.get(), params.get(), get(), get(), get()) }
     viewModel { params -> PlaceDetailViewModel(params.get(), get(), get(), get(), get(), get(), get(), get(), get()) }
     viewModel { params -> CollectionViewModel(params.get(), get(), get(), get()) }
     viewModelOf(::AppGateViewModel)

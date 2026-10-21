@@ -31,6 +31,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import app.signkorean.ui.reviews.ReviewsSheet
+import app.signkorean.ui.plan.AddToPlanSheet
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -85,6 +86,7 @@ fun PlacesScreen(
     onClose: () -> Unit,
     onOpenPlace: (PlaceId) -> Unit,
     onUpgrade: (UpgradeFeature) -> Unit,
+    onCreateTrip: () -> Unit = {},
     viewModel: PlacesViewModel = koinViewModel { parametersOf(card) },
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -97,12 +99,21 @@ fun PlacesScreen(
         }
     }
     var reviewsFor by rememberSaveable { mutableStateOf<String?>(null) }
-    PlacesContent(state, viewModel::onAction, onClose, onOpenReviews = { reviewsFor = it.value })
+    // SC15 시트. SC12 로 여행을 만들고 돌아오면 이 값이 남아 있어 시트가 다시 열린다(PRD §14 SC15).
+    var addFor by rememberSaveable { mutableStateOf<String?>(null) }
+    PlacesContent(state, viewModel::onAction, onClose, onOpenReviews = { reviewsFor = it.value }, onAddToPlan = { addFor = it.value })
     reviewsFor?.let { ReviewsSheet(PlaceId(it), onDismiss = { reviewsFor = null }) }
+    addFor?.let { AddToPlanSheet(PlaceId(it), onDismiss = { addFor = null }, onCreateTrip = onCreateTrip) }
 }
 
 @Composable
-fun PlacesContent(state: PlacesUiState, onAction: (PlacesAction) -> Unit, onClose: () -> Unit, onOpenReviews: (PlaceId) -> Unit = {}) {
+fun PlacesContent(
+    state: PlacesUiState,
+    onAction: (PlacesAction) -> Unit,
+    onClose: () -> Unit,
+    onOpenReviews: (PlaceId) -> Unit = {},
+    onAddToPlan: (PlaceId) -> Unit = {},
+) {
     val t = SignKoreanTheme.tokens
     if (state.loading) return
     // 장소가 많은 유형(시장 등)도 보이는 카드의 사진만 받도록 지연 목록으로 그린다(Phase 14 리뷰 PLC-08).
@@ -136,7 +147,7 @@ fun PlacesContent(state: PlacesUiState, onAction: (PlacesAction) -> Unit, onClos
                             Text(group.area.name.text(), style = MaterialTheme.typography.titleMedium, modifier = Modifier.semantics { heading() })
                         }
                         items(group.places, key = { it.id.value }) { place ->
-                            PlaceCard(place, group.area.color, state.summaryFor(place.id), state.summary == SummaryState.Loading, state.paid, onAction, onOpenReviews)
+                            PlaceCard(place, group.area.color, state.summaryFor(place.id), state.summary == SummaryState.Loading, state.paid, onAction, onOpenReviews, onAddToPlan)
                         }
                     }
                 }
@@ -164,7 +175,7 @@ private fun SignStrip(card: SignCard, onPlay: () -> Unit) {
 }
 
 @Composable
-private fun PlaceCard(place: Place, areaColor: String, summary: PlaceSummary?, summaryLoading: Boolean, paid: Boolean, onAction: (PlacesAction) -> Unit, onOpenReviews: (PlaceId) -> Unit) {
+private fun PlaceCard(place: Place, areaColor: String, summary: PlaceSummary?, summaryLoading: Boolean, paid: Boolean, onAction: (PlacesAction) -> Unit, onOpenReviews: (PlaceId) -> Unit, onAddToPlan: (PlaceId) -> Unit) {
     val t = SignKoreanTheme.tokens
     val openLabel = stringResource(R.string.place_open, place.name.text())
     Column(
@@ -190,7 +201,7 @@ private fun PlaceCard(place: Place, areaColor: String, summary: PlaceSummary?, s
         // 카드마다 같은 "Reviews" 라 어느 장소인지 함께 읽힌다(RVW-17).
         val reviewsLabel = stringResource(R.string.reviews_for, place.name.text())
         QuietButton(stringResource(R.string.reviews_title), onClick = { onOpenReviews(place.id) }, modifier = Modifier.semantics { contentDescription = reviewsLabel })
-        PaidActions(paid, onUpgrade = { onAction(PlacesAction.Upgrade(it)) })
+        PaidActions(paid, onUpgrade = { onAction(PlacesAction.Upgrade(it)) }, onAdd = { onAddToPlan(place.id) })
     }
 }
 
@@ -215,8 +226,12 @@ private fun PlaceTitle(place: Place) {
  */
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-private fun PaidActions(paid: Boolean, onUpgrade: (UpgradeFeature) -> Unit) {
-    if (paid) return
+private fun PaidActions(paid: Boolean, onUpgrade: (UpgradeFeature) -> Unit, onAdd: () -> Unit) {
+    // 유료: Add to plan 은 SC15 를 연다. Route 는 경로 화면이 생기는 Phase 19 까지 그리지 않는다.
+    if (paid) {
+        SecondaryButton(stringResource(R.string.lock_add_to_plan), onClick = onAdd)
+        return
+    }
     FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
         LockBadge(stringResource(R.string.lock_route), onClick = { onUpgrade(UpgradeFeature.Route) })
         LockBadge(stringResource(R.string.lock_add_to_plan), onClick = { onUpgrade(UpgradeFeature.Plan) })
@@ -230,6 +245,7 @@ fun PlaceDetailScreen(
     onClose: () -> Unit,
     onOpenLearn: () -> Unit,
     onUpgrade: (UpgradeFeature) -> Unit,
+    onCreateTrip: () -> Unit = {},
     viewModel: PlaceDetailViewModel = koinViewModel { parametersOf(place) },
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -247,12 +263,20 @@ fun PlaceDetailScreen(
         }
     }
     var reviewsOpen by rememberSaveable { mutableStateOf(false) }
-    PlaceDetailContent(state, viewModel::onAction, onClose, onOpenReviews = { reviewsOpen = true })
+    var addOpen by rememberSaveable { mutableStateOf(false) }
+    PlaceDetailContent(state, viewModel::onAction, onClose, onOpenReviews = { reviewsOpen = true }, onAddToPlan = { addOpen = true })
     if (reviewsOpen) ReviewsSheet(place, onDismiss = { reviewsOpen = false })
+    if (addOpen) AddToPlanSheet(place, onDismiss = { addOpen = false }, onCreateTrip = onCreateTrip)
 }
 
 @Composable
-fun PlaceDetailContent(state: PlaceDetailUiState, onAction: (PlaceDetailAction) -> Unit, onClose: () -> Unit, onOpenReviews: () -> Unit = {}) {
+fun PlaceDetailContent(
+    state: PlaceDetailUiState,
+    onAction: (PlaceDetailAction) -> Unit,
+    onClose: () -> Unit,
+    onOpenReviews: () -> Unit = {},
+    onAddToPlan: () -> Unit = {},
+) {
     val t = SignKoreanTheme.tokens
     if (state.loading) return
     if (state.confirmReplace) {
@@ -299,7 +323,7 @@ fun PlaceDetailContent(state: PlaceDetailUiState, onAction: (PlaceDetailAction) 
         if (where.isNotEmpty()) Text(where, style = MaterialTheme.typography.labelLarge, color = t.primary)
         Text(place.address.text(), style = MaterialTheme.typography.bodyMedium, color = t.muted)
         SecondaryButton(stringResource(R.string.reviews_title), onClick = onOpenReviews)
-        PaidActions(state.paid, onUpgrade = { onAction(PlaceDetailAction.Upgrade(it)) })
+        PaidActions(state.paid, onUpgrade = { onAction(PlaceDetailAction.Upgrade(it)) }, onAdd = onAddToPlan)
 
         if (state.signs.isNotEmpty()) {
             Text(stringResource(R.string.place_signs), style = MaterialTheme.typography.titleMedium, modifier = Modifier.semantics { heading() })

@@ -72,7 +72,7 @@ class TripViewModelsTest {
     @Test
     fun `SC11 샘플 여행 만들기는 오늘부터 하루, 등록 장소 세 곳`() = runTest {
         val vm = TripListViewModel(store, editor, content, clock)
-        vm.onAction(TripListAction.CreateSample)
+        vm.onAction(TripListAction.CreateSample("Sample day in Seoul"))
         val made = store.all().single()
         assertEquals(today, made.start)
         assertEquals(3, made.placeCount)

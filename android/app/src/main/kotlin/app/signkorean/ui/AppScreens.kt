@@ -12,6 +12,10 @@ import app.signkorean.ui.learn.LearnScreen
 import app.signkorean.ui.learn.ResultScreen
 import app.signkorean.ui.saved.SavedScreen
 import app.signkorean.ui.plan.PlanScreen
+import app.signkorean.ui.plan.PlacePickerScreen
+import app.signkorean.ui.plan.TripFormScreen
+import app.signkorean.ui.plan.TripListScreen
+import app.signkorean.domain.trip.TripId
 import app.signkorean.domain.content.CardId
 import app.signkorean.domain.content.PlaceId
 import app.signkorean.ui.places.PlaceDetailScreen
@@ -28,6 +32,30 @@ object CollectionArg {
         arg == BASICS -> SessionSource.Basics
         arg != null && arg.startsWith("area:") -> SessionSource.Area(AreaId(arg.removePrefix("area:")))
         else -> null
+    }
+}
+
+/** SC12 인자: "new", "new-sheet"(SC15 에서 옴 — 저장하면 시트로 돌아간다), "edit:<여행 id>". */
+object TripFormArg {
+    const val NEW = "new"
+    const val NEW_FROM_SHEET = "new-sheet"
+    fun edit(id: TripId) = "edit:${id.value}"
+
+    data class Parsed(val trip: TripId?, val returnToSheet: Boolean)
+
+    fun parse(arg: String?): Parsed = when {
+        arg == NEW_FROM_SHEET -> Parsed(null, returnToSheet = true)
+        arg != null && arg.startsWith("edit:") -> Parsed(TripId(arg.removePrefix("edit:")), returnToSheet = false)
+        else -> Parsed(null, returnToSheet = false)
+    }
+}
+
+/** SC13·SC14 의 하루 인자: "<여행 id>|<yyyy-MM-dd>". */
+object TripDayArg {
+    fun of(trip: TripId, date: java.time.LocalDate) = "${trip.value}|$date"
+    fun parse(arg: String?): Pair<TripId, java.time.LocalDate>? {
+        val (id, date) = arg?.split("|")?.takeIf { it.size == 2 } ?: return null
+        return runCatching { TripId(id) to java.time.LocalDate.parse(date) }.getOrNull()
     }
 }
 
@@ -68,7 +96,12 @@ fun AppScreen(route: Route, navigator: AppNavigator) {
         // 무료면 잠금 안내(U-09). 유료 여행 목록은 Phase 17 에서 만든다.
         ScreenId.SC11 -> PlanScreen(
             onUpgrade = { navigator.push(Route(ScreenId.SC21, UpgradeFeature.Plan.arg)) },
-            paidContent = { PlaceholderScreen(route) },
+            paidContent = {
+                TripListScreen(
+                    onNewTrip = { navigator.push(Route(ScreenId.SC12, TripFormArg.NEW)) },
+                    onOpenTrip = { id -> navigator.push(Route(ScreenId.SC13, id.value)) },
+                )
+            },
         )
         // 간판의 장소 목록. Learn 아래 스와이프로 온다(FR09). 닫으면 같은 카드로 돌아간다.
         ScreenId.SC08 -> route.arg?.let { card ->
@@ -77,6 +110,7 @@ fun AppScreen(route: Route, navigator: AppNavigator) {
                 onClose = { navigator.back() },
                 onOpenPlace = { id -> navigator.push(Route(ScreenId.SC07, id.value)) },
                 onUpgrade = { f -> navigator.push(Route(ScreenId.SC21, f.arg)) },
+                onCreateTrip = { navigator.push(Route(ScreenId.SC12, TripFormArg.NEW_FROM_SHEET)) },
             )
         } ?: PlaceholderScreen(route)
         ScreenId.SC07 -> route.arg?.let { place ->
@@ -85,7 +119,21 @@ fun AppScreen(route: Route, navigator: AppNavigator) {
                 onClose = { navigator.back() },
                 onOpenLearn = { navigator.openLearn() },
                 onUpgrade = { f -> navigator.push(Route(ScreenId.SC21, f.arg)) },
+                onCreateTrip = { navigator.push(Route(ScreenId.SC12, TripFormArg.NEW_FROM_SHEET)) },
             )
+        } ?: PlaceholderScreen(route)
+        ScreenId.SC12 -> {
+            val arg = TripFormArg.parse(route.arg)
+            TripFormScreen(
+                tripId = arg.trip,
+                // 새 여행은 그 여행의 일정(SC13)으로 간다. 추가 시트에서 왔으면 시트로 돌아간다(PRD §14 SC15).
+                onSaved = { id, created -> if (created && !arg.returnToSheet) navigator.replaceTop(Route(ScreenId.SC13, id.value)) else navigator.back() },
+                onDeleted = { navigator.selectTab(app.signkorean.navigation.RootTab.Plan) },
+                onClose = { navigator.back() },
+            )
+        }
+        ScreenId.SC14 -> TripDayArg.parse(route.arg)?.let { (trip, date) ->
+            PlacePickerScreen(trip, date, onClose = { navigator.back() })
         } ?: PlaceholderScreen(route)
         // 결제·복원·Not now 모두 호출한 화면으로 돌아간다. 이어서 할 동작은 보류 동작이 맡는다 (PRD §14.1).
         ScreenId.SC21 -> UpgradeScreen(UpgradeFeature.parse(route.arg), onClose = { navigator.back() })

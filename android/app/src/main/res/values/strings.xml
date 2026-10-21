@@ -261,6 +261,50 @@
     <string name="reviews_rating_spoken">Rated %1$d out of 5</string>
     <string name="reviews_for">Reviews of %1$s</string>
 
+
+    <!-- 여행 계획 (Phase 17). 오류는 필드 바로 아래에 보인다 (UX07). -->
+    <string name="trip_error_title">Enter a trip name.</string>
+    <string name="trip_error_end_before_start">The end date can\'t be before the start date.</string>
+    <string name="trip_error_too_long">A trip can be up to %1$d days.</string>
+    <string name="trip_error_duplicate">This place is already on that day.</string>
+    <string name="trip_error_day_full">A day can have up to %1$d places.</string>
+    <string name="trip_error_not_destination">Only registered places can be added to a day.</string>
+    <string name="trip_error_stay">Enter whole minutes from 0 to %1$d.</string>
+    <string name="trip_error_outside">Planned days fall outside the new dates (%1$d). Move or remove those places first.</string>
+    <string name="trip_error_missing">This trip is no longer available.</string>
+    <string name="trip_dates">%1$s – %2$s</string>
+    <string name="plan_new_trip">New trip</string>
+    <string name="plan_sample">Try a sample day</string>
+    <string name="plan_sample_title">Sample day in Seoul</string>
+    <string name="plan_empty_title">Your Seoul story starts here.</string>
+    <string name="plan_empty_body">Make a trip, then add registered places to each day.</string>
+    <string name="plan_storage_note">Saved on this device. No account needed.</string>
+    <string name="trip_form_new">New trip</string>
+    <string name="trip_form_edit">Trip details</string>
+    <string name="trip_name">Trip name</string>
+    <string name="trip_start">Start date</string>
+    <string name="trip_end">End date</string>
+    <string name="trip_save">Save</string>
+    <string name="trip_delete">Delete trip</string>
+    <string name="trip_discard_title">Discard changes?</string>
+    <string name="trip_discard_body">Your changes to this trip won\'t be saved.</string>
+    <string name="trip_discard">Discard</string>
+    <string name="trip_keep">Keep editing</string>
+    <string name="trip_delete_title">Delete this trip?</string>
+    <string name="trip_delete_body">Its days and places are removed. Your saved signs and learning progress stay.</string>
+    <string name="trip_delete_confirm">Delete</string>
+    <string name="add_title">Add to plan</string>
+    <string name="add_choose_trip">Trip</string>
+    <string name="add_choose_day">Day</string>
+    <string name="add_button">Add to this day</string>
+    <string name="add_added">Added to %1$s.</string>
+    <string name="add_no_trips">You don\'t have a trip yet.</string>
+    <string name="add_create_trip">Create a trip</string>
+    <string name="picker_title">Add a registered place</string>
+    <string name="picker_search">Search places</string>
+    <string name="picker_added">Added</string>
+    <string name="picker_add">Add</string>
+
     <plurals name="places_count">
         <item quantity="one">%d place</item>
         <item quantity="other">%d places</item>
