@@ -8,6 +8,7 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import app.signkorean.ui.designsystem.SignKoreanTheme
+import app.signkorean.ui.plan.PlanLockedContent
 import app.signkorean.ui.text.UiText
 import app.signkorean.R
 import org.junit.Assert.assertEquals

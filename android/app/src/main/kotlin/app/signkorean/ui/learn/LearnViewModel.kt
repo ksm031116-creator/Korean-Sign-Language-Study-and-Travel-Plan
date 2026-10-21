@@ -24,6 +24,8 @@ import app.signkorean.domain.learning.UndoJudgement
 import app.signkorean.domain.learning.UndoOutcome
 import app.signkorean.domain.learning.Verdict
 import app.signkorean.domain.onboarding.OnboardingStore
+import app.signkorean.domain.upgrade.PendingAction
+import app.signkorean.domain.upgrade.PendingActionStore
 import app.signkorean.ui.text.UiText
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.channels.Channel
@@ -87,6 +89,9 @@ sealed interface LearnAction {
 
     /** 카드 저장·해제. 판정이 아니며 카드를 뒤집거나 넘기지 않는다 (FR12). */
     data object ToggleBookmark : LearnAction
+
+    /** 화면에 다시 들어왔을 때(SC21 에서 결제 뒤 돌아옴 등) 저장 여부를 다시 읽는다. */
+    data object RefreshBookmarks : LearnAction
 }
 
 /** 한 번만 처리할 일. 화면 재구성으로 두 번 처리되지 않게 Channel 로 낸다 (설계서 §5.3). */
@@ -94,7 +99,7 @@ sealed interface LearnEffect {
     data class OpenPlaces(val card: CardId) : LearnEffect
     data object Finished : LearnEffect
 
-    /** 무료 한도에서 6번째 저장 (FR27). 업그레이드 화면은 Phase 13 에서 연결한다. */
+    /** 무료 한도에서 6번째 저장 (FR27). 화면은 SC21 을 연다. 저장은 보류 동작으로 남겨 결제 뒤 이어서 한다. */
     data class BookmarkLimit(val count: Int, val limit: Int) : LearnEffect
 }
 
@@ -107,6 +112,7 @@ class LearnViewModel(
     private val audio: AudioPlayer,
     private val bookmarks: BookmarkStore,
     private val setBookmark: SetBookmark,
+    private val pendingActions: PendingActionStore,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(LearnUiState())
@@ -204,12 +210,33 @@ class LearnViewModel(
                     BookmarkOutcome.Saved, BookmarkOutcome.Removed, BookmarkOutcome.Unchanged ->
                         savedIds = if (target) savedIds + card.id else savedIds - card.id
                     is BookmarkOutcome.NeedsUpgrade -> {
+                        // SC21 을 열기 전에 보류해 둔다. 결제 중 프로세스가 끝나도 복귀 후 이어서 저장된다(B-07).
+                        try {
+                            pendingActions.save(PendingAction.SaveBookmark(card.id))
+                        } catch (e: CancellationException) {
+                            throw e
+                        } catch (_: Exception) {
+                        }
                         _state.update { if (it.card?.id == card.id) it.copy(bookmarked = false, notice = UiText.Res(R.string.bookmark_limit, listOf(o.count, o.limit))) else it }
                         _effects.send(LearnEffect.BookmarkLimit(o.count, o.limit))
                     }
                     BookmarkOutcome.SaveFailed ->
                         _state.update { if (it.card?.id == card.id) it.copy(bookmarked = !target, notice = UiText.Res(R.string.common_save_failed)) else it }
                 }
+            }
+            return
+        }
+        if (action == LearnAction.RefreshBookmarks) {
+            viewModelScope.launch {
+                val ids = try {
+                    bookmarks.all().map { it.card }.toSet()
+                } catch (e: CancellationException) {
+                    throw e
+                } catch (_: Exception) {
+                    return@launch
+                }
+                savedIds = ids
+                _state.update { it.copy(bookmarked = it.card != null && it.card.id in ids) }
             }
             return
         }
@@ -231,7 +258,8 @@ class LearnViewModel(
             is LearnAction.Judge -> save(action)
             LearnAction.Undo -> if (s.canUndo) save(action)
             LearnAction.Retry -> failed?.let { save(it) }
-            LearnAction.DismissCoach, LearnAction.PlayAudio, LearnAction.StopAudio, LearnAction.ToggleBookmark -> Unit // 위에서 처리했다
+            LearnAction.DismissCoach, LearnAction.PlayAudio, LearnAction.StopAudio, LearnAction.ToggleBookmark,
+            LearnAction.RefreshBookmarks -> Unit // 위에서 처리했다
         }
     }
 

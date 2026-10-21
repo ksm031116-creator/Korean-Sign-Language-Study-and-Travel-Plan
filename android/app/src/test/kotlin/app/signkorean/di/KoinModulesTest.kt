@@ -36,6 +36,10 @@ class KoinModulesTest {
             definition<app.signkorean.ui.explore.CollectionViewModel>(app.signkorean.domain.learning.SessionSource::class),
             // 디버그 빌드 여부(앱 정보에서 읽은 값).
             definition<app.signkorean.ui.onboarding.FirstRunViewModel>(Boolean::class),
+            // SC21 을 연 진입점(화면 인자).
+            definition<app.signkorean.ui.upgrade.UpgradeViewModel>(app.signkorean.ui.upgrade.UpgradeFeature::class),
+            // 다시 잠그기는 디버그 빌드의 모의 결제에만 있고(getOrNull), 릴리스에는 없다.
+            definition<app.signkorean.ui.plan.PlanGateViewModel>(app.signkorean.ui.plan.DebugRelock::class),
         )
         // 모듈끼리 서로의 정의를 쓰므로(예: StartSession 이 platformModule 의 IdGenerator) 전체를 한 그래프로 검사한다.
         module { includes(appModules) }.verify(extraTypes = passedDirectly, injections = catalogIds)

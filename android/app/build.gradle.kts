@@ -22,6 +22,8 @@ android {
         debug {
             // 의사 언어 en-XA(긴 문구)·ar-XB(오른쪽→왼쪽)로 레이아웃을 검사한다 (설계서 §8.7, L10N-09).
             isPseudoLocalesEnabled = true
+            // 디버그는 모의 결제가 기본이다(에뮬레이터에 Play 가 없다). 실기기 Play 결제: -PrealBilling=true
+            buildConfigField("boolean", "SIMULATED_BILLING", (project.findProperty("realBilling") != "true").toString())
         }
         release {
             isMinifyEnabled = false
@@ -35,6 +37,7 @@ android {
 
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 
     // values-xx/ 를 추가하면 앱별 언어 목록이 자동으로 따라온다 (손으로 쓴 locales_config 와 어긋날 일이 없다).

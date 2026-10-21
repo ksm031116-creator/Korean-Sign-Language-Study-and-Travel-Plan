@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- 기본(영어). 다른 언어 파일에 같은 키가 없으면 Lint MissingTranslation 오류로 빌드가 실패한다. -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name" translatable="false">Sign Korean</string>
     <string name="app_tagline">Read the city, one sign at a time.</string>
 
@@ -168,6 +168,48 @@
     <string name="saved_unavailable">This sign is no longer available.</string>
     <string name="saved_clear_filters">Clear filters</string>
     <string name="saved_no_match">No saved signs match these filters.</string>
+
+
+    <!-- SC21 업그레이드 (PRD §14.1). 가격은 스토어가 준 문자열을 그대로 넣는다. 문구에 금액·통화 기호를 쓰지 않는다 (L10N-11). -->
+    <string name="upgrade_title">Unlock trip planning</string>
+    <string name="upgrade_subtitle">Keep learning for free. Add the travel tools when you need them.</string>
+    <string name="upgrade_lead_bookmark">You\'ve saved %1$d of %2$d signs.</string>
+    <string name="upgrade_lead_plan">Trip planning is part of the upgrade.</string>
+    <string name="upgrade_lead_route">Walking routes are part of the upgrade.</string>
+    <string name="upgrade_feature_bookmarks">Unlimited bookmarks</string>
+    <string name="upgrade_feature_bookmarks_body">Keep every sign you want to find again.</string>
+    <string name="upgrade_feature_routes">Walking routes &amp; times</string>
+    <string name="upgrade_feature_routes_body">See how long each walk takes between your stops.</string>
+    <string name="upgrade_feature_planner">Day-by-day trip planner</string>
+    <string name="upgrade_feature_planner_body">Put places in order for each day, then learn their signs before you go.</string>
+    <string name="upgrade_free_note">All signs, meanings, pronunciation and reviews stay free.</string>
+    <string name="upgrade_price_note">One-time purchase · no subscription</string>
+    <string name="upgrade_price_unavailable">The price isn\'t available right now.</string>
+    <string name="upgrade_unlock">Unlock</string>
+    <string name="upgrade_unlock_for">Unlock for %1$s</string>
+    <string name="upgrade_restore">Restore purchase</string>
+    <string name="upgrade_not_now">Not now</string>
+    <string name="upgrade_in_progress">Waiting for Google Play…</string>
+    <string name="upgrade_pending">Your payment is still being processed. Trip planning opens as soon as it goes through.</string>
+    <string name="upgrade_failed">The payment didn\'t go through. You haven\'t been charged.</string>
+    <string name="upgrade_failed_store">Google Play isn\'t available right now. You haven\'t been charged.</string>
+    <string name="upgrade_failed_product">This purchase isn\'t available for your account right now. You haven\'t been charged.</string>
+    <string name="upgrade_offline">You\'re offline. Connect to unlock.</string>
+    <string name="upgrade_unlocked">Unlocked. Trip planning is now available.</string>
+    <string name="upgrade_restored">Restored. Trip planning is available again.</string>
+    <string name="upgrade_restore_none">No previous purchase found.</string>
+    <string name="upgrade_restore_failed">Couldn\'t check your purchases. Try again.</string>
+
+    <!-- 잠금 진입점의 기능 이름 (UX09) -->
+    <string name="lock_trip_planning">Trip planning</string>
+    <string name="lock_unlimited_bookmarks">Unlimited bookmarks</string>
+
+    <!-- SC11 Plan (무료면 잠금 안내) -->
+    <string name="plan_title">A day worth wandering.</string>
+    <string name="plan_subtitle">Build your route. Learn the signs before you go.</string>
+    <string name="plan_locked_body">Plan your days in Seoul with the places you found. This is part of the one-time upgrade.</string>
+    <!-- 디버그 빌드의 모의 결제를 되돌리는 버튼. 릴리스에는 연결되지 않는다(조립이 없음). 개발자용이라 번역하지 않는다. -->
+    <string name="debug_relock" translatable="false" tools:ignore="UnusedResources">Lock again (debug build)</string>
 
     <plurals name="places_count">
         <item quantity="one">%d place</item>

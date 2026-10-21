@@ -151,4 +151,40 @@
     <plurals name="places_count">
         <item quantity="other">%dか所</item>
     </plurals>
+
+    <string name="upgrade_title">旅の計画を解放</string>
+    <string name="upgrade_subtitle">学習はずっと無料です。旅の道具は、必要になったときに追加できます。</string>
+    <string name="upgrade_lead_bookmark">保存した看板が %2$d 枚中 %1$d 枚になりました。</string>
+    <string name="upgrade_lead_plan">旅の計画は、アップグレードで使えるようになります。</string>
+    <string name="upgrade_lead_route">徒歩ルートは、アップグレードで使えるようになります。</string>
+    <string name="upgrade_feature_bookmarks">ブックマーク無制限</string>
+    <string name="upgrade_feature_bookmarks_body">また探したい看板を、枚数を気にせず残せます。</string>
+    <string name="upgrade_feature_routes">徒歩ルートと所要時間</string>
+    <string name="upgrade_feature_routes_body">立ち寄る場所のあいだを歩くと、どのくらいかかるかがわかります。</string>
+    <string name="upgrade_feature_planner">日ごとの旅程づくり</string>
+    <string name="upgrade_feature_planner_body">日ごとに行き先を並べて、出かける前にその場所の看板を覚えられます。</string>
+    <string name="upgrade_free_note">看板・意味・発音・レビューは、これからも無料です。</string>
+    <string name="upgrade_price_note">買い切り・定期購入なし</string>
+    <string name="upgrade_price_unavailable">いまは価格を表示できません。</string>
+    <string name="upgrade_unlock">解放する</string>
+    <string name="upgrade_unlock_for">%1$s で解放する</string>
+    <string name="upgrade_restore">購入を復元</string>
+    <string name="upgrade_not_now">今はしない</string>
+    <string name="upgrade_in_progress">Google Play の応答を待っています…</string>
+    <string name="upgrade_pending">お支払いの手続き中です。完了すると、すぐに旅の計画が使えるようになります。</string>
+    <string name="upgrade_failed">お支払いが完了しませんでした。料金は請求されていません。</string>
+    <string name="upgrade_failed_store">いまは Google Play に接続できません。料金は請求されていません。</string>
+    <string name="upgrade_failed_product">このアカウントでは、いまこの商品を購入できません。料金は請求されていません。</string>
+    <string name="upgrade_offline">オフラインです。インターネットに接続してから解放してください。</string>
+    <string name="upgrade_unlocked">解放しました。旅の計画が使えます。</string>
+    <string name="upgrade_restored">復元しました。旅の計画がまた使えます。</string>
+    <string name="upgrade_restore_none">以前の購入は見つかりませんでした。</string>
+    <string name="upgrade_restore_failed">購入履歴を確認できませんでした。もう一度お試しください。</string>
+
+    <string name="lock_trip_planning">旅の計画</string>
+    <string name="lock_unlimited_bookmarks">ブックマーク無制限</string>
+
+    <string name="plan_title">歩きたくなる一日を。</string>
+    <string name="plan_subtitle">ルートを組んで、出かける前に看板を覚えましょう。</string>
+    <string name="plan_locked_body">見つけた場所で、ソウルでの毎日を計画できます。買い切りのアップグレードで使えるようになります。</string>
 </resources>

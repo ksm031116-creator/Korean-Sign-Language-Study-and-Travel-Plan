@@ -129,12 +129,13 @@ fun LearnScreen(
     LifecycleResumeEffect(viewModel) {
         onPauseOrDispose { viewModel.onAction(LearnAction.StopAudio) }
     }
+    // 화면에 다시 들어올 때마다(SC21 에서 돌아옴 등) 저장 여부를 다시 읽는다. 결제 뒤 보류한 저장이 끝났을 수 있다.
+    LaunchedEffect(Unit) { viewModel.onAction(LearnAction.RefreshBookmarks) }
     LaunchedEffect(viewModel) {
         for (effect in viewModel.effects) {
             when (effect) {
                 is LearnEffect.OpenPlaces -> onOpenPlaces(effect.card)
                 LearnEffect.Finished -> onFinished()
-                // 업그레이드 화면(SC21)은 Phase 13 에서 연다. 그전에는 카드 위 안내만 보인다.
                 is LearnEffect.BookmarkLimit -> onBookmarkLimit()
             }
         }

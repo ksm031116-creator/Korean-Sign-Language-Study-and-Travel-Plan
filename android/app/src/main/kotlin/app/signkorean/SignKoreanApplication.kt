@@ -4,6 +4,10 @@ import android.app.Application
 import android.content.pm.ApplicationInfo
 import android.util.Log
 import app.signkorean.di.appModules
+import app.signkorean.di.variantModules
+import app.signkorean.domain.entitlement.Entitlement
+import app.signkorean.domain.entitlement.EntitlementGateway
+import app.signkorean.domain.upgrade.ResumePendingAction
 import app.signkorean.domain.common.AppDispatchers
 import app.signkorean.domain.content.ContentRepository
 import app.signkorean.adapter.billing.PlayBillingEntitlementGateway
@@ -21,7 +25,8 @@ class SignKoreanApplication : Application() {
         super.onCreate()
         val koin = startKoin {
             androidContext(this@SignKoreanApplication)
-            modules(appModules)
+            // 디버그 빌드는 모의 결제 등으로 덮어쓴다. 릴리스의 variantModules 는 비어 있다.
+            modules(appModules + variantModules)
         }.koin
 
         // 콘텐츠 팩을 미리 읽어 첫 화면의 대기를 줄이고, 읽은 결과를 로그로 남긴다.
@@ -39,7 +44,12 @@ class SignKoreanApplication : Application() {
             it.onForeground = refresh
             registerActivityLifecycleCallbacks(it)
         }
-        koin.get<PlayBillingEntitlementGateway>().onStoreChanged = refresh
+        (koin.get<EntitlementGateway>() as? PlayBillingEntitlementGateway)?.onStoreChanged = refresh
+
+        // 권한이 Paid 로 확인될 때마다 보류 동작을 이어서 한다. 결제 중 프로세스가 끝났다가 다시 켠 뒤
+        // 시작 확인에서 Paid 가 된 경우도 여기서 저장된다(B-07). 보류 동작이 없으면 아무 일도 없다.
+        val resume = koin.get<ResumePendingAction>()
+        scope.launch { entitlements.entitlement.collect { if (it == Entitlement.Paid) resume() } }
 
         scope.launch {
             try {

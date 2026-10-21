@@ -31,6 +31,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import app.signkorean.R
 import app.signkorean.domain.learning.CardStatus
 import app.signkorean.ui.designsystem.AppChip
+import app.signkorean.ui.designsystem.LockBadge
 import app.signkorean.ui.designsystem.ConfirmDialog
 import app.signkorean.ui.designsystem.EmptyState
 import app.signkorean.ui.designsystem.ErrorState
@@ -51,7 +52,7 @@ object SavedTags {
 
 /** SC09 Saved. */
 @Composable
-fun SavedScreen(onOpenLearn: () -> Unit, viewModel: SavedViewModel = koinViewModel()) {
+fun SavedScreen(onOpenLearn: () -> Unit, onUpgrade: () -> Unit = {}, viewModel: SavedViewModel = koinViewModel()) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     LifecycleResumeEffect(viewModel) {
         viewModel.onAction(SavedAction.Refresh)
@@ -64,11 +65,11 @@ fun SavedScreen(onOpenLearn: () -> Unit, viewModel: SavedViewModel = koinViewMod
             }
         }
     }
-    SavedContent(state, viewModel::onAction)
+    SavedContent(state, onUpgrade = onUpgrade, onAction = viewModel::onAction)
 }
 
 @Composable
-fun SavedContent(state: SavedUiState, onAction: (SavedAction) -> Unit) {
+fun SavedContent(state: SavedUiState, onUpgrade: () -> Unit = {}, onAction: (SavedAction) -> Unit) {
     val t = SignKoreanTheme.tokens
     if (state.loading) return
     if (state.confirmReplace) {
@@ -87,7 +88,11 @@ fun SavedContent(state: SavedUiState, onAction: (SavedAction) -> Unit) {
     ) {
         Text(stringResource(R.string.saved_title), style = MaterialTheme.typography.headlineSmall, modifier = Modifier.semantics { heading() })
         if (state.failed) ErrorState(stringResource(R.string.explore_load_failed), onRetry = { onAction(SavedAction.Refresh) })
-        state.freeLimit?.let { limit -> Quota(state.all.size, limit) }
+        state.freeLimit?.let { limit ->
+            Quota(state.all.size, limit)
+            // 유료 기능은 숨기지 않고 자물쇠 + 기능명으로 보인다 (UX09). 누르면 SC21.
+            LockBadge(stringResource(R.string.lock_unlimited_bookmarks), onClick = onUpgrade)
+        }
         if (state.all.isEmpty()) {
             EmptyState(title = stringResource(R.string.saved_empty_title), body = stringResource(R.string.saved_empty_body))
             return@Column

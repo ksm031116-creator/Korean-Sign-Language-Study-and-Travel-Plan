@@ -41,6 +41,11 @@ import app.signkorean.domain.entitlement.Entitlements
 import app.signkorean.domain.entitlement.NetworkMonitor
 import app.signkorean.domain.learning.ResetLearning
 import org.koin.dsl.bind
+import app.signkorean.adapter.prefs.DataStorePendingActionStore
+import app.signkorean.domain.upgrade.PendingActionStore
+import app.signkorean.domain.upgrade.ResumePendingAction
+import app.signkorean.ui.plan.PlanGateViewModel
+import app.signkorean.ui.upgrade.UpgradeViewModel
 import app.signkorean.domain.locale.CurrentLocale
 import app.signkorean.domain.onboarding.OnboardingStore
 import app.signkorean.domain.locale.ResolveAppLanguage
@@ -112,6 +117,9 @@ val entitlementModule = module {
     single<EntitlementCache> { DataStoreEntitlementCache.create(androidContext()) }
     single<NetworkMonitor> { AndroidNetworkMonitor(androidContext()) }
     single { Entitlements(get(), get(), get()) } bind EntitlementSource::class
+    // 결제 뒤 이어서 할 동작 (Phase 13). 여러 곳(SC21·앱 수준 확인)이 불러도 한 번만 수행하도록 하나만 둔다.
+    single<PendingActionStore> { DataStorePendingActionStore.create(androidContext()) }
+    single { ResumePendingAction(get(), get()) }
 }
 
 /** 화면 ViewModel. 화면은 koinViewModel() 로만 받는다 (AR-03). */
@@ -120,6 +128,9 @@ val uiModule = module {
     viewModelOf(::ResultViewModel)
     viewModelOf(::ExploreViewModel)
     viewModelOf(::SavedViewModel)
+    viewModel { params -> UpgradeViewModel(params.get(), get(), get(), get(), get()) }
+    // 디버그 빌드의 모의 결제에만 다시 잠그기가 있다(variantModules). 릴리스는 null.
+    viewModel { PlanGateViewModel(get(), getOrNull()) }
     viewModel { params -> CollectionViewModel(params.get(), get(), get(), get()) }
     viewModelOf(::AppGateViewModel)
     viewModel {
