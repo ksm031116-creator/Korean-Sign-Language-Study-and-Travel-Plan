@@ -122,7 +122,7 @@ window.DATA = {
     {id:'shinsegae',areaId:'myeongdong',type:'shopping',name:'Shinsegae Department Store Main',koName:'신세계백화점 본점',address:'63 Sogong-ro, Jung-gu, Seoul',lat:37.5610,lng:126.9810},
     {id:'lotte-main',areaId:'myeongdong',type:'shopping',name:'Lotte Department Store Main',koName:'롯데백화점 본점',address:'81 Namdaemun-ro, Jung-gu, Seoul',lat:37.5650,lng:126.9820},
     {id:'deoksugung',areaId:'myeongdong',type:'palace',name:'Deoksugung Palace',koName:'덕수궁',address:'99 Sejong-daero, Jung-gu, Seoul',lat:37.5658,lng:126.9751},
-    {id:'seoulstation',areaId:'myeongdong',type:'station',name:'Seoul Station',koName:'서울역',address:'405 Hangang-daero, Jung-gu, Seoul',lat:37.5547,lng:126.9707},
+    {id:'seoulstation',areaId:'myeongdong',type:'station',name:'Seoul Station',koName:'서울역',address:'405 Hangang-daero, Yongsan-gu, Seoul',lat:37.5547,lng:126.9707},
     {id:'namsan-tower',areaId:'myeongdong',type:'tower',name:'N Seoul Tower',koName:'남산서울타워',address:'105 Namsangongwon-gil, Yongsan-gu, Seoul',lat:37.5512,lng:126.9882},
     {id:'myeongdong-bank',areaId:'myeongdong',type:'services',signWords:['환전'],name:'Example exchange booth · Myeongdong',koName:'명동 환전소',address:'Example place in Myeongdong',lat:37.5640,lng:126.9860,example:true},
     {id:'myeongdong-food',areaId:'myeongdong',type:'street',name:'Myeongdong Street Food Alley',koName:'명동 먹자골목',address:'Myeongdong-gil, Jung-gu, Seoul',lat:37.5636,lng:126.9850},
@@ -322,8 +322,9 @@ DATA.landmarks = DATA.areas;
 // ---------- 표지판 픽토그램 (PRD §8.3, v2.6) ----------
 // 실제로 그림과 함께 쓰이는 표지판만. 카드 뒷면에서만 그린다 — 앞면에 그림이 있으면 글자를 읽지 않고도 맞힐 수 있다.
 // 그림은 app.js 의 PICTOGRAMS 에서 공공 기호를 단순화해 직접 그린 SVG.
+// 출구(일반 출구)에는 그리지 않는다. exit 그림은 달리는 사람 + 문, 곧 비상구 기호(ISO 7010 E001)라 일반 출구를 비상구로 오해하게 한다.
 DATA.pictograms = {
-  '화장실':'restroom', '공중 화장실':'restroom', '남자 화장실':'men', '여자 화장실':'women', '장애인 화장실':'accessible', '출구':'exit', '비상구':'exit', '엘리베이터':'elevator', '에스컬레이터':'escalator', '계단':'stairs', '비상계단':'stairs', '지하철':'subway', '버스 정류장':'bus', '금연':'noSmoking', '촬영 금지':'noPhoto', '와이파이':'wifi', '약국':'pharmacy', '수유실':'nursing', '기저귀 교환대':'babyChange', '안내':'info', '관광안내소':'info', '현금인출기':'atm', '택시 타는 곳':'taxi', '주차장':'parking', '공항':'airport', '보관함':'lockers', '휴지통':'wasteBin', '음수대':'drinkingWater', '출입 금지':'noEntry', '미끄럼 주의':'caution', '위험':'caution', '소화기':'fireExtinguisher', '휴대폰 충전':'phoneCharging', '흡연실':'smokingRoom', '반려동물 동반 금지':'noPets', '음식물 반입 금지':'noFood', '분리수거':'recycling', '횡단보도':'crossing', '경찰서':'police', '환승':'transfer'
+  '화장실':'restroom', '공중 화장실':'restroom', '남자 화장실':'men', '여자 화장실':'women', '장애인 화장실':'accessible', '비상구':'exit', '엘리베이터':'elevator', '에스컬레이터':'escalator', '계단':'stairs', '비상계단':'stairs', '지하철':'subway', '버스 정류장':'bus', '금연':'noSmoking', '촬영 금지':'noPhoto', '와이파이':'wifi', '약국':'pharmacy', '수유실':'nursing', '기저귀 교환대':'babyChange', '안내':'info', '관광안내소':'info', '현금인출기':'atm', '택시 타는 곳':'taxi', '주차장':'parking', '공항':'airport', '보관함':'lockers', '휴지통':'wasteBin', '음수대':'drinkingWater', '출입 금지':'noEntry', '미끄럼 주의':'caution', '위험':'caution', '소화기':'fireExtinguisher', '휴대폰 충전':'phoneCharging', '흡연실':'smokingRoom', '반려동물 동반 금지':'noPets', '음식물 반입 금지':'noFood', '분리수거':'recycling', '횡단보도':'crossing', '경찰서':'police', '환승':'transfer'
 };
 
 // ---------- 카드 생성 ----------

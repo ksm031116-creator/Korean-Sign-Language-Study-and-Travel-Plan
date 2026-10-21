@@ -1,6 +1,6 @@
 {
  "schemaVersion": 1,
- "version": "238107051cd4",
+ "version": "6d5390d2cb60",
  "locales": {
   "en": "reviewed",
   "ja": "draft"
@@ -349,7 +349,7 @@
    },
    "note": {
     "en": "Where you buy the entry ticket. The same word appears at towers and terminals.",
-    "ja": "入場券を買う窓口。タワーやターミナルでも同じ言葉を見かけます。"
+    "ja": "漢字では「売票所」。日本の切符売り場に当たり、タワーやターミナルでも見かけます。"
    },
    "pictogram": null,
    "plateColor": "#2f6f5e",
@@ -376,7 +376,7 @@
    },
    "note": {
     "en": "무료 next to it means free entry.",
-    "ja": "横に 무료 とあれば入場無料です。"
+    "ja": "日本語の「入場料」と同じ字。横に 무료(無料)とあれば入場無料です。"
    },
    "pictogram": null,
    "plateColor": "#2f6f5e",
@@ -403,7 +403,7 @@
    },
    "note": {
     "en": "관람 is viewing. You will see it at museums too.",
-    "ja": "관람 は「観覧」。博物館でも見かけます。"
+    "ja": "관람 は「観覧」と同じ字。博物館の入口でもよく見かけます。"
    },
    "pictogram": null,
    "plateColor": "#2f6f5e",
@@ -430,7 +430,7 @@
    },
    "note": {
     "en": "관 at the end means a public hall or building.",
-    "ja": "最後の 관 は「館」。公共の建物によく付きます。"
+    "ja": "日本語の「博物館」と同じ字。最後の 관(館)は美術館などにも付きます。"
    },
    "pictogram": null,
    "plateColor": "#4a5b8c",
@@ -457,7 +457,7 @@
    },
    "note": {
     "en": "기획 전시 is a special exhibition.",
-    "ja": "기획 전시 は企画展です。"
+    "ja": "日本語の「展示」と同じ字。기획 전시 は企画展です。"
    },
    "pictogram": null,
    "plateColor": "#4a5b8c",
@@ -480,11 +480,11 @@
    },
    "meaning": {
     "en": "Lockers",
-    "ja": "ロッカー"
+    "ja": "ロッカー(コインロッカー)"
    },
    "note": {
     "en": "Leave your bag before going in.",
-    "ja": "入る前に荷物を預ける場所です。"
+    "ja": "「保管」＋「函(はこ)」で、荷物を預けるロッカーのこと。展示室に入る前に使います。"
    },
    "pictogram": "lockers",
    "plateColor": "#4a5b8c",
@@ -503,7 +503,7 @@
    "koText": "국밥",
    "romanization": "gukbap",
    "reading": {
-    "ja": "クッパ"
+    "ja": "クッパプ"
    },
    "meaning": {
     "en": "Rice and soup",
@@ -511,7 +511,7 @@
    },
    "note": {
     "en": "A cheap, filling market meal. The word is on dozens of stalls.",
-    "ja": "安くてお腹いっぱいになる市場ごはん。たくさんの店先で見かけます。"
+    "ja": "日本でもおなじみのクッパ。市場では安くてお腹いっぱいになる定番で、多くの店先に書かれています。"
    },
    "pictogram": null,
    "plateColor": "#b8554a",
@@ -534,11 +534,11 @@
    },
    "meaning": {
     "en": "Dumplings",
-    "ja": "餃子"
+    "ja": "マンドゥ(韓国式餃子)"
    },
    "note": {
     "en": "Steamed or fried, sold by the plate.",
-    "ja": "蒸しも焼きもあり、皿単位で売られています。"
+    "ja": "日本の焼き餃子より皮が厚めで、蒸しや揚げもあります。皿単位で売られています。"
    },
    "pictogram": null,
    "plateColor": "#b8554a",
@@ -561,11 +561,11 @@
    },
    "meaning": {
     "en": "Knife-cut noodles",
-    "ja": "手打ちうどん"
+    "ja": "カルグクス(韓国式の手打ち麺)"
    },
    "note": {
     "en": "A hand-cut noodle soup, common in market alleys.",
-    "ja": "包丁で切った麺のスープ。市場の路地の定番です。"
+    "ja": "칼 は「包丁」、국수 は「麺」。包丁で切った麺を煮込んだ汁麺で、市場の路地の定番です。"
    },
    "pictogram": null,
    "plateColor": "#b8554a",
@@ -588,11 +588,11 @@
    },
    "meaning": {
     "en": "Spicy rice cakes",
-    "ja": "トッポッキ(甘辛餅)"
+    "ja": "トッポッキ"
    },
    "note": {
     "en": "The most common street food sign in the country.",
-    "ja": "韓国でいちばんよく見る屋台の看板です。"
+    "ja": "新大久保でもおなじみ。韓国でいちばんよく見かける屋台の看板です。"
    },
    "pictogram": null,
    "plateColor": "#b8554a",
@@ -619,7 +619,7 @@
    },
    "note": {
     "en": "Often sold at the same stall as 떡볶이.",
-    "ja": "トッポッキと同じ屋台で売られることが多いです。"
+    "ja": "떡볶이(トッポッキ)と同じ屋台で売られていることが多いです。"
    },
    "pictogram": null,
    "plateColor": "#b8554a",
@@ -646,7 +646,7 @@
    },
    "note": {
     "en": "A loanword — read it aloud and you will hear it.",
-    "ja": "外来語。声に出して読むと意味がわかります。"
+    "ja": "外来語なので、声に出せば「カフェ」とわかります。韓国語にはフの音がなく ㅍ(パ行)で書きます。"
    },
    "pictogram": null,
    "plateColor": "#8c6239",
@@ -673,7 +673,7 @@
    },
    "note": {
     "en": "Another loanword you can decode on sight.",
-    "ja": "これも外来語。見ただけで読み解けます。"
+    "ja": "これも外来語。「コーヒー」が 커피(コピ)になります。"
    },
    "pictogram": null,
    "plateColor": "#8c6239",
@@ -691,11 +691,11 @@
    },
    "meaning": {
     "en": "Takeout",
-    "ja": "テイクアウト"
+    "ja": "テイクアウト(お持ち帰り)"
    },
    "note": {
     "en": "Also used at restaurants for food to go.",
-    "ja": "食堂で料理を持ち帰るときにも使います。"
+    "ja": "漢字では「包装」。日本の「お持ち帰り」に当たり、食堂でも使います。"
    },
    "pictogram": null,
    "plateColor": "#8c6239",
@@ -722,7 +722,7 @@
    },
    "note": {
     "en": "The plain, general word for an eating place.",
-    "ja": "飲食店を指すいちばん一般的な言葉です。"
+    "ja": "日本語の「食堂」と同じ字。飲食店をいちばん広く指す言葉です。"
    },
    "pictogram": null,
    "plateColor": "#a8492f",
@@ -749,7 +749,7 @@
    },
    "note": {
     "en": "Cheap, quick Korean snacks — kimbap, ramyeon, fried bites.",
-    "ja": "キンパ、ラーメン、揚げ物など手軽な韓国の軽食。"
+    "ja": "漢字では「粉食」。キンパ、ラミョン(インスタント麺)、揚げ物など、手軽な軽食のお店です。"
    },
    "pictogram": null,
    "plateColor": "#a8492f",
@@ -776,7 +776,7 @@
    },
    "note": {
     "en": "From the German Hof. Usually paired with 치킨 on the same sign.",
-    "ja": "ドイツ語の Hof から。同じ看板に 치킨 が並ぶことが多いです。"
+    "ja": "ドイツ語の Hof が語源。看板に 치킨 が並ぶことが多く、チキンとビール(チメク)が定番です。"
    },
    "pictogram": null,
    "plateColor": "#a8492f",
@@ -795,7 +795,7 @@
    "koText": "백화점",
    "romanization": "baekhwajeom",
    "reading": {
-    "ja": "ペッカジョム"
+    "ja": "ペックァジョム"
    },
    "meaning": {
     "en": "Department store",
@@ -803,7 +803,7 @@
    },
    "note": {
     "en": "점 at the end means shop.",
-    "ja": "最後の 점 は「店」。"
+    "ja": "日本語の「百貨店」と同じ字。最後の 점 は「店」です。"
    },
    "pictogram": null,
    "plateColor": "#9c5a9e",
@@ -830,7 +830,7 @@
    },
    "note": {
     "en": "면세 means tax exempt.",
-    "ja": "면세 は「免税」。"
+    "ja": "日本語の「免税店」と同じ字。면세 は「免税」です。"
    },
    "pictogram": null,
    "plateColor": "#9c5a9e",
@@ -857,7 +857,7 @@
    },
    "note": {
     "en": "세일 is also used on the same signs.",
-    "ja": "同じ看板に 세일(セール)もよく使われます。"
+    "ja": "日本語の「割引」と同じ字ですが、読みは ハリン。同じ看板に 세일(セール)もよく出ます。"
    },
    "pictogram": null,
    "plateColor": "#9c5a9e",
@@ -884,7 +884,7 @@
    },
    "note": {
     "en": "대여 means rental. Wearing hanbok gets you free palace entry.",
-    "ja": "대여 は「貸与」。韓服を着ると古宮の入場が無料になります。"
+    "ja": "대여 は「貸与」で、日本でいうレンタル。韓服を着ていくと古宮の入場が無料になります。"
    },
    "pictogram": null,
    "plateColor": "#7a6a3a",
@@ -911,7 +911,7 @@
    },
    "note": {
     "en": "A small studio where things are made and sold.",
-    "ja": "ものを作って売る小さなアトリエです。"
+    "ja": "日本語の「工房」と同じ字。ものを作って売る小さなアトリエです。"
    },
    "pictogram": null,
    "plateColor": "#7a6a3a",
@@ -934,11 +934,11 @@
    },
    "meaning": {
     "en": "Tea house",
-    "ja": "茶房(お茶の店)"
+    "ja": "お茶屋さん(伝統茶カフェ)"
    },
    "note": {
     "en": "집 at the end means house or shop.",
-    "ja": "最後の 집 は「家・店」。"
+    "ja": "차(茶)＋집(家・店)。伝統茶を出す落ち着いたお店です。"
    },
    "pictogram": null,
    "plateColor": "#7a6a3a",
@@ -965,11 +965,16 @@
    },
    "note": {
     "en": "The board showing where everything is. 도 means map or drawing.",
-    "ja": "周辺の地図を示す案内板。도 は「図」。"
+    "ja": "日本語の「案内図」と同じ字で、도 は「図」。周辺の地図を示す案内板です。"
    },
    "pictogram": null,
    "plateColor": "#3d6f8f",
-   "audio": null,
+   "audio": {
+    "path": "audio/t-landmark-1.m4a",
+    "sha256": "4ab3fe933da0e19a6af7d2fc0ea34117bbfb4d6d953e6211f59561b19367e017",
+    "bytes": 8695,
+    "durationMs": 1416
+   },
    "reviewed": true
   },
   {
@@ -987,11 +992,16 @@
    },
    "note": {
     "en": "A Konglish loanword — marks the spot with the best view.",
-    "ja": "韓国製英語。いちばん景色のいい撮影場所の目印です。"
+    "ja": "韓国式の英語(和製英語のようなもの)。いちばん景色のいい撮影場所の目印です。"
    },
    "pictogram": null,
    "plateColor": "#3d6f8f",
-   "audio": null,
+   "audio": {
+    "path": "audio/t-landmark-2.m4a",
+    "sha256": "36934058a6ddde1c8ba4e80bfd255032ae55292db9042dd6c531b47afe58c99c",
+    "bytes": 9329,
+    "durationMs": 1399
+   },
    "reviewed": true
   },
   {
@@ -1009,7 +1019,7 @@
    },
    "note": {
     "en": "The reason you queued for the lift.",
-    "ja": "エレベーターに並んだ目的地です。"
+    "ja": "日本語の「展望台」と同じ字。エレベーターの行列に並んでまで来た目的地です。"
    },
    "pictogram": null,
    "plateColor": "#2f7f94",
@@ -1031,7 +1041,7 @@
    },
    "note": {
     "en": "기념 means commemoration.",
-    "ja": "기념 は「記念」。"
+    "ja": "日本語の「記念品」と同じ字で、기념 は「記念」。おみやげ売り場の看板です。"
    },
    "pictogram": null,
    "plateColor": "#2f7f94",
@@ -1053,7 +1063,7 @@
    },
    "note": {
     "en": "Machines that reload T-money cards.",
-    "ja": "T-money カードに入金する機械です。"
+    "ja": "충전 は「充電」の字でチャージのこと。日本の Suica のチャージ機に当たり、T-money をチャージできます。"
    },
    "pictogram": null,
    "plateColor": "#1f6f78",
@@ -1075,7 +1085,7 @@
    },
    "note": {
     "en": "Ask here for route help or lost items.",
-    "ja": "乗り換えの相談や忘れ物はここで聞きます。"
+    "ja": "漢字では「顧客案内センター」。乗り換えの相談や忘れ物はここで聞きます。"
    },
    "pictogram": null,
    "plateColor": "#1f6f78",
@@ -1097,7 +1107,7 @@
    },
    "note": {
     "en": "로 at the end means road or path.",
-    "ja": "最後の 로 は「路」。"
+    "ja": "日本語の「散策路」と同じ字。最後の 로 は「路」です。"
    },
    "pictogram": null,
    "plateColor": "#6b8e3d",
@@ -1119,7 +1129,7 @@
    },
    "note": {
     "en": "Benches and shade. 쉼 means rest.",
-    "ja": "ベンチと日陰があります。쉼 は「休み」。"
+    "ja": "漢字のない固有語。쉼 は「休み」、터 は「場所」で、ベンチと日陰のある休憩所です。"
    },
    "pictogram": null,
    "plateColor": "#6b8e3d",
@@ -1141,7 +1151,7 @@
    },
    "note": {
     "en": "Usually with a green cross outside.",
-    "ja": "たいてい外に緑の十字があります。"
+    "ja": "日本語の「薬局」と同じ字。たいてい外に緑の十字があります。"
    },
    "pictogram": "pharmacy",
    "plateColor": "#3a7d44",
@@ -1163,7 +1173,7 @@
    },
    "note": {
     "en": "치과 is dental, 내과 is internal medicine.",
-    "ja": "치과 は歯科、내과 は内科です。"
+    "ja": "「病院」と同じ字ですが、小さなクリニックにも使います。치과(歯科)、내과(内科)も同じ字です。"
    },
    "pictogram": null,
    "plateColor": "#3a7d44",
@@ -1185,7 +1195,7 @@
    },
    "note": {
     "en": "ATMs are labelled ATM or 현금인출기.",
-    "ja": "ATM は ATM または 현금인출기 と表示されます。"
+    "ja": "日本語の「銀行」と同じ字。ATM は ATM か 현금인출기 と表示されています。"
    },
    "pictogram": null,
    "plateColor": "#3a7d44",
@@ -1207,7 +1217,7 @@
    },
    "note": {
     "en": "Useful near markets and tourist streets.",
-    "ja": "市場や観光通りの近くで役立ちます。"
+    "ja": "漢字では「換銭」で、両替のこと。市場や観光通りの近くにあります。"
    },
    "pictogram": null,
    "plateColor": "#3a7d44",
@@ -1229,7 +1239,7 @@
    },
    "note": {
     "en": "The word itself. Everything else on a restroom door is a variation of this.",
-    "ja": "この言葉そのもの。トイレのドアの表示はどれもこの言葉の仲間です。"
+    "ja": "漢字では「化粧室」。日本でもトイレを「化粧室」と書くのと同じです。"
    },
    "pictogram": "restroom",
    "plateColor": "#2f6fb0",
@@ -1251,7 +1261,7 @@
    },
    "note": {
     "en": "남자 means man. Often shown with a blue plate or figure.",
-    "ja": "남자 は「男性」。青い表示や人の形で示されることが多いです。"
+    "ja": "남자 は「男子」と同じ字。青い表示や人の形で示されることが多いです。"
    },
    "pictogram": "men",
    "plateColor": "#2f6fb0",
@@ -1273,7 +1283,7 @@
    },
    "note": {
     "en": "여자 means woman. Often shown with a red plate or figure.",
-    "ja": "여자 は「女性」。赤い表示や人の形で示されることが多いです。"
+    "ja": "여자 は「女子」と同じ字。赤い表示や人の形で示されることが多いです。"
    },
    "pictogram": "women",
    "plateColor": "#2f6fb0",
@@ -1295,7 +1305,7 @@
    },
    "note": {
     "en": "Marked separately in stations, museums and larger cafés.",
-    "ja": "駅、博物館、大きなカフェでは別に表示されています。"
+    "ja": "장애인 は「障害者」。日本の多目的トイレに当たり、駅や博物館、大きなカフェにあります。"
    },
    "pictogram": "accessible",
    "plateColor": "#2f6fb0",
@@ -1317,7 +1327,7 @@
    },
    "note": {
     "en": "Common in department stores and large stations.",
-    "ja": "百貨店や大きな駅によくあります。"
+    "ja": "日本語の「授乳室」と同じ字。百貨店や大きな駅によくあります。"
    },
    "pictogram": "nursing",
    "plateColor": "#2f6fb0",
@@ -1335,11 +1345,11 @@
    },
    "meaning": {
     "en": "Push",
-    "ja": "押す"
+    "ja": "押してください"
    },
    "note": {
     "en": "On the door you are about to walk into. Push, don’t pull.",
-    "ja": "これから通るドアに書いてあります。引かずに押してください。"
+    "ja": "日本のドアの「押」の表示に当たります。反対は 당기세요(引)。"
    },
    "pictogram": null,
    "plateColor": "#3a7d44",
@@ -1357,11 +1367,11 @@
    },
    "meaning": {
     "en": "Pull",
-    "ja": "引く"
+    "ja": "引いてください"
    },
    "note": {
     "en": "The other half of every Korean door.",
-    "ja": "韓国のドアのもう片方の表示です。"
+    "ja": "日本のドアの「引」の表示に当たります。反対は 미세요(押)。"
    },
    "pictogram": null,
    "plateColor": "#3a7d44",
@@ -1383,7 +1393,7 @@
    },
    "note": {
     "en": "입 is enter, 구 is opening. The pair shows up on buildings and stations.",
-    "ja": "입 は「入」、구 は「口」。建物や駅でペアで見かけます。"
+    "ja": "漢字語で、日本語の「入口」と同じ字(입=入、구=口)。反対は 출구(出口)。"
    },
    "pictogram": null,
    "plateColor": "#3a7d44",
@@ -1405,9 +1415,9 @@
    },
    "note": {
     "en": "Subway exits are numbered: 3번 출구 is Exit 3.",
-    "ja": "地下鉄の出口は番号付き。3번 출구 は3番出口です。"
+    "ja": "日本語の「出口」と同じ字。地下鉄の出口は番号付きで、3번 출구 は3番出口です。"
    },
-   "pictogram": "exit",
+   "pictogram": null,
    "plateColor": "#3a7d44",
    "audio": null,
    "reviewed": true
@@ -1427,7 +1437,7 @@
    },
    "note": {
     "en": "Always on the green running-figure sign.",
-    "ja": "いつも緑の走る人の表示と一緒です。"
+    "ja": "日本語の「非常口」と同じ字。緑の走る人のマークも日本と同じです。"
    },
    "pictogram": "exit",
    "plateColor": "#3a7d44",
@@ -1449,7 +1459,7 @@
    },
    "note": {
     "en": "Hung on the door while the shop is serving.",
-    "ja": "お店が営業している間、ドアに掛かっています。"
+    "ja": "日本語の「営業中」と同じ字で、使い方も同じです。"
    },
    "pictogram": null,
    "plateColor": "#b9772a",
@@ -1471,7 +1481,7 @@
    },
    "note": {
     "en": "The shop exists and is staffed — it just isn’t serving you yet.",
-    "ja": "お店も店員もいますが、まだ営業していません。"
+    "ja": "日本語の「準備中」と同じ字。お店はあるけれど、まだ営業していません。"
    },
    "pictogram": null,
    "plateColor": "#b9772a",
@@ -1489,11 +1499,11 @@
    },
    "meaning": {
     "en": "Closed (day off)",
-    "ja": "休業日"
+    "ja": "休業"
    },
    "note": {
     "en": "금일 휴무 means closed today.",
-    "ja": "금일 휴무 は「本日休業」です。"
+    "ja": "漢字では「休務」。금일 휴무 は「本日休業」です。"
    },
    "pictogram": null,
    "plateColor": "#b9772a",
@@ -1515,7 +1525,7 @@
    },
    "note": {
     "en": "Convenience stores, saunas and some cafés.",
-    "ja": "コンビニ、サウナ、一部のカフェ。"
+    "ja": "コンビニ、チムジルバン(サウナ)、一部のカフェで見かけます。"
    },
    "pictogram": null,
    "plateColor": "#b9772a",
@@ -1537,7 +1547,7 @@
    },
    "note": {
     "en": "금 is to forbid. You will see it on 금지 signs too.",
-    "ja": "금 は「禁」。금지(禁止)の看板でも見かけます。"
+    "ja": "日本語の「禁煙」と同じ字。금(禁)は 금지(禁止)にも出てきます。"
    },
    "pictogram": "noSmoking",
    "plateColor": "#c0392b",
@@ -1559,7 +1569,7 @@
    },
    "note": {
     "en": "Museums, some shops, and parts of palaces.",
-    "ja": "博物館、一部のお店、古宮の一部。"
+    "ja": "日本語の「撮影禁止」と同じ字。博物館、一部のお店、古宮の一部で見かけます。"
    },
    "pictogram": "noPhoto",
    "plateColor": "#c0392b",
@@ -1581,7 +1591,7 @@
    },
    "note": {
     "en": "Staff-only doors and closed-off areas.",
-    "ja": "関係者専用のドアや閉鎖された場所。"
+    "ja": "漢字では「出入禁止」。日本の「立入禁止」に当たり、関係者専用のドアなどにあります。"
    },
    "pictogram": "noEntry",
    "plateColor": "#c0392b",
@@ -1603,7 +1613,7 @@
    },
    "note": {
     "en": "주의 means caution. It pairs with many other words.",
-    "ja": "주의 は「注意」。ほかの言葉ともよく組み合わさります。"
+    "ja": "미끄럼 は「滑ること」、주의 は「注意」と同じ字。주의 はほかの言葉ともよく組み合わさります。"
    },
    "pictogram": "caution",
    "plateColor": "#c0392b",
@@ -1625,7 +1635,7 @@
    },
    "note": {
     "en": "Low doorways in older buildings and markets.",
-    "ja": "古い建物や市場の低い入口にあります。"
+    "ja": "머리 は「頭」、조심 は「気をつける」。古い建物や市場の低い入口にあります。"
    },
    "pictogram": null,
    "plateColor": "#c0392b",
@@ -1647,7 +1657,7 @@
    },
    "note": {
     "en": "지하 is underground, 철 is rail.",
-    "ja": "지하 は「地下」、철 は「鉄」。"
+    "ja": "日本語の「地下鉄」と同じ字。지하 は「地下」、철 は「鉄」です。"
    },
    "pictogram": "subway",
    "plateColor": "#1f6f78",
@@ -1669,7 +1679,7 @@
    },
    "note": {
     "en": "정류장 is the stop itself.",
-    "ja": "정류장 は「停留場」。"
+    "ja": "정류장 は「停留場」と同じ字。日本のバス停です。"
    },
    "pictogram": "bus",
    "plateColor": "#1f6f78",
@@ -1691,7 +1701,7 @@
    },
    "note": {
     "en": "On subway platforms where lines meet.",
-    "ja": "路線が交わる地下鉄のホームで見かけます。"
+    "ja": "漢字では「換乗」。路線が交わる駅のホームで見かけます。"
    },
    "pictogram": "transfer",
    "plateColor": "#1f6f78",
@@ -1713,7 +1723,7 @@
    },
    "note": {
     "en": "Follow it to reach the train.",
-    "ja": "これをたどると電車に乗れます。"
+    "ja": "漢字では「乗降場」。日本の駅のホームに当たります。"
    },
    "pictogram": null,
    "plateColor": "#1f6f78",
@@ -1735,7 +1745,7 @@
    },
    "note": {
     "en": "Paired with 엘리베이터 and 에스컬레이터 on station signs.",
-    "ja": "駅では 엘리베이터、에스컬레이터 と並んで表示されます。"
+    "ja": "日本語の「階段」と同じ字。駅では 엘리베이터、에스컬레이터 と並んで表示されます。"
    },
    "pictogram": "stairs",
    "plateColor": "#1f6f78",
@@ -1757,7 +1767,7 @@
    },
    "note": {
     "en": "A loanword — read it aloud and you will hear it.",
-    "ja": "外来語。声に出して読むと意味がわかります。"
+    "ja": "外来語なので、声に出せば「エレベーター」とわかります。"
    },
    "pictogram": "elevator",
    "plateColor": "#1f6f78",
@@ -1779,7 +1789,7 @@
    },
    "note": {
     "en": "편의 means convenience, 점 means shop.",
-    "ja": "편의 は「便宜」、점 は「店」。"
+    "ja": "漢字では「便宜店」。편의(便宜)＋점(店)で、日本のコンビニです。"
    },
    "pictogram": null,
    "plateColor": "#5b4b8a",
@@ -1797,11 +1807,11 @@
    },
    "meaning": {
     "en": "Cash machine (ATM)",
-    "ja": "ATM(現金引き出し機)"
+    "ja": "ATM"
    },
    "note": {
     "en": "Often labelled ATM as well.",
-    "ja": "ATM とも表示されています。"
+    "ja": "漢字では「現金引出機」。ATM とも表示されています。"
    },
    "pictogram": "atm",
    "plateColor": "#5b4b8a",
@@ -1823,7 +1833,7 @@
    },
    "note": {
     "en": "무료 와이파이 means free Wi-Fi.",
-    "ja": "무료 와이파이 は「無料Wi-Fi」です。"
+    "ja": "무료(無料) 와이파이 は「無料Wi-Fi」です。"
    },
    "pictogram": "wifi",
    "plateColor": "#5b4b8a",
@@ -1841,11 +1851,11 @@
    },
    "meaning": {
     "en": "Lost and found",
-    "ja": "遺失物センター"
+    "ja": "忘れ物センター(遺失物センター)"
    },
    "note": {
     "en": "In stations, malls and museums.",
-    "ja": "駅、モール、博物館にあります。"
+    "ja": "분실물 は「紛失物」と同じ字。駅、モール、博物館にあります。"
    },
    "pictogram": null,
    "plateColor": "#5b4b8a",
@@ -1867,7 +1877,7 @@
    },
    "note": {
     "en": "Red and white branding across the country.",
-    "ja": "全国どこでも赤と白のデザインです。"
+    "ja": "漢字では「郵逓局」。日本の郵便局に当たり、赤系の看板が目印です。"
    },
    "pictogram": null,
    "plateColor": "#5b4b8a",
@@ -1889,7 +1899,7 @@
    },
    "note": {
     "en": "Free to use. Parks, stations and tourist streets point to the nearest one.",
-    "ja": "無料で使えます。公園や駅、観光通りでは最寄りの場所を案内しています。"
+    "ja": "공중 は「公衆」と同じ字。無料で使え、公園や駅、観光通りには最寄りの場所の案内があります。"
    },
    "pictogram": "restroom",
    "plateColor": "#2f6fb0",
@@ -1911,7 +1921,7 @@
    },
    "note": {
     "en": "On restroom and fitting-room doors. 중 means in the middle of.",
-    "ja": "トイレや試着室のドアに。중 は「〜中」。"
+    "ja": "日本語の「使用中」と同じ字。중 は「〜中」で、トイレや試着室のドアに出ます。"
    },
    "pictogram": null,
    "plateColor": "#2f6fb0",
@@ -1933,7 +1943,7 @@
    },
    "note": {
     "en": "In many restrooms the sign asks you to put paper in the bin, not the toilet.",
-    "ja": "トイレでは紙を便器ではなくごみ箱に捨てるよう求める表示がよくあります。"
+    "ja": "トイレでは「紙は便器ではなくごみ箱に」と書かれていることがあります。"
    },
    "pictogram": "wasteBin",
    "plateColor": "#2f6fb0",
@@ -1955,7 +1965,7 @@
    },
    "note": {
     "en": "Found in both men’s and women’s restrooms in newer buildings.",
-    "ja": "新しい建物では男性用・女性用どちらのトイレにもあります。"
+    "ja": "기저귀 は「おむつ」、교환대 は「交換台」と同じ字。新しい建物では男女どちらのトイレにもあります。"
    },
    "pictogram": "babyChange",
    "plateColor": "#2f6fb0",
@@ -1977,7 +1987,7 @@
    },
    "note": {
     "en": "Most Korean toilets have one. The buttons are labelled in Korean too.",
-    "ja": "韓国のトイレの多くに付いています。ボタンも韓国語表示です。"
+    "ja": "外来語の「ビデ」。日本の温水洗浄便座と同じものですが、ボタンは韓国語表示です。"
    },
    "pictogram": null,
    "plateColor": "#2f6fb0",
@@ -1999,7 +2009,7 @@
    },
    "note": {
     "en": "Smoking is only allowed in these rooms or marked zones.",
-    "ja": "喫煙はこの部屋か表示された場所だけでできます。"
+    "ja": "漢字では「吸煙室」。喫煙はこの部屋か表示された場所だけでできます。"
    },
    "pictogram": "smokingRoom",
    "plateColor": "#2f6fb0",
@@ -2021,7 +2031,7 @@
    },
    "note": {
     "en": "In shops, gyms and swimming pools. 실 at the end means room.",
-    "ja": "お店、ジム、プールに。最後の 실 は「室」。"
+    "ja": "漢字では「脱衣室」。お店、ジム、プールに。最後の 실 は「室」です。"
    },
    "pictogram": null,
    "plateColor": "#2f6fb0",
@@ -2043,7 +2053,7 @@
    },
    "note": {
     "en": "Free drinking water in parks and public buildings.",
-    "ja": "公園や公共施設で無料の飲み水が飲めます。"
+    "ja": "漢字では「飲水台」。公園や公共施設で無料の水が飲めます。"
    },
    "pictogram": "drinkingWater",
    "plateColor": "#2f6fb0",
@@ -2065,7 +2075,7 @@
    },
    "note": {
     "en": "One restroom shared by men and women, common in small cafés.",
-    "ja": "男女で使うひとつのトイレ。小さなカフェによくあります。"
+    "ja": "日本語の「男女共用」と同じ字。小さなカフェによくあります。"
    },
    "pictogram": null,
    "plateColor": "#2f6fb0",
@@ -2087,7 +2097,7 @@
    },
    "note": {
     "en": "By lifts, entrances and counters.",
-    "ja": "エレベーター、入口、カウンターのそばにあります。"
+    "ja": "손 は「手」、세정제 は「洗浄剤」と同じ字。エレベーターや入口のそばにあります。"
    },
    "pictogram": null,
    "plateColor": "#2f6fb0",
@@ -2109,7 +2119,7 @@
    },
    "note": {
     "en": "Wait for it to open. 문 means door.",
-    "ja": "開くのを待ちましょう。문 は「門・ドア」。"
+    "ja": "漢字では「自動門」。문 は「門・ドア」です。"
    },
    "pictogram": null,
    "plateColor": "#3a7d44",
@@ -2131,7 +2141,7 @@
    },
    "note": {
     "en": "On lift buttons, next to 닫힘.",
-    "ja": "エレベーターのボタン。닫힘 の隣にあります。"
+    "ja": "エレベーターの「開」ボタン。隣に 닫힘(閉)があります。"
    },
    "pictogram": null,
    "plateColor": "#3a7d44",
@@ -2153,7 +2163,7 @@
    },
    "note": {
     "en": "The other lift button. Press 열림 if someone is still coming.",
-    "ja": "もう一方のボタン。まだ人が来ていたら 열림 を押しましょう。"
+    "ja": "エレベーターの「閉」ボタン。まだ人が来ていたら 열림(開)を押しましょう。"
    },
    "pictogram": null,
    "plateColor": "#3a7d44",
@@ -2175,7 +2185,7 @@
    },
    "note": {
     "en": "The front entrance of a palace, school or park.",
-    "ja": "古宮、学校、公園の正面入口。"
+    "ja": "日本語の「正門」と同じ字。古宮、学校、公園の正面入口です。"
    },
    "pictogram": null,
    "plateColor": "#3a7d44",
@@ -2197,7 +2207,7 @@
    },
    "note": {
     "en": "Often closer to the subway than the main gate.",
-    "ja": "正門より地下鉄に近いことがよくあります。"
+    "ja": "漢字では「後門」。正門より地下鉄に近いことがよくあります。"
    },
    "pictogram": null,
    "plateColor": "#3a7d44",
@@ -2219,7 +2229,7 @@
    },
    "note": {
     "en": "On some stairs and corridors. 좌 is left.",
-    "ja": "一部の階段や通路で。좌 は「左」。"
+    "ja": "日本語の「左側通行」と同じ字。좌 は「左」です。"
    },
    "pictogram": null,
    "plateColor": "#3a7d44",
@@ -2241,7 +2251,7 @@
    },
    "note": {
     "en": "The usual rule in stations. 우 is right.",
-    "ja": "駅ではふつうこちら。우 は「右」。"
+    "ja": "日本語の「右側通行」と同じ字で、우 は「右」。韓国の駅ではふつう右側通行です。"
    },
    "pictogram": null,
    "plateColor": "#3a7d44",
@@ -2263,7 +2273,7 @@
    },
    "note": {
     "en": "On arrows in stations and malls.",
-    "ja": "駅やモールの矢印に書かれています。"
+    "ja": "日本語の「直進」と同じ字。駅やモールの矢印に書かれています。"
    },
    "pictogram": null,
    "plateColor": "#3a7d44",
@@ -2285,7 +2295,7 @@
    },
    "note": {
     "en": "The usual way is blocked. Follow the arrow around.",
-    "ja": "いつもの道がふさがっています。矢印に沿って回りましょう。"
+    "ja": "日本語の「迂回」と同じ字。いつもの道がふさがっているので、矢印に沿って回りましょう。"
    },
    "pictogram": null,
    "plateColor": "#3a7d44",
@@ -2307,7 +2317,7 @@
    },
    "note": {
     "en": "Hotels and department stores. A side door is usually next to it.",
-    "ja": "ホテルや百貨店に。たいてい隣に普通のドアがあります。"
+    "ja": "漢字では「回転門」。たいてい隣に普通のドアがあります。"
    },
    "pictogram": null,
    "plateColor": "#3a7d44",
@@ -2329,7 +2339,7 @@
    },
    "note": {
     "en": "비상 means emergency, the same word as in 비상구.",
-    "ja": "비상 は「非常」。비상구 と同じ言葉です。"
+    "ja": "日本語の「非常階段」と同じ字。비상 は 비상구(非常口)と同じ言葉です。"
    },
    "pictogram": "stairs",
    "plateColor": "#3a7d44",
@@ -2351,7 +2361,7 @@
    },
    "note": {
     "en": "On lift buttons and stairwell signs. Some rooftops are cafés or gardens.",
-    "ja": "エレベーターのボタンや階段の表示に。屋上がカフェや庭園のことも。"
+    "ja": "日本語の「屋上」と同じ字。屋上がカフェや庭園になっていることもあります。"
    },
    "pictogram": null,
    "plateColor": "#3a7d44",
@@ -2373,7 +2383,7 @@
    },
    "note": {
     "en": "층 means floor. Lifts show it as B1.",
-    "ja": "층 は「階」。エレベーターでは B1 と表示されます。"
+    "ja": "층 は「層」の字で「階」のこと。エレベーターでは B1 と表示されます。"
    },
    "pictogram": null,
    "plateColor": "#3a7d44",
@@ -2417,7 +2427,7 @@
    },
    "note": {
     "en": "A desk or board where you can ask the way.",
-    "ja": "道を尋ねられるカウンターや案内板。"
+    "ja": "日本語の「案内」と同じ字。道を尋ねられるカウンターや案内板です。"
    },
    "pictogram": "info",
    "plateColor": "#3a7d44",
@@ -2439,7 +2449,7 @@
    },
    "note": {
     "en": "Followed by the times, for example 11:00~21:00.",
-    "ja": "続けて時間が書かれます。例: 11:00~21:00。"
+    "ja": "日本語の「営業時間」と同じ字。続けて時間が書かれます。例: 11:00~21:00。"
    },
    "pictogram": null,
    "plateColor": "#b9772a",
@@ -2461,7 +2471,7 @@
    },
    "note": {
     "en": "Many restaurants close between lunch and dinner, often 15:00~17:00.",
-    "ja": "昼と夜の間、たとえば15:00〜17:00に閉める飲食店が多いです。"
+    "ja": "昼と夜の間(15:00〜17:00など)に閉める飲食店が多く、日本の「中休み」に当たります。"
    },
    "pictogram": null,
    "plateColor": "#b9772a",
@@ -2483,7 +2493,7 @@
    },
    "note": {
     "en": "매주 월요일 정기 휴무 means closed every Monday.",
-    "ja": "매주 월요일 정기 휴무 は「毎週月曜定休」です。"
+    "ja": "漢字では「定期休務」。매주 월요일 정기 휴무 は「毎週月曜定休」です。"
    },
    "pictogram": null,
    "plateColor": "#b9772a",
@@ -2505,7 +2515,7 @@
    },
    "note": {
     "en": "No day off at all.",
-    "ja": "休みの日がまったくありません。"
+    "ja": "日本語の「年中無休」と同じ字です。"
    },
    "pictogram": null,
    "plateColor": "#b9772a",
@@ -2527,7 +2537,7 @@
    },
    "note": {
     "en": "A loanword used on new shops, often with a date: 10월 오픈.",
-    "ja": "新しいお店に使う外来語。日付付きのことも: 10월 오픈。"
+    "ja": "外来語の「オープン」。日付付きのこともあります: 10월 오픈(10月オープン)。"
    },
    "pictogram": null,
    "plateColor": "#b9772a",
@@ -2549,7 +2559,7 @@
    },
    "note": {
     "en": "입장 마감 means last admission.",
-    "ja": "입장 마감 は「入場終了」です。"
+    "ja": "입장 마감 は「入場終了」。この時間を過ぎると入れません。"
    },
    "pictogram": null,
    "plateColor": "#b9772a",
@@ -2571,7 +2581,7 @@
    },
    "note": {
     "en": "The kitchen stops taking orders after this time.",
-    "ja": "この時間を過ぎると注文を受け付けません。"
+    "ja": "日本と同じ意味。この時間を過ぎると注文を受け付けません。"
    },
    "pictogram": null,
    "plateColor": "#b9772a",
@@ -2593,7 +2603,7 @@
    },
    "note": {
     "en": "Banks, post offices and clinics may pause service.",
-    "ja": "銀行、郵便局、クリニックは窓口を一時止めることがあります。"
+    "ja": "銀行、郵便局、クリニックは昼休みに窓口を止めることがあります。"
    },
    "pictogram": null,
    "plateColor": "#b9772a",
@@ -2615,7 +2625,7 @@
    },
    "note": {
     "en": "On ticket windows and food stalls.",
-    "ja": "チケット窓口や屋台で。"
+    "ja": "漢字では「売尽」。チケット窓口や屋台で見かけます。"
    },
    "pictogram": null,
    "plateColor": "#b9772a",
@@ -2637,7 +2647,7 @@
    },
    "note": {
     "en": "The shop is closed for a while, not for good.",
-    "ja": "しばらく休んでいるだけで、閉店ではありません。"
+    "ja": "日本語の「臨時休業」と同じ字。しばらく休んでいるだけで、閉店ではありません。"
    },
    "pictogram": null,
    "plateColor": "#b9772a",
@@ -2659,7 +2669,7 @@
    },
    "note": {
     "en": "Opposite of 주말 (weekend). Hours often differ between them.",
-    "ja": "反対は 주말(週末)。営業時間が違うことがよくあります。"
+    "ja": "日本語の「平日」と同じ字。反対は 주말(週末)で、営業時間が違うことがよくあります。"
    },
    "pictogram": null,
    "plateColor": "#b9772a",
@@ -2681,7 +2691,7 @@
    },
    "note": {
     "en": "Usually on a red or yellow sign. Stay back.",
-    "ja": "たいてい赤か黄色の看板。近づかないでください。"
+    "ja": "日本語の「危険」と同じ字。たいてい赤か黄色の看板です。近づかないでください。"
    },
    "pictogram": "caution",
    "plateColor": "#c0392b",
@@ -2703,7 +2713,7 @@
    },
    "note": {
     "en": "금지 again — anything followed by it is forbidden.",
-    "ja": "また 금지。後ろに付くものは禁止です。"
+    "ja": "日本語の「駐車禁止」と同じ字。ここでも 금지(禁止)。금지 の前にある言葉が禁止されている内容です。"
    },
    "pictogram": null,
    "plateColor": "#c0392b",
@@ -2725,7 +2735,7 @@
    },
    "note": {
     "en": "반입 means bringing in. Common at museums and theatres.",
-    "ja": "반입 は「搬入・持ち込み」。博物館や劇場でよく見かけます。"
+    "ja": "반입 は「搬入」の字で、持ち込みのこと。博物館や劇場でよく見かけます。"
    },
    "pictogram": "noFood",
    "plateColor": "#c0392b",
@@ -2743,11 +2753,11 @@
    },
    "meaning": {
     "en": "Do not touch",
-    "ja": "触らないでください"
+    "ja": "手を触れないでください"
    },
    "note": {
     "en": "On exhibits and shop displays.",
-    "ja": "展示品やお店のディスプレイに。"
+    "ja": "展示品やお店のディスプレイに書かれています。"
    },
    "pictogram": null,
    "plateColor": "#c0392b",
@@ -2769,7 +2779,7 @@
    },
    "note": {
     "en": "발밑 is under your feet. Gaps, steps and uneven floors.",
-    "ja": "발밑 は「足元」。すき間、段差、でこぼこの床に。"
+    "ja": "발밑 は「足元」。すき間、段差、でこぼこの床にあります。"
    },
    "pictogram": null,
    "plateColor": "#c0392b",
@@ -2791,7 +2801,7 @@
    },
    "note": {
     "en": "Expect detours or closed exits.",
-    "ja": "迂回や出口の閉鎖があるかもしれません。"
+    "ja": "日本語の「工事中」と同じ字。迂回や出口の閉鎖があるかもしれません。"
    },
    "pictogram": null,
    "plateColor": "#c0392b",
@@ -2813,7 +2823,7 @@
    },
    "note": {
     "en": "반려동물 is a companion animal.",
-    "ja": "반려동물 は「伴侶動物(ペット)」。"
+    "ja": "반려동물 は「伴侶動物」の字でペットのこと。동반 は「同伴」です。"
    },
    "pictogram": "noPets",
    "plateColor": "#c0392b",
@@ -2835,7 +2845,7 @@
    },
    "note": {
     "en": "Red cabinets in stations and corridors.",
-    "ja": "駅や廊下の赤いボックスに入っています。"
+    "ja": "日本語の「消火器」と同じ字。駅や廊下の赤いボックスに入っています。"
    },
    "pictogram": "fireExtinguisher",
    "plateColor": "#c0392b",
@@ -2857,7 +2867,7 @@
    },
    "note": {
     "en": "On lifts, ticket machines and vending machines.",
-    "ja": "エレベーター、券売機、自販機に。"
+    "ja": "日本語の「故障」と同じ字。エレベーター、券売機、自販機に貼られます。"
    },
    "pictogram": null,
    "plateColor": "#c0392b",
@@ -2879,7 +2889,7 @@
    },
    "note": {
     "en": "A stronger form of no fire, near fuel or gas.",
-    "ja": "燃料やガスの近くにある、より強い禁止表示です。"
+    "ja": "日本語の「火気厳禁」と同じ字。燃料やガスの近くにあります。"
    },
    "pictogram": null,
    "plateColor": "#c0392b",
@@ -2901,7 +2911,7 @@
    },
    "note": {
     "en": "A loanword. Stand still or walk carefully.",
-    "ja": "外来語。立ち止まるか、気をつけて歩きましょう。"
+    "ja": "外来語なので、声に出せば「エスカレーター」とわかります。"
    },
    "pictogram": "escalator",
    "plateColor": "#1f6f78",
@@ -2923,7 +2933,7 @@
    },
    "note": {
     "en": "타는 곳 means where you board.",
-    "ja": "타는 곳 は「乗る所」。"
+    "ja": "타는 곳 は「乗る所」。日本のタクシー乗り場です。"
    },
    "pictogram": "taxi",
    "plateColor": "#1f6f78",
@@ -2945,7 +2955,7 @@
    },
    "note": {
     "en": "The subway screen shows which side the doors will open.",
-    "ja": "地下鉄の画面にどちら側のドアが開くか表示されます。"
+    "ja": "地下鉄の画面に、どちら側のドアが開くか表示されます。"
    },
    "pictogram": null,
    "plateColor": "#1f6f78",
@@ -2967,7 +2977,7 @@
    },
    "note": {
     "en": "For older people, pregnant women and people with disabilities.",
-    "ja": "お年寄り、妊婦、障害のある方のための席です。"
+    "ja": "考え方は日本の優先席と同じです。"
    },
    "pictogram": null,
    "plateColor": "#1f6f78",
@@ -2985,11 +2995,11 @@
    },
    "meaning": {
     "en": "Seat for pregnant women",
-    "ja": "妊婦優先席"
+    "ja": "妊婦さん優先席"
    },
    "note": {
     "en": "Pink seats on Seoul subways. Leave them empty.",
-    "ja": "ソウルの地下鉄のピンクの席。空けておきましょう。"
+    "ja": "ソウルの地下鉄ではピンク色の座席。空けておくのがマナーです。"
    },
    "pictogram": null,
    "plateColor": "#1f6f78",
@@ -3011,7 +3021,7 @@
    },
    "note": {
     "en": "차 means vehicle.",
-    "ja": "차 は「車」。"
+    "ja": "첫 は「最初の」、차 は「車」。始発の電車・バスです。"
    },
    "pictogram": null,
    "plateColor": "#1f6f78",
@@ -3033,7 +3043,7 @@
    },
    "note": {
     "en": "Check it before a late night out.",
-    "ja": "夜遅く出かける前に確認しましょう。"
+    "ja": "飲み会の前に時刻を確認しておきましょう。"
    },
    "pictogram": null,
    "plateColor": "#1f6f78",
@@ -3055,7 +3065,7 @@
    },
    "note": {
     "en": "Stops at fewer stations. Some lines run both.",
-    "ja": "止まる駅が少なめ。急行と各停の両方が走る路線もあります。"
+    "ja": "日本語の「急行」と同じ字。止まる駅が少なめで、各駅停車と両方走る路線もあります。"
    },
    "pictogram": null,
    "plateColor": "#1f6f78",
@@ -3077,7 +3087,7 @@
    },
    "note": {
     "en": "Everyone gets off here.",
-    "ja": "ここで全員降ります。"
+    "ja": "日本語の「終点」と同じ字。ここで全員降ります。"
    },
    "pictogram": null,
    "plateColor": "#1f6f78",
@@ -3099,7 +3109,7 @@
    },
    "note": {
     "en": "시청 방면 means toward City Hall. Pick the platform by it.",
-    "ja": "시청 방면 は「市庁方面」。これでホームを選びます。"
+    "ja": "日本語の「方面」と同じ字。시청 방면 は「市庁方面」で、これでホームを選びます。"
    },
    "pictogram": null,
    "plateColor": "#1f6f78",
@@ -3121,7 +3131,7 @@
    },
    "note": {
     "en": "Painted stripes on the road.",
-    "ja": "道路に描かれたしま模様です。"
+    "ja": "日本語の「横断歩道」と同じ字です。"
    },
    "pictogram": "crossing",
    "plateColor": "#1f6f78",
@@ -3143,7 +3153,7 @@
    },
    "note": {
     "en": "장 at the end means place.",
-    "ja": "最後の 장 は「場」。"
+    "ja": "日本語の「駐車場」と同じ字。最後の 장 は「場」です。"
    },
    "pictogram": "parking",
    "plateColor": "#1f6f78",
@@ -3165,7 +3175,7 @@
    },
    "note": {
     "en": "On airport railroad and bus signs.",
-    "ja": "空港鉄道やバスの表示に。"
+    "ja": "日本語の「空港」と同じ字。空港鉄道やバスの表示にあります。"
    },
    "pictogram": "airport",
    "plateColor": "#1f6f78",
@@ -3187,7 +3197,7 @@
    },
    "note": {
     "en": "Bus card readers at the back door say 하차. Tap again when you get off.",
-    "ja": "バスの後ろのドアのカード読み取り機。降りるときにもう一度タッチします。"
+    "ja": "バスの後ろのドアのカード読み取り機に 하차 と書かれています。降りるときにもう一度タッチします。"
    },
    "pictogram": null,
    "plateColor": "#1f6f78",
@@ -3209,7 +3219,7 @@
    },
    "note": {
     "en": "무 means without. 무료 입장 is free entry.",
-    "ja": "무 は「無」。무료 입장 は入場無料です。"
+    "ja": "日本語の「無料」と同じ字で、무 は「無」。무료 입장 は入場無料です。"
    },
    "pictogram": null,
    "plateColor": "#5b4b8a",
@@ -3231,7 +3241,7 @@
    },
    "note": {
     "en": "Water, side dishes or returning trays are up to you.",
-    "ja": "水、おかず、トレーの返却はお客さんがします。"
+    "ja": "外来語の「セルフ」。水、おかず、トレーの返却はお客さんがします。"
    },
    "pictogram": null,
    "plateColor": "#5b4b8a",
@@ -3253,7 +3263,7 @@
    },
    "note": {
     "en": "Where you pay. 계산 means paying the bill.",
-    "ja": "支払う場所。계산 は「会計」。"
+    "ja": "漢字では「計算台」。계산 は「会計」のことです。"
    },
    "pictogram": null,
    "plateColor": "#5b4b8a",
@@ -3271,11 +3281,11 @@
    },
    "meaning": {
     "en": "Receipt",
-    "ja": "領収書・レシート"
+    "ja": "レシート(領収証)"
    },
    "note": {
     "en": "Machines ask if you want one printed.",
-    "ja": "機械が印刷するか聞いてきます。"
+    "ja": "日本語の「領収証」と同じ字。機械が印刷するか聞いてきます。"
    },
    "pictogram": null,
    "plateColor": "#5b4b8a",
@@ -3297,7 +3307,7 @@
    },
    "note": {
     "en": "Charging stations in cafés, stations and malls.",
-    "ja": "カフェ、駅、モールに充電スタンドがあります。"
+    "ja": "휴대폰 は「携帯フォン」、충전 は「充電」。カフェ、駅、モールに充電スタンドがあります。"
    },
    "pictogram": "phoneCharging",
    "plateColor": "#5b4b8a",
@@ -3319,7 +3329,7 @@
    },
    "note": {
     "en": "Coin-operated, often open 24 hours.",
-    "ja": "コイン式で、24時間営業のことが多いです。"
+    "ja": "빨래 は「洗濯」、방 は「部屋」。24時間営業のことが多いです。"
    },
    "pictogram": null,
    "plateColor": "#5b4b8a",
@@ -3341,7 +3351,7 @@
    },
    "note": {
     "en": "You will see one on almost every block.",
-    "ja": "ほぼどの通りにもあります。"
+    "ja": "日本語の「美容室」と同じ字。ほぼどの通りにもあります。"
    },
    "pictogram": null,
    "plateColor": "#5b4b8a",
@@ -3363,7 +3373,7 @@
    },
    "note": {
     "en": "Smaller local posts are called 파출소 or 지구대.",
-    "ja": "小さな交番は 파출소 や 지구대 と呼ばれます。"
+    "ja": "日本語の「警察署」と同じ字。小さな交番は 파출소(派出所)や 지구대 と呼ばれます。"
    },
    "pictogram": "police",
    "plateColor": "#5b4b8a",
@@ -3385,7 +3395,7 @@
    },
    "note": {
     "en": "Maps and help in English. Look for the i sign.",
-    "ja": "地図や案内があり、日本語が通じることもあります。i のマークが目印です。"
+    "ja": "日本語の「観光案内所」と同じ字。地図があり、日本語や英語で案内してもらえる所も多いです。i のマークが目印です。"
    },
    "pictogram": "info",
    "plateColor": "#5b4b8a",
@@ -3407,7 +3417,7 @@
    },
    "note": {
     "en": "Bins are split by type: 일반 (general), 플라스틱, 캔, 종이.",
-    "ja": "種類ごとに分かれています: 일반(一般)、플라스틱、캔、종이。"
+    "ja": "種類ごとに分かれています: 일반(一般)、플라스틱(プラ)、캔(缶)、종이(紙)。"
    },
    "pictogram": "recycling",
    "plateColor": "#5b4b8a",
@@ -3843,8 +3853,8 @@
     "ja": "ソウル駅"
    },
    "address": {
-    "en": "405 Hangang-daero, Jung-gu, Seoul",
-    "ja": "ソウル特別市 中区 漢江大路405"
+    "en": "405 Hangang-daero, Yongsan-gu, Seoul",
+    "ja": "ソウル特別市 龍山区 漢江大路405"
    },
    "lat": 37.5547,
    "lng": 126.9707,

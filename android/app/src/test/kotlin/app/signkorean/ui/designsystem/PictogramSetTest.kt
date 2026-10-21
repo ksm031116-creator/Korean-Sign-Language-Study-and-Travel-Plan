@@ -35,4 +35,11 @@ class PictogramSetTest {
             assertTrue(id, context.getString(PictogramArt.label(PictogramId(id))!!).isNotBlank())
         }
     }
+
+    @Test
+    fun `ja 스크린리더 이름도 그림마다 있다`() {
+        val ja = app.signkorean.l10n.ResourceStrings.language("ja").strings.keys
+        val missing = PictogramArt.drawnIds.map { context.resources.getResourceEntryName(PictogramArt.label(PictogramId(it))!!) }.filterNot { it in ja }
+        assertEquals(emptyList<String>(), missing)
+    }
 }

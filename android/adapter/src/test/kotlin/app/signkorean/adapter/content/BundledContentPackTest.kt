@@ -59,6 +59,24 @@ class BundledContentPackTest {
     }
 
     @Test
+    fun `L10N ja 설명은 en 설명의 한국어 단어를 모두 그대로 쓴다 (설명의 핵심이 빠지지 않게)`() {
+        val hangul = Regex("[\uAC00-\uD7A3]+")
+        val en = LocaleTag("en")
+        val ja = LocaleTag("ja")
+        val missing = pack.cards.mapNotNull { c ->
+            val lost = hangul.findAll(c.note[en].orEmpty()).map { it.value }.toSet() - hangul.findAll(c.note[ja].orEmpty()).map { it.value }.toSet()
+            if (lost.isEmpty()) null else "${c.id.value}: $lost"
+        }
+        assertEquals(emptyList<String>(), missing)
+    }
+
+    @Test
+    fun `일반 출구에는 비상구 그림을 붙이지 않는다 (비상구만)`() {
+        assertEquals(null, pack.cards.single { it.koText == "출구" }.pictogram)
+        assertEquals("exit", pack.cards.single { it.koText == "비상구" }.pictogram?.value)
+    }
+
+    @Test
     fun `L10N ja 콘텐츠 초안이 빠짐없다 - 카드 뜻·설명·카타카나, 장소·지역 이름 (Phase 20 D2)`() {
         val jaGaps = ContentLanguageAudit.audit(pack).gaps.filter { it.locale == LocaleTag("ja") }
         assertEquals(emptyList<LanguageGap>(), jaGaps)

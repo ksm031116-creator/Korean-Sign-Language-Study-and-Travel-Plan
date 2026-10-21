@@ -169,24 +169,34 @@ def convert_audio(card_id: str, cache: dict, write: bool) -> dict:
 
 
 def apply_ja(areas: list, groups: list, cards: list, places: list, ja: dict) -> None:
-    """일본어 값을 각 항목에 넣는다. 원본에 없는 항목·모르는 ID 는 실패한다 — 새 카드·장소는 일본어도 함께 적는다."""
+    """일본어 값을 각 항목에 넣는다. 빠진 항목·모르는 ID·빠지거나 빈 필드는 ID 와 함께 실패한다 — 새 카드·장소는 일본어도 함께 적는다."""
+    fields = {'areas': ('name', 'tag', 'description'), 'cards': ('reading', 'meaning', 'note'), 'places': ('name', 'address')}
+
     def table(kind: str, items: list) -> dict:
-        source = ja.get(kind, {})
+        source = ja.get(kind)
+        if not isinstance(source, dict):
+            raise BuildError(f'data_ja.json: {kind} 가 없다')
         ids = {i['id'] for i in items}
         missing, unknown = sorted(ids - source.keys()), sorted(source.keys() - ids)
         if missing or unknown:
             raise BuildError(f'data_ja.json {kind}: 빠짐 {missing} / 모르는 ID {unknown}')
+        for key, value in source.items():
+            values = [value] if kind == 'groups' else [value.get(f) if isinstance(value, dict) else None for f in fields[kind]]
+            if any(not isinstance(v, str) or not v.strip() for v in values):
+                raise BuildError(f'data_ja.json {kind}.{key}: 빠지거나 빈 값이 있다')
         return source
+
+    ta, tg, tc, tp = table('areas', areas), table('groups', groups), table('cards', cards), table('places', places)
     for a in areas:
-        t = table('areas', areas)[a['id']]
+        t = ta[a['id']]
         a['name']['ja'], a['tag']['ja'], a['description']['ja'] = t['name'], t['tag'], t['description']
     for g in groups:
-        g['label']['ja'] = table('groups', groups)[g['id']]
+        g['label']['ja'] = tg[g['id']]
     for c in cards:
-        t = table('cards', cards)[c['id']]
+        t = tc[c['id']]
         c['reading']['ja'], c['meaning']['ja'], c['note']['ja'] = t['reading'], t['meaning'], t['note']
     for p in places:
-        t = table('places', places)[p['id']]
+        t = tp[p['id']]
         p['name']['ja'], p['address']['ja'] = t['name'], t['address']
 
 

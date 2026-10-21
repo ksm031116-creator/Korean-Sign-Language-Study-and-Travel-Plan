@@ -56,7 +56,7 @@
     <string name="pictogram_lockers">ロッカーのマーク</string>
     <string name="pictogram_waste_bin">ごみ箱のマーク</string>
     <string name="pictogram_drinking_water">水飲み場のマーク</string>
-    <string name="pictogram_no_entry">進入禁止のマーク</string>
+    <string name="pictogram_no_entry">立入禁止のマーク</string>
     <string name="pictogram_caution">注意の三角マーク</string>
     <string name="pictogram_fire_extinguisher">消火器のマーク</string>
     <string name="pictogram_phone_charging">充電のマーク</string>
