@@ -258,4 +258,19 @@ class TripEditorTest {
         assertEquals(TripResult.Rejected(TripProblem.NotADestination), editor.setStart(t.id, d1, LocalTime.of(9, 0), Origin.AtPlace(PlaceId("myeongdong"))))
         assertTrue(editor.setStart(t.id, d1, LocalTime.of(9, 0), Origin.AtCoordinate(Coordinate(37.55, 126.97), "Seoul Station")) is TripResult.Ok)
     }
+
+    @Test
+    fun `T-07 경로를 다 계산하면 다시 계산 표시를 끈다, 그 사이 일정이 바뀌었으면 그대로`() = runTest {
+        val t = trip(1)
+        val day = editor.addStop(t.id, d1, "p1").ok().day(d1)
+        editor.addStop(t.id, d1, "p2")
+        // revision 1 로 계산한 결과는 revision 2 가 된 지금 늦게 도착했다.
+        assertTrue(!editor.markRoutesCalculated(t.id, d1, day.revision))
+        assertTrue(store.get(t.id)!!.day(d1).needsRecalculation)
+        val now = store.get(t.id)!!.day(d1)
+        assertTrue(editor.markRoutesCalculated(t.id, d1, now.revision))
+        val after = store.get(t.id)!!.day(d1)
+        assertTrue(!after.needsRecalculation)
+        assertEquals(now.revision, after.revision, "계산 표시만 바꾸고 revision 은 그대로")
+    }
 }

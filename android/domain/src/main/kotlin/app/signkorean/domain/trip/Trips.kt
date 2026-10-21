@@ -220,6 +220,26 @@ class TripEditor(
         DayEdit.Change(day.copy(startTime = time.truncatedTo(ChronoUnit.MINUTES), origin = origin))
     }
 
+    /**
+     * 그날 경로를 [revision] 기준으로 다 계산했다. 지금 revision 이 같을 때만 "다시 계산" 표시를 끈다 —
+     * 그 사이 일정이 바뀌었으면 늦게 온 결과라 무시한다(T-07, AT12). revision 은 올리지 않는다.
+     * 무료 상태에서도 된다(읽기 전용 여행의 경로 표시).
+     */
+    suspend fun markRoutesCalculated(id: TripId, date: LocalDate, revision: Int): Boolean = mutex.withLock {
+        try {
+            val trip = store.get(id) ?: return@withLock false
+            val day = trip.days.firstOrNull { it.date == date } ?: return@withLock false
+            if (day.revision != revision) return@withLock false
+            if (!day.needsRecalculation) return@withLock true
+            store.save(trip.copy(days = trip.days.map { if (it.date == date) it.copy(needsRecalculation = false) else it }))
+            true
+        } catch (e: CancellationException) {
+            throw e
+        } catch (_: Exception) {
+            false
+        }
+    }
+
     private sealed interface DayEdit {
         data class Change(val day: TripDay) : DayEdit
         data class Reject(val problem: TripProblem) : DayEdit
