@@ -11,6 +11,15 @@ import app.signkorean.domain.review.ReviewError
 import app.signkorean.domain.review.ReviewPage
 import app.signkorean.domain.review.ReviewProvider
 import app.signkorean.domain.review.ReviewResponse
+import app.signkorean.domain.location.Coordinate
+import app.signkorean.domain.route.Route
+import app.signkorean.domain.route.RouteFailure
+import app.signkorean.domain.route.RouteProvider
+import app.signkorean.domain.route.RouteRequest
+import app.signkorean.domain.route.RouteResult
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
+import kotlinx.serialization.json.longOrNull
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runInterruptible
@@ -55,14 +64,21 @@ class ApiClient(
 ) {
     private val json = Json { ignoreUnknownKeys = true }
 
+    suspend fun get(pathSegments: List<String>, language: LocaleTag): ApiResult =
+        send(pathSegments, "?language=${URLEncoder.encode(language.value, "UTF-8")}", language, body = null)
+
+    /** JSON 본문을 보낸다(경로 요청). 경로에는 언어가 없어 기본 언어를 헤더로만 보낸다. */
+    suspend fun post(pathSegments: List<String>, body: String, language: LocaleTag = LocaleTag("en")): ApiResult =
+        send(pathSegments, "", language, body)
+
     // runInterruptible: 막힌 소켓 읽기도 코루틴 취소(시트 닫기, 8초 제한)로 끊는다(RVW-14).
-    suspend fun get(pathSegments: List<String>, language: LocaleTag): ApiResult = runInterruptible(io) {
+    private suspend fun send(pathSegments: List<String>, query: String, language: LocaleTag, body: String?): ApiResult = runInterruptible(io) {
         val path = pathSegments.joinToString("/") { segment(it) }
         // https 만(같은 기기의 루프백 테스트 서버는 예외). Android 9+ 는 평문 http 를 막아
         // 영원히 "다시 시도" 로 보이게 된다(NFR05, RVW-05).
         if (!baseUrl.startsWith("https://") && !LOOPBACK.matches(baseUrl)) return@runInterruptible ApiResult.Misconfigured
         val conn = try {
-            URL("${baseUrl.trimEnd('/')}/$path?language=${URLEncoder.encode(language.value, "UTF-8")}").openConnection() as HttpURLConnection
+            URL("${baseUrl.trimEnd('/')}/$path$query").openConnection() as HttpURLConnection
         } catch (_: java.net.MalformedURLException) {
             return@runInterruptible ApiResult.Misconfigured
         } catch (_: IOException) {
@@ -73,6 +89,14 @@ class ApiClient(
             conn.readTimeout = timeoutMs
             conn.setRequestProperty("Accept", "application/json")
             conn.setRequestProperty("Accept-Language", language.value)
+            if (body != null) {
+                val bytes = body.toByteArray(Charsets.UTF_8)
+                conn.requestMethod = "POST"
+                conn.doOutput = true
+                conn.setRequestProperty("Content-Type", "application/json; charset=utf-8")
+                conn.setFixedLengthStreamingMode(bytes.size)
+                conn.outputStream.use { it.write(bytes) }
+            }
             val status = conn.responseCode
             val text = (if (status in 200..299) conn.inputStream else conn.errorStream)?.bufferedReader()?.use { it.readText() }.orEmpty()
             val body = runCatching { json.parseToJsonElement(text).jsonObject }.getOrNull()
@@ -182,3 +206,45 @@ class HttpPlaceSummaryProvider(private val client: ApiClient) : PlaceSummaryProv
 
 private fun JsonObject.string(key: String): String? =
     this[key]?.takeUnless { it is JsonNull }?.jsonPrimitive?.content?.takeIf { it.isNotBlank() }
+
+/**
+ * `POST /v1/routes` (PRD §10.3). 도보만 보낸다(FR14). 공급자의 거리·시간·경로선을 그대로 쓰고, 빠진 값을 지어내지 않는다(FR15).
+ */
+class HttpRouteProvider(private val client: ApiClient) : RouteProvider {
+    override suspend fun route(request: RouteRequest): RouteResult {
+        val body = buildJsonObject {
+            put("origin", point(request.origin))
+            put("destination", point(request.destination))
+            put("mode", "walk")
+        }.toString()
+        return when (val r = client.post(listOf("v1", "routes"), body)) {
+            is ApiResult.Ok -> runCatching {
+                val o = r.body
+                RouteResult.Found(
+                    Route(
+                        distanceMeters = o["distance_m"]!!.jsonPrimitive.intOrNull!!,
+                        durationSeconds = o["duration_s"]!!.jsonPrimitive.longOrNull!!,
+                        path = o["path"]!!.jsonArray.map { p -> p.jsonArray.let { Coordinate(it[0].jsonPrimitive.doubleOrNull!!, it[1].jsonPrimitive.doubleOrNull!!) } },
+                        attribution = o.string("attribution").orEmpty(),
+                    ),
+                )
+            }.getOrElse { RouteResult.Failed(RouteFailure.Network) }
+            ApiResult.Timeout -> RouteResult.Failed(RouteFailure.Timeout)
+            ApiResult.Network -> RouteResult.Failed(RouteFailure.Network)
+            ApiResult.Misconfigured -> RouteResult.Failed(RouteFailure.Unsupported)
+            is ApiResult.ServerError -> RouteResult.Failed(
+                when (r.code) {
+                    "NO_DATA", "NOT_FOUND" -> RouteFailure.NoRoute
+                    "UNSUPPORTED", "INVALID_INPUT" -> RouteFailure.Unsupported
+                    "UPSTREAM_TIMEOUT" -> RouteFailure.Timeout
+                    else -> if (r.retryable == false) RouteFailure.Unsupported else RouteFailure.Network
+                },
+            )
+        }
+    }
+
+    private fun point(c: Coordinate) = buildJsonObject {
+        put("lat", c.lat)
+        put("lng", c.lng)
+    }
+}

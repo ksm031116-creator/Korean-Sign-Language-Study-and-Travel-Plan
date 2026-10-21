@@ -7,6 +7,10 @@ import app.signkorean.domain.place.PlaceSummary
 import app.signkorean.domain.place.PlaceSummaryResult
 import app.signkorean.domain.review.ReviewError
 import app.signkorean.domain.review.ReviewResponse
+import app.signkorean.domain.location.Coordinate
+import app.signkorean.domain.route.RouteFailure
+import app.signkorean.domain.route.RouteRequest
+import app.signkorean.domain.route.RouteResult
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -36,6 +40,8 @@ class HttpProvidersTest {
     @Volatile private var lastQuery: String? = null
     @Volatile private var lastAcceptLanguage: String? = null
     @Volatile private var lastRawPath = ""
+    @Volatile private var lastMethod = ""
+    @Volatile private var lastBody = ""
 
     init {
         pool.execute {
@@ -49,8 +55,12 @@ class HttpProvidersTest {
 
     private fun serve(socket: Socket) = socket.use { s ->
         val reader = s.getInputStream().bufferedReader()
-        val target = reader.readLine()?.split(" ")?.getOrNull(1) ?: return
+        val requestLine = reader.readLine()?.split(" ") ?: return
+        lastMethod = requestLine.getOrNull(0).orEmpty()
+        val target = requestLine.getOrNull(1) ?: return
         val headers = generateSequence { reader.readLine()?.takeIf { it.isNotEmpty() } }.toList()
+        val length = headers.firstOrNull { it.startsWith("Content-Length:", ignoreCase = true) }?.substringAfter(":")?.trim()?.toIntOrNull() ?: 0
+        lastBody = if (length > 0) CharArray(length).also { buf -> var read = 0; while (read < length) { val n = reader.read(buf, read, length - read); if (n < 0) break; read += n } }.let(::String) else ""
         val uri = URI(target)
         lastPath = uri.path
         lastRawPath = uri.rawPath
@@ -182,5 +192,43 @@ class HttpProvidersTest {
         status = 429
         body = """{"error":"RATE_LIMITED"}"""
         assertEquals(ReviewError.Network, (HttpReviewProvider(client).reviews(PlaceId("p"), LocaleTag("en")) as ReviewResponse.Error).error)
+    }
+
+    // ---------- 경로 (Phase 19) ----------
+
+    @Test
+    fun `경로 - 도보로 출발·도착 좌표를 POST 하고 거리·시간·경로선·출처를 읽는다`() = runBlocking {
+        body = """{"distance_m":1200,"duration_s":900,"path":[[37.57,126.99],[37.575,126.985]],"attribution":"Kakao Map"}"""
+        val r = HttpRouteProvider(client).route(RouteRequest(Coordinate(37.57, 126.99), Coordinate(37.575, 126.985))) as RouteResult.Found
+        assertEquals("POST", lastMethod)
+        assertEquals("/v1/routes", lastPath)
+        assertTrue(lastBody.contains("\"mode\":\"walk\""))
+        assertTrue(lastBody.contains("\"origin\":{\"lat\":37.57,\"lng\":126.99}"))
+        assertEquals(1200, r.route.distanceMeters)
+        assertEquals(900, r.route.durationSeconds)
+        assertEquals(2, r.route.path.size)
+        assertEquals("Kakao Map", r.route.attribution)
+    }
+
+    @Test
+    fun `경로 오류 매핑 - 길 없음·미지원·시간 초과·그 밖`() = runBlocking {
+        val table = mapOf(
+            "NO_DATA" to RouteFailure.NoRoute,
+            "NOT_FOUND" to RouteFailure.NoRoute,
+            "UNSUPPORTED" to RouteFailure.Unsupported,
+            "UPSTREAM_TIMEOUT" to RouteFailure.Timeout,
+            "RATE_LIMITED" to RouteFailure.Network,
+        )
+        table.forEach { (code, expected) ->
+            status = 422
+            body = """{"error":{"code":"$code"}}"""
+            assertEquals(code, RouteResult.Failed(expected), HttpRouteProvider(client).route(RouteRequest(Coordinate(37.5, 127.0), Coordinate(37.51, 127.01))))
+        }
+    }
+
+    @Test
+    fun `경로 응답이 비었거나 형식이 틀리면 지어내지 않고 실패`() = runBlocking {
+        body = """{"distance_m":1200}"""
+        assertEquals(RouteResult.Failed(RouteFailure.Network), HttpRouteProvider(client).route(RouteRequest(Coordinate(37.5, 127.0), Coordinate(37.51, 127.01))))
     }
 }
