@@ -93,4 +93,15 @@ class RoomTripStoreTest {
             }
         }
     }
+
+    @Test
+    fun `TRP-L7 저장이 제약에 걸리면 통째로 되돌려 이전 여행이 남는다`() = runBlocking {
+        val d = LocalDate.of(2026, 11, 3)
+        val before = Trip(TripId("t"), "Before", d, d, listOf(TripDay(d, stops = listOf(TripStop(StopId("s1"), PlaceId("p"))))), Instant.EPOCH)
+        store.save(before)
+        // 같은 날 같은 장소 두 번은 UNIQUE 에 걸린다. 지우고 다시 넣던 중이라도 남는 것은 이전 여행이어야 한다.
+        val broken = before.copy(title = "Broken", days = listOf(TripDay(d, stops = listOf(TripStop(StopId("s2"), PlaceId("p")), TripStop(StopId("s3"), PlaceId("p"))))))
+        assertTrue(runCatching { store.save(broken) }.isFailure)
+        assertEquals(before, store.get(TripId("t")))
+    }
 }

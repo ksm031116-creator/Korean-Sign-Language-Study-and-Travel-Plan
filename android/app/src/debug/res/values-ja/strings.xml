@@ -241,6 +241,7 @@
     <string name="trip_error_stay">0〜%1$d の整数（分）で入力してください。</string>
     <string name="trip_error_outside">予定のある日が新しい期間の外になります（%1$d 日）。先にその場所を移動するか削除してください。</string>
     <string name="trip_error_missing">この旅行は利用できなくなりました。</string>
+    <string name="trip_error_paid">旅行の変更はアップグレードで使えます。旅行はここに残り、見ることはできます。</string>
     <string name="trip_dates">%1$s〜%2$s</string>
     <string name="plan_new_trip">新しい旅行</string>
     <string name="plan_sample">サンプルの一日を試す</string>

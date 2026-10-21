@@ -59,8 +59,8 @@ class ScheduleCalculatorTest {
     @Test
     fun `T-05 23시 30분 출발이 자정을 넘기면 다음 날 도착`() {
         val s = ScheduleCalculator.calculate(t(23, 30), hasOrigin = true, stays = listOf(30, 30), legSeconds = listOf(min(10), min(15)))
-        assertFalse(s.stops[0].arriveNextDay)
-        assertTrue(s.stops[1].arriveNextDay)
+        assertEquals(0, s.stops[0].arriveDay)
+        assertEquals(1, s.stops[1].arriveDay)
         assertTrue(s.nextDay)
         assertEquals(t(0, 25), s.stops[1].arrive)
     }
@@ -71,6 +71,9 @@ class ScheduleCalculatorTest {
         assertEquals(3, s.travelMinutes)
         assertEquals(listOf(1, 1, 1), s.legMinutes)
         assertFalse(s.roundingDiffers)
+        // 시각도 같은 규칙(누적 초를 분으로 올림)이라 끝 시각 = 출발 + 이동 합계다(TRP-02).
+        assertEquals(t(9, 3), s.end)
+        assertEquals(listOf(t(9, 1), t(9, 2), t(9, 3)), s.stops.map { it.arrive })
     }
 
     @Test
@@ -105,6 +108,12 @@ class ScheduleCalculatorTest {
                 assertFalse(s.incomplete)
                 assertEquals(s.travelMinutes!! + s.stayMinutes, s.totalMinutes)
                 assertTrue(s.stops.all { it.arrive != null && it.leave != null })
+                // 도착은 늘 앞 장소 출발 뒤, 출발 = 도착 + 체류 (TRP-07). 자정을 넘겨도 경과 분으로 비교한다.
+                s.stops.forEachIndexed { i, st ->
+                    assertEquals(st.arriveMinute!! + stays[i], st.leaveMinute)
+                    if (i > 0) assertTrue(st.arriveMinute!! >= s.stops[i - 1].leaveMinute!!)
+                }
+                assertEquals(s.totalMinutes, s.stops.last().leaveMinute)
             } else {
                 assertTrue(s.incomplete)
                 assertNull(s.totalMinutes)
@@ -120,5 +129,29 @@ class ScheduleCalculatorTest {
         org.junit.jupiter.api.assertThrows<IllegalArgumentException> {
             ScheduleCalculator.calculate(t(9, 0), hasOrigin = true, stays = listOf(30, 30), legSeconds = listOf(60))
         }
+    }
+
+    @Test
+    fun `TRP-03 음수 구간은 계산하지 않고, 며칠 넘어가는 일정은 날 수로 알린다`() {
+        org.junit.jupiter.api.assertThrows<IllegalArgumentException> {
+            ScheduleCalculator.calculate(t(0, 0), hasOrigin = true, stays = listOf(0), legSeconds = listOf(-60))
+        }
+        val s = ScheduleCalculator.calculate(t(9, 0), hasOrigin = false, stays = List(10) { 480 }, legSeconds = List(9) { 0L })
+        assertEquals(3, s.stops.last().arriveDay, "80시간 뒤는 다음 날이 아니라 3일 뒤")
+        assertEquals(3, s.stops.last().leaveDay)
+    }
+
+    @Test
+    fun `TRP-03 도착은 오늘이고 출발이 자정을 넘으면 출발 쪽 날 수가 오른다`() {
+        val s = ScheduleCalculator.calculate(t(23, 50), hasOrigin = false, stays = listOf(30), legSeconds = emptyList())
+        assertEquals(0, s.stops[0].arriveDay)
+        assertEquals(1, s.stops[0].leaveDay)
+        assertTrue(s.nextDay)
+    }
+
+    @Test
+    fun `TRP-02 시작 시각의 초는 버린다`() {
+        val s = ScheduleCalculator.calculate(LocalTime.of(9, 0, 45), hasOrigin = false, stays = listOf(30), legSeconds = emptyList())
+        assertEquals(t(9, 0), s.stops[0].arrive)
     }
 }

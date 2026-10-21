@@ -272,6 +272,7 @@
     <string name="trip_error_stay">Enter whole minutes from 0 to %1$d.</string>
     <string name="trip_error_outside">Planned days fall outside the new dates (%1$d). Move or remove those places first.</string>
     <string name="trip_error_missing">This trip is no longer available.</string>
+    <string name="trip_error_paid">Changing trips is part of the upgrade. Your trips stay here to read.</string>
     <string name="trip_dates">%1$s – %2$s</string>
     <string name="plan_new_trip">New trip</string>
     <string name="plan_sample">Try a sample day</string>

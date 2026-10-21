@@ -42,6 +42,7 @@ internal fun TripProblem.text(dates: List<LocalDate> = emptyList()): UiText = wh
     TripProblem.InvalidStay -> UiText.Res(R.string.trip_error_stay, listOf(TripRules.MAX_STAY))
     TripProblem.StopsOutsideDates -> UiText.Res(R.string.trip_error_outside, listOf(dates.size))
     TripProblem.DateOutsideTrip, TripProblem.NotFound -> UiText.Res(R.string.trip_error_missing)
+    TripProblem.PaidOnly -> UiText.Res(R.string.trip_error_paid)
 }
 
 // ---------------------------------------------------------------- SC11

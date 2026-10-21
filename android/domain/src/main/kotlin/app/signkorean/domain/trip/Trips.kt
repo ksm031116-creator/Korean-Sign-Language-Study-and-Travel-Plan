@@ -4,6 +4,8 @@ import app.signkorean.domain.common.Clock
 import app.signkorean.domain.common.IdGenerator
 import app.signkorean.domain.content.ContentRepository
 import app.signkorean.domain.content.PlaceId
+import app.signkorean.domain.entitlement.Entitlement
+import app.signkorean.domain.entitlement.EntitlementSource
 import app.signkorean.domain.location.Coordinate
 import app.signkorean.domain.place.PlaceListing
 import kotlinx.coroutines.CancellationException
@@ -74,6 +76,9 @@ enum class TripProblem {
     StopsOutsideDates,
     DateOutsideTrip,
     NotFound,
+
+    /** 무료 상태. 여행은 지우지 않고 읽기만 된다(E-12). 화면은 SC21 을 연다. */
+    PaidOnly,
 }
 
 sealed interface TripResult {
@@ -133,10 +138,12 @@ class TripEditor(
     private val ids: IdGenerator,
     private val clock: Clock,
     private val content: ContentRepository,
+    private val entitlement: EntitlementSource,
 ) {
     private val mutex = Mutex()
 
     suspend fun create(title: String, start: LocalDate, end: LocalDate): TripResult = mutex.withLock {
+        if (!paid()) return@withLock TripResult.Rejected(TripProblem.PaidOnly)
         val name = title.trim()
         if (name.isEmpty()) return@withLock TripResult.Rejected(TripProblem.TitleBlank)
         TripRules.checkDates(start, end)?.let { return@withLock TripResult.Rejected(it) }
@@ -205,8 +212,12 @@ class TripEditor(
         DayEdit.Change(day.copy(stops = day.stops.filterNot { it.id == stop }))
     }
 
+    /** 시작 시각은 분 단위로 저장한다(TRP-05). 출발지 장소도 등록 장소만이다(TRP-L3). */
     suspend fun setStart(id: TripId, date: LocalDate, time: LocalTime, origin: Origin?): TripResult = editDay(id, date) { _, day ->
-        DayEdit.Change(day.copy(startTime = time, origin = origin))
+        if (origin is Origin.AtPlace && PlaceListing.visiblePlaces(content.load()).none { it.id == origin.place }) {
+            return@editDay DayEdit.Reject(TripProblem.NotADestination)
+        }
+        DayEdit.Change(day.copy(startTime = time.truncatedTo(ChronoUnit.MINUTES), origin = origin))
     }
 
     private sealed interface DayEdit {
@@ -216,22 +227,33 @@ class TripEditor(
 
     private suspend fun editDay(id: TripId, date: LocalDate, block: suspend (Trip, TripDay) -> DayEdit): TripResult = edit(id) { trip ->
         if (!inTrip(trip, date)) return@edit TripResult.Rejected(TripProblem.DateOutsideTrip)
-        when (val e = block(trip, trip.day(date))) {
+        val day = trip.day(date)
+        when (val e = block(trip, day)) {
             is DayEdit.Reject -> TripResult.Rejected(e.problem)
-            is DayEdit.Change -> TripResult.Ok(trip.withDay(changed(e.day)))
+            // 바뀐 게 없으면 revision 도 저장도 그대로(진행 중 경로 응답을 버리지 않게, TRP-L1).
+            is DayEdit.Change -> if (e.day == day) TripResult.Ok(trip) else TripResult.Ok(trip.withDay(changed(e.day)))
         }
     }
 
     /** 규칙을 통과한 새 여행만 저장한다. 저장에 실패하면 저장소의 여행은 그대로다. */
     private suspend fun edit(id: TripId, block: suspend (Trip) -> TripResult): TripResult = mutex.withLock {
+        if (!paid()) return@withLock TripResult.Rejected(TripProblem.PaidOnly)
         val trip = try {
-            store.get(id)
+            store.get(id)?.withAllDays()
         } catch (e: CancellationException) {
             throw e
         } catch (_: Exception) {
             return@withLock TripResult.SaveFailed
         } ?: return@withLock TripResult.Rejected(TripProblem.NotFound)
-        when (val r = block(trip)) {
+        // 규칙 검사 중 실패(콘텐츠 읽기 등)도 예외가 아니라 결과로 끝낸다(설계서 원칙 8, TRP-04).
+        val result = try {
+            block(trip)
+        } catch (e: CancellationException) {
+            throw e
+        } catch (_: Exception) {
+            return@withLock TripResult.SaveFailed
+        }
+        when (val r = result) {
             is TripResult.Ok -> if (r.trip == trip) r else persist(r.trip)
             else -> r
         }
@@ -250,5 +272,17 @@ class TripEditor(
 
     private fun changed(day: TripDay) = day.copy(revision = day.revision + 1, needsRecalculation = true)
 
-    private fun Trip.withDay(day: TripDay) = copy(days = days.map { if (it.date == day.date) day else it })
+    /** 그날이 없으면 넣는다(바꾸기만 하면 없는 날로 옮긴 장소가 사라진다, TRP-01). 날짜 순서를 지킨다. */
+    private fun Trip.withDay(day: TripDay) = copy(days = (days.filterNot { it.date == day.date } + day).sortedBy { it.date })
+
+    /** 저장된 여행에 빠진 날짜가 있으면 빈 하루로 채운다. */
+    private fun Trip.withAllDays() = copy(days = TripRules.datesOf(start, end).map { d -> days.firstOrNull { it.date == d } ?: TripDay(d) })
+
+    private suspend fun paid(): Boolean = try {
+        entitlement.current() == Entitlement.Paid
+    } catch (e: CancellationException) {
+        throw e
+    } catch (_: Exception) {
+        false
+    }
 }

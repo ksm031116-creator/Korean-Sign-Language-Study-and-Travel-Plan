@@ -52,7 +52,8 @@ data class TripDayEntity(
 
 /**
  * 하루의 방문 장소. 같은 날 같은 장소는 데이터베이스도 막는다(UNIQUE, T-08 의 마지막 방어선).
- * 그날이 지워지면 함께 지워진다. [position] 은 그날 안의 순서다.
+ * 그날이 지워지면 함께 지워진다. [position] 은 그날 안의 순서다. [id] 는 표 전체에서 유일해야 한다 —
+ * 편집기는 IdGenerator(UUID)로 만든다. 고정 ID 를 쓰면 다른 여행과 부딪혀 저장이 실패한다(Phase 16 리뷰 TRP-L6).
  */
 @Entity(
     tableName = "trip_stop",

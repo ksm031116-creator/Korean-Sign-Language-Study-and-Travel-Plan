@@ -133,7 +133,7 @@ val learningModule = module {
     single<BookmarkStore> { get<RoomLearningStorage>().bookmarks }
     // 여행 (Phase 16). 같은 데이터베이스 파일이지만 학습·북마크와 따로 지운다(FR22).
     single<TripStore> { get<RoomLearningStorage>().trips }
-    single { TripEditor(get(), get(), get(), get()) }
+    single { TripEditor(get(), get(), get(), get(), get()) }
     factory { SetBookmark(get(), get(), get(), get()) }
     factory { ClearBookmarks(get()) }
     factory { StartSession(get(), get(), get(), get()) }

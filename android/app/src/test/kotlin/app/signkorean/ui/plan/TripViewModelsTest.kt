@@ -46,7 +46,7 @@ class TripViewModelsTest {
     )
     private val content = InMemoryContentRepository(pack)
     private val store = FakeTripStore()
-    private val editor = TripEditor(store, SequentialIdGenerator("id"), clock, content)
+    private val editor = TripEditor(store, SequentialIdGenerator("id"), clock, content, { app.signkorean.domain.entitlement.Entitlement.Paid })
 
     @Before
     fun setUp() = Dispatchers.setMain(UnconfinedTestDispatcher())
