@@ -422,6 +422,8 @@ sealed interface PurchaseFlowState {
     data object Cancelled : PurchaseFlowState         // 오류 표시 없이 복귀
     data class Failed(val reason: FailReason) : PurchaseFlowState  // "과금되지 않았음" 안내
     data object Offline : PurchaseFlowState           // 결제를 시도하지 않음
+    data object Succeeded : PurchaseFlowState         // (구현 시 추가) 성공 토스트·보류 동작 재개 신호.
+                                                      // 결제 화면 밖에서 Free → Paid 가 돼도 낸다
 }
 ```
 
@@ -530,7 +532,12 @@ fun calculate(start: LocalTime, origin: Origin?, stops: List<Stop>, legs: List<L
 
 ### 7.3 결제 어댑터
 
-`PlayBillingEntitlementGateway`는 `enablePendingPurchases`를 켠 Billing 클라이언트로 Billing Library의 콜백을 `Flow<PurchaseEvent>`로 바꾸고 도메인 이벤트(`Purchased`, `Pending`, `Cancelled`, `Failed(reason)`, `Restored`, `NothingToRestore`)로 매핑한다. 응답 코드 → `FailReason` 매핑표를 단위 테스트로 고정한다. 연결 끊김은 지수 백오프로 재연결하되 **사용자 동작 없이 결제를 다시 시도하지 않는다.**
+`PlayBillingEntitlementGateway`는 `enablePendingPurchases`를 켠 Billing 클라이언트(Billing Library 8.3, Java API)의 콜백을 suspend 함수로 감싸 `PurchaseResult`(`Purchased`, `Pending`, `Cancelled`, `AlreadyOwned`, `Unconfirmed`, `Failed(reason)`)와 `StoreQuery`(`Success(구매 목록)` / `Failure`)를 돌려준다. 복원 결과(`Restored`, `NothingToRestore`, `Failed`)는 도메인 `Entitlements.restore()` 가 구매 목록 조회로 정한다. 응답 코드 → 결과 매핑표(`BillingResponses`)를 단위 테스트로 고정한다. 연결 끊김은 지수 백오프로 재연결하되 **사용자 동작 없이 결제를 다시 시도하지 않는다.**
+
+- 모든 콜백 대기에 시간 상한(15초)을 둔다. 결제 결과 대기는 5분이며, 지나면 `Unconfirmed` 를 돌려 도메인이 구매 목록으로 정한다(Phase 12 리뷰 ENT-01·02).
+- 결제 화면 밖에서 온 구매 갱신(앱이 앞에 있는 동안 대기 결제 완료)은 `onStoreChanged` 로 알리고, 앱이 권한을 다시 확인한다.
+- 권한 확인의 "전면 복귀"는 시작된 Activity 수가 0 → 1 이 되는 순간이다. 결제 화면(`ProxyBillingActivity`)은 같은 프로세스의 Activity 라 resume 마다 확인하면 결제 중에 끼어든다.
+- 상품 ID 는 `full_unlock` 이다. Play Console 의 비소모성 상품 ID 와 같아야 하며, 바꾸면 기존 구매자의 복원이 끊긴다.
 
 ### 7.4 음성 어댑터
 
