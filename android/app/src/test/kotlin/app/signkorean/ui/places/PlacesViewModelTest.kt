@@ -211,4 +211,63 @@ class PlacesViewModelTest {
     fun `SC07 없는 장소는 빈 상태`() = runTest {
         assertTrue(detail("nope").state.value.missing)
     }
+
+    // ---------- Phase 14 리뷰 수정 ----------
+
+    private class FlakyContent(private val pack: app.signkorean.domain.content.ContentPack) : app.signkorean.domain.content.ContentRepository {
+        @Volatile var fail = false
+        override suspend fun load() = if (fail) throw java.io.IOException("disk") else pack
+    }
+
+    @Test
+    fun `PLC-05 SC08 콘텐츠를 못 읽으면 없음이 아니라 다시 시도`() = runTest {
+        val flaky = FlakyContent(pack).apply { fail = true }
+        val vm = PlacesViewModel(CardId("t-market-1"), flaky, summaries, language, entitlements, player)
+        assertTrue(vm.state.value.loadFailed)
+        assertFalse(vm.state.value.missing)
+        flaky.fail = false
+        vm.onAction(PlacesAction.Retry)
+        assertEquals(3, vm.state.value.placeCount)
+    }
+
+    @Test
+    fun `PLC-05 SC07 다시 읽기가 실패해도 보이던 화면을 지우지 않는다`() = runTest {
+        val flaky = FlakyContent(pack)
+        val vm = PlaceDetailViewModel(PlaceId("gwangjang"), flaky, states, bookmarks, setBookmark, pending, entitlements, start, player)
+        flaky.fail = true
+        vm.onAction(PlaceDetailAction.Refresh)
+        assertEquals("gwangjang", vm.state.value.place?.id?.value)
+        assertFalse(vm.state.value.loadFailed)
+    }
+
+    @Test
+    fun `PLC-07 SC07 결제 뒤 저장이 끝나면 한도 안내를 거둔다`() = runTest {
+        (1..5).forEach { bookmarks.add(Bookmark(CardId("x$it"), clock.now())) }
+        val vm = detail()
+        vm.onAction(PlaceDetailAction.ToggleBookmark)
+        assertEquals(UiText.Res(R.string.bookmark_limit, listOf(5, 5)), vm.state.value.message)
+        bookmarks.add(Bookmark(CardId("t-market-1"), clock.now())) // 결제 뒤 보류 동작이 저장했다
+        vm.onAction(PlaceDetailAction.Refresh)
+        assertTrue(vm.state.value.selectedSaved)
+        assertNull(vm.state.value.message)
+    }
+
+    @Test
+    fun `SC07 장소 유형 이름을 보인다`() = runTest {
+        assertEquals("Market", detail().state.value.typeLabel?.get(LocaleTag("en")))
+    }
+
+    @Test
+    fun `PLC-12 비활성 지역의 장소는 SC07 에서도 없다`() = runTest {
+        val closed = pack.copy(areas = pack.areas.map { if (it.id.value == "jongno") it.copy(active = false) else it })
+        val vm = PlaceDetailViewModel(PlaceId("gwangjang"), InMemoryContentRepository(closed), states, bookmarks, setBookmark, pending, entitlements, start, player)
+        assertTrue(vm.state.value.missing)
+    }
+
+    @Test
+    fun `PLC-14 유료 사용자는 첫 화면부터 잠금 없이`() = runTest {
+        cache.stored = Entitlement.Paid
+        assertTrue(list().state.value.paid)
+        assertTrue(detail().state.value.paid)
+    }
 }

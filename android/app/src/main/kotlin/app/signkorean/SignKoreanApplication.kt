@@ -3,6 +3,9 @@ package app.signkorean
 import android.app.Application
 import android.content.pm.ApplicationInfo
 import android.util.Log
+import coil.ImageLoader
+import coil.ImageLoaderFactory
+import okhttp3.OkHttpClient
 import app.signkorean.di.appModules
 import app.signkorean.di.variantModules
 import app.signkorean.domain.entitlement.Entitlement
@@ -18,7 +21,20 @@ import kotlinx.coroutines.launch
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
 
-class SignKoreanApplication : Application() {
+class SignKoreanApplication : Application(), ImageLoaderFactory {
+
+    /**
+     * 장소 사진 로더. Wikimedia 는 일반 User-Agent 요청을 막을 수 있어 앱 이름과 연락처를 밝힌다
+     * (Wikimedia User-Agent 정책, Phase 14 리뷰 질문). 메모리·디스크 캐시는 Coil 기본값을 쓴다.
+     */
+    override fun newImageLoader(): ImageLoader = ImageLoader.Builder(this)
+        .okHttpClient {
+            OkHttpClient.Builder()
+                .addInterceptor { chain -> chain.proceed(chain.request().newBuilder().header("User-Agent", USER_AGENT).build()) }
+                .build()
+        }
+        .build()
+
 
     override fun onCreate() {
         super.onCreate()
@@ -80,5 +96,6 @@ class SignKoreanApplication : Application() {
 
     private companion object {
         const val TAG = "SignKorean"
+        val USER_AGENT = "SignKorean/${BuildConfig.VERSION_NAME} (Android; https://github.com/ksm031116-creator)"
     }
 }

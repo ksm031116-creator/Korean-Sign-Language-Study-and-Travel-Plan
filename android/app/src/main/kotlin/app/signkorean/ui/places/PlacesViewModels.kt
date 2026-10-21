@@ -4,6 +4,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import app.signkorean.R
 import app.signkorean.domain.audio.AudioPlayer
+import app.signkorean.domain.audio.PlaybackState
+import app.signkorean.domain.content.AudioClip
+import app.signkorean.domain.content.GroupKind
+import kotlinx.coroutines.Job
 import app.signkorean.domain.bookmark.BookmarkOutcome
 import app.signkorean.domain.bookmark.BookmarkStore
 import app.signkorean.domain.bookmark.SetBookmark
@@ -51,8 +55,10 @@ sealed interface SummaryState {
 
 data class PlacesUiState(
     val loading: Boolean = true,
-    /** 카드가 없거나(콘텐츠에서 빠짐) 읽지 못했다. */
+    /** 카드가 콘텐츠에서 빠졌다. */
     val missing: Boolean = false,
+    /** 콘텐츠를 읽지 못했다. 같은 화면에서 다시 시도한다 (UX02·03, 리뷰 PLC-05). */
+    val loadFailed: Boolean = false,
     val card: SignCard? = null,
     val groups: List<AreaPlaces> = emptyList(),
     val summary: SummaryState = SummaryState.Loading,
@@ -63,6 +69,7 @@ data class PlacesUiState(
 }
 
 sealed interface PlacesAction {
+    data object Retry : PlacesAction
     data object RetrySummaries : PlacesAction
     data object PlayAudio : PlacesAction
     data class OpenPlace(val id: PlaceId) : PlacesAction
@@ -83,7 +90,7 @@ class PlacesViewModel(
     private val content: ContentRepository,
     private val summaries: PlaceSummaryProvider,
     private val language: ResolveAppLanguage,
-    entitlements: Entitlements,
+    private val entitlements: Entitlements,
     private val audio: AudioPlayer,
 ) : ViewModel() {
 
@@ -98,11 +105,11 @@ class PlacesViewModel(
     init {
         // SC21 에서 결제하고 돌아오면 잠금이 바로 풀린다.
         viewModelScope.launch { entitlements.entitlement.collect { e -> _state.update { it.copy(paid = e == Entitlement.Paid) } } }
-        viewModelScope.launch {
-            entitlements.current()
-            load()
-        }
+        viewModelScope.launch { load() }
     }
+
+    private var summaryJob: Job? = null
+    private val sounds = OwnAudio(audio)
 
     private suspend fun load() {
         val p = try {
@@ -110,18 +117,26 @@ class PlacesViewModel(
         } catch (e: CancellationException) {
             throw e
         } catch (_: Exception) {
-            _state.update { it.copy(loading = false, missing = true) }
+            _state.update { it.copy(loading = false, loadFailed = true) }
             return
         }
         pack = p
         val card = p.cards.firstOrNull { it.id == cardId && it.active }
+        val paid = entitlements.current() == Entitlement.Paid
         if (card == null) {
-            _state.update { it.copy(loading = false, missing = true) }
+            _state.update { it.copy(loading = false, loadFailed = false, missing = true, paid = paid) }
             return
         }
         val groups = PlaceListing.forCard(p, card)
-        _state.update { it.copy(loading = false, card = card, groups = groups) }
-        if (groups.isNotEmpty()) loadSummaries(p)
+        // 권한을 같은 갱신에 넣는다. 유료 사용자에게 자물쇠가 한 프레임 비치지 않게(PLC-14).
+        _state.update { it.copy(loading = false, loadFailed = false, card = card, groups = groups, paid = paid) }
+        if (groups.isNotEmpty()) startSummaries(p)
+    }
+
+    /** 요약 요청은 하나만. 다시 시도를 연타해도 늦게 온 결과가 새 결과를 덮지 않는다(PLC-13). */
+    private fun startSummaries(p: ContentPack) {
+        summaryJob?.cancel()
+        summaryJob = viewModelScope.launch { loadSummaries(p) }
     }
 
     private suspend fun loadSummaries(p: ContentPack) {
@@ -143,17 +158,26 @@ class PlacesViewModel(
 
     fun onAction(action: PlacesAction) {
         when (action) {
-            PlacesAction.RetrySummaries -> pack?.let { p -> viewModelScope.launch { loadSummaries(p) } }
-            PlacesAction.PlayAudio -> _state.value.card?.audio?.let { audio.play(it) }
+            PlacesAction.Retry -> {
+                _state.update { it.copy(loading = true, loadFailed = false) }
+                viewModelScope.launch { load() }
+            }
+            PlacesAction.RetrySummaries -> pack?.let(::startSummaries)
+            PlacesAction.PlayAudio -> sounds.play(_state.value.card?.audio)
             is PlacesAction.OpenPlace -> viewModelScope.launch { _effects.send(PlacesEffect.OpenPlace(action.id)) }
             is PlacesAction.Upgrade -> viewModelScope.launch { _effects.send(PlacesEffect.Upgrade(action.feature)) }
         }
     }
+
+    override fun onCleared() = sounds.stopMine()
 }
 
 data class PlaceDetailUiState(
     val loading: Boolean = true,
     val missing: Boolean = false,
+    val loadFailed: Boolean = false,
+    /** 장소 유형 이름(시장·고궁 …). 콘텐츠 팩의 묶음 이름이다 (구현 계획 Phase 14 D3). */
+    val typeLabel: app.signkorean.domain.common.LocalizedText? = null,
     val place: Place? = null,
     val area: Area? = null,
     val signs: List<SignCard> = emptyList(),
@@ -172,6 +196,7 @@ data class PlaceDetailUiState(
 }
 
 sealed interface PlaceDetailAction {
+    data object Retry : PlaceDetailAction
     data class Select(val id: CardId) : PlaceDetailAction
     data object ToggleBookmark : PlaceDetailAction
     data object Practice : PlaceDetailAction
@@ -195,12 +220,13 @@ class PlaceDetailViewModel(
     private val bookmarks: BookmarkStore,
     private val setBookmark: SetBookmark,
     private val pending: PendingActionStore,
-    entitlements: Entitlements,
+    private val entitlements: Entitlements,
     private val start: StartSession,
     private val audio: AudioPlayer,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(PlaceDetailUiState())
+    private val sounds = OwnAudio(audio)
     val state: StateFlow<PlaceDetailUiState> = _state.asStateFlow()
 
     private val _effects = Channel<PlaceDetailEffect>(Channel.BUFFERED)
@@ -210,17 +236,16 @@ class PlaceDetailViewModel(
 
     init {
         viewModelScope.launch { entitlements.entitlement.collect { e -> _state.update { it.copy(paid = e == Entitlement.Paid) } } }
-        viewModelScope.launch {
-            entitlements.current()
-            load()
-        }
+        viewModelScope.launch { load() }
     }
 
     private suspend fun load() {
         try {
             val p = content.load()
             pack = p
-            val place = p.places.firstOrNull { it.id == placeId }
+            val activeAreas = p.areas.filter { it.active }.map { it.id }.toSet()
+            // 비활성 지역의 장소는 목록에도 상세에도 없다(PLC-12).
+            val place = p.places.firstOrNull { it.id == placeId && it.areaId in activeAreas }
             if (place == null) {
                 _state.update { it.copy(loading = false, missing = true) }
                 return
@@ -228,13 +253,20 @@ class PlaceDetailViewModel(
             val signs = PlaceListing.signsAt(p, place)
             val statuses = states.all()
             val saved = bookmarks.all().map { it.card }.toSet()
+            val paid = entitlements.current() == Entitlement.Paid
             _state.update {
+                val selected = it.selectedId?.takeIf { id -> signs.any { s -> s.id == id } } ?: signs.firstOrNull()?.id
                 it.copy(
                     loading = false,
+                    loadFailed = false,
+                    paid = paid,
                     place = place,
+                    typeLabel = p.groups.firstOrNull { g -> g.kind == GroupKind.PlaceType && g.id == place.typeId }?.label,
+                    // 결제 뒤 이어서 저장됐으면 한도 안내를 거둔다(PLC-07, Learn 의 UPG-08 과 같다).
+                    message = if (selected != null && selected in saved && it.message is UiText.Res && (it.message as UiText.Res).id == R.string.bookmark_limit) null else it.message,
                     area = p.areas.firstOrNull { a -> a.id == place.areaId },
                     signs = signs,
-                    selectedId = it.selectedId?.takeIf { id -> signs.any { s -> s.id == id } } ?: signs.firstOrNull()?.id,
+                    selectedId = selected,
                     statuses = statuses,
                     saved = saved,
                 )
@@ -242,7 +274,8 @@ class PlaceDetailViewModel(
         } catch (e: CancellationException) {
             throw e
         } catch (_: Exception) {
-            _state.update { it.copy(loading = false, missing = true) }
+            // 이미 보이는 화면이 있으면 그대로 둔다. 처음 읽기만 실패 화면이다(PLC-05).
+            _state.update { if (it.place != null) it.copy(loading = false) else it.copy(loading = false, loadFailed = true) }
         }
     }
 
@@ -257,8 +290,13 @@ class PlaceDetailViewModel(
                 practice(replace = true)
             }
             PlaceDetailAction.KeepSession -> _state.update { it.copy(confirmReplace = false) }
-            PlaceDetailAction.PlayAudio -> s.selected?.audio?.let { audio.play(it) }
-            PlaceDetailAction.Refresh -> viewModelScope.launch { load() }
+            PlaceDetailAction.PlayAudio -> sounds.play(s.selected?.audio)
+            // 첫 읽기가 끝나기 전의 화면 resume 은 건너뛴다(같은 읽기를 두 번 하지 않게, PLC-14).
+            PlaceDetailAction.Refresh -> if (!s.loading) viewModelScope.launch { load() }
+            PlaceDetailAction.Retry -> {
+                _state.update { it.copy(loading = true, loadFailed = false) }
+                viewModelScope.launch { load() }
+            }
             is PlaceDetailAction.Upgrade -> viewModelScope.launch { _effects.send(PlaceDetailEffect.Upgrade(action.feature)) }
         }
     }
@@ -300,5 +338,27 @@ class PlaceDetailViewModel(
                 StartOutcome.SaveFailed -> _state.update { it.copy(message = UiText.Res(R.string.common_save_failed)) }
             }
         }
+    }
+
+    override fun onCleared() = sounds.stopMine()
+}
+
+/**
+ * 이 화면이 튼 발음만 기억했다가 화면이 닫힐 때 멈춘다. 재생기는 앱에 하나라서 남이 튼 음성은 건드리지 않는다
+ * (Learn 의 stopMine 과 같은 규칙, Phase 14 리뷰 PLC-15).
+ */
+internal class OwnAudio(private val audio: AudioPlayer) {
+    private var mine: AudioClip? = null
+
+    fun play(clip: AudioClip?) {
+        clip ?: return
+        mine = clip
+        audio.play(clip)
+    }
+
+    fun stopMine() {
+        val playing = (audio.state.value as? PlaybackState.Playing)?.clip
+        if (playing != null && playing == mine) audio.stop()
+        mine = null
     }
 }

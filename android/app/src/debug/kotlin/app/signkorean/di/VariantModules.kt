@@ -9,6 +9,14 @@ import app.signkorean.domain.entitlement.StoreQuery
 import app.signkorean.ui.plan.DebugRelock
 import kotlinx.coroutines.delay
 import org.koin.core.module.Module
+import app.signkorean.domain.common.LocaleTag
+import app.signkorean.domain.content.CardId
+import app.signkorean.domain.content.ContentRepository
+import app.signkorean.domain.place.PlaceListing
+import app.signkorean.domain.place.PlaceSummary
+import app.signkorean.domain.place.PlaceSummaryProvider
+import app.signkorean.domain.place.PlaceSummaryResult
+import kotlin.math.abs
 import org.koin.dsl.module
 import java.util.UUID
 
@@ -18,7 +26,7 @@ import java.util.UUID
  * 에뮬레이터 이미지에는 Play 스토어가 없고, 실결제는 Play Console 에 올린 빌드에서만 된다. 그래서 디버그 빌드는
  * 기본으로 모의 결제를 쓴다. 실기기에서 Play 결제를 시험하려면 `./gradlew installDebug -PrealBilling=true`.
  */
-val variantModules: List<Module> = if (BuildConfig.SIMULATED_BILLING) {
+val variantModules: List<Module> = listOf(sampleDataModule) + if (BuildConfig.SIMULATED_BILLING) {
     listOf(
         module {
             single { SimulatedBillingGateway() }
@@ -34,6 +42,32 @@ val variantModules: List<Module> = if (BuildConfig.SIMULATED_BILLING) {
     )
 } else {
     emptyList()
+}
+
+/**
+ * 디버그 빌드의 표본 데이터. 중계 서버가 없어도 SC08 의 평점·리뷰 수·발췌 화면을 확인할 수 있게 한다(AT04,
+ * Phase 14 리뷰 PLC-02). 발췌에 "Sample" 을 붙여 실제 리뷰로 보이지 않게 한다. 릴리스는 "없음"이다(지어내지 않는다).
+ */
+// getter: 이 파일의 최상위 값은 위에서부터 초기화되므로, 위의 variantModules 가 읽을 때 아직 null 이 아니게.
+private val sampleDataModule get() = module {
+    single<PlaceSummaryProvider> { SamplePlaceSummaries(get()) }
+}
+
+class SamplePlaceSummaries(private val content: ContentRepository) : PlaceSummaryProvider {
+    override suspend fun summaries(card: CardId, language: LocaleTag): PlaceSummaryResult {
+        val pack = content.load()
+        val sign = pack.cards.firstOrNull { it.id == card } ?: return PlaceSummaryResult.Loaded(emptyMap())
+        return PlaceSummaryResult.Loaded(
+            PlaceListing.forCard(pack, sign).flatMap { it.places }.associate { place ->
+                val seed = abs(place.id.value.hashCode())
+                place.id to PlaceSummary(
+                    rating = 3.6 + (seed % 13) / 10.0,
+                    reviewCount = 12 + seed % 480,
+                    excerpt = "Sample (debug build): visitors mention the " + sign.romanization + " sign near the entrance.",
+                )
+            },
+        )
+    }
 }
 
 /**

@@ -54,6 +54,14 @@ class PlacesScreenTest {
     }
 
     @Test
+    fun `PLC-01·03·06 그리는 방식은 라이선스가 정한다 - 제3유형과 CC BY 는 원본 그대로`() {
+        assertEquals(PhotoFit.Original, PhotoFit.of(PhotoLicense.KoglType3))
+        assertEquals(PhotoFit.Original, PhotoFit.of(PhotoLicense.CcBy("Jane", "4.0")))
+        assertEquals(PhotoFit.Cropped, PhotoFit.of(PhotoLicense.KoglType1))
+        assertEquals(PhotoFit.Cropped, PhotoFit.of(PhotoLicense.Cc0))
+    }
+
+    @Test
     fun `U-11 제3유형은 자르지 않고 원본 비율, 출처를 보인다`() {
         rule.setContent { SignKoreanTheme { PlacePhotoView(type3, fallbackColor = "#2f6f5e") } }
         rule.onNodeWithTag(PhotoTags.UNCROPPED).assertExists()
@@ -89,7 +97,7 @@ class PlacesScreenTest {
         rule.setContent { SignKoreanTheme { PlacesContent(placesState(), {}, {}) } }
         rule.onNodeWithText("Gwangjang Market").assertExists()
         rule.onNodeWithText("Great tteok.").assertExists()
-        rule.onNodeWithTag(PlacesTags.rating(PlaceId("gwangjang"))).assertExists()
+        rule.onNodeWithTag(PlacesTags.rating(PlaceId("gwangjang")), useUnmergedTree = true).assertExists()
         rule.onNodeWithText("2 places").assertExists()
     }
 

@@ -208,6 +208,7 @@
     <string name="place_signs">ここで見られる看板</string>
     <string name="place_practice">ここの看板を練習</string>
     <string name="place_missing">この場所は利用できなくなりました。</string>
+    <string name="place_open">%1$s を開く</string>
     <string name="lock_route">徒歩ルート</string>
     <string name="lock_add_to_plan">旅程に追加</string>
 </resources>

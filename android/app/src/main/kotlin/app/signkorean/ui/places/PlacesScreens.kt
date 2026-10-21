@@ -6,6 +6,9 @@ import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -30,6 +33,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
@@ -45,6 +49,8 @@ import app.signkorean.domain.place.PlaceSummary
 import app.signkorean.ui.designsystem.AppChip
 import app.signkorean.ui.designsystem.ConfirmDialog
 import app.signkorean.ui.designsystem.EmptyState
+import app.signkorean.ui.designsystem.ErrorState
+import app.signkorean.ui.designsystem.LoadingSkeleton
 import app.signkorean.ui.designsystem.LockBadge
 import app.signkorean.ui.designsystem.PlateFace
 import app.signkorean.ui.designsystem.PlateSize
@@ -93,33 +99,41 @@ fun PlacesScreen(
 fun PlacesContent(state: PlacesUiState, onAction: (PlacesAction) -> Unit, onClose: () -> Unit) {
     val t = SignKoreanTheme.tokens
     if (state.loading) return
-    Column(
-        Modifier.fillMaxSize().background(t.paper).verticalScroll(rememberScrollState()).padding(20.dp),
+    // 장소가 많은 유형(시장 등)도 보이는 카드의 사진만 받도록 지연 목록으로 그린다(Phase 14 리뷰 PLC-08).
+    LazyColumn(
+        Modifier.fillMaxSize().background(t.paper),
+        contentPadding = PaddingValues(20.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-        IconButton(onClick = onClose) { Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.action_back)) }
-        Text(stringResource(R.string.places_title), style = MaterialTheme.typography.headlineSmall, modifier = Modifier.semantics { heading() })
+        item { IconButton(onClick = onClose) { Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.action_back)) } }
+        item { Text(stringResource(R.string.places_title), style = MaterialTheme.typography.headlineSmall, modifier = Modifier.semantics { heading() }) }
         val card = state.card
-        if (state.missing || card == null) {
-            EmptyState(title = stringResource(R.string.places_missing), body = "")
-            return@Column
-        }
-        SignStrip(card, onPlay = { onAction(PlacesAction.PlayAudio) })
-        if (state.placeCount == 0) {
-            EmptyState(title = stringResource(R.string.places_none), body = "")
-            return@Column
-        }
-        Text(pluralStringResource(R.plurals.places_count, state.placeCount, state.placeCount), style = MaterialTheme.typography.labelLarge, color = t.muted)
-        if (state.summary == SummaryState.Unavailable) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(stringResource(R.string.places_summary_unavailable), style = MaterialTheme.typography.bodyMedium, color = t.muted, modifier = Modifier.weight(1f))
-                QuietButton(stringResource(R.string.common_retry), onClick = { onAction(PlacesAction.RetrySummaries) })
-            }
-        }
-        state.groups.forEach { group ->
-            Text(group.area.name.text(), style = MaterialTheme.typography.titleMedium, modifier = Modifier.semantics { heading() })
-            group.places.forEach { place ->
-                PlaceCard(place, group.area.color, state.summaryFor(place.id), state.paid, onAction)
+        when {
+            state.loadFailed -> item { ErrorState(stringResource(R.string.explore_load_failed), onRetry = { onAction(PlacesAction.Retry) }) }
+            state.missing || card == null -> item { EmptyState(title = stringResource(R.string.places_missing), body = "") }
+            else -> {
+                item { SignStrip(card, onPlay = { onAction(PlacesAction.PlayAudio) }) }
+                if (state.placeCount == 0) {
+                    item { EmptyState(title = stringResource(R.string.places_none), body = "") }
+                } else {
+                    item { Text(pluralStringResource(R.plurals.places_count, state.placeCount, state.placeCount), style = MaterialTheme.typography.labelLarge, color = t.muted) }
+                    if (state.summary == SummaryState.Unavailable) {
+                        item {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Text(stringResource(R.string.places_summary_unavailable), style = MaterialTheme.typography.bodyMedium, color = t.muted, modifier = Modifier.weight(1f))
+                                QuietButton(stringResource(R.string.common_retry), onClick = { onAction(PlacesAction.RetrySummaries) })
+                            }
+                        }
+                    }
+                    state.groups.forEach { group ->
+                        item(key = "area-" + group.area.id.value) {
+                            Text(group.area.name.text(), style = MaterialTheme.typography.titleMedium, modifier = Modifier.semantics { heading() })
+                        }
+                        items(group.places, key = { it.id.value }) { place ->
+                            PlaceCard(place, group.area.color, state.summaryFor(place.id), state.summary == SummaryState.Loading, state.paid, onAction)
+                        }
+                    }
+                }
             }
         }
     }
@@ -144,18 +158,22 @@ private fun SignStrip(card: SignCard, onPlay: () -> Unit) {
 }
 
 @Composable
-private fun PlaceCard(place: Place, areaColor: String, summary: PlaceSummary?, paid: Boolean, onAction: (PlacesAction) -> Unit) {
+private fun PlaceCard(place: Place, areaColor: String, summary: PlaceSummary?, summaryLoading: Boolean, paid: Boolean, onAction: (PlacesAction) -> Unit) {
     val t = SignKoreanTheme.tokens
+    val openLabel = stringResource(R.string.place_open, place.name.text())
     Column(
         Modifier.fillMaxWidth().background(t.surface, RoundedCornerShape(16.dp))
-            .clickable(role = Role.Button) { onAction(PlacesAction.OpenPlace(place.id)) }
+            // 스크린리더가 "두 번 탭하면 활성화" 대신 무엇이 열리는지 읽는다(PLC-09).
+            .clickable(role = Role.Button, onClickLabel = openLabel) { onAction(PlacesAction.OpenPlace(place.id)) }
             .padding(12.dp).testTag(PlacesTags.place(place.id)),
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         PlacePhotoView(place.photo, areaColor)
         PlaceTitle(place)
+        if (summaryLoading) LoadingSkeleton(rows = 2)
         if (summary != null) {
-            Row(Modifier.testTag(PlacesTags.rating(place.id)).semantics(mergeDescendants = true) {}, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            // 따로 합치지 않는다. 카드 안내에 이름과 함께 읽힌다(PLC-09).
+            Row(Modifier.testTag(PlacesTags.rating(place.id)), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 summary.rating?.let { Text(stringResource(R.string.places_rating, it), style = MaterialTheme.typography.labelLarge) }
                 Text(pluralStringResource(R.plurals.reviews_count, summary.reviewCount, summary.reviewCount), style = MaterialTheme.typography.labelLarge, color = t.muted)
             }
@@ -241,6 +259,10 @@ fun PlaceDetailContent(state: PlaceDetailUiState, onAction: (PlaceDetailAction) 
     ) {
         IconButton(onClick = onClose) { Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.action_back)) }
         val place = state.place
+        if (state.loadFailed) {
+            ErrorState(stringResource(R.string.explore_load_failed), onRetry = { onAction(PlaceDetailAction.Retry) })
+            return@Column
+        }
         if (state.missing || place == null) {
             EmptyState(title = stringResource(R.string.place_missing), body = "")
             return@Column
@@ -260,7 +282,9 @@ fun PlaceDetailContent(state: PlaceDetailUiState, onAction: (PlaceDetailAction) 
                 modifier = Modifier.fillMaxWidth().background(t.primarySoft, RoundedCornerShape(12.dp)).padding(12.dp),
             )
         }
-        state.area?.let { Text(it.name.text(), style = MaterialTheme.typography.labelLarge, color = t.primary) }
+        // 지역 · 장소 유형 (구현 계획 Phase 14 D3).
+        val where = listOfNotNull(state.area?.name?.text(), state.typeLabel?.text()).filter { it.isNotBlank() }.joinToString(" · ")
+        if (where.isNotEmpty()) Text(where, style = MaterialTheme.typography.labelLarge, color = t.primary)
         Text(place.address.text(), style = MaterialTheme.typography.bodyMedium, color = t.muted)
         PaidActions(state.paid, onUpgrade = { onAction(PlaceDetailAction.Upgrade(it)) })
 
@@ -268,7 +292,14 @@ fun PlaceDetailContent(state: PlaceDetailUiState, onAction: (PlaceDetailAction) 
             Text(stringResource(R.string.place_signs), style = MaterialTheme.typography.titleMedium, modifier = Modifier.semantics { heading() })
             Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 state.signs.forEach { s ->
-                    AppChip(s.koText, selected = s.id == state.selectedId, onClick = { onAction(PlaceDetailAction.Select(s.id)) })
+                    // 한글만 있으면 영어·일본어 스크린리더가 한글을 제대로 읽지 못한다. 로마자를 함께 읽힌다(PLC-11).
+                    val spoken = s.koText + ", " + s.romanization
+                    AppChip(
+                        s.koText,
+                        selected = s.id == state.selectedId,
+                        onClick = { onAction(PlaceDetailAction.Select(s.id)) },
+                        modifier = Modifier.semantics { contentDescription = spoken },
+                    )
                 }
             }
             state.selected?.let { SelectedSign(it, state.selectedStatus, state.selectedSaved, onAction) }
@@ -287,7 +318,11 @@ private fun SelectedSign(card: SignCard, status: CardStatus, saved: Boolean, onA
     ) {
         SignPlate(card, PlateFace.Back, Modifier.fillMaxWidth())
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text(card.romanization, style = MaterialTheme.typography.bodyLarge, modifier = Modifier.weight(1f))
+            Column(Modifier.weight(1f)) {
+                Text(card.romanization, style = MaterialTheme.typography.bodyLarge)
+                // 언어별 발음 보조(ja 는 가타카나). Learn 뒷면과 같다(PLC-11).
+                card.reading.text().takeIf { it.isNotBlank() }?.let { Text(it, style = MaterialTheme.typography.bodyMedium, color = t.muted) }
+            }
             val (label, tone) = when (status) {
                 CardStatus.Known -> R.string.collection_known to StatusTone.Known
                 CardStatus.Learning -> R.string.collection_learning to StatusTone.Learning

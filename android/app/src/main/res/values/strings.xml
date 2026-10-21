@@ -235,6 +235,7 @@
     <string name="place_signs">Signs you can see here</string>
     <string name="place_practice">Practise these signs</string>
     <string name="place_missing">This place is no longer available.</string>
+    <string name="place_open">Open %1$s</string>
     <string name="lock_route">Walking route</string>
     <string name="lock_add_to_plan">Add to plan</string>
 
