@@ -17,9 +17,16 @@ import java.time.LocalTime
 class FakeTripStore : TripStore {
     private val trips = linkedMapOf<TripId, Trip>()
     @Volatile var failNextSave = false
+    @Volatile var failNextGet = false
 
     override suspend fun all(): List<Trip> = trips.values.sortedWith(compareBy<Trip> { it.start }.thenBy { it.createdAt })
-    override suspend fun get(id: TripId): Trip? = trips[id]
+    override suspend fun get(id: TripId): Trip? {
+        if (failNextGet) {
+            failNextGet = false
+            throw FakeStorageException("trip read")
+        }
+        return trips[id]
+    }
 
     override suspend fun save(trip: Trip) {
         if (failNextSave) {

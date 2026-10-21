@@ -53,7 +53,9 @@ class DayPlanViewModelTest {
     private val d1 = LocalDate.of(2026, 11, 3)
 
     /** 경로 공급자 자리. 테스트마다 구간 초를 정한다. 기본은 "아직 계산 안 됨". */
-    private var legs: (TripDay) -> List<Long?> = { day -> List((day.stops.size - 1).coerceAtLeast(0) + if (day.origin != null) 1 else 0) { null } }
+    private var legs: (TripDay) -> List<Long?> = { day -> List(app.signkorean.domain.route.legCount(day)) { null } }
+    /** 구간 수를 그날에 맞춘 고정 초. 길이가 틀려 조용히 "모름"이 되지 않게(DPV-M5). */
+    private fun every(seconds: Long): (TripDay) -> List<Long?> = { day -> List(app.signkorean.domain.route.legCount(day)) { seconds } }
     private val dayLegs = DayLegs { _, day -> legs(day) }
 
     @Before
@@ -72,7 +74,7 @@ class DayPlanViewModelTest {
 
     @Test
     fun `SC13 첫날의 타임라인 - 이름, 간판 수, 기본 09시 시작과 30분 체류`() = runTest {
-        legs = { listOf(600L) }
+        legs = every(600L)
         val t = trip()
         val s = vm(t.id).state.value
         assertEquals(d1, s.date)
@@ -166,7 +168,7 @@ class DayPlanViewModelTest {
 
     @Test
     fun `SC17 출발 시각을 바꾸면 그날 시각이 모두 따라온다`() = runTest {
-        legs = { listOf(600L) }
+        legs = every(600L)
         val t = trip()
         val vm = vm(t.id)
         vm.onAction(DayPlanAction.ApplyStart(LocalTime.of(10, 30), null))
@@ -196,7 +198,7 @@ class DayPlanViewModelTest {
 
     @Test
     fun `다음 날 도착이면 안내 플래그`() = runTest {
-        legs = { listOf(600L) }
+        legs = every(600L)
         val t = trip()
         val vm = vm(t.id)
         vm.onAction(DayPlanAction.ApplyStart(LocalTime.of(23, 40), null))
@@ -213,5 +215,80 @@ class DayPlanViewModelTest {
         val t = trip()
         val vm = DayPlanViewModel(t.id, d1.plusDays(1), store, editor, content, dayLegs, { entitlement })
         assertEquals(d1.plusDays(1), vm.state.value.date)
+    }
+
+    // ---------- Phase 18 리뷰 수정 ----------
+
+    @Test
+    fun `DPV-H1 처음 읽기가 실패해도 여행 없음이 아니라 다시 시도, 다시 읽으면 보인다`() = runTest {
+        val t = trip()
+        store.failNextGet = true
+        val vm = vm(t.id)
+        assertTrue(vm.state.value.loadFailed)
+        assertFalse(vm.state.value.missing)
+        vm.onAction(DayPlanAction.Refresh)
+        assertFalse(vm.state.value.loadFailed)
+        assertEquals(2, vm.state.value.rows.size)
+    }
+
+    @Test
+    fun `DPV-M5 구간 매핑 - 출발지가 없으면 첫 장소 앞 구간 없음, 있으면 첫 장소 앞에도 있다`() = runTest {
+        legs = { day -> List(app.signkorean.domain.route.legCount(day)) { i -> (i + 1) * 60L } }
+        val t = trip(places = listOf("p1", "p2", "p3"))
+        val vm = vm(t.id)
+        assertEquals(listOf(false, true, true), vm.state.value.rows.map { it.hasLegBefore })
+        assertEquals(listOf(null, 1, 2), vm.state.value.rows.map { it.legBefore })
+        vm.onAction(DayPlanAction.ApplyStart(LocalTime.of(9, 0), app.signkorean.domain.trip.Origin.AtPlace(PlaceId("p4"))))
+        assertEquals(listOf(true, true, true), vm.state.value.rows.map { it.hasLegBefore })
+        assertEquals(listOf(1, 2, 3), vm.state.value.rows.map { it.legBefore })
+    }
+
+    @Test
+    fun `DPV-M5 읽기 전용이면 시트와 확인창이 열리지 않는다(뷰모델에서 막는다)`() = runTest {
+        val t = trip()
+        entitlement = Entitlement.Free
+        val vm = vm(t.id)
+        val stop = vm.state.value.rows[0].stop.id
+        vm.onAction(DayPlanAction.OpenStop(stop))
+        vm.onAction(DayPlanAction.OpenStart)
+        vm.onAction(DayPlanAction.Remove(stop))
+        assertNull(vm.state.value.editing)
+        assertFalse(vm.state.value.startSheet)
+        assertNull(vm.state.value.confirmRemove)
+        assertNull(vm.state.value.message)
+    }
+
+    @Test
+    fun `DPV-M1 날짜를 바꾼 뒤 늦게 온 이전 날 결과는 덮어쓰지 않는다`() = runTest {
+        val t = trip(days = 2)
+        editor.addStop(t.id, d1.plusDays(1), "p5")
+        val gate = kotlinx.coroutines.CompletableDeferred<Unit>()
+        var holdDay1 = false
+        val slow = DayLegs { _, day -> if (holdDay1 && day.date == d1) gate.await(); List(app.signkorean.domain.route.legCount(day)) { 60L } }
+        val vm = DayPlanViewModel(t.id, null, store, editor, content, slow, { entitlement })
+        holdDay1 = true
+        vm.onAction(DayPlanAction.Refresh) // 첫날 다시 그리기가 경로에서 멈춘다
+        vm.onAction(DayPlanAction.SelectDate(d1.plusDays(1)))
+        gate.complete(Unit)
+        assertEquals(d1.plusDays(1), vm.state.value.date)
+        assertEquals(listOf("p5"), vm.state.value.rows.map { it.stop.place.value })
+    }
+
+    @Test
+    fun `DPV-M6 진행 중 삭제 확인은 창을 닫지 않는다`() = runTest {
+        val t = trip()
+        val gate = kotlinx.coroutines.CompletableDeferred<Unit>()
+        var hold = false
+        val slow = DayLegs { _, day -> if (hold) gate.await(); List(app.signkorean.domain.route.legCount(day)) { null } }
+        val vm = DayPlanViewModel(t.id, null, store, editor, content, slow, { entitlement })
+        val first = vm.state.value.rows[0].stop.id
+        hold = true
+        vm.onAction(DayPlanAction.MoveDown(first)) // 저장 뒤 그리기가 멈춰 busy 가 남는다
+        assertTrue(vm.state.value.busy)
+        vm.onAction(DayPlanAction.Remove(first))
+        vm.onAction(DayPlanAction.ConfirmRemove)
+        assertEquals(first, vm.state.value.confirmRemove)
+        gate.complete(Unit)
+        assertFalse(vm.state.value.busy)
     }
 }
