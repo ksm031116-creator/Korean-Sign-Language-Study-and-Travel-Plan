@@ -109,9 +109,18 @@ class Entitlements(
         PurchaseResult.Pending -> PurchaseFlowState.Pending
         PurchaseResult.Cancelled -> PurchaseFlowState.Cancelled
         is PurchaseResult.Failed -> PurchaseFlowState.Failed(result.reason)
-        PurchaseResult.AlreadyOwned ->
-            if (sync() is StoreQuery.Success && _entitlement.value == Entitlement.Paid) PurchaseFlowState.Succeeded
-            else PurchaseFlowState.Failed(FailReason.Unknown)
+        PurchaseResult.AlreadyOwned, PurchaseResult.Unconfirmed -> settleFromStore()
+    }
+
+    /** 결제 결과를 스토어 목록으로 정한다. 대기 중인 구매가 있으면(같은 상품을 다시 결제) 실패가 아니라 대기다. */
+    private suspend fun settleFromStore(): PurchaseFlowState {
+        val query = sync()
+        return when {
+            _entitlement.value == Entitlement.Paid -> PurchaseFlowState.Succeeded
+            query is StoreQuery.Success && query.purchases.any { it.state == StorePurchase.State.Pending } ->
+                PurchaseFlowState.Pending
+            else -> PurchaseFlowState.Failed(FailReason.Unknown)
+        }
     }
 
     private suspend fun sync(): StoreQuery = storeLock.withLock {
@@ -130,9 +139,18 @@ class Entitlements(
     private suspend fun apply(purchases: List<StorePurchase>) {
         val owned = purchases.filter { it.state == StorePurchase.State.Purchased }
         if (owned.isNotEmpty()) {
+            val wasFree = _entitlement.value == Entitlement.Free
             grant(Entitlement.Paid)
             owned.filterNot { it.acknowledged }.forEach { acknowledge(it.token) }
-            _purchaseFlow.update { if (it == PurchaseFlowState.Pending) PurchaseFlowState.Succeeded else it }
+            // 대기 결제가 끝났거나, 결제 화면을 벗어난 뒤 결과가 스토어에만 남은 경우도 성공 신호를 준다.
+            // 이미 Paid 였던 확인(앱을 켤 때마다)은 신호를 만들지 않는다. 결제 중이면 unlock 이 직접 정한다.
+            _purchaseFlow.update {
+                when {
+                    it == PurchaseFlowState.Pending -> PurchaseFlowState.Succeeded
+                    wasFree && it != PurchaseFlowState.InProgress -> PurchaseFlowState.Succeeded
+                    else -> it
+                }
+            }
         } else {
             grant(Entitlement.Free)
             val pending = purchases.any { it.state == StorePurchase.State.Pending }
@@ -148,7 +166,11 @@ class Entitlements(
 
     /** 이번 실행은 확인된 값을 쓴다. 캐시 저장 실패는 다음 확인에서 다시 저장된다. */
     private suspend fun grant(entitlement: Entitlement) {
-        _entitlement.value = entitlement
+        // 스토어로 확인한 값이 캐시보다 새롭다. 앞서 캐시 읽기가 실패했어도 이제 다시 읽지 않는다.
+        loadLock.withLock {
+            _entitlement.value = entitlement
+            loaded = true
+        }
         try {
             cache.save(entitlement)
         } catch (e: CancellationException) {
@@ -170,14 +192,15 @@ class Entitlements(
         if (loaded) return
         loadLock.withLock {
             if (loaded) return
+            // 읽기가 실패하면 이번에는 Free 로 두되 loaded 를 세우지 않는다. 일시적 입출력 오류 하나로
+            // 오프라인 Paid 사용자가 그 실행 내내 Free 가 되지 않게, 다음 호출이 다시 읽는다.
             _entitlement.value = try {
-                cache.load()
+                cache.load().also { loaded = true }
             } catch (e: CancellationException) {
                 throw e
             } catch (_: Exception) {
                 Entitlement.Free
             }
-            loaded = true
         }
     }
 }

@@ -84,8 +84,15 @@ class FakeEntitlementGateway(
 
 class FakeEntitlementCache(@Volatile var stored: Entitlement = Entitlement.Free) : EntitlementCache {
     @Volatile var failNextSave = false
+    @Volatile var failNextLoad = false
 
-    override suspend fun load(): Entitlement = stored
+    override suspend fun load(): Entitlement {
+        if (failNextLoad) {
+            failNextLoad = false
+            throw FakeStorageException("entitlement read")
+        }
+        return stored
+    }
     override suspend fun save(entitlement: Entitlement) {
         if (failNextSave) {
             failNextSave = false

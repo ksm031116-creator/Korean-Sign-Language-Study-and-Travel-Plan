@@ -236,6 +236,65 @@ class EntitlementsTest {
     }
 
     @Test
+    fun `캐시 읽기가 한 번 실패해도 다음에 다시 읽는다 (오프라인 Paid 유지)`() = runTest {
+        cache.stored = Entitlement.Paid
+        cache.failNextLoad = true
+        gateway.queryFails = true
+        assertEquals(Entitlement.Free, entitlements.current(), "읽지 못한 동안은 Free 로 본다")
+        entitlements.refresh()
+        assertEquals(Entitlement.Paid, entitlements.current())
+    }
+
+    @Test
+    fun `확인된 권한은 뒤늦은 캐시 읽기가 덮지 않는다`() = runTest {
+        cache.failNextLoad = true
+        assertEquals(Entitlement.Free, entitlements.current())
+        gateway.owned = listOf(purchased("t"))
+        cache.failNextSave = true // 캐시에는 Free 가 남아 있다
+        entitlements.refresh()
+        assertEquals(Entitlement.Paid, entitlements.current())
+    }
+
+    @Test
+    fun `대기 결제가 있는데 다시 Unlock 하면 대기 안내`() = runTest {
+        gateway.owned = listOf(pending("p"))
+        gateway.nextPurchase = PurchaseResult.AlreadyOwned
+        entitlements.unlock()
+        assertEquals(PurchaseFlowState.Pending, flow)
+        assertEquals(Entitlement.Free, entitlements.current())
+    }
+
+    @Test
+    fun `결과를 받지 못한 결제는 스토어를 다시 보고 정한다`() = runTest {
+        gateway.nextPurchase = PurchaseResult.Unconfirmed
+        entitlements.unlock()
+        assertEquals(PurchaseFlowState.Failed(FailReason.Unknown), flow, "스토어에 구매가 없으면 과금되지 않은 것")
+
+        gateway.owned = listOf(purchased("late", acknowledged = false))
+        entitlements.unlock()
+        assertEquals(PurchaseFlowState.Succeeded, flow)
+        assertEquals(Entitlement.Paid, entitlements.current())
+        assertEquals(listOf("late"), gateway.acknowledged)
+    }
+
+    @Test
+    fun `결제 화면 밖에서 Free 가 Paid 로 바뀌어도 성공 신호를 준다`() = runTest {
+        gateway.nextPurchase = PurchaseResult.Cancelled
+        entitlements.unlock()
+        gateway.owned = listOf(purchased("t")) // 결제 화면을 벗어난 뒤 결과가 스토어에만 남았다
+        entitlements.refresh()
+        assertEquals(PurchaseFlowState.Succeeded, flow)
+    }
+
+    @Test
+    fun `이미 Paid 였으면 확인할 때마다 성공 신호를 만들지 않는다`() = runTest {
+        cache.stored = Entitlement.Paid
+        gateway.owned = listOf(purchased("t"))
+        entitlements.refresh()
+        assertEquals(PurchaseFlowState.Idle, flow)
+    }
+
+    @Test
     fun `가격은 스토어의 현지화 문자열 그대로, 없으면 null`() = runTest {
         gateway.price = "¥150"
         assertEquals("¥150", entitlements.localizedPrice())

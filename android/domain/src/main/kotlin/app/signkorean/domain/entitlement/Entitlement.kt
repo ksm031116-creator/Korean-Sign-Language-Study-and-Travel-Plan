@@ -58,6 +58,9 @@ sealed interface PurchaseResult {
 
     /** 이 계정이 이미 샀다(재설치 후 Unlock). 구매 목록을 다시 읽어 Paid 로 만든다. */
     data object AlreadyOwned : PurchaseResult
+
+    /** 결제 화면의 결과를 받지 못했다(시간 초과, 결제 앱 종료). 구매 목록을 다시 읽어 정한다. */
+    data object Unconfirmed : PurchaseResult
     data class Failed(val reason: FailReason) : PurchaseResult
 }
 
