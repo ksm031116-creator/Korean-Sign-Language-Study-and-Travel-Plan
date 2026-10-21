@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 휴지통 픽토그램. .work/build_pictograms.py 가 만든다 — 직접 고치지 말고 스크립트를 고친다.
+     공공 안내 기호를 단순화해 직접 그린 그림이며 타사 이미지가 아니다. 색은 SignPlate 가 흰색으로 칠한다. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="120dp"
+    android:height="100dp"
+    android:viewportWidth="120"
+    android:viewportHeight="100">
+    <group android:translateX="60" android:translateY="50">
+        <path android:fillColor="#FFFFFFFF" android:pathData="M-30,-34 h60 v8 h-60 Z" />
+        <path android:fillColor="#FFFFFFFF" android:pathData="M-8,-42 h16 v6 h-16 Z" />
+        <path android:strokeColor="#FFFFFFFF" android:strokeWidth="6" android:strokeLineCap="round" android:strokeLineJoin="round" android:pathData="M-24,-20 l6,60 h36 l6,-60" />
+        <path android:strokeColor="#FFFFFFFF" android:strokeWidth="4" android:strokeLineCap="round" android:strokeLineJoin="round" android:pathData="M-8,-10 v40 M8,-10 v40" />
+    </group>
+</vector>

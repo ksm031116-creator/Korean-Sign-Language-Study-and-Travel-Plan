@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 방패와 별(경찰) 픽토그램. .work/build_pictograms.py 가 만든다 — 직접 고치지 말고 스크립트를 고친다.
+     공공 안내 기호를 단순화해 직접 그린 그림이며 타사 이미지가 아니다. 색은 SignPlate 가 흰색으로 칠한다. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="120dp"
+    android:height="100dp"
+    android:viewportWidth="120"
+    android:viewportHeight="100">
+    <group android:translateX="60" android:translateY="50">
+        <path android:fillColor="#FFFFFFFF" android:fillType="evenOdd" android:pathData="M0,-44 l34,12 v20 c0,30 -18,46 -34,54 c-16,-8 -34,-24 -34,-54 v-20 Z M0,-22 l5,11 h12 l-10,7 l4,12 l-11,-7 l-11,7 l4,-12 l-10,-7 h12 Z" />
+    </group>
+</vector>

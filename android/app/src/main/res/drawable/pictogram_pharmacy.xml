@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 약국 십자 픽토그램. .work/build_pictograms.py 가 만든다 — 직접 고치지 말고 스크립트를 고친다.
+     공공 안내 기호를 단순화해 직접 그린 그림이며 타사 이미지가 아니다. 색은 SignPlate 가 흰색으로 칠한다. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="120dp"
+    android:height="100dp"
+    android:viewportWidth="120"
+    android:viewportHeight="100">
+    <group android:translateX="60" android:translateY="50">
+        <path android:fillColor="#FFFFFFFF" android:pathData="M-12,-40 h24 v28 h28 v24 h-28 v28 h-24 v-28 h-28 v-24 h28 Z" />
+    </group>
+</vector>

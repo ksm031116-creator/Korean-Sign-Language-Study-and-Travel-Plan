@@ -1,6 +1,6 @@
 {
  "schemaVersion": 1,
- "version": "20e52ae63ec4",
+ "version": "238107051cd4",
  "locales": {
   "en": "reviewed",
   "ja": "draft"
@@ -486,7 +486,7 @@
     "en": "Leave your bag before going in.",
     "ja": "入る前に荷物を預ける場所です。"
    },
-   "pictogram": null,
+   "pictogram": "lockers",
    "plateColor": "#4a5b8c",
    "audio": {
     "path": "audio/t-museum-3.m4a",
@@ -1319,7 +1319,7 @@
     "en": "Common in department stores and large stations.",
     "ja": "百貨店や大きな駅によくあります。"
    },
-   "pictogram": null,
+   "pictogram": "nursing",
    "plateColor": "#2f6fb0",
    "audio": null,
    "reviewed": true
@@ -1583,7 +1583,7 @@
     "en": "Staff-only doors and closed-off areas.",
     "ja": "関係者専用のドアや閉鎖された場所。"
    },
-   "pictogram": null,
+   "pictogram": "noEntry",
    "plateColor": "#c0392b",
    "audio": null,
    "reviewed": true
@@ -1605,7 +1605,7 @@
     "en": "주의 means caution. It pairs with many other words.",
     "ja": "주의 は「注意」。ほかの言葉ともよく組み合わさります。"
    },
-   "pictogram": null,
+   "pictogram": "caution",
    "plateColor": "#c0392b",
    "audio": null,
    "reviewed": true
@@ -1693,7 +1693,7 @@
     "en": "On subway platforms where lines meet.",
     "ja": "路線が交わる地下鉄のホームで見かけます。"
    },
-   "pictogram": null,
+   "pictogram": "transfer",
    "plateColor": "#1f6f78",
    "audio": null,
    "reviewed": true
@@ -1803,7 +1803,7 @@
     "en": "Often labelled ATM as well.",
     "ja": "ATM とも表示されています。"
    },
-   "pictogram": null,
+   "pictogram": "atm",
    "plateColor": "#5b4b8a",
    "audio": null,
    "reviewed": true
@@ -1935,7 +1935,7 @@
     "en": "In many restrooms the sign asks you to put paper in the bin, not the toilet.",
     "ja": "トイレでは紙を便器ではなくごみ箱に捨てるよう求める表示がよくあります。"
    },
-   "pictogram": null,
+   "pictogram": "wasteBin",
    "plateColor": "#2f6fb0",
    "audio": null,
    "reviewed": true
@@ -1957,7 +1957,7 @@
     "en": "Found in both men’s and women’s restrooms in newer buildings.",
     "ja": "新しい建物では男性用・女性用どちらのトイレにもあります。"
    },
-   "pictogram": null,
+   "pictogram": "babyChange",
    "plateColor": "#2f6fb0",
    "audio": null,
    "reviewed": true
@@ -2001,7 +2001,7 @@
     "en": "Smoking is only allowed in these rooms or marked zones.",
     "ja": "喫煙はこの部屋か表示された場所だけでできます。"
    },
-   "pictogram": null,
+   "pictogram": "smokingRoom",
    "plateColor": "#2f6fb0",
    "audio": null,
    "reviewed": true
@@ -2045,7 +2045,7 @@
     "en": "Free drinking water in parks and public buildings.",
     "ja": "公園や公共施設で無料の飲み水が飲めます。"
    },
-   "pictogram": null,
+   "pictogram": "drinkingWater",
    "plateColor": "#2f6fb0",
    "audio": null,
    "reviewed": true
@@ -2419,7 +2419,7 @@
     "en": "A desk or board where you can ask the way.",
     "ja": "道を尋ねられるカウンターや案内板。"
    },
-   "pictogram": null,
+   "pictogram": "info",
    "plateColor": "#3a7d44",
    "audio": null,
    "reviewed": true
@@ -2683,7 +2683,7 @@
     "en": "Usually on a red or yellow sign. Stay back.",
     "ja": "たいてい赤か黄色の看板。近づかないでください。"
    },
-   "pictogram": null,
+   "pictogram": "caution",
    "plateColor": "#c0392b",
    "audio": null,
    "reviewed": true
@@ -2727,7 +2727,7 @@
     "en": "반입 means bringing in. Common at museums and theatres.",
     "ja": "반입 は「搬入・持ち込み」。博物館や劇場でよく見かけます。"
    },
-   "pictogram": null,
+   "pictogram": "noFood",
    "plateColor": "#c0392b",
    "audio": null,
    "reviewed": true
@@ -2815,7 +2815,7 @@
     "en": "반려동물 is a companion animal.",
     "ja": "반려동물 は「伴侶動物(ペット)」。"
    },
-   "pictogram": null,
+   "pictogram": "noPets",
    "plateColor": "#c0392b",
    "audio": null,
    "reviewed": true
@@ -2837,7 +2837,7 @@
     "en": "Red cabinets in stations and corridors.",
     "ja": "駅や廊下の赤いボックスに入っています。"
    },
-   "pictogram": null,
+   "pictogram": "fireExtinguisher",
    "plateColor": "#c0392b",
    "audio": null,
    "reviewed": true
@@ -2925,7 +2925,7 @@
     "en": "타는 곳 means where you board.",
     "ja": "타는 곳 は「乗る所」。"
    },
-   "pictogram": null,
+   "pictogram": "taxi",
    "plateColor": "#1f6f78",
    "audio": null,
    "reviewed": true
@@ -3123,7 +3123,7 @@
     "en": "Painted stripes on the road.",
     "ja": "道路に描かれたしま模様です。"
    },
-   "pictogram": null,
+   "pictogram": "crossing",
    "plateColor": "#1f6f78",
    "audio": null,
    "reviewed": true
@@ -3145,7 +3145,7 @@
     "en": "장 at the end means place.",
     "ja": "最後の 장 は「場」。"
    },
-   "pictogram": null,
+   "pictogram": "parking",
    "plateColor": "#1f6f78",
    "audio": null,
    "reviewed": true
@@ -3167,7 +3167,7 @@
     "en": "On airport railroad and bus signs.",
     "ja": "空港鉄道やバスの表示に。"
    },
-   "pictogram": null,
+   "pictogram": "airport",
    "plateColor": "#1f6f78",
    "audio": null,
    "reviewed": true
@@ -3299,7 +3299,7 @@
     "en": "Charging stations in cafés, stations and malls.",
     "ja": "カフェ、駅、モールに充電スタンドがあります。"
    },
-   "pictogram": null,
+   "pictogram": "phoneCharging",
    "plateColor": "#5b4b8a",
    "audio": null,
    "reviewed": true
@@ -3365,7 +3365,7 @@
     "en": "Smaller local posts are called 파출소 or 지구대.",
     "ja": "小さな交番は 파출소 や 지구대 と呼ばれます。"
    },
-   "pictogram": null,
+   "pictogram": "police",
    "plateColor": "#5b4b8a",
    "audio": null,
    "reviewed": true
@@ -3387,7 +3387,7 @@
     "en": "Maps and help in English. Look for the i sign.",
     "ja": "地図や案内があり、日本語が通じることもあります。i のマークが目印です。"
    },
-   "pictogram": null,
+   "pictogram": "info",
    "plateColor": "#5b4b8a",
    "audio": null,
    "reviewed": true
@@ -3409,7 +3409,7 @@
     "en": "Bins are split by type: 일반 (general), 플라스틱, 캔, 종이.",
     "ja": "種類ごとに分かれています: 일반(一般)、플라스틱、캔、종이。"
    },
-   "pictogram": null,
+   "pictogram": "recycling",
    "plateColor": "#5b4b8a",
    "audio": null,
    "reviewed": true

@@ -323,9 +323,7 @@ DATA.landmarks = DATA.areas;
 // 실제로 그림과 함께 쓰이는 표지판만. 카드 뒷면에서만 그린다 — 앞면에 그림이 있으면 글자를 읽지 않고도 맞힐 수 있다.
 // 그림은 app.js 의 PICTOGRAMS 에서 공공 기호를 단순화해 직접 그린 SVG.
 DATA.pictograms = {
-  '화장실':'restroom', '공중 화장실':'restroom', '남자 화장실':'men', '여자 화장실':'women', '장애인 화장실':'accessible',
-  '출구':'exit', '비상구':'exit', '엘리베이터':'elevator', '에스컬레이터':'escalator', '계단':'stairs', '비상계단':'stairs',
-  '지하철':'subway', '버스 정류장':'bus', '금연':'noSmoking', '촬영 금지':'noPhoto', '와이파이':'wifi', '약국':'pharmacy'
+  '화장실':'restroom', '공중 화장실':'restroom', '남자 화장실':'men', '여자 화장실':'women', '장애인 화장실':'accessible', '출구':'exit', '비상구':'exit', '엘리베이터':'elevator', '에스컬레이터':'escalator', '계단':'stairs', '비상계단':'stairs', '지하철':'subway', '버스 정류장':'bus', '금연':'noSmoking', '촬영 금지':'noPhoto', '와이파이':'wifi', '약국':'pharmacy', '수유실':'nursing', '기저귀 교환대':'babyChange', '안내':'info', '관광안내소':'info', '현금인출기':'atm', '택시 타는 곳':'taxi', '주차장':'parking', '공항':'airport', '보관함':'lockers', '휴지통':'wasteBin', '음수대':'drinkingWater', '출입 금지':'noEntry', '미끄럼 주의':'caution', '위험':'caution', '소화기':'fireExtinguisher', '휴대폰 충전':'phoneCharging', '흡연실':'smokingRoom', '반려동물 동반 금지':'noPets', '음식물 반입 금지':'noFood', '분리수거':'recycling', '횡단보도':'crossing', '경찰서':'police', '환승':'transfer'
 };
 
 // ---------- 카드 생성 ----------

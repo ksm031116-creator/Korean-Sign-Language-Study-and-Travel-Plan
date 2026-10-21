@@ -13,8 +13,7 @@ class PictogramCatalog(val ids: Set<PictogramId>) {
         /** 앱에 들어간 픽토그램. ID 를 더하면 UI 의 그림 매핑 테스트가 빠진 그림을 잡는다. */
         val BUNDLED = PictogramCatalog(
             listOf(
-                "restroom", "men", "women", "accessible", "exit", "elevator", "escalator",
-                "stairs", "subway", "bus", "noSmoking", "noPhoto", "wifi", "pharmacy",
+                "restroom", "men", "women", "accessible", "exit", "elevator", "escalator", "stairs", "subway", "bus", "noSmoking", "noPhoto", "wifi", "pharmacy", "nursing", "babyChange", "info", "atm", "taxi", "parking", "airport", "lockers", "wasteBin", "drinkingWater", "noEntry", "caution", "fireExtinguisher", "phoneCharging", "smokingRoom", "noPets", "noFood", "recycling", "crossing", "police", "transfer",
             ).map(::PictogramId).toSet(),
         )
     }

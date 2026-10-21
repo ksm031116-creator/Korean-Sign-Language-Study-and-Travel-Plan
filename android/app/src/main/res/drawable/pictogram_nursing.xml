@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 젖병(수유실) 픽토그램. .work/build_pictograms.py 가 만든다 — 직접 고치지 말고 스크립트를 고친다.
+     공공 안내 기호를 단순화해 직접 그린 그림이며 타사 이미지가 아니다. 색은 SignPlate 가 흰색으로 칠한다. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="120dp"
+    android:height="100dp"
+    android:viewportWidth="120"
+    android:viewportHeight="100">
+    <group android:translateX="60" android:translateY="50">
+        <path android:fillColor="#FFFFFFFF" android:pathData="M-5,-44 h10 l3,12 h-16 Z" />
+        <path android:fillColor="#FFFFFFFF" android:pathData="M-12,-32 h24 v8 h-24 Z" />
+        <path android:strokeColor="#FFFFFFFF" android:strokeWidth="6" android:strokeLineCap="round" android:strokeLineJoin="round" android:pathData="M-6,-22 h12 a8,8 0 0,1 8,8 v46 a8,8 0 0,1 -8,8 h-12 a8,8 0 0,1 -8,-8 v-46 a8,8 0 0,1 8,-8 Z" />
+        <path android:strokeColor="#FFFFFFFF" android:strokeWidth="4" android:strokeLineCap="round" android:strokeLineJoin="round" android:pathData="M-14,0 h12 M-14,14 h12" />
+    </group>
+</vector>

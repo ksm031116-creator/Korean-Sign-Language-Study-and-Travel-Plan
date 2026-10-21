@@ -40,6 +40,38 @@
     <string name="pictogram_restroom">men\'s and women\'s restroom symbol</string>
     <string name="pictogram_exit">running person and door symbol</string>
     <string name="pictogram_no_smoking">no smoking symbol</string>
+    <string name="pictogram_men">man symbol</string>
+    <string name="pictogram_women">woman symbol</string>
+    <string name="pictogram_accessible">wheelchair symbol</string>
+    <string name="pictogram_elevator">elevator symbol</string>
+    <string name="pictogram_escalator">escalator symbol</string>
+    <string name="pictogram_stairs">stairs symbol</string>
+    <string name="pictogram_subway">subway train symbol</string>
+    <string name="pictogram_bus">bus symbol</string>
+    <string name="pictogram_no_photo">no photography symbol</string>
+    <string name="pictogram_wifi">Wi-Fi symbol</string>
+    <string name="pictogram_pharmacy">pharmacy cross</string>
+    <string name="pictogram_nursing">baby bottle symbol</string>
+    <string name="pictogram_baby_change">baby changing table symbol</string>
+    <string name="pictogram_info">information symbol</string>
+    <string name="pictogram_atm">cash machine symbol</string>
+    <string name="pictogram_taxi">taxi symbol</string>
+    <string name="pictogram_parking">parking symbol</string>
+    <string name="pictogram_airport">airplane symbol</string>
+    <string name="pictogram_lockers">lockers symbol</string>
+    <string name="pictogram_waste_bin">waste bin symbol</string>
+    <string name="pictogram_drinking_water">drinking fountain symbol</string>
+    <string name="pictogram_no_entry">no entry symbol</string>
+    <string name="pictogram_caution">warning triangle</string>
+    <string name="pictogram_fire_extinguisher">fire extinguisher symbol</string>
+    <string name="pictogram_phone_charging">phone charging symbol</string>
+    <string name="pictogram_smoking_room">smoking area symbol</string>
+    <string name="pictogram_no_pets">no pets symbol</string>
+    <string name="pictogram_no_food">no food or drink symbol</string>
+    <string name="pictogram_recycling">recycling symbol</string>
+    <string name="pictogram_crossing">pedestrian crossing symbol</string>
+    <string name="pictogram_police">police badge symbol</string>
+    <string name="pictogram_transfer">transfer arrows symbol</string>
 
     <!-- SC04 Learn. 방향 범례는 사용자 언어 + 한국어 병기 (설계서 §8.5, UX11). 한국어 부분은 학습 요소라 번역하지 않는다. -->
     <string name="ko_know" translatable="false">알아요</string>
