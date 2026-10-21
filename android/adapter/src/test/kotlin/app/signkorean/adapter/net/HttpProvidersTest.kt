@@ -7,21 +7,26 @@ import app.signkorean.domain.place.PlaceSummary
 import app.signkorean.domain.place.PlaceSummaryResult
 import app.signkorean.domain.review.ReviewError
 import app.signkorean.domain.review.ReviewResponse
-import com.sun.net.httpserver.HttpServer
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
-import java.net.InetSocketAddress
+import java.net.InetAddress
+import java.net.ServerSocket
+import java.net.Socket
+import java.net.URI
+import java.util.concurrent.Executors
 
 /**
- * 중계 서버 계약 (PRD §10.3) 대 HTTP 어댑터. 실제 소켓으로 JDK 내장 서버에 붙는다(구현 계획 Phase 15 D3).
+ * 중계 서버 계약 (PRD §10.3) 대 HTTP 어댑터. 실제 소켓으로 테스트용 로컬 서버에 붙는다(구현 계획 Phase 15 D3).
  * 계약: 요청 언어는 `language` 와 `Accept-Language` 둘 다, 오류는 `{"error":{"code":..}}`, 8초 시간 제한.
  */
 class HttpProvidersTest {
 
-    private val server = HttpServer.create(InetSocketAddress("127.0.0.1", 0), 0)
+    // android.jar 에는 JDK 의 HTTP 서버가 없어 소켓으로 최소 HTTP/1.1 서버를 만든다(한 요청 = 한 연결).
+    private val server = ServerSocket(0, 50, InetAddress.getByName("127.0.0.1"))
+    private val pool = Executors.newCachedThreadPool()
     private var status = 200
     private var body = "{}"
     // 켜면 서버가 답하지 않고 기다린다(sleep 없이). 클라이언트의 읽기 시간 제한을 실제 소켓으로 확인한다.
@@ -33,28 +38,41 @@ class HttpProvidersTest {
     private var lastRawPath = ""
 
     init {
-        server.createContext("/") { ex ->
-            lastPath = ex.requestURI.path
-            lastRawPath = ex.requestURI.rawPath
-            lastQuery = ex.requestURI.query
-            lastAcceptLanguage = ex.requestHeaders.getFirst("Accept-Language")
-            if (hang) released.await()
-            val bytes = body.toByteArray()
-            ex.sendResponseHeaders(status, bytes.size.toLong())
-            ex.responseBody.use { it.write(bytes) }
+        pool.execute {
+            while (!server.isClosed) {
+                val socket = runCatching { server.accept() }.getOrNull() ?: break
+                // 기다리는 요청이 다음 요청을 막지 않게 요청마다 스레드.
+                pool.execute { serve(socket) }
+            }
         }
-        // 기다리는 요청이 다음 요청을 막지 않게 요청마다 스레드.
-        server.executor = java.util.concurrent.Executors.newCachedThreadPool()
-        server.start()
     }
 
-    private val base = "http://127.0.0.1:${server.address.port}"
+    private fun serve(socket: Socket) = socket.use { s ->
+        val reader = s.getInputStream().bufferedReader()
+        val target = reader.readLine()?.split(" ")?.getOrNull(1) ?: return
+        val headers = generateSequence { reader.readLine()?.takeIf { it.isNotEmpty() } }.toList()
+        val uri = URI(target)
+        lastPath = uri.path
+        lastRawPath = uri.rawPath
+        lastQuery = uri.query
+        lastAcceptLanguage = headers.firstOrNull { it.startsWith("Accept-Language:", ignoreCase = true) }?.substringAfter(":")?.trim()
+        if (hang) released.await()
+        val bytes = body.toByteArray()
+        val out = s.getOutputStream()
+        val head = "HTTP/1.1 $status X\r\nContent-Type: application/json\r\nContent-Length: ${bytes.size}\r\nConnection: close\r\n\r\n"
+        out.write(head.toByteArray())
+        out.write(bytes)
+        out.flush()
+    }
+
+    private val base = "http://127.0.0.1:${server.localPort}"
     private val client = ApiClient(base, timeoutMs = 500)
 
     @After
     fun stop() {
         released.countDown()
-        server.stop(0)
+        server.close()
+        pool.shutdownNow()
     }
 
     @Test
