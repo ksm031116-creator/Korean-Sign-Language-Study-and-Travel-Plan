@@ -306,6 +306,43 @@
     <string name="picker_added">Added</string>
     <string name="picker_add">Add</string>
 
+
+    <!-- SC13 날짜별 일정 · SC16 방문 장소 · SC17 하루 출발 (Phase 18) -->
+    <string name="day_tab">Day %1$d</string>
+    <string name="day_starts">Starts at %1$s</string>
+    <string name="day_from">From %1$s</string>
+    <string name="day_no_origin">No start point</string>
+    <string name="day_edit_start">Change start</string>
+    <string name="day_add_place">Add a place</string>
+    <string name="day_move_up">Move %1$s up</string>
+    <string name="day_move_down">Move %1$s down</string>
+    <string name="day_times">%1$s – %2$s</string>
+    <string name="day_plus_days">+%1$d day</string>
+    <string name="day_stay">%1$s stay</string>
+    <string name="day_leg">%1$s walk</string>
+    <string name="day_leg_unknown">Walking time not calculated</string>
+    <string name="day_summary">Travel %1$s · Stay %2$s · Ends %3$s</string>
+    <string name="day_summary_incomplete">Stay %1$s · End time unknown</string>
+    <string name="day_incomplete">Some walking times are missing, so arrival times after them and the day\'s end aren\'t shown.</string>
+    <string name="day_next_day">This day runs past midnight. Think about removing a place or shortening a stay.</string>
+    <string name="day_rounding">Each walk is rounded up to the minute, so the parts can add up to more than the total.</string>
+    <string name="day_recalc">This day changed. Walking routes will be updated when you\'re online.</string>
+    <string name="day_empty">No places on this day yet.</string>
+    <string name="day_edit_trip">Trip details</string>
+    <string name="day_readonly">On the free plan this trip is read-only. Nothing has been deleted.</string>
+    <string name="lock_change_trip">Change this trip</string>
+    <string name="stop_title">Edit visit</string>
+    <string name="stop_stay_label">Stay (minutes)</string>
+    <string name="stop_save">Save</string>
+    <string name="stop_move">Move to another day</string>
+    <string name="stop_remove">Remove from this day</string>
+    <string name="stop_remove_title">Remove this place?</string>
+    <string name="stop_remove_body">It\'s removed from this day only. Your saved signs and learning stay.</string>
+    <string name="start_title">Day start</string>
+    <string name="start_time">Start time</string>
+    <string name="start_origin">Start point</string>
+    <string name="start_apply">Apply</string>
+
     <plurals name="places_count">
         <item quantity="one">%d place</item>
         <item quantity="other">%d places</item>

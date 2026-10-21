@@ -68,12 +68,18 @@ class PlanGateViewModel(private val entitlements: Entitlements, private val relo
 
 /** SC11 Plan 탭 루트. 무료면 잠금 안내(U-09), 유료면 여행 목록(Phase 17 에서 만든다). */
 @Composable
-fun PlanScreen(onUpgrade: () -> Unit, paidContent: @Composable () -> Unit, viewModel: PlanGateViewModel = koinViewModel()) {
+fun PlanScreen(
+    onUpgrade: () -> Unit,
+    paidContent: @Composable () -> Unit,
+    /** 무료 상태의 내용. 기본은 잠금 안내. 여행이 있으면 읽기 전용 목록을 보인다(E-12). */
+    freeContent: @Composable () -> Unit = { PlanLockedContent(onUpgrade) },
+    viewModel: PlanGateViewModel = koinViewModel(),
+) {
     val ready by viewModel.ready.collectAsStateWithLifecycle()
     val entitlement by viewModel.entitlement.collectAsStateWithLifecycle()
     if (!ready) return
     if (entitlement == Entitlement.Free) {
-        PlanLockedContent(onUpgrade)
+        freeContent()
     } else {
         Column(Modifier.fillMaxSize()) {
             Column(Modifier.weight(1f)) { paidContent() }

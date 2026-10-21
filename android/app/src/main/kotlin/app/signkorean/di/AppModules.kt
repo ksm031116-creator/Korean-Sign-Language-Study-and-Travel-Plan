@@ -53,6 +53,9 @@ import kotlinx.coroutines.SupervisorJob
 import app.signkorean.ui.plan.PlanGateViewModel
 import app.signkorean.ui.plan.AddToPlanViewModel
 import app.signkorean.ui.plan.PlacePickerViewModel
+import app.signkorean.ui.plan.DayPlanViewModel
+import app.signkorean.domain.route.DayLegs
+import app.signkorean.domain.route.UnknownLegs
 import app.signkorean.ui.plan.TripFormViewModel
 import app.signkorean.ui.plan.TripListViewModel
 import app.signkorean.ui.places.PlaceDetailViewModel
@@ -134,6 +137,8 @@ val learningModule = module {
     // 여행 (Phase 16). 같은 데이터베이스 파일이지만 학습·북마크와 따로 지운다(FR22).
     single<TripStore> { get<RoomLearningStorage>().trips }
     single { TripEditor(get(), get(), get(), get(), get()) }
+    // 경로 공급자는 Phase 19. 그전에는 모든 구간이 "모름"이라 일정은 Incomplete 로 보인다(FR20).
+    single<DayLegs> { UnknownLegs }
     factory { SetBookmark(get(), get(), get(), get()) }
     factory { ClearBookmarks(get()) }
     factory { StartSession(get(), get(), get(), get()) }
@@ -176,6 +181,7 @@ val uiModule = module {
     viewModel { params -> TripFormViewModel(params.getOrNull(), get(), get(), get()) }
     viewModel { params -> AddToPlanViewModel(params.get(), get(), get()) }
     viewModel { params -> PlacePickerViewModel(params.get(), params.get(), get(), get(), get()) }
+    viewModel { params -> DayPlanViewModel(params.get(), params.getOrNull(), get(), get(), get(), get(), get()) }
     viewModel { params -> PlaceDetailViewModel(params.get(), get(), get(), get(), get(), get(), get(), get(), get()) }
     viewModel { params -> CollectionViewModel(params.get(), get(), get(), get()) }
     viewModelOf(::AppGateViewModel)

@@ -106,10 +106,12 @@ class DayPlanViewModelTest {
     fun `T-16 순서를 바꾸면 저장 뒤 반영되고 경로 다시 계산 표시`() = runTest {
         val t = trip()
         val vm = vm(t.id)
-        assertFalse(vm.state.value.needsRecalculation)
+        // 장소를 넣은 것만으로도 경로를 계산해야 한다. 순서를 바꾸면 revision 이 올라 이전 경로 응답을 버린다(T-07).
+        val before = vm.state.value.day!!.revision
         vm.onAction(DayPlanAction.MoveDown(vm.state.value.rows[0].stop.id))
         assertEquals(listOf("p2", "p1"), vm.state.value.rows.map { it.stop.place.value })
         assertTrue(vm.state.value.needsRecalculation)
+        assertEquals(before + 1, vm.state.value.day!!.revision)
         assertEquals(listOf(PlaceId("p2"), PlaceId("p1")), store.get(t.id)!!.day(d1).stops.map { it.place })
     }
 

@@ -84,7 +84,14 @@ object TripTags {
 
 /** SC11 여행 목록 (유료일 때 Plan 탭 루트). */
 @Composable
-fun TripListScreen(onNewTrip: () -> Unit, onOpenTrip: (TripId) -> Unit, viewModel: TripListViewModel = koinViewModel()) {
+fun TripListScreen(
+    onNewTrip: () -> Unit,
+    onOpenTrip: (TripId) -> Unit,
+    /** 무료 상태: 만들지 못하고 보기만 한다(E-12). 여행이 없으면 잠금 안내다(U-09). */
+    readOnly: Boolean = false,
+    onUpgrade: () -> Unit = {},
+    viewModel: TripListViewModel = koinViewModel(),
+) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val sampleTitle = stringResource(R.string.plan_sample_title)
     LifecycleResumeEffect(viewModel) {
@@ -98,19 +105,35 @@ fun TripListScreen(onNewTrip: () -> Unit, onOpenTrip: (TripId) -> Unit, viewMode
             }
         }
     }
-    TripListContent(state, onNewTrip, onOpenTrip, onSample = { viewModel.onAction(TripListAction.CreateSample(sampleTitle)) })
+    if (readOnly && !state.loading && state.trips.isEmpty()) {
+        PlanLockedContent(onUpgrade)
+        return
+    }
+    TripListContent(state, onNewTrip, onOpenTrip, onSample = { viewModel.onAction(TripListAction.CreateSample(sampleTitle)) }, readOnly = readOnly, onUpgrade = onUpgrade)
 }
 
 @Composable
-fun TripListContent(state: TripListUiState, onNewTrip: () -> Unit, onOpenTrip: (TripId) -> Unit, onSample: () -> Unit) {
+fun TripListContent(
+    state: TripListUiState,
+    onNewTrip: () -> Unit,
+    onOpenTrip: (TripId) -> Unit,
+    onSample: () -> Unit,
+    readOnly: Boolean = false,
+    onUpgrade: () -> Unit = {},
+) {
     val t = SignKoreanTheme.tokens
     val formats = rememberAppFormats()
     if (state.loading) return
     LazyColumn(Modifier.fillMaxSize().background(t.paper), contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
         item { Text(stringResource(R.string.plan_title), style = MaterialTheme.typography.headlineSmall, modifier = Modifier.semantics { heading() }) }
         item { Text(stringResource(R.string.plan_subtitle), style = MaterialTheme.typography.bodyMedium, color = t.muted) }
-        item { PrimaryButton(stringResource(R.string.plan_new_trip), onClick = onNewTrip, modifier = Modifier.fillMaxWidth()) }
-        if (state.trips.isEmpty()) {
+        if (readOnly) {
+            item { Text(stringResource(R.string.day_readonly), style = MaterialTheme.typography.bodyMedium) }
+            item { app.signkorean.ui.designsystem.LockBadge(stringResource(R.string.lock_trip_planning), onClick = onUpgrade) }
+        } else {
+            item { PrimaryButton(stringResource(R.string.plan_new_trip), onClick = onNewTrip, modifier = Modifier.fillMaxWidth()) }
+        }
+        if (state.trips.isEmpty() && !readOnly) {
             item {
                 EmptyState(title = stringResource(R.string.plan_empty_title), body = stringResource(R.string.plan_empty_body)) {
                     SecondaryButton(stringResource(R.string.plan_sample), onClick = onSample, enabled = !state.busy)

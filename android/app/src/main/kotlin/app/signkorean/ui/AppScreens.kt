@@ -13,6 +13,7 @@ import app.signkorean.ui.learn.ResultScreen
 import app.signkorean.ui.saved.SavedScreen
 import app.signkorean.ui.plan.PlanScreen
 import app.signkorean.ui.plan.PlacePickerScreen
+import app.signkorean.ui.plan.DayPlanScreen
 import app.signkorean.ui.plan.TripFormScreen
 import app.signkorean.ui.plan.TripListScreen
 import app.signkorean.domain.trip.TripId
@@ -96,6 +97,15 @@ fun AppScreen(route: Route, navigator: AppNavigator) {
         // 무료면 잠금 안내(U-09). 유료 여행 목록은 Phase 17 에서 만든다.
         ScreenId.SC11 -> PlanScreen(
             onUpgrade = { navigator.push(Route(ScreenId.SC21, UpgradeFeature.Plan.arg)) },
+            // 무료가 된 뒤에도 여행은 보인다(E-12). 만들기·고치기는 SC21.
+            freeContent = {
+                TripListScreen(
+                    onNewTrip = { navigator.push(Route(ScreenId.SC21, UpgradeFeature.Plan.arg)) },
+                    onOpenTrip = { id -> navigator.push(Route(ScreenId.SC13, id.value)) },
+                    readOnly = true,
+                    onUpgrade = { navigator.push(Route(ScreenId.SC21, UpgradeFeature.Plan.arg)) },
+                )
+            },
             paidContent = {
                 TripListScreen(
                     onNewTrip = { navigator.push(Route(ScreenId.SC12, TripFormArg.NEW)) },
@@ -132,6 +142,18 @@ fun AppScreen(route: Route, navigator: AppNavigator) {
                 onClose = { navigator.back() },
             )
         }
+        // SC13 인자: 여행 id, 또는 "여행 id|날짜"(그날을 열어 둔다).
+        ScreenId.SC13 -> route.arg?.let { arg ->
+            val (trip, date) = TripDayArg.parse(arg) ?: (TripId(arg) to null)
+            DayPlanScreen(
+                trip = trip,
+                date = date,
+                onClose = { navigator.back() },
+                onOpenPicker = { id, d -> navigator.push(Route(ScreenId.SC14, TripDayArg.of(id, d))) },
+                onEditTrip = { id -> navigator.push(Route(ScreenId.SC12, TripFormArg.edit(id))) },
+                onUpgrade = { f -> navigator.push(Route(ScreenId.SC21, f.arg)) },
+            )
+        } ?: PlaceholderScreen(route)
         ScreenId.SC14 -> TripDayArg.parse(route.arg)?.let { (trip, date) ->
             PlacePickerScreen(trip, date, onClose = { navigator.back() })
         } ?: PlaceholderScreen(route)

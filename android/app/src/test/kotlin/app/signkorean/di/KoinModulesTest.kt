@@ -47,6 +47,7 @@ class KoinModulesTest {
             // 여행 화면 인자: 여행·날짜·장소 ID.
             definition<app.signkorean.ui.plan.TripFormViewModel>(app.signkorean.domain.trip.TripId::class),
             definition<app.signkorean.ui.plan.AddToPlanViewModel>(app.signkorean.domain.content.PlaceId::class),
+            definition<app.signkorean.ui.plan.DayPlanViewModel>(app.signkorean.domain.trip.TripId::class, java.time.LocalDate::class),
             definition<app.signkorean.ui.plan.PlacePickerViewModel>(app.signkorean.domain.trip.TripId::class, java.time.LocalDate::class),
             // SC21 을 연 진입점(화면 인자).
             definition<app.signkorean.ui.upgrade.UpgradeViewModel>(app.signkorean.ui.upgrade.UpgradeFeature::class),
