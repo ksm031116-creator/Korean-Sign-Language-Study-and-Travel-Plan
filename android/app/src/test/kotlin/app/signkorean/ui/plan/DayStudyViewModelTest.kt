@@ -177,8 +177,43 @@ class DayStudyViewModelTest {
         val t = trip("cafe")
         vm(t).onAction(DayStudyAction.Start)
         editor.addStop(t.id, d1, "marketA")
-        val result = app.signkorean.ui.learn.ResultViewModel(content, sessions, start, app.signkorean.domain.trip.StudyCards(trips))
+        val result = app.signkorean.ui.learn.ResultViewModel(content, sessions, start, app.signkorean.domain.trip.StudyCards(trips), { entitlement })
         result.onAction(app.signkorean.ui.learn.ResultAction.PracticeAll)
         assertEquals(listOf("c1", "m1", "m2"), sessions.current()!!.cardIds.map { it.value })
+    }
+
+    // ---------- Phase 20 D1 리뷰 수정 ----------
+
+    @Test
+    fun `STY-M1 일정을 바꾼 직후 다시 읽기 전에 시작해도 바뀐 일정의 카드로 만든다(T-14)`() = runTest {
+        val t = trip("cafe", "marketA")
+        val vm = vm(t)
+        editor.removeStop(t.id, d1, trips.get(t.id)!!.day(d1).stops.first().id) // Refresh 없이
+        vm.onAction(DayStudyAction.Start)
+        assertEquals(listOf("m1", "m2"), sessions.current()!!.cardIds.map { it.value })
+    }
+
+    @Test
+    fun `STY-M2 읽기 실패는 카드 없음이 아니라 다시 시도`() = runTest {
+        val t = trip("cafe")
+        trips.failNextGet = true
+        val vm = vm(t)
+        assertTrue(vm.state.value.loadFailed)
+        assertFalse(vm.state.value.noCards)
+        vm.onAction(DayStudyAction.Refresh)
+        assertFalse(vm.state.value.loadFailed)
+        assertEquals(1, vm.state.value.cardCount)
+    }
+
+    @Test
+    fun `STY-L1 무료가 된 뒤 결과 화면에서 일정 학습을 다시 열 수 없다`() = runTest {
+        val t = trip("cafe")
+        vm(t).onAction(DayStudyAction.Start)
+        val before = sessions.current()!!.id
+        entitlement = Entitlement.Free
+        val result = app.signkorean.ui.learn.ResultViewModel(content, sessions, start, app.signkorean.domain.trip.StudyCards(trips), { entitlement })
+        result.onAction(app.signkorean.ui.learn.ResultAction.PracticeAll)
+        assertEquals(before, sessions.current()!!.id)
+        assertEquals(listOf<app.signkorean.ui.learn.ResultEffect>(app.signkorean.ui.learn.ResultEffect.Upgrade(UpgradeFeature.Plan)), result.effects.drain())
     }
 }

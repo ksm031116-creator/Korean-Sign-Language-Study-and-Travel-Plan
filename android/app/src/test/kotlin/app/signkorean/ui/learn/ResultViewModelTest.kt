@@ -58,7 +58,7 @@ class ResultViewModelTest {
         }
     }
 
-    private fun viewModel() = ResultViewModel(InMemoryContentRepository(pack), sessions, start, app.signkorean.domain.trip.StudyCards(app.signkorean.testing.FakeTripStore()))
+    private fun viewModel() = ResultViewModel(InMemoryContentRepository(pack), sessions, start, app.signkorean.domain.trip.StudyCards(app.signkorean.testing.FakeTripStore()), { app.signkorean.domain.entitlement.Entitlement.Paid })
 
     @Test
     fun `U-17 앎·모름 판정 수, 고유 카드 수, 남은 복습 수를 각각 보인다`() = runTest {
@@ -104,7 +104,7 @@ class ResultViewModelTest {
     @Test
     fun `출처에 카드가 없으면 안내만 하고 머문다`() = runTest {
         finishSession()
-        val vm = ResultViewModel(InMemoryContentRepository(ContentFixtures.pack()), sessions, start, app.signkorean.domain.trip.StudyCards(app.signkorean.testing.FakeTripStore()))
+        val vm = ResultViewModel(InMemoryContentRepository(ContentFixtures.pack()), sessions, start, app.signkorean.domain.trip.StudyCards(app.signkorean.testing.FakeTripStore()), { app.signkorean.domain.entitlement.Entitlement.Paid })
         vm.onAction(ResultAction.PracticeAll)
         assertNotNull(vm.state.value.message)
         assertEquals(null, vm.effects.tryReceive().getOrNull())
