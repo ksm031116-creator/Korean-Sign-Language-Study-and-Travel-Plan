@@ -36,6 +36,8 @@ class KoinModulesTest {
             definition<app.signkorean.ui.explore.CollectionViewModel>(app.signkorean.domain.learning.SessionSource::class),
             // 디버그 빌드 여부(앱 정보에서 읽은 값).
             definition<app.signkorean.ui.onboarding.FirstRunViewModel>(Boolean::class),
+            // 앱 범위 코루틴은 조립부에서 바로 만든다(SupervisorJob + 기본 디스패처).
+            definition<app.signkorean.domain.common.AppScope>(kotlinx.coroutines.CoroutineScope::class),
             // SC21 을 연 진입점(화면 인자).
             definition<app.signkorean.ui.upgrade.UpgradeViewModel>(app.signkorean.ui.upgrade.UpgradeFeature::class),
             // 다시 잠그기는 디버그 빌드의 모의 결제에만 있고(getOrNull), 릴리스에는 없다.

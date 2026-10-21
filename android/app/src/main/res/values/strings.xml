@@ -176,6 +176,7 @@
     <string name="upgrade_lead_bookmark">You\'ve saved %1$d of %2$d signs.</string>
     <string name="upgrade_lead_plan">Trip planning is part of the upgrade.</string>
     <string name="upgrade_lead_route">Walking routes are part of the upgrade.</string>
+    <string name="upgrade_lead_bookmarks">Unlimited bookmarks are part of the upgrade.</string>
     <string name="upgrade_feature_bookmarks">Unlimited bookmarks</string>
     <string name="upgrade_feature_bookmarks_body">Keep every sign you want to find again.</string>
     <string name="upgrade_feature_routes">Walking routes &amp; times</string>

@@ -33,8 +33,9 @@ import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
 /**
- * 디버그 빌드의 "다시 잠그기"(프로토타입의 relock). 모의 결제를 쓸 때만 있다. 릴리스 조립에는 없다
- * (구현 계획 Phase 13 D3). 버튼 문구도 디버그 리소스에만 있다.
+ * 디버그 빌드의 "다시 잠그기"(프로토타입의 relock). 모의 결제를 쓸 때만 조립된다(variantModules). 릴리스 조립에는
+ * 없어 버튼이 그려지지 않는다(구현 계획 Phase 13 D3). 문구 debug_relock 은 main 리소스에 번역 없이 있다 —
+ * src/debug/res/values 에 두면 "검수 전 언어만 디버그 리소스에" 규칙(ReleaseLanguagesTest)과 겹치기 때문이다.
  */
 interface DebugRelock {
     /** 디버그 리소스의 버튼 문구. */

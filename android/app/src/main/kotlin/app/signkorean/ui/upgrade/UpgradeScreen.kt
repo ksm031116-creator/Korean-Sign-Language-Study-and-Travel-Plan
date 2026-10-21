@@ -62,8 +62,8 @@ fun UpgradeScreen(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val context = LocalContext.current
-    // 시스템 Back 은 Not now 와 같다. 보류 동작을 버리고 돌아간다.
-    BackHandler { viewModel.onAction(UpgradeAction.NotNow) }
+    // 시스템 Back 은 Not now 와 같다. 결제·복원 중에는 아무것도 하지 않는다(받아서 버린다, 리뷰 UPG-02).
+    BackHandler { if (!state.busy) viewModel.onAction(UpgradeAction.NotNow) }
     LaunchedEffect(viewModel) {
         for (effect in viewModel.effects) {
             when (effect) {
@@ -96,6 +96,7 @@ fun UpgradeContent(state: UpgradeUiState, onAction: (UpgradeAction) -> Unit) {
         val lead = when {
             state.savedCount != null -> stringResource(R.string.upgrade_lead_bookmark, state.savedCount, state.limit)
             state.feature == UpgradeFeature.Route -> stringResource(R.string.upgrade_lead_route)
+            state.feature == UpgradeFeature.Bookmarks -> stringResource(R.string.upgrade_lead_bookmarks)
             else -> stringResource(R.string.upgrade_lead_plan)
         }
         Text(lead, style = MaterialTheme.typography.titleMedium, color = t.primary)
@@ -137,7 +138,12 @@ fun UpgradeContent(state: UpgradeUiState, onAction: (UpgradeAction) -> Unit) {
             )
         }
         if (state.busy) {
-            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                // 버튼이 왜 막혔는지 스크린리더에도 알린다 (UX03, 리뷰 UPG-12).
+                modifier = Modifier.semantics(mergeDescendants = true) { liveRegion = LiveRegionMode.Polite },
+            ) {
                 CircularProgressIndicator(Modifier.size(24.dp).testTag(UpgradeTags.PROGRESS), strokeWidth = 3.dp)
                 Text(stringResource(R.string.upgrade_in_progress), style = MaterialTheme.typography.bodyMedium, color = t.muted)
             }
@@ -160,7 +166,7 @@ fun UpgradeContent(state: UpgradeUiState, onAction: (UpgradeAction) -> Unit) {
             enabled = !state.busy,
             modifier = Modifier.fillMaxWidth().testTag(UpgradeTags.RESTORE),
         )
-        QuietButton(stringResource(R.string.upgrade_not_now), onClick = { onAction(UpgradeAction.NotNow) }, modifier = Modifier.fillMaxWidth())
+        QuietButton(stringResource(R.string.upgrade_not_now), onClick = { onAction(UpgradeAction.NotNow) }, enabled = !state.busy, modifier = Modifier.fillMaxWidth())
     }
 }
 

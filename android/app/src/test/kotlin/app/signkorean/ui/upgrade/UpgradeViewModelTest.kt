@@ -22,6 +22,12 @@ import app.signkorean.ui.text.UiText
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.cancel
+import androidx.lifecycle.viewModelScope
+import app.signkorean.domain.common.AppScope
+import app.signkorean.domain.entitlement.PurchaseFlowState
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
@@ -54,8 +60,8 @@ class UpgradeViewModelTest {
     @After
     fun tearDown() = Dispatchers.resetMain()
 
-    private fun vm(feature: UpgradeFeature = UpgradeFeature.Bookmark) =
-        UpgradeViewModel(feature, entitlements, bookmarks, pending, resume)
+    private fun TestScope.vm(feature: UpgradeFeature = UpgradeFeature.BookmarkLimit) =
+        UpgradeViewModel(feature, entitlements, bookmarks, pending, resume, AppScope(CoroutineScope(UnconfinedTestDispatcher(testScheduler))))
 
     private fun UpgradeViewModel.nextEffect() = effects.tryReceive().getOrNull()
 
@@ -200,5 +206,97 @@ class UpgradeViewModelTest {
         gateway.failWith(FailReason.Unknown)
         vm().onAction(UpgradeAction.Unlock)
         assertNull(vm().state.value.message)
+    }
+
+    // ---------- Phase 13 리뷰 수정 ----------
+
+    @Test
+    fun `UPG-01 대기 결제 중 Not now 로 떠나도 보류 동작은 남고, 결제가 끝나면 저장된다`() = runTest {
+        pending.save(PendingAction.SaveBookmark(sixth))
+        gateway.nextPurchase = PurchaseResult.Pending
+        val vm = vm()
+        vm.onAction(UpgradeAction.Unlock)
+        vm.onAction(UpgradeAction.NotNow)
+        assertEquals(UpgradeEffect.Close, vm.nextEffect())
+        assertEquals(PendingAction.SaveBookmark(sixth), pending.peek())
+        assertEquals("다음 SC21 도 대기 중임을 안다", PurchaseFlowState.Pending, entitlements.purchaseFlow.value)
+
+        gateway.completePending()
+        entitlements.refresh()
+        resume() // 앱 수준 확인이 하는 일
+        assertTrue(bookmarks.contains(sixth))
+    }
+
+    @Test
+    fun `UPG-02 결제 중에는 Not now 가 듣지 않는다`() = runTest {
+        pending.save(PendingAction.SaveBookmark(sixth))
+        gateway.holdPurchase = true
+        val vm = vm()
+        vm.onAction(UpgradeAction.Unlock)
+        vm.onAction(UpgradeAction.NotNow)
+        assertNull(vm.nextEffect())
+        assertEquals(PendingAction.SaveBookmark(sixth), pending.peek())
+        gateway.releasePurchase()
+    }
+
+    @Test
+    fun `UPG-02 화면이 닫혀도 결제는 앱 범위에서 끝까지 간다`() = runTest {
+        gateway.holdPurchase = true
+        val vm = vm()
+        vm.onAction(UpgradeAction.Unlock)
+        vm.viewModelScope.cancel() // 화면 항목이 닫혀 ViewModel 이 정리됐다
+        gateway.releasePurchase()
+        assertEquals(Entitlement.Paid, entitlements.current())
+    }
+
+    @Test
+    fun `UPG-04 Unlock 을 누른 즉시 바빠서 Restore 가 끼어들지 않는다`() = runTest {
+        gateway.holdPurchase = true
+        val vm = vm()
+        vm.onAction(UpgradeAction.Unlock)
+        val queries = gateway.queryCalls
+        vm.onAction(UpgradeAction.Restore)
+        assertEquals(queries, gateway.queryCalls)
+        gateway.releasePurchase()
+        assertTrue(vm.nextEffect() is UpgradeEffect.Unlocked)
+    }
+
+    @Test
+    fun `UPG-05 실패 뒤 다시 시도하면 실패 표시가 풀린다`() = runTest {
+        gateway.failWith(FailReason.Unknown)
+        val vm = vm()
+        vm.onAction(UpgradeAction.Unlock)
+        assertTrue(vm.state.value.failed)
+        gateway.nextPurchase = PurchaseResult.Pending
+        vm.onAction(UpgradeAction.Unlock)
+        assertFalse(vm.state.value.failed)
+        assertEquals(UiText.Res(R.string.upgrade_pending), vm.state.value.message)
+    }
+
+    @Test
+    fun `다른 곳에서 시작한 결제의 취소는 이 화면을 닫지 않는다`() = runTest {
+        pending.save(PendingAction.SaveBookmark(sixth))
+        val vm = vm()
+        gateway.nextPurchase = PurchaseResult.Cancelled
+        entitlements.unlock()
+        assertNull(vm.nextEffect())
+        assertEquals(PendingAction.SaveBookmark(sixth), pending.peek())
+    }
+
+    @Test
+    fun `UPG-13 가격을 못 받았으면 다시 시도할 때 다시 묻는다`() = runTest {
+        gateway.price = null
+        gateway.holdPurchase = true
+        val vm = vm()
+        assertNull(vm.state.value.price)
+        gateway.price = "US$0.99"
+        vm.onAction(UpgradeAction.Unlock)
+        assertEquals("US$0.99", vm.state.value.price)
+        gateway.releasePurchase()
+    }
+
+    @Test
+    fun `UPG-14 Saved 잠금 배지에서 연 SC21 은 저장 수를 보이지 않는다`() = runTest {
+        assertNull(vm(UpgradeFeature.Bookmarks).state.value.savedCount)
     }
 }

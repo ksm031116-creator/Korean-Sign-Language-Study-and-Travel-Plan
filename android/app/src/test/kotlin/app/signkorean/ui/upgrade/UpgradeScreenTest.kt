@@ -39,7 +39,7 @@ class UpgradeScreenTest {
 
     @Test
     fun `북마크 한도에서 왔으면 위에 저장 수`() {
-        show(UpgradeUiState(UpgradeFeature.Bookmark, savedCount = 5, price = "US$0.99", priceChecked = true))
+        show(UpgradeUiState(UpgradeFeature.BookmarkLimit, savedCount = 5, price = "US$0.99", priceChecked = true))
         rule.onNodeWithText("You've saved 5 of 5 signs.").assertIsDisplayed()
     }
 

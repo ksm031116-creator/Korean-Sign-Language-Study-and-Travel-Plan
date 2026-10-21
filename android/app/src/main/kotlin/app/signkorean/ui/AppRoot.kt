@@ -43,6 +43,7 @@ import app.signkorean.R
 import app.signkorean.navigation.AppNavigator
 import app.signkorean.navigation.RootTab
 import app.signkorean.navigation.Route
+import app.signkorean.navigation.ScreenId
 import app.signkorean.ui.designsystem.SignKoreanTheme
 
 /** 화면 회전·언어 변경으로 Activity 가 다시 만들어져도 이동 상태를 지킨다. 프로세스가 끝나면 처음부터(PRD §14). */
@@ -79,6 +80,9 @@ class EntryViewModelStores {
 
 /** 넓은 화면(태블릿·펼친 폴더블)은 옆 레일, 휴대폰은 아래 탭 (구현 계획 Phase 4). */
 private const val WIDE_SCREEN_DP = 600
+
+/** 탭 없이 그리는 화면. */
+private val FULL_SCREEN = setOf(ScreenId.SC21)
 
 /**
  * 앱의 최상위 셸. 루트 탭 Explore·Saved·Plan 과 화면 스택을 그린다.
@@ -120,7 +124,10 @@ fun AppRoot(
             }
         }
 
-        if (wide) {
+        // SC21 은 전체 화면이다(PRD §14). 탭을 숨겨 다른 탭에 SC21 이 하나 더 쌓이지 않게 한다(리뷰 UPG-03).
+        if (state.current.route.screen in FULL_SCREEN) {
+            content(Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.safeDrawing))
+        } else if (wide) {
             // 휴대폰은 Scaffold 가 시스템 막대 여백을 넣는다. 넓은 화면도 같은 여백을 직접 넣는다(Android 15 전체 화면).
             Row(Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.safeDrawing)) {
                 NavigationRail {

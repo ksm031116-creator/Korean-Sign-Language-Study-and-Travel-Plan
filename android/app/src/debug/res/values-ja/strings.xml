@@ -157,6 +157,7 @@
     <string name="upgrade_lead_bookmark">保存した看板が %2$d 枚中 %1$d 枚になりました。</string>
     <string name="upgrade_lead_plan">旅の計画は、アップグレードで使えるようになります。</string>
     <string name="upgrade_lead_route">徒歩ルートは、アップグレードで使えるようになります。</string>
+    <string name="upgrade_lead_bookmarks">ブックマーク無制限は、アップグレードで使えるようになります。</string>
     <string name="upgrade_feature_bookmarks">ブックマーク無制限</string>
     <string name="upgrade_feature_bookmarks_body">また探したい看板を、枚数を気にせず残せます。</string>
     <string name="upgrade_feature_routes">徒歩ルートと所要時間</string>

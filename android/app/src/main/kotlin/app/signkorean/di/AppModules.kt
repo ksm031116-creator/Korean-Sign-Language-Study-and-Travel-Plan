@@ -44,6 +44,10 @@ import org.koin.dsl.bind
 import app.signkorean.adapter.prefs.DataStorePendingActionStore
 import app.signkorean.domain.upgrade.PendingActionStore
 import app.signkorean.domain.upgrade.ResumePendingAction
+import app.signkorean.domain.upgrade.StartupPendingCheck
+import app.signkorean.domain.common.AppScope
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
 import app.signkorean.ui.plan.PlanGateViewModel
 import app.signkorean.ui.upgrade.UpgradeViewModel
 import app.signkorean.domain.locale.CurrentLocale
@@ -71,6 +75,8 @@ val platformModule = module {
     single<Clock> { SystemTimeClock }
     single<IdGenerator> { UuidIdGenerator() }
     single { AppDispatchers(io = Dispatchers.IO, default = Dispatchers.Default, main = Dispatchers.Main) }
+    // 화면이 닫혀도 끝까지 가야 하는 일(결제, 권한 확인). 실패가 다른 작업을 멈추지 않게 SupervisorJob.
+    single { AppScope(CoroutineScope(SupervisorJob() + get<AppDispatchers>().default)) }
 }
 
 /** 콘텐츠 팩 (Phase 2). 팩은 앱에 내장되고 한 번만 읽는다. */
@@ -120,6 +126,7 @@ val entitlementModule = module {
     // 결제 뒤 이어서 할 동작 (Phase 13). 여러 곳(SC21·앱 수준 확인)이 불러도 한 번만 수행하도록 하나만 둔다.
     single<PendingActionStore> { DataStorePendingActionStore.create(androidContext()) }
     single { ResumePendingAction(get(), get()) }
+    single { StartupPendingCheck(get(), get(), get()) }
 }
 
 /** 화면 ViewModel. 화면은 koinViewModel() 로만 받는다 (AR-03). */
@@ -128,7 +135,7 @@ val uiModule = module {
     viewModelOf(::ResultViewModel)
     viewModelOf(::ExploreViewModel)
     viewModelOf(::SavedViewModel)
-    viewModel { params -> UpgradeViewModel(params.get(), get(), get(), get(), get()) }
+    viewModel { params -> UpgradeViewModel(params.get(), get(), get(), get(), get(), get()) }
     // 디버그 빌드의 모의 결제에만 다시 잠그기가 있다(variantModules). 릴리스는 null.
     viewModel { PlanGateViewModel(get(), getOrNull()) }
     viewModel { params -> CollectionViewModel(params.get(), get(), get(), get()) }

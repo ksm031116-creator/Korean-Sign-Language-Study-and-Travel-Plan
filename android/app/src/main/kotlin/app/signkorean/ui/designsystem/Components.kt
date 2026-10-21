@@ -69,8 +69,8 @@ fun SecondaryButton(text: String, onClick: () -> Unit, modifier: Modifier = Modi
 }
 
 @Composable
-fun QuietButton(text: String, onClick: () -> Unit, modifier: Modifier = Modifier) {
-    TextButton(onClick = onClick, modifier = modifier.defaultMinSize(minWidth = MinTouch, minHeight = MinTouch)) {
+fun QuietButton(text: String, onClick: () -> Unit, modifier: Modifier = Modifier, enabled: Boolean = true) {
+    TextButton(onClick = onClick, enabled = enabled, modifier = modifier.defaultMinSize(minWidth = MinTouch, minHeight = MinTouch)) {
         Text(text, style = MaterialTheme.typography.labelLarge)
     }
 }

@@ -54,11 +54,11 @@ fun AppScreen(route: Route, navigator: AppNavigator) {
             onClose = { navigator.back() },
             onOpenPlaces = { card -> navigator.push(Route(ScreenId.SC08, card.value)) },
             onFinished = { navigator.replaceTop(Route(ScreenId.SC06)) },
-            onBookmarkLimit = { navigator.push(Route(ScreenId.SC21, UpgradeFeature.Bookmark.arg)) },
+            onBookmarkLimit = { navigator.push(Route(ScreenId.SC21, UpgradeFeature.BookmarkLimit.arg)) },
         )
         ScreenId.SC09 -> SavedScreen(
             onOpenLearn = { navigator.push(Route(ScreenId.SC04)) },
-            onUpgrade = { navigator.push(Route(ScreenId.SC21, UpgradeFeature.Bookmark.arg)) },
+            onUpgrade = { navigator.push(Route(ScreenId.SC21, UpgradeFeature.Bookmarks.arg)) },
         )
         // 무료면 잠금 안내(U-09). 유료 여행 목록은 Phase 17 에서 만든다.
         ScreenId.SC11 -> PlanScreen(

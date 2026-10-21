@@ -236,7 +236,11 @@ class LearnViewModel(
                     return@launch
                 }
                 savedIds = ids
-                _state.update { it.copy(bookmarked = it.card != null && it.card.id in ids) }
+                _state.update {
+                    val saved = it.card != null && it.card.id in ids
+                    // 결제 뒤 이어서 저장됐으면 한도 안내도 거둔다(리뷰 UPG-08).
+                    it.copy(bookmarked = saved, notice = if (saved) null else it.notice)
+                }
             }
             return
         }
