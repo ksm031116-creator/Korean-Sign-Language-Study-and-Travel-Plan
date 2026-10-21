@@ -76,11 +76,20 @@ class ResumePendingActionTest {
 
     @Test
     fun `동시에 두 번 불러도 한 번만 수행한다`() = runTest {
-        pending.save(PendingAction.SaveBookmark(sixth))
-        entitlement = Entitlement.Paid
-        val results = (1..3).map { async { resume() } }.awaitAll()
+        // 저장소마다 차례를 넘겨야 잠금이 없을 때 세 호출이 모두 peek 에서 같은 동작을 본다(리뷰 UPG-09).
+        val racingBookmarks = FakeBookmarkStore((1..5).map { Bookmark(CardId("b%02d".format(it)), clock.now()) }, yieldOnAccess = true)
+        val racingPending = FakePendingActionStore(PendingAction.SaveBookmark(sixth), yieldOnAccess = true)
+        val racing = ResumePendingAction(racingPending, SetBookmark(racingBookmarks, FakeTransactionRunner(racingBookmarks), { Entitlement.Paid }, clock))
+        val results = (1..3).map { async { racing() } }.awaitAll()
         assertEquals(1, results.count { it is ResumeResult.Done })
-        assertEquals(6, bookmarks.count())
+        assertEquals(6, racingBookmarks.count())
+    }
+
+    @Test
+    fun `동시 호출 경합 검사가 실제로 경합을 만든다`() = runTest {
+        val racingPending = FakePendingActionStore(PendingAction.SaveBookmark(sixth), yieldOnAccess = true)
+        val seen = (1..3).map { async { racingPending.peek() } }.awaitAll()
+        assertEquals(3, seen.count { it != null }, "잠금 없이 읽으면 셋 다 같은 동작을 본다")
     }
 
     @Test

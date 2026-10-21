@@ -3,6 +3,9 @@ package app.signkorean.domain.upgrade
 import app.signkorean.domain.bookmark.BookmarkOutcome
 import app.signkorean.domain.bookmark.SetBookmark
 import app.signkorean.domain.content.CardId
+import app.signkorean.domain.entitlement.Entitlement
+import app.signkorean.domain.entitlement.Entitlements
+import app.signkorean.domain.entitlement.PurchaseFlowState
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -72,5 +75,31 @@ class ResumePendingAction(
             }
         }
         result
+    }
+}
+
+/**
+ * 앱 시작 때 한 번. 화면 이동은 복원되지 않으므로(PRD §14) 이때 SC21 은 열려 있지 않다.
+ * - Paid 면 보류 동작을 이어서 한다(결제 중 프로세스가 끝났다가 돌아온 경우, B-07).
+ * - 스토어가 "구매도 대기 결제도 없음"을 확인해 주면 지난 실행의 보류 동작을 버린다. 그대로 두면 며칠 뒤
+ *   다른 진입점에서 결제했을 때 예전 카드가 뜻밖에 저장된다(Phase 13 리뷰 UPG-07).
+ * - 스토어를 확인하지 못했거나 대기 결제가 있으면 남긴다.
+ */
+class StartupPendingCheck(
+    private val entitlements: Entitlements,
+    private val store: PendingActionStore,
+    private val resume: ResumePendingAction,
+) {
+    suspend operator fun invoke() {
+        val answered = entitlements.refresh()
+        when {
+            entitlements.current() == Entitlement.Paid -> resume()
+            answered && entitlements.purchaseFlow.value != PurchaseFlowState.Pending -> try {
+                store.clear()
+            } catch (e: CancellationException) {
+                throw e
+            } catch (_: Exception) {
+            }
+        }
     }
 }

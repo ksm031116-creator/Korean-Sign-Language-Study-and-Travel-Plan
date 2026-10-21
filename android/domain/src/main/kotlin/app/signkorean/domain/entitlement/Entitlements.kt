@@ -44,9 +44,8 @@ class Entitlements(
         return _entitlement.value
     }
 
-    suspend fun refresh() {
-        sync()
-    }
+    /** 스토어에 닿아 결과를 반영했으면 true. 실패하면 마지막 권한을 그대로 둔다. */
+    suspend fun refresh(): Boolean = sync() is StoreQuery.Success
 
     suspend fun unlock() {
         if (!purchaseLock.tryLock()) return
