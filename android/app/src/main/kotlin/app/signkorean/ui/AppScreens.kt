@@ -60,6 +60,19 @@ object TripDayArg {
     }
 }
 
+/** SC18 인자: "day:<여행 id>|<날짜>" 또는 "place:<장소 id>". */
+object MapArg {
+    fun day(trip: TripId, date: java.time.LocalDate) = "day:" + TripDayArg.of(trip, date)
+    fun place(id: PlaceId) = "place:${id.value}"
+
+    fun parse(arg: String?): app.signkorean.ui.map.MapTarget? = when {
+        arg == null -> null
+        arg.startsWith("day:") -> TripDayArg.parse(arg.removePrefix("day:"))?.let { (t, d) -> app.signkorean.ui.map.MapTarget.Day(t, d) }
+        arg.startsWith("place:") -> arg.removePrefix("place:").takeIf { it.isNotBlank() }?.let { app.signkorean.ui.map.MapTarget.ToPlace(PlaceId(it)) }
+        else -> null
+    }
+}
+
 /** 화면 ID → 화면. 아직 만들지 않은 화면은 자리 표시이며 진입점을 숨긴다(구현 계획 원칙 3). */
 @Composable
 fun AppScreen(route: Route, navigator: AppNavigator) {
@@ -121,6 +134,7 @@ fun AppScreen(route: Route, navigator: AppNavigator) {
                 onOpenPlace = { id -> navigator.push(Route(ScreenId.SC07, id.value)) },
                 onUpgrade = { f -> navigator.push(Route(ScreenId.SC21, f.arg)) },
                 onCreateTrip = { navigator.push(Route(ScreenId.SC12, TripFormArg.NEW_FROM_SHEET)) },
+                onRoute = { id -> navigator.push(Route(ScreenId.SC18, MapArg.place(id))) },
             )
         } ?: PlaceholderScreen(route)
         ScreenId.SC07 -> route.arg?.let { place ->
@@ -130,6 +144,7 @@ fun AppScreen(route: Route, navigator: AppNavigator) {
                 onOpenLearn = { navigator.openLearn() },
                 onUpgrade = { f -> navigator.push(Route(ScreenId.SC21, f.arg)) },
                 onCreateTrip = { navigator.push(Route(ScreenId.SC12, TripFormArg.NEW_FROM_SHEET)) },
+                onRoute = { id -> navigator.push(Route(ScreenId.SC18, MapArg.place(id))) },
             )
         } ?: PlaceholderScreen(route)
         ScreenId.SC12 -> {
@@ -152,8 +167,12 @@ fun AppScreen(route: Route, navigator: AppNavigator) {
                 onClose = { navigator.back() },
                 onOpenPicker = { id, d -> navigator.push(Route(ScreenId.SC14, TripDayArg.of(id, d))) },
                 onEditTrip = { id -> navigator.push(Route(ScreenId.SC12, TripFormArg.edit(id))) },
+                onOpenMap = { id, d -> navigator.push(Route(ScreenId.SC18, MapArg.day(id, d))) },
                 onUpgrade = { f -> navigator.push(Route(ScreenId.SC21, f.arg)) },
             )
+        } ?: PlaceholderScreen(route)
+        ScreenId.SC18 -> MapArg.parse(route.arg)?.let { target ->
+            app.signkorean.ui.map.MapScreen(target, onClose = { navigator.back() }, onUpgrade = { f -> navigator.push(Route(ScreenId.SC21, f.arg)) })
         } ?: PlaceholderScreen(route)
         ScreenId.SC14 -> TripDayArg.parse(route.arg)?.let { (trip, date) ->
             PlacePickerScreen(trip, date, onClose = { navigator.back() })

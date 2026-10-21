@@ -18,3 +18,9 @@ object UnavailableReviews : app.signkorean.domain.review.ReviewProvider {
     override suspend fun reviews(place: app.signkorean.domain.content.PlaceId, language: LocaleTag) =
         app.signkorean.domain.review.ReviewResponse.Error(app.signkorean.domain.review.ReviewError.Unsupported, sourceUrl = null)
 }
+
+/** 중계 서버 주소가 없는 빌드의 경로 공급자. 직선거리·임의 속도로 대신하지 않고 "지원 안 됨"으로 답한다(FR15, M-03). */
+object UnavailableRoutes : app.signkorean.domain.route.RouteProvider {
+    override suspend fun route(request: app.signkorean.domain.route.RouteRequest) =
+        app.signkorean.domain.route.RouteResult.Failed(app.signkorean.domain.route.RouteFailure.Unsupported)
+}

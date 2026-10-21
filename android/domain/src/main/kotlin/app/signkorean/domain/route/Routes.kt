@@ -39,8 +39,14 @@ interface RouteProvider {
     suspend fun route(request: RouteRequest): RouteResult
 }
 
-/** 하루 경로 결과. [revision] 은 계산에 쓴 그날의 revision 이다. 지금 revision 과 다르면 버린다(T-07, AT12). */
-data class DayRoutePlan(val revision: Int, val legs: List<Long?>, val routes: List<Route?>)
+/**
+ * 하루 경로 결과. [revision] 은 계산에 쓴 그날의 revision 이다. 지금 revision 과 다르면 버린다(T-07, AT12).
+ * [failures] 는 구간별 실패 이유. 끝점 좌표를 몰라 묻지 않은 구간은 경로도 이유도 null 이다.
+ */
+data class DayRoutePlan(val revision: Int, val legs: List<Long?>, val routes: List<Route?>, val failures: List<RouteFailure?> = routes.map { null }) {
+    /** 모든 구간을 공급자가 계산했다. 일정의 "다시 계산" 표시를 끌 수 있다(T-16). */
+    val complete: Boolean get() = routes.none { it == null }
+}
 
 object RouteFreshness {
     fun isCurrent(plan: DayRoutePlan, day: TripDay): Boolean = plan.revision == day.revision
@@ -62,8 +68,9 @@ class DayRoutePlanner(
 
     suspend fun plan(trip: TripId, day: TripDay): DayRoutePlan {
         val points = endpoints(day)
-        val routes = points.zipWithNext { from, to -> if (from == null || to == null) null else route(RouteRequest(from, to)) }
-        return DayRoutePlan(day.revision, routes.map { it?.durationSeconds }, routes)
+        val results = points.zipWithNext { from, to -> if (from == null || to == null) null else single(from, to) }
+        val routes = results.map { (it as? RouteResult.Found)?.route }
+        return DayRoutePlan(day.revision, routes.map { it?.durationSeconds }, routes, results.map { (it as? RouteResult.Failed)?.reason })
     }
 
     /** 한 장소까지의 경로(SC18 단일 경로). 실패하면 이유를 그대로 돌려준다(FR15). */
@@ -74,8 +81,6 @@ class DayRoutePlanner(
         if (result is RouteResult.Found) lock.withLock { cache[request] = result.route }
         return result
     }
-
-    private suspend fun route(request: RouteRequest): Route? = (single(request.origin, request.destination) as? RouteResult.Found)?.route
 
     private suspend fun ask(request: RouteRequest): RouteResult = try {
         provider.route(request)

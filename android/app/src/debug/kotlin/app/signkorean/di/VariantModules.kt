@@ -59,6 +59,7 @@ val variantModules: List<Module> = (if (BuildConfig.API_BASE_URL.isBlank()) list
 private val sampleDataModule get() = module {
     single<PlaceSummaryProvider> { SamplePlaceSummaries(get()) }
     single<ReviewProvider> { SampleReviews }
+    single<app.signkorean.domain.route.RouteProvider> { SampleRoutes }
 }
 
 /**
@@ -119,5 +120,25 @@ class SimulatedBillingGateway : EntitlementGateway {
 
     fun relock() {
         owned = emptyList()
+    }
+}
+
+/**
+ * 표본 경로(디버그 빌드 전용). 중계 서버 없이 SC18·SC13 화면을 확인하려고 쓴다. 출처 표기에 "Sample" 을 넣어 실제 도보
+ * 경로로 보이지 않게 한다. 릴리스는 서버가 없으면 "지원 안 됨"이다(FR15 — 직선거리로 대신하지 않는다).
+ */
+object SampleRoutes : app.signkorean.domain.route.RouteProvider {
+    override suspend fun route(request: app.signkorean.domain.route.RouteRequest): app.signkorean.domain.route.RouteResult {
+        val a = request.origin
+        val b = request.destination
+        val r = 6_371_000.0
+        val dLat = Math.toRadians(b.lat - a.lat)
+        val dLng = Math.toRadians(b.lng - a.lng)
+        val h = Math.sin(dLat / 2).let { it * it } + Math.cos(Math.toRadians(a.lat)) * Math.cos(Math.toRadians(b.lat)) * Math.sin(dLng / 2).let { it * it }
+        val meters = (2 * r * Math.asin(Math.sqrt(h)) * 1.3).toInt().coerceAtLeast(1)
+        val bend = app.signkorean.domain.location.Coordinate((a.lat + b.lat) / 2 + (b.lng - a.lng) * 0.15, (a.lng + b.lng) / 2 - (b.lat - a.lat) * 0.15)
+        return app.signkorean.domain.route.RouteResult.Found(
+            app.signkorean.domain.route.Route(meters, (meters / 1.2).toLong(), listOf(a, bend, b), attribution = "Sample routes (debug build), not real walking directions"),
+        )
     }
 }

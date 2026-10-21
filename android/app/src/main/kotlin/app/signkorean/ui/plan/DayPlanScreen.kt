@@ -30,6 +30,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -83,6 +84,7 @@ fun DayPlanScreen(
     onOpenPicker: (TripId, LocalDate) -> Unit,
     onEditTrip: (TripId) -> Unit,
     onUpgrade: (UpgradeFeature) -> Unit,
+    onOpenMap: (TripId, LocalDate) -> Unit = { _, _ -> },
     viewModel: DayPlanViewModel = koinViewModel { parametersOf(trip, date) },
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -97,6 +99,7 @@ fun DayPlanScreen(
             when (effect) {
                 is DayPlanEffect.OpenPicker -> onOpenPicker(effect.trip, effect.date)
                 is DayPlanEffect.EditTrip -> onEditTrip(effect.trip)
+                is DayPlanEffect.OpenMap -> onOpenMap(effect.trip, effect.date)
                 is DayPlanEffect.Upgrade -> onUpgrade(effect.feature)
             }
         }
@@ -183,12 +186,19 @@ fun DayPlanContent(state: DayPlanUiState, onAction: (DayPlanAction) -> Unit, onC
                         val origin = when (val o = day.origin) {
                             null -> stringResource(R.string.day_no_origin)
                             is Origin.AtPlace -> stringResource(R.string.day_from, state.originPlace?.name?.text() ?: o.place.value)
-                            is Origin.AtCoordinate -> stringResource(R.string.day_from, o.label ?: String.format(java.util.Locale.ROOT, "%.4f, %.4f", o.coordinate.lat, o.coordinate.lng))
+                            is Origin.AtCoordinate -> stringResource(R.string.day_from, o.label ?: stringResource(R.string.origin_current))
                         }
                         Text(origin, style = MaterialTheme.typography.bodyMedium, color = t.muted)
                     }
                     if (!state.readOnly) QuietButton(stringResource(R.string.day_edit_start), onClick = { onAction(DayPlanAction.OpenStart) })
                 }
+            }
+        }
+        // 하루 경로 지도(SC18). 경로는 유료라 무료면 자물쇠 + 기능명 (UX09).
+        if (state.rows.isNotEmpty()) {
+            item {
+                if (state.readOnly) LockBadge(stringResource(R.string.lock_route), onClick = { onAction(DayPlanAction.OpenMap) })
+                else SecondaryButton(stringResource(R.string.map_open), onClick = { onAction(DayPlanAction.OpenMap) }, modifier = Modifier.fillMaxWidth())
             }
         }
         if (state.needsRecalculation) item { Notice(stringResource(R.string.day_recalc)) }
@@ -324,17 +334,28 @@ private fun StopSheet(row: StopRowUi, state: DayPlanUiState, onAction: (DayPlanA
     }
 }
 /**
- * SC17 하루 출발 시트: 출발 시각(OS 시간 선택기)과 출발지. 출발지는 없음·지금 출발지·그날 일정에 없는
- * 등록 장소 중에서 고른다(DPV-H2). 현재 위치·추천 출발점은 SC19.
+ * SC17 하루 출발 시트: 출발 시각(OS 시간 선택기)과 출발지. 출발지는 없음·지금 출발지·그날 일정에 없는 등록 장소에서
+ * 고르거나(DPV-H2), SC19(검색·추천 출발점·현재 위치)로 찾는다. 고른 출발지는 Apply 할 때만 저장한다(PRD §10.4).
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun StartSheet(state: DayPlanUiState, onAction: (DayPlanAction) -> Unit) {
     val day = state.day ?: return
     val picker = rememberTimePickerState(initialHour = day.startTime.hour, initialMinute = day.startTime.minute)
-    // 고른 것: NONE, CURRENT, 또는 등록 장소 id.
+    // 고른 것: NONE, CURRENT, PICKED(SC19 에서 찾은 것), 또는 등록 장소 id.
     var choice by rememberSaveable { mutableStateOf(if (day.origin == null) NONE else CURRENT) }
-    AppBottomSheet(title = stringResource(R.string.start_title), onDismiss = { onAction(DayPlanAction.CloseSheet) }) {
+    var picked by remember { mutableStateOf<Pair<Origin, String>?>(null) }
+    var searching by rememberSaveable { mutableStateOf(false) }
+    AppBottomSheet(title = stringResource(if (searching) R.string.origin_title else R.string.start_title), onDismiss = { onAction(DayPlanAction.CloseSheet) }) {
+        if (searching) {
+            app.signkorean.ui.map.OriginPicker(onPicked = { origin, label ->
+                picked = origin to label
+                choice = PICKED
+                searching = false
+            })
+            QuietButton(stringResource(R.string.action_back), onClick = { searching = false })
+            return@AppBottomSheet
+        }
         Text(stringResource(R.string.start_time), style = MaterialTheme.typography.labelLarge)
         TimePicker(state = picker)
         Text(stringResource(R.string.start_origin), style = MaterialTheme.typography.labelLarge)
@@ -343,10 +364,11 @@ private fun StartSheet(state: DayPlanUiState, onAction: (DayPlanAction) -> Unit)
             day.origin?.let { o ->
                 val label = when (o) {
                     is Origin.AtPlace -> state.originPlace?.name?.text() ?: o.place.value
-                    is Origin.AtCoordinate -> o.label ?: stringResource(R.string.start_origin)
+                    is Origin.AtCoordinate -> o.label ?: stringResource(R.string.origin_current)
                 }
                 AppChip(label, selected = choice == CURRENT, onClick = { choice = CURRENT })
             }
+            picked?.let { (_, label) -> AppChip(label, selected = choice == PICKED, onClick = { choice = PICKED }) }
         }
         val candidates = state.originCandidates.filter { p -> (day.origin as? Origin.AtPlace)?.place != p.id }
         if (candidates.isNotEmpty()) {
@@ -355,10 +377,12 @@ private fun StartSheet(state: DayPlanUiState, onAction: (DayPlanAction) -> Unit)
                 candidates.forEach { p -> AppChip(p.name.text(), selected = choice == p.id.value, onClick = { choice = p.id.value }) }
             }
         }
+        QuietButton(stringResource(R.string.start_find), onClick = { searching = true })
         PrimaryButton(stringResource(R.string.start_apply), onClick = {
             val origin = when (choice) {
                 NONE -> null
                 CURRENT -> day.origin
+                PICKED -> picked?.first ?: day.origin
                 else -> Origin.AtPlace(app.signkorean.domain.content.PlaceId(choice))
             }
             onAction(DayPlanAction.ApplyStart(LocalTime.of(picker.hour, picker.minute), origin))
@@ -368,3 +392,4 @@ private fun StartSheet(state: DayPlanUiState, onAction: (DayPlanAction) -> Unit)
 
 private const val NONE = "\u0000none"
 private const val CURRENT = "\u0000current"
+private const val PICKED = "\u0000picked"

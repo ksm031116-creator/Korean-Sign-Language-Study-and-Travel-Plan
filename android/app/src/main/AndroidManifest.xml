@@ -4,6 +4,9 @@
 
     <!-- 장소 사진(TourAPI·Wikimedia)을 내려받는다 (Phase 14). 리뷰·경로 API 도 이 권한을 쓴다. -->
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- 출발지로 "현재 위치"를 고를 때만 한 번 읽는다. 백그라운드 위치는 선언하지 않는다(NFR05). -->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
     <!--
       allowBackup=false 만으로는 Android 12+ 의 기기 간 이전을 막지 못한다. 학습 기록·여행 계획은

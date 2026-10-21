@@ -19,6 +19,7 @@ import app.signkorean.ui.designsystem.SignKoreanTheme
 import app.signkorean.ui.text.UiText
 import app.signkorean.ui.upgrade.UpgradeFeature
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -118,9 +119,13 @@ class PlacesScreenTest {
     }
 
     @Test
-    fun `SC08 유료면 아직 없는 화면의 진입점은 그리지 않는다`() {
-        rule.setContent { SignKoreanTheme { PlacesContent(placesState(paid = true), {}, {}) } }
-        assertEquals(0, rule.onAllNodesWithText("Walking route").fetchSemanticsNodes().size)
+    fun `SC08 유료면 Route 는 자물쇠 없이 SC18 을 연다(Phase 19)`() {
+        var routed = listOf<PlaceId>()
+        var actions = listOf<PlacesAction>()
+        rule.setContent { SignKoreanTheme { PlacesContent(placesState(paid = true), { actions = actions + it }, {}, onRoute = { routed = routed + it }) } }
+        rule.onAllNodesWithText("Walking route")[0].performClick()
+        assertEquals(1, routed.size)
+        assertTrue(actions.none { it is PlacesAction.Upgrade })
     }
 
     @Test

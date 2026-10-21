@@ -55,7 +55,14 @@ import app.signkorean.ui.plan.AddToPlanViewModel
 import app.signkorean.ui.plan.PlacePickerViewModel
 import app.signkorean.ui.plan.DayPlanViewModel
 import app.signkorean.domain.route.DayLegs
-import app.signkorean.domain.route.UnknownLegs
+import app.signkorean.domain.route.DayRoutePlanner
+import app.signkorean.domain.route.RouteProvider
+import app.signkorean.domain.location.LocationProvider
+import app.signkorean.adapter.location.AndroidLocationProvider
+import app.signkorean.adapter.net.HttpRouteProvider
+import app.signkorean.adapter.net.UnavailableRoutes
+import app.signkorean.ui.map.MapViewModel
+import app.signkorean.ui.map.OriginPickerViewModel
 import app.signkorean.ui.plan.TripFormViewModel
 import app.signkorean.ui.plan.TripListViewModel
 import app.signkorean.ui.places.PlaceDetailViewModel
@@ -118,6 +125,11 @@ val placeModule = module {
     single { ApiClient(BuildConfig.API_BASE_URL, io = get<AppDispatchers>().io) }
     single<PlaceSummaryProvider> { if (BuildConfig.API_BASE_URL.isBlank()) UnavailablePlaceSummaries else HttpPlaceSummaryProvider(get()) }
     single<ReviewProvider> { if (BuildConfig.API_BASE_URL.isBlank()) UnavailableReviews else HttpReviewProvider(get()) }
+    // 경로 (Phase 19). 서버가 없는 빌드는 "지원 안 됨"이다 — 직선거리로 대신하지 않는다(FR15). 디버그는 표본(variantModules).
+    single<RouteProvider> { if (BuildConfig.API_BASE_URL.isBlank()) UnavailableRoutes else HttpRouteProvider(get()) }
+    // 구간 결과를 프로세스 동안 기억하므로 앱에 하나다(NFR08).
+    single { DayRoutePlanner(get(), get()) }
+    single<LocationProvider> { AndroidLocationProvider(androidContext()) }
     factory { LoadReviews(get()) }
 }
 
@@ -137,8 +149,8 @@ val learningModule = module {
     // 여행 (Phase 16). 같은 데이터베이스 파일이지만 학습·북마크와 따로 지운다(FR22).
     single<TripStore> { get<RoomLearningStorage>().trips }
     single { TripEditor(get(), get(), get(), get(), get()) }
-    // 경로 공급자는 Phase 19. 그전에는 모든 구간이 "모름"이라 일정은 Incomplete 로 보인다(FR20).
-    single<DayLegs> { UnknownLegs }
+    // 일정의 구간 시간은 경로 공급자에서 온다. 모르면 Incomplete 로 보인다(FR20).
+    single<DayLegs> { get<DayRoutePlanner>() }
     factory { SetBookmark(get(), get(), get(), get()) }
     factory { ClearBookmarks(get()) }
     factory { StartSession(get(), get(), get(), get()) }
@@ -182,6 +194,8 @@ val uiModule = module {
     viewModel { params -> AddToPlanViewModel(params.get(), get(), get()) }
     viewModel { params -> PlacePickerViewModel(params.get(), params.get(), get(), get(), get()) }
     viewModel { params -> DayPlanViewModel(params.get(), params.getOrNull(), get(), get(), get(), get(), get()) }
+    viewModel { params -> MapViewModel(params.get(), get(), get(), get(), get(), get(), get()) }
+    viewModelOf(::OriginPickerViewModel)
     viewModel { params -> PlaceDetailViewModel(params.get(), get(), get(), get(), get(), get(), get(), get(), get()) }
     viewModel { params -> CollectionViewModel(params.get(), get(), get(), get()) }
     viewModelOf(::AppGateViewModel)

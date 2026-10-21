@@ -95,11 +95,15 @@ sealed interface DayPlanAction {
     data class ApplyStart(val time: LocalTime, val origin: Origin?) : DayPlanAction
     data object AddPlace : DayPlanAction
     data object EditTrip : DayPlanAction
+
+    /** SC18 하루 경로. 경로는 유료 기능이라 무료면 SC21 (UX09). */
+    data object OpenMap : DayPlanAction
 }
 
 sealed interface DayPlanEffect {
     data class OpenPicker(val trip: TripId, val date: LocalDate) : DayPlanEffect
     data class EditTrip(val trip: TripId) : DayPlanEffect
+    data class OpenMap(val trip: TripId, val date: LocalDate) : DayPlanEffect
     data class Upgrade(val feature: UpgradeFeature) : DayPlanEffect
 }
 
@@ -160,7 +164,7 @@ class DayPlanViewModel(
         val p = pack ?: return
         val gen = ++generation
         val date = _state.value.date?.takeIf { d -> trip.days.any { it.date == d } } ?: trip.start
-        val day = trip.day(date)
+        var day = trip.day(date)
         val places = p.places.associateBy { it.id }
         val legSeconds = try {
             legs.legs(trip.id, day).takeIf { it.size == legCount(day) } ?: List(legCount(day)) { null }
@@ -168,6 +172,13 @@ class DayPlanViewModel(
             throw e
         } catch (_: Exception) {
             List(legCount(day)) { null }
+        }
+        if (gen != generation) return
+        // 모든 구간을 공급자가 계산했으면 "다시 계산" 표시를 끈다. 그 사이 일정이 바뀌었으면(revision 다름) 끄지 않는다(T-07·16).
+        if (!readOnly && day.needsRecalculation && legSeconds.isNotEmpty() && legSeconds.none { it == null } &&
+            editor.markRoutesCalculated(trip.id, date, day.revision)
+        ) {
+            day = day.copy(needsRecalculation = false)
         }
         if (gen != generation) return
         val schedule = ScheduleCalculator.calculate(day.startTime, day.origin != null, day.stops.map { it.stayMinutes }, legSeconds)
@@ -235,6 +246,9 @@ class DayPlanViewModel(
             is DayPlanAction.ApplyStart -> apply(closeSheet = true) { editor.setStart(tripId, date, action.time, action.origin) }
             DayPlanAction.AddPlace -> viewModelScope.launch { _effects.send(DayPlanEffect.OpenPicker(tripId, date)) }
             DayPlanAction.EditTrip -> viewModelScope.launch { _effects.send(DayPlanEffect.EditTrip(tripId)) }
+            DayPlanAction.OpenMap -> viewModelScope.launch {
+                _effects.send(if (s.readOnly) DayPlanEffect.Upgrade(UpgradeFeature.Route) else DayPlanEffect.OpenMap(tripId, date))
+            }
         }
     }
 
@@ -242,7 +256,7 @@ class DayPlanViewModel(
         is DayPlanAction.MoveUp, is DayPlanAction.MoveDown, is DayPlanAction.OpenStop, is DayPlanAction.SaveStay,
         is DayPlanAction.MoveTo, is DayPlanAction.Remove, DayPlanAction.ConfirmRemove, DayPlanAction.OpenStart,
         is DayPlanAction.ApplyStart, DayPlanAction.AddPlace, DayPlanAction.EditTrip -> true
-        DayPlanAction.Refresh, is DayPlanAction.SelectDate, DayPlanAction.CloseSheet, DayPlanAction.CancelRemove, DayPlanAction.StayEdited -> false
+        DayPlanAction.Refresh, is DayPlanAction.SelectDate, DayPlanAction.CloseSheet, DayPlanAction.CancelRemove, DayPlanAction.StayEdited, DayPlanAction.OpenMap -> false
     }
 
     /** 보이는 그날 줄을 대상으로 하는 편집. */

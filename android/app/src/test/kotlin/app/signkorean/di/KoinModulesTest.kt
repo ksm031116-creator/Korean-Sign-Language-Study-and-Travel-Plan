@@ -49,6 +49,8 @@ class KoinModulesTest {
             definition<app.signkorean.ui.plan.AddToPlanViewModel>(app.signkorean.domain.content.PlaceId::class),
             definition<app.signkorean.ui.plan.DayPlanViewModel>(app.signkorean.domain.trip.TripId::class, java.time.LocalDate::class),
             definition<app.signkorean.ui.plan.PlacePickerViewModel>(app.signkorean.domain.trip.TripId::class, java.time.LocalDate::class),
+            // SC18 이 보여 줄 것(하루 경로 또는 한 장소).
+            definition<app.signkorean.ui.map.MapViewModel>(app.signkorean.ui.map.MapTarget::class),
             // SC21 을 연 진입점(화면 인자).
             definition<app.signkorean.ui.upgrade.UpgradeViewModel>(app.signkorean.ui.upgrade.UpgradeFeature::class),
             // 다시 잠그기는 디버그 빌드의 모의 결제에만 있고(getOrNull), 릴리스에는 없다.
