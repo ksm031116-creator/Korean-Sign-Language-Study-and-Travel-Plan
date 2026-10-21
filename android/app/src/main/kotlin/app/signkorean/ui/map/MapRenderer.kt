@@ -70,6 +70,7 @@ object SchematicMapRenderer : MapRenderer {
         var pan by remember { mutableStateOf(Offset.Zero) }
         val coords = points.mapNotNull { it.coordinate } + legs.flatMap { it.route?.path.orEmpty() }
         val description = stringResource(R.string.map_schematic)
+        val controlsPx = with(androidx.compose.ui.platform.LocalDensity.current) { 56.dp.toPx() }
         Box(modifier.fillMaxWidth().height(300.dp).clip(RoundedCornerShape(14.dp)).background(t.surface)) {
             if (coords.isNotEmpty()) {
                 val bounds = Bounds.of(coords)
@@ -78,14 +79,14 @@ object SchematicMapRenderer : MapRenderer {
                         .semantics { contentDescription = description }
                         .pointerInput(legs, zoom, pan) {
                             detectTapGestures { tap ->
-                                val project = bounds.projector(size.width.toFloat(), size.height.toFloat(), zoom, pan)
+                                val project = bounds.projector(size.width.toFloat(), size.height.toFloat(), zoom, pan, controlsPx)
                                 nearestLeg(legs, points, project, tap)?.let(onSelectLeg)
                             }
                         }
                         // 확대했을 때만 끌기를 받는다. 아니면 화면 세로 스크롤을 막지 않는다.
                         .then(if (zoom > 1f) Modifier.pointerInput(zoom) { detectDragGestures { change, drag -> change.consume(); pan += drag } } else Modifier),
                 ) {
-                    val project = bounds.projector(size.width, size.height, zoom, pan)
+                    val project = bounds.projector(size.width, size.height, zoom, pan, controlsPx)
                     legs.forEachIndexed { i, leg ->
                         val path = leg.route?.path ?: return@forEachIndexed // 모르는 구간은 선을 그리지 않는다(FR15).
                         if (path.size < 2) return@forEachIndexed
@@ -154,12 +155,14 @@ object SchematicMapRenderer : MapRenderer {
     private class Bounds(val minLat: Double, val maxLat: Double, val minLng: Double, val maxLng: Double) {
         private val kx = cos(Math.toRadians((minLat + maxLat) / 2))
 
-        fun projector(width: Float, height: Float, zoom: Float, pan: Offset): (Coordinate) -> Offset {
+        fun projector(width: Float, height: Float, zoom: Float, pan: Offset, rightInset: Float = 0f): (Coordinate) -> Offset {
             val pad = 48f
+            // 오른쪽 확대·축소 버튼 아래에 점이 숨지 않게 그만큼 비운다(기기 확인에서 발견).
+            val usable = width - rightInset
             val spanX = max((maxLng - minLng) * kx, 1e-5)
             val spanY = max(maxLat - minLat, 1e-5)
-            val scale = minOf((width - 2 * pad) / spanX, (height - 2 * pad) / spanY) * zoom
-            val cx = width / 2f
+            val scale = minOf((usable - 2 * pad) / spanX, (height - 2 * pad) / spanY) * zoom
+            val cx = usable / 2f
             val cy = height / 2f
             val midX = (minLng + maxLng) / 2 * kx
             val midY = (minLat + maxLat) / 2

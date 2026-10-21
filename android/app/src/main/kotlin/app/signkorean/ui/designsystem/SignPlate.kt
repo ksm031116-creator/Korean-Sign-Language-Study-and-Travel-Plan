@@ -14,7 +14,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -184,13 +187,16 @@ private fun PlateFrame(
 
 @Composable
 private fun PlateWord(koText: String, size: TextUnit, singleLine: Boolean = false) {
+    // 한 줄 판(목록 미리보기)은 넘치면 글자를 줄여 판 안에 맞춘다. 잘린 글자는 다른 단어로 읽힌다(기기 확인에서 발견).
+    var fitted by remember(koText, size) { mutableStateOf(size) }
     KoreanText(
         text = koText,
         maxLines = if (singleLine) 1 else Int.MAX_VALUE,
+        onTextLayout = { layout -> if (singleLine && layout.hasVisualOverflow && fitted.value > 9f) fitted = (fitted.value * 0.9f).sp },
         style = MaterialTheme.typography.headlineSmall.copy(
             color = Color.White,
             fontWeight = FontWeight.ExtraBold,
-            fontSize = size,
+            fontSize = fitted,
             textAlign = TextAlign.Center,
         ),
         modifier = Modifier.fillMaxWidth(),
