@@ -51,6 +51,14 @@ class BundledContentPackTest {
     }
 
     @Test
+    fun `C-11 앱의 픽토그램은 모두 콘텐츠의 어느 카드엔가 쓰이고, 카드는 앱에 있는 ID 만 쓴다 (Phase 20 D3)`() {
+        val used = pack.cards.mapNotNull { it.pictogram }.toSet()
+        assertEquals(app.signkorean.domain.content.PictogramCatalog.BUNDLED.ids, used)
+        assertEquals("nursing", pack.cards.single { it.koText == "수유실" }.pictogram?.value)
+        assertEquals("info", pack.cards.single { it.koText == "관광안내소" }.pictogram?.value)
+    }
+
+    @Test
     fun `L10N ja 콘텐츠 초안이 빠짐없다 - 카드 뜻·설명·카타카나, 장소·지역 이름 (Phase 20 D2)`() {
         val jaGaps = ContentLanguageAudit.audit(pack).gaps.filter { it.locale == LocaleTag("ja") }
         assertEquals(emptyList<LanguageGap>(), jaGaps)
