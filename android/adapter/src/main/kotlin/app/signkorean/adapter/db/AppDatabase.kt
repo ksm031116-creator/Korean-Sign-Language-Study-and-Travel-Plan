@@ -111,16 +111,21 @@ interface SessionDao {
  * 파괴적 마이그레이션은 쓰지 않는다: 학습 기록이 사라진다 (설계서 §7.2).
  */
 @Database(
-    entities = [CardStateEntity::class, SessionEntity::class, BookmarkEntity::class],
-    version = 2,
+    entities = [
+        CardStateEntity::class, SessionEntity::class, BookmarkEntity::class,
+        TripEntity::class, TripDayEntity::class, TripStopEntity::class,
+    ],
+    version = 3,
     exportSchema = true,
-    // v2: bookmark 표 추가(Phase 11). 표 추가는 자동 마이그레이션으로 충분하다. 기존 학습 기록은 그대로 남는다.
-    autoMigrations = [AutoMigration(from = 1, to = 2)],
+    // v2: bookmark 표 추가(Phase 11). v3: 여행 표 3개 추가(Phase 16). 표 추가는 자동 마이그레이션으로 충분하다.
+    // 기존 학습 기록·북마크는 그대로 남는다.
+    autoMigrations = [AutoMigration(from = 1, to = 2), AutoMigration(from = 2, to = 3)],
 )
 abstract class AppDatabase : RoomDatabase() {
     abstract fun cardStateDao(): CardStateDao
     abstract fun sessionDao(): SessionDao
     abstract fun bookmarkDao(): BookmarkDao
+    abstract fun tripDao(): TripDao
 
     companion object {
         const val NAME = "sign-korean.db"

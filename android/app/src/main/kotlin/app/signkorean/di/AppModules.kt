@@ -27,6 +27,8 @@ import app.signkorean.domain.learning.TransactionRunner
 import app.signkorean.domain.learning.UndoJudgement
 import app.signkorean.domain.audio.AudioPlayer
 import app.signkorean.domain.bookmark.BookmarkStore
+import app.signkorean.domain.trip.TripEditor
+import app.signkorean.domain.trip.TripStore
 import app.signkorean.domain.bookmark.ClearBookmarks
 import app.signkorean.domain.bookmark.SetBookmark
 import app.signkorean.ForegroundActivityTracker
@@ -125,6 +127,9 @@ val learningModule = module {
     single<SessionStore> { get<RoomLearningStorage>().sessions }
     single<TransactionRunner> { get<RoomLearningStorage>().transactions }
     single<BookmarkStore> { get<RoomLearningStorage>().bookmarks }
+    // 여행 (Phase 16). 같은 데이터베이스 파일이지만 학습·북마크와 따로 지운다(FR22).
+    single<TripStore> { get<RoomLearningStorage>().trips }
+    single { TripEditor(get(), get(), get(), get()) }
     factory { SetBookmark(get(), get(), get(), get()) }
     factory { ClearBookmarks(get()) }
     factory { StartSession(get(), get(), get(), get()) }

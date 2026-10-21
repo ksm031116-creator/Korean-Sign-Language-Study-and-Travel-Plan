@@ -223,6 +223,8 @@ class RoomBookmarkStore(private val dao: BookmarkDao) : BookmarkStore {
  * 앱 조립부가 Room 타입을 몰라도 되도록 포트만 내보낸다. 데이터베이스는 앱 하나에 하나다.
  */
 class RoomLearningStorage private constructor(db: AppDatabase, reporter: StorageProblemReporter) {
+    // 여행도 같은 데이터베이스 파일이다. 학습 초기화·북마크 초기화는 여행 표를 건드리지 않는다(FR16·22).
+    val trips: app.signkorean.domain.trip.TripStore = RoomTripStore(db)
     val states: LearningStateStore = RoomLearningStateStore(db.cardStateDao(), reporter)
     val sessions: SessionStore = RoomSessionStore(db.sessionDao(), reporter)
     val transactions: TransactionRunner = RoomTransactionRunner(db)
