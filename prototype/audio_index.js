@@ -1,5 +1,5 @@
 /* 자동 생성 파일 — .work/generate_tts.py 로 다시 만든다. 직접 고치지 않는다.
- * 발음: Gemini TTS (gemini-3.8-flash-tts, voice Kore) · 생성일 2026-10-20
+ * 발음: Gemini TTS (gemini-3.8-flash-tts, voice Kore) · 생성일 2026-10-21
  */
 window.AUDIO_FILES = {
  "t-palace-1": "audio/t-palace-1.mp3",
@@ -23,5 +23,7 @@ window.AUDIO_FILES = {
  "t-shopping-3": "audio/t-shopping-3.mp3",
  "t-hanok-1": "audio/t-hanok-1.mp3",
  "t-hanok-2": "audio/t-hanok-2.mp3",
- "t-hanok-3": "audio/t-hanok-3.mp3"
+ "t-hanok-3": "audio/t-hanok-3.mp3",
+ "t-landmark-1": "audio/t-landmark-1.mp3",
+ "t-landmark-2": "audio/t-landmark-2.mp3"
 };

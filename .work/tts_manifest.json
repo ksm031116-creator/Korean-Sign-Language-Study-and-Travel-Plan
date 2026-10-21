@@ -136,5 +136,17 @@
   "heard": "찻집",
   "ok": true,
   "attempts": 1
+ },
+ "t-landmark-1": {
+  "word": "안내도",
+  "heard": "안내도",
+  "ok": true,
+  "attempts": 1
+ },
+ "t-landmark-2": {
+  "word": "포토존",
+  "heard": "포토존",
+  "ok": true,
+  "attempts": 1
  }
 }
