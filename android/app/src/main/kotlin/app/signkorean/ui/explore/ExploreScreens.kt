@@ -8,6 +8,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -190,6 +192,7 @@ private fun ResumeBanner(resume: ResumeUi, onResume: () -> Unit) {
     }
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun BasicsCard(state: ExploreUiState, onOpen: () -> Unit) {
     val t = SignKoreanTheme.tokens
@@ -199,12 +202,14 @@ private fun BasicsCard(state: ExploreUiState, onOpen: () -> Unit) {
         verticalArrangement = Arrangement.spacedBy(10.dp),
     ) {
         // 앞면 표지판만 보인다(그림 없이 단어만, U-18).
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            state.basicsPreview.forEach { SignPlate(it, PlateFace.Front, Modifier.weight(1f), PlateSize.Mini) }
+        // 세 판의 높이를 맞춘다. 긴 단어는 글자가 줄어 판이 낮아지므로(360dp 기기 확인에서 발견).
+        Row(Modifier.height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            state.basicsPreview.forEach { SignPlate(it, PlateFace.Front, Modifier.weight(1f).fillMaxHeight(), PlateSize.Mini) }
         }
-        Row(verticalAlignment = Alignment.CenterVertically) {
+        // 좁은 화면에서는 한국어 이름이 한 덩어리로 다음 줄로 간다(글자마다 쪼개지지 않게).
+        FlowRow(verticalArrangement = Arrangement.Center) {
             Text(stringResource(R.string.basics_name) + " · ", style = MaterialTheme.typography.titleMedium)
-            KoreanText(stringResource(R.string.ko_basics_name), style = MaterialTheme.typography.titleMedium)
+            KoreanText(stringResource(R.string.ko_basics_name), style = MaterialTheme.typography.titleMedium, maxLines = 1)
         }
         Text(stringResource(R.string.basics_description), style = MaterialTheme.typography.bodyMedium, color = t.muted)
         ProgressLine(state.basics)

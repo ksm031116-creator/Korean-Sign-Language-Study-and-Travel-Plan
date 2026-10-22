@@ -182,7 +182,8 @@ private fun PlateFrame(
                 if (drawnPictogram != null) this.drawnPictogram = drawnPictogram.value
             },
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(10.dp),
+        // 같은 줄의 판과 높이를 맞췄을 때 글자가 위에 붙지 않게 가운데로.
+        verticalArrangement = Arrangement.spacedBy(10.dp, Alignment.CenterVertically),
     ) { content() }
 }
 
