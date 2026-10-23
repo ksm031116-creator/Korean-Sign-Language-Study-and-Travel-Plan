@@ -24,6 +24,7 @@ import app.signkorean.domain.review.ReviewProvider
 import app.signkorean.domain.review.ReviewResponse
 import kotlin.math.abs
 import org.koin.dsl.module
+import org.koin.android.ext.koin.androidContext
 import java.util.UUID
 
 /**
@@ -36,7 +37,7 @@ import java.util.UUID
 val variantModules: List<Module> = (if (BuildConfig.API_BASE_URL.isBlank()) listOf(sampleDataModule) else emptyList()) + if (BuildConfig.SIMULATED_BILLING) {
     listOf(
         module {
-            single { SimulatedBillingGateway() }
+            single { SimulatedBillingGateway(androidContext()) }
             single<EntitlementGateway> { get<SimulatedBillingGateway>() }
             single<DebugRelock> {
                 val gateway = get<SimulatedBillingGateway>()
@@ -98,8 +99,22 @@ class SamplePlaceSummaries(private val content: ContentRepository) : PlaceSummar
  * 모의 결제. 결제는 잠깐 기다린 뒤 성공하고, 구매는 프로세스가 살아 있는 동안만 기억한다(다시 켜면 캐시의 권한을 쓰고,
  * 시작 확인에서 구매가 없으니 Free 로 돌아간다 — 실제 환불과 같은 경로라 E-11 도 눈으로 볼 수 있다).
  */
-class SimulatedBillingGateway : EntitlementGateway {
-    @Volatile private var owned: List<StorePurchase> = emptyList()
+/**
+ * 디버그 빌드의 모의 결제. 결제 버튼을 누르면 0.8초 뒤 구매 완료가 된다(실제 돈은 오가지 않는다).
+ * 구매 기록은 기기에 저장해 앱을 껐다 켜도 남는다 — 메모리에만 두면 다시 켤 때 무료로 돌아갔다(BIL-01).
+ */
+class SimulatedBillingGateway(context: android.content.Context) : EntitlementGateway {
+    private val prefs = context.applicationContext.getSharedPreferences("simulated_billing", android.content.Context.MODE_PRIVATE)
+
+    // "토큰|acknowledged" 를 한 줄씩 저장한다.
+    @Volatile private var owned: List<StorePurchase> = prefs.getStringSet(KEY, emptySet()).orEmpty().sorted().mapNotNull { line ->
+        val parts = line.split('|')
+        if (parts.size == 2) StorePurchase(parts[0], StorePurchase.State.Purchased, acknowledged = parts[1] == "1") else null
+    }
+        set(value) {
+            field = value
+            prefs.edit().putStringSet(KEY, value.map { it.token + "|" + (if (it.acknowledged) "1" else "0") }.toSet()).commit()
+        }
 
     override suspend fun queryPurchases(): StoreQuery = StoreQuery.Success(owned)
 
@@ -120,6 +135,10 @@ class SimulatedBillingGateway : EntitlementGateway {
 
     fun relock() {
         owned = emptyList()
+    }
+
+    private companion object {
+        const val KEY = "owned"
     }
 }
 
