@@ -1,5 +1,5 @@
 // Sign Korean 중계 서버 (PRD §10.3). 공급자 비밀키는 이 서버에만 두고 앱에는 넣지 않는다(설계서 원칙 13).
-// 지금은 카카오맵 도보 경로(POST /v1/routes)만 실제로 묻는다. 리뷰·평점은 공급자가 없어 UNSUPPORTED 다.
+// 카카오맵 도보·대중교통 경로(POST /v1/routes)를 묻는다. 리뷰·평점은 공급자가 없어 UNSUPPORTED 다.
 // 실행: node server/relay.mjs  (키는 저장소 루트 .env 또는 server/.env 의 KAKAO_REST_API_KEY — git 에 올리지 않는다)
 import { createServer } from 'node:http';
 import { readFileSync, existsSync } from 'node:fs';
@@ -14,14 +14,51 @@ const NO_ROUTE = new Set([
   // 대중교통
   'NO_RESULTS', 'STARTNODES_NULL', 'ENDNODES_NULL', 'EQUAL_POINTS',
 ]);
+// 앱이 그릴 줄 아는 탈것. 그 밖의 것(기차·고속버스 등)이 섞인 경로는 건너뛴다 — 걷기로 바꿔 보이지 않게.
 const STEP_KIND = { WALKING: 'walk', BUS: 'bus', SUBWAY: 'subway' };
+const MAX_BODY = 16 * 1024;
+const ALLOWED_HOST = /^(127\.0\.0\.1|localhost)(:\d+)?$/;
 
 const json = (status, body) => ({ status, body: JSON.stringify(body) });
 const error = (status, code, retryable) => json(status, { error: { code, retryable } });
 const isCoord = (p) => p && Number.isFinite(p.lat) && Number.isFinite(p.lng) && Math.abs(p.lat) <= 90 && Math.abs(p.lng) <= 180;
+const list = (v) => (Array.isArray(v) ? v : []);
 
-/** 요청 하나를 처리한다. HTTP 서버와 떼어 두어 테스트가 가짜 fetch 로 부를 수 있게 한다. */
+class Upstream extends Error {}
+
+/** 요청 하나를 처리한다. HTTP 서버와 떼어 두어 테스트가 가짜 fetch 로 부를 수 있게 한다. 어떤 응답이 와도 던지지 않는다. */
 export function createHandler({ kakaoKey, fetch = globalThis.fetch, timeoutMs = 8_000 }) {
+  // 외부 호출은 헤더부터 본문 끝까지 8초에서 끊는다(PRD §10.3). 늦은 fetch 도 abort 로 멈춘다.
+  async function askKakao(url) {
+    const ac = new AbortController();
+    let timer;
+    const deadline = new Promise((_, reject) => {
+      timer = setTimeout(() => {
+        ac.abort();
+        reject(new Error('timeout'));
+      }, timeoutMs);
+    });
+    try {
+      return await Promise.race([
+        (async () => {
+          const res = await fetch(url, { headers: { Authorization: `KakaoAK ${kakaoKey}` }, signal: ac.signal });
+          // 원시 오류 본문은 앱에 넘기지 않는다(키가 들어 있을 수 있다).
+          if (res.status === 429) return { fail: error(503, 'RATE_LIMITED', true) };
+          if (res.status === 401 || res.status === 403) return { fail: error(502, 'UNSUPPORTED', false) };
+          // 400 은 좌표가 지원 범위 밖인 경우 등 — 다시 해도 같다.
+          if (res.status === 400) return { fail: error(422, 'NO_DATA', false) };
+          if (!res.ok) return { fail: error(502, 'UPSTREAM_ERROR', res.status >= 500) };
+          return { body: await res.json() };
+        })(),
+        deadline,
+      ]);
+    } catch (e) {
+      return { fail: e?.message === 'timeout' ? error(504, 'UPSTREAM_TIMEOUT', true) : error(502, 'UPSTREAM_ERROR', true) };
+    } finally {
+      clearTimeout(timer);
+    }
+  }
+
   async function routes(rawBody) {
     let req;
     try {
@@ -39,86 +76,72 @@ export function createHandler({ kakaoKey, fetch = globalThis.fetch, timeoutMs = 
     url.searchParams.set('end_x', String(req.destination.lng));
     url.searchParams.set('end_y', String(req.destination.lat));
 
-    let res;
-    let timer;
-    try {
-      // 외부 호출은 8초에서 끊는다(PRD §10.3). 늦은 응답은 버린다.
-      res = await Promise.race([
-        fetch(url, { headers: { Authorization: `KakaoAK ${kakaoKey}` } }),
-        new Promise((_, reject) => { timer = setTimeout(() => reject(new Error('timeout')), timeoutMs); }),
-      ]);
-    } catch (e) {
-      return e?.message === 'timeout' ? error(504, 'UPSTREAM_TIMEOUT', true) : error(502, 'UPSTREAM_ERROR', true);
-    } finally {
-      clearTimeout(timer);
-    }
-    // 원시 오류 본문은 앱에 넘기지 않는다(키가 들어 있을 수 있다).
-    if (res.status === 429) return error(503, 'RATE_LIMITED', true);
-    if (res.status === 401 || res.status === 403) return error(502, 'UNSUPPORTED', false);
-    if (!res.ok) return error(502, 'UPSTREAM_ERROR', res.status >= 500);
-
-    let body;
-    try {
-      body = await res.json();
-    } catch {
-      return error(502, 'UPSTREAM_ERROR', true);
-    }
+    const { body, fail } = await askKakao(url);
+    if (fail) return fail;
     if (body?.status !== 'OK') return NO_ROUTE.has(body?.status) ? error(422, 'NO_DATA', false) : error(502, 'UPSTREAM_ERROR', true);
-
-    return transit ? transitRoute(body, req) : walkRoute(body, req);
+    try {
+      return transit ? transitRoute(body) : walkRoute(body);
+    } catch (e) {
+      if (e instanceof Upstream || e instanceof TypeError) return error(502, 'UPSTREAM_ERROR', true);
+      throw e;
+    }
   }
 
   // 카카오의 [x(경도), y(위도)] 를 앱의 [위도, 경도] 로. 단계가 이어지는 같은 점은 한 번만 넣는다.
-  function toPath(steps, req) {
+  // 점이 없으면 빈 경로선이다 — 출발·도착을 직선으로 잇지 않는다(FR15).
+  function toPath(steps) {
     const path = [];
-    for (const step of steps) {
-      for (const [x, y] of step.path?.points ?? []) {
+    for (const step of list(steps)) {
+      for (const point of list(step?.path?.points)) {
+        if (!Array.isArray(point)) throw new Upstream('point');
+        const [x, y] = point;
+        if (!Number.isFinite(x) || !Number.isFinite(y)) throw new Upstream('point');
         const last = path[path.length - 1];
         if (!last || last[0] !== y || last[1] !== x) path.push([y, x]);
       }
     }
-    if (path.length < 2) return [[req.origin.lat, req.origin.lng], [req.destination.lat, req.destination.lng]];
-    return path;
+    return path.length >= 2 ? path : [];
   }
 
-  function walkRoute(body, req) {
+  function walkRoute(body) {
     const props = body.route?.properties;
-    if (!Number.isFinite(props?.totalDistance) || !Number.isFinite(props?.totalTime)) return error(502, 'UPSTREAM_ERROR', true);
-    const steps = (body.route.legs ?? []).flatMap((leg) => leg.steps ?? []);
-    return json(200, { distance_m: props.totalDistance, duration_s: props.totalTime, path: toPath(steps, req), attribution: 'Kakao Map' });
+    if (!Number.isFinite(props?.totalDistance) || !Number.isFinite(props?.totalTime)) throw new Upstream('walk');
+    const steps = list(body.route.legs).flatMap((leg) => list(leg?.steps));
+    return json(200, { distance_m: props.totalDistance, duration_s: props.totalTime, path: toPath(steps), attribution: 'Kakao Map' });
   }
 
-  // 대중교통은 카카오가 준 경로 중 가장 빨리 도착하는 것을 고른다. 단계마다 탈것(걷기·버스·지하철)과 노선 이름을 넘긴다.
-  function transitRoute(body, req) {
-    const candidates = (body.routes ?? []).filter((r) => Number.isFinite(r.properties?.totalTime) && Number.isFinite(r.properties?.totalDistance));
-    if (candidates.length === 0) return error(422, 'NO_DATA', false);
-    const best = candidates.reduce((a, b) => (b.properties.totalTime < a.properties.totalTime ? b : a));
-    const steps = [];
-    for (const step of best.steps ?? []) {
-      const kind = STEP_KIND[step.properties?.type];
-      if (!kind) return error(502, 'UPSTREAM_ERROR', true);
-      steps.push({
-        kind,
-        // 같은 노선의 열차가 여러 대 오므로 이름은 한 번씩만(순서 유지).
-        lines: [...new Set((step.properties.vehicles ?? []).map((v) => v.name).filter(Boolean))],
-        minutes: Math.ceil((step.properties.time ?? 0) / 60),
-        distance_m: step.properties.distance ?? 0,
-      });
-    }
+  // 대중교통은 그릴 수 있는 경로 중 가장 빨리 도착하는 것을 고른다. 단계마다 탈것과 노선 이름, 공급자 초를 그대로 넘긴다.
+  function transitRoute(body) {
+    if (!Array.isArray(body.routes)) throw new Upstream('routes');
+    const usable = body.routes
+      .filter((r) => Number.isFinite(r?.properties?.totalTime) && Number.isFinite(r?.properties?.totalDistance))
+      .filter((r) => list(r.steps).length > 0 && list(r.steps).every((s) => STEP_KIND[s?.properties?.type]));
+    if (usable.length === 0) return error(422, 'NO_DATA', false);
+    const best = usable.reduce((a, b) => (b.properties.totalTime < a.properties.totalTime ? b : a));
+    const steps = best.steps.map((step) => ({
+      kind: STEP_KIND[step.properties.type],
+      // 같은 노선의 열차가 여러 대 오므로 이름은 한 번씩만(순서 유지).
+      lines: [...new Set(list(step.properties.vehicles).map((v) => v?.name).filter((n) => typeof n === 'string' && n))],
+      time_s: Number.isFinite(step.properties.time) ? step.properties.time : null,
+      distance_m: Number.isFinite(step.properties.distance) ? step.properties.distance : null,
+    }));
     const p = best.properties;
     return json(200, {
       distance_m: p.totalDistance,
       duration_s: p.totalTime,
-      path: toPath(best.steps ?? [], req),
+      path: toPath(best.steps),
       attribution: 'Kakao Map',
-      transit: { transfers: p.transfers ?? 0, fare_won: p.fare?.value ?? null, steps },
+      transit: { transfers: Number.isFinite(p.transfers) ? p.transfers : 0, fare_won: Number.isFinite(p.fare?.value) ? p.fare.value : null, steps },
     });
   }
 
-  return async function handle({ method, path, body }) {
+  return async function handle({ method, path, body, host }) {
+    // 같은 PC 의 브라우저 페이지가 DNS 리바인딩으로 쿼터를 쓰지 못하게 Host 를 본다(서버는 루프백에서만 듣는다).
+    if (host !== undefined && !ALLOWED_HOST.test(host)) return error(403, 'FORBIDDEN', false);
+    if (body !== undefined && Buffer.byteLength(body) > MAX_BODY) return error(413, 'INVALID_INPUT', false);
     const pathname = path.split('?')[0];
     if (method === 'POST' && pathname === '/v1/routes') return routes(body);
-    // 리뷰·평점 공급자(Google Places 등)는 아직 연결하지 않았다. 앱은 "연결되지 않음"으로 보인다.
+    // 리뷰·평점 공급자는 아직 연결하지 않았다. 앱은 "연결되지 않음"으로 보인다.
     if (method === 'GET' && (/^\/v1\/places\/[^/]+\/reviews$/.test(pathname) || /^\/v1\/cards\/[^/]+\/places$/.test(pathname))) {
       return error(501, 'UNSUPPORTED', false);
     }
@@ -126,7 +149,7 @@ export function createHandler({ kakaoKey, fetch = globalThis.fetch, timeoutMs = 
   };
 }
 
-/** server/.env 의 KEY=VALUE 줄을 읽는다(외부 패키지 없이). */
+/** .env 의 KEY=VALUE 줄을 읽는다(외부 패키지 없이). */
 function loadEnv(file) {
   if (!existsSync(file)) return {};
   const env = {};
@@ -148,9 +171,19 @@ if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
   const handle = createHandler({ kakaoKey: env.KAKAO_REST_API_KEY ?? '' });
   createServer((req, res) => {
     const chunks = [];
-    req.on('data', (c) => chunks.push(c));
+    let size = 0;
+    req.on('data', (c) => {
+      size += c.length;
+      if (size <= MAX_BODY + 1) chunks.push(c);
+    });
     req.on('end', async () => {
-      const out = await handle({ method: req.method, path: req.url, body: Buffer.concat(chunks).toString('utf8') });
+      let out;
+      try {
+        out = await handle({ method: req.method, path: req.url, body: Buffer.concat(chunks).toString('utf8'), host: req.headers.host ?? '' });
+      } catch {
+        // 어떤 요청도 서버를 죽이지 않는다.
+        out = error(500, 'UPSTREAM_ERROR', true);
+      }
       res.writeHead(out.status, { 'Content-Type': 'application/json; charset=utf-8' });
       res.end(out.body);
       // 좌표·키는 로그에 남기지 않는다(NFR05). 경로와 상태만.
