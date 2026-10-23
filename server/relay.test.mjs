@@ -154,9 +154,9 @@ test('TRN 대중교통 - 카카오 대중교통 경로 중 가장 빠른 것을 
     transfers: 1,
     fare_won: 1550,
     steps: [
-      { kind: 'walk', lines: [], minutes: 4, distance_m: 300 },
-      { kind: 'subway', lines: ['3호선'], minutes: 20, distance_m: 4000 },
-      { kind: 'bus', lines: ['7212', '1020'], minutes: 12, distance_m: 713 },
+      { kind: 'walk', lines: [], time_s: 240, distance_m: 300 },
+      { kind: 'subway', lines: ['3호선'], time_s: 1200, distance_m: 4000 },
+      { kind: 'bus', lines: ['7212', '1020'], time_s: 675, distance_m: 713 },
     ],
   });
 });
@@ -179,4 +179,71 @@ test('TRN 같은 노선의 열차가 여러 번 와도 노선 이름은 한 번�
   body.routes[1].steps[1].properties.vehicles = [{ name: '1호선' }, { name: '1호선' }, { name: '4호선' }, { name: '1호선' }];
   const res = await call(createHandler({ kakaoKey: 'k', fetch: fakeFetch(async () => ({ body })) }), 'POST', '/v1/routes', transitReq);
   assert.deepEqual(res.body.transit.steps[1].lines, ['1호선', '4호선']);
+});
+
+// ---------- 리뷰 수정 (RLY) ----------
+
+test('RLY-M1 카카오 응답 모양이 이상해도 서버는 죽지 않고 UPSTREAM_ERROR 로 답한다', async () => {
+  const shapes = [
+    { status: 'OK', routes: {} },
+    { status: 'OK', routes: [{ properties: { totalTime: 10, totalDistance: 10, transfers: 0 }, steps: [null] }] },
+    { status: 'OK', routes: [{ properties: { totalTime: 10, totalDistance: 10, transfers: 0 }, steps: [{ properties: { type: 'BUS', time: 60, vehicles: [null] }, path: { points: [[126.99, 37.57], [126.98, 37.58]] } }] }] },
+  ];
+  for (const body of shapes) {
+    const res = await call(createHandler({ kakaoKey: 'k', fetch: fakeFetch(async () => ({ body })) }), 'POST', '/v1/routes', transitReq);
+    assert.ok([200, 422, 502].includes(res.status), JSON.stringify(body));
+  }
+  const walkShape = { status: 'OK', route: { properties: { totalDistance: 5, totalTime: 5 }, legs: [{ steps: [{ path: { points: [{ x: 1, y: 2 }] } }] }] } };
+  const res = await call(createHandler({ kakaoKey: 'k', fetch: fakeFetch(async () => ({ body: walkShape })) }), 'POST', '/v1/routes', walk);
+  assert.ok([200, 502].includes(res.status));
+});
+
+test('RLY-M2 모르는 탈것(기차 등)이 섞인 경로는 건너뛰고 다음으로 빠른 경로를 쓴다, 다 그러면 NO_DATA', async () => {
+  const body = structuredClone(KAKAO_TRANSIT);
+  body.routes[1].steps[1].properties.type = 'TRAIN';
+  const res = await call(createHandler({ kakaoKey: 'k', fetch: fakeFetch(async () => ({ body })) }), 'POST', '/v1/routes', transitReq);
+  assert.equal(res.status, 200);
+  assert.equal(res.body.duration_s, 2700);
+  body.routes[0].steps[0].properties.type = 'EXPRESS_BUS';
+  const none = await call(createHandler({ kakaoKey: 'k', fetch: fakeFetch(async () => ({ body })) }), 'POST', '/v1/routes', transitReq);
+  assert.equal(none.status, 422);
+  assert.deepEqual(none.body.error, { code: 'NO_DATA', retryable: false });
+});
+
+test('RLY-M3 본문을 늦게 보내도 시간 제한 안에서 끊는다', async () => {
+  const fetch = async () => ({ status: 200, ok: true, json: () => new Promise(() => {}) });
+  const started = Date.now();
+  const res = await call(createHandler({ kakaoKey: 'k', fetch, timeoutMs: 50 }), 'POST', '/v1/routes', walk);
+  assert.equal(res.status, 504);
+  assert.ok(Date.now() - started < 1000);
+});
+
+test('RLY-L4 경로 점이 없으면 직선을 그리지 않고 빈 경로선', async () => {
+  const body = structuredClone(KAKAO_OK);
+  body.route.legs = [];
+  const res = await call(createHandler({ kakaoKey: 'k', fetch: fakeFetch(async () => ({ body })) }), 'POST', '/v1/routes', walk);
+  assert.equal(res.status, 200);
+  assert.deepEqual(res.body.path, []);
+});
+
+test('RLY-L5 대중교통 단계 시간은 초 그대로(time_s), 없으면 null', async () => {
+  const body = structuredClone(KAKAO_TRANSIT);
+  delete body.routes[1].steps[2].properties.time;
+  const res = await call(createHandler({ kakaoKey: 'k', fetch: fakeFetch(async () => ({ body })) }), 'POST', '/v1/routes', transitReq);
+  assert.deepEqual(res.body.transit.steps.map((s) => s.time_s), [240, 1200, null]);
+});
+
+test('카카오 400 은 이 좌표로는 길이 없다는 뜻이라 NO_DATA', async () => {
+  const res = await call(createHandler({ kakaoKey: 'k', fetch: fakeFetch(async () => ({ status: 400, body: {} })) }), 'POST', '/v1/routes', walk);
+  assert.deepEqual(res.body.error, { code: 'NO_DATA', retryable: false });
+});
+
+test('RLY-L3 본문이 16KB 를 넘으면 413, 다른 Host 로 온 요청은 403', async () => {
+  const handler = createHandler({ kakaoKey: 'k', fetch: fakeFetch(async () => ({ body: KAKAO_OK })) });
+  const big = await handler({ method: 'POST', path: '/v1/routes', body: 'x'.repeat(17 * 1024) });
+  assert.equal(big.status, 413);
+  const rebinding = await handler({ method: 'POST', path: '/v1/routes', body: JSON.stringify(walk), host: 'evil.example:8787' });
+  assert.equal(rebinding.status, 403);
+  const ok = await handler({ method: 'POST', path: '/v1/routes', body: JSON.stringify(walk), host: '127.0.0.1:8787' });
+  assert.equal(ok.status, 200);
 });
