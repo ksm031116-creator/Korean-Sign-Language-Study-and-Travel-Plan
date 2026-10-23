@@ -235,4 +235,12 @@ class ReviewsTest {
         rule.onNodeWithText("This is an example place, so it has no reviews.").assertIsDisplayed()
         rule.onNodeWithText("You can read them on Kakao Map", substring = true).assertDoesNotExist()
     }
+
+    @Test
+    fun `리뷰 시트를 실제로 열어도 죽지 않는다(바닥 시트 안에 스크롤을 겹치지 않는다)`() {
+        // 바닥 시트(AppBottomSheet)가 이미 세로 스크롤이다. 안에 또 verticalScroll 을 두면 측정에서 예외로 앱이 죽었다.
+        val vm = vm()
+        rule.setContent { SignKoreanTheme { ReviewsSheet(PlaceId("gwangjang"), onDismiss = {}, viewModel = vm) } }
+        rule.onNodeWithText("Gwangjang Market").assertExists()
+    }
 }
