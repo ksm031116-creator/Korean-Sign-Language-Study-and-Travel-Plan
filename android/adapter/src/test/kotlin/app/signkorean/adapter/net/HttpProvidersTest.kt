@@ -69,7 +69,12 @@ class HttpProvidersTest {
                 val c = reader.read()
                 if (c < 0) break
                 append(c.toChar())
-                bytes += c.toChar().toString().toByteArray(Charsets.UTF_8).size
+                // 서로게이트 쌍(이모지 등)은 두 글자가 합쳐 4바이트다.
+                bytes += when {
+                    Character.isHighSurrogate(c.toChar()) -> 0
+                    Character.isLowSurrogate(c.toChar()) -> 4
+                    else -> c.toChar().toString().toByteArray(Charsets.UTF_8).size
+                }
             }
         }
         val uri = URI(target)

@@ -119,9 +119,15 @@ export function createHandler({ kakaoKey, fetch = globalThis.fetch, timeoutMs = 
     const { body, fail } = await askKakao(url);
     if (fail) return fail;
     if (!Array.isArray(body?.documents)) return error(502, 'UPSTREAM_ERROR', true);
-    const want = name.replace(/\s+/g, '');
+    // 공백·대소문자·유니코드 정규형(NFC/NFD)만 무시한다.
+    const key = (s) => s.normalize('NFC').replace(/\s+/g, '').toLowerCase();
+    const want = key(name);
     // id 가 숫자인 것만 — 받은 place_url 을 그대로 쓰지 않고 https 주소를 직접 만든다.
-    const hit = body.documents.find((d) => typeof d?.place_name === 'string' && d.place_name.replace(/\s+/g, '') === want && /^\d+$/.test(String(d.id)));
+    // 같은 이름이 여럿이면(체인점 등) 앱 좌표에서 가장 가까운 곳.
+    const dist = (d) => (Number.isFinite(Number(d.distance)) && d.distance !== '' ? Number(d.distance) : Infinity);
+    const hit = body.documents
+      .filter((d) => typeof d?.place_name === 'string' && key(d.place_name) === want && /^\d+$/.test(String(d.id)))
+      .reduce((best, d) => (best === null || dist(d) < dist(best) ? d : best), null);
     if (!hit) return error(404, 'NOT_FOUND', false);
     return json(200, { url: `https://place.map.kakao.com/${hit.id}` });
   }

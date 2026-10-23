@@ -292,6 +292,7 @@
     <string name="reviews_network">Couldn\'t load reviews.</string>
     <string name="reviews_not_connected">Reviews can\'t be shown in the app. You can read them on Kakao Map.</string>
     <string name="reviews_open_kakao">View reviews on Kakao Map</string>
+    <string name="reviews_example_place">This is an example place, so it has no reviews.</string>
     <string name="reviews_open_source">Open the original page</string>
     <string name="reviews_provider_unknown">the review provider</string>
     <string name="reviews_rating_spoken">Rated %1$d out of 5</string>

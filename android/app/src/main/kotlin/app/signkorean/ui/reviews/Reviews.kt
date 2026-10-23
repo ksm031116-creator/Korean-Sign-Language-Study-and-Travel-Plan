@@ -12,6 +12,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -81,6 +82,9 @@ data class ReviewsUiState(
 sealed interface ReviewsAction {
     /** 시트를 열었다. 지난번에 실패했으면 다시 불러온다(RVW-08). */
     data object Opened : ReviewsAction
+
+    /** 시트를 닫았다. 찾는 중인 카카오 링크는 버린다 — 다음에 열 때 저절로 열리지 않게. */
+    data object Closed : ReviewsAction
     data object Retry : ReviewsAction
     data class OpenLink(val url: String) : ReviewsAction
 
@@ -110,6 +114,7 @@ class ReviewsViewModel(
     val effects: ReceiveChannel<ReviewsEffect> = _effects
 
     private var job: Job? = null
+    private var kakaoJob: Job? = null
 
     init {
         fetch()
@@ -141,6 +146,10 @@ class ReviewsViewModel(
             // 허용 목록의 주소만 연다 (UX08, U-16).
             is ReviewsAction.OpenLink -> if (ExternalLinks.isAllowed(action.url)) viewModelScope.launch { _effects.send(ReviewsEffect.OpenUrl(action.url)) }
             ReviewsAction.OpenKakao -> openKakao()
+            ReviewsAction.Closed -> {
+                kakaoJob?.cancel()
+                _state.update { it.copy(openingKakao = false) }
+            }
             is ReviewsAction.ToggleOriginal -> _state.update { it.copy(showingOriginal = it.showingOriginal.toggle(action.index)) }
             is ReviewsAction.ToggleExpand -> _state.update { it.copy(expanded = it.expanded.toggle(action.index)) }
         }
@@ -151,7 +160,7 @@ class ReviewsViewModel(
         val place = s.place ?: return
         if (!s.kakaoAvailable || s.openingKakao) return
         _state.update { it.copy(openingKakao = true) }
-        viewModelScope.launch {
+        kakaoJob = viewModelScope.launch {
             try {
                 // 허용 목록의 주소만 연다 (UX08, U-16).
                 kakaoLink(place)?.takeIf(ExternalLinks::isAllowed)?.let { _effects.send(ReviewsEffect.OpenUrl(it)) }
@@ -171,6 +180,7 @@ fun ReviewsSheet(place: PlaceId, onDismiss: () -> Unit) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val uri = LocalUriHandler.current
     LaunchedEffect(Unit) { viewModel.onAction(ReviewsAction.Opened) }
+    DisposableEffect(viewModel) { onDispose { viewModel.onAction(ReviewsAction.Closed) } }
     LaunchedEffect(viewModel) {
         for (effect in viewModel.effects) {
             when (effect) {
@@ -228,10 +238,13 @@ fun ReviewsContent(state: ReviewsUiState, onAction: (ReviewsAction) -> Unit) {
             // 다른 장소의 리뷰로 채우지 않는다. 링크도 보이지 않는다(엉뚱한 장소로 갈 수 있다).
             ReviewState.PlaceMismatch -> Notice(stringResource(R.string.reviews_mismatch))
             ReviewState.NetworkFailure -> ErrorState(stringResource(R.string.reviews_network), onRetry = { onAction(ReviewsAction.Retry) })
-            ReviewState.NotConnected -> Notice(stringResource(R.string.reviews_not_connected))
+            // 예시 장소는 실제 장소가 아니라 카카오맵에도 없다. 없는 버튼을 가리키지 않는다.
+            ReviewState.NotConnected ->
+                Notice(stringResource(if (state.place?.isExample == true) R.string.reviews_example_place else R.string.reviews_not_connected))
         }
         // 카카오·네이버 모두 리뷰 공식 API 가 없다. 앱 안에 리뷰를 가져오지 않고 카카오맵으로 보낸다.
-        if (state.kakaoAvailable && state.reviews != null && !sourceShown) {
+        // 공급자가 다른 장소라고 판단했으면 카카오 링크도 보이지 않는다(엉뚱한 장소로 갈 수 있다).
+        if (state.kakaoAvailable && state.reviews != null && state.reviews != ReviewState.PlaceMismatch && !sourceShown) {
             SecondaryButton(stringResource(R.string.reviews_open_kakao), onClick = { onAction(ReviewsAction.OpenKakao) }, enabled = !state.openingKakao)
         }
     }
