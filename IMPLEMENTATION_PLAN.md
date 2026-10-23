@@ -430,7 +430,7 @@ gantt
 
 | 일 | 작업 |
 |---|---|
-| D1 | NFR01 Macrobenchmark(카드 전환 p95 300ms, 첫 카드 3초), NFR03 강제 종료 30회 E2E(판정·Undo·북마크 저장 중), NFR06 비행기 모드 E2E, NFR04 접근성 점검(TalkBack·200%), NFR07 최소·최신 OS와 360/430dp, NFR08 외부 요청 집계, NFR05 비밀키·위치 로그 점검 |
+| D1 | NFR01 Macrobenchmark(카드 전환 p95 300ms, 첫 카드 3초), NFR03 강제 종료 30회 E2E(판정·Undo·북마크 저장 중), NFR06 비행기 모드 E2E, NFR04 접근성 점검(200%. TalkBack 수동 확인은 제외 — DEVELOPMENT_LOG 결정 21), NFR07 최소·최신 OS와 360/430dp, NFR08 외부 요청 집계, NFR05 비밀키·위치 로그 점검 |
 | D2 | 릴리스 빌드 게이트 전체 실행(AR-04, 언어 검사, 오디오 10MB, 연결 감사 스냅샷). AT01~AT18 회귀 1회. 스토어 등록 정보(en·ja), 개인정보 처리방침, 서명, 실제 계정 결제 테스트. `README`·`DEVELOPMENT_LOG`·`BUGFIX_LOG` 갱신 |
 
 **산출물**: 출시 후보 빌드
