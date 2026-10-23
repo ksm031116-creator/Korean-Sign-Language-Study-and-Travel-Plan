@@ -10,6 +10,7 @@ import app.signkorean.domain.review.Review
 import app.signkorean.domain.review.ReviewError
 import app.signkorean.domain.review.ReviewPage
 import app.signkorean.domain.review.ReviewProvider
+import app.signkorean.domain.review.PlacePageLookup
 import app.signkorean.domain.review.ReviewResponse
 import app.signkorean.domain.location.Coordinate
 import app.signkorean.domain.route.Route
@@ -205,6 +206,26 @@ class HttpPlaceSummaryProvider(private val client: ApiClient) : PlaceSummaryProv
                 },
             )
         }.getOrDefault(PlaceSummaryResult.Unavailable)
+    }
+}
+
+/**
+ * `POST /v1/places/kakao-page` — "카카오맵에서 리뷰 보기"의 장소 페이지. 이름은 주소줄이 아니라 본문으로 보낸다.
+ * 못 찾음·오류·형식이 다른 응답은 모두 null 이다(앱이 카카오맵 검색으로 대신 연다). 주소 모양은 도메인이 다시 본다.
+ */
+class HttpPlacePageLookup(private val client: ApiClient) : PlacePageLookup {
+    override suspend fun kakaoPlacePage(koName: String, at: Coordinate): String? {
+        val body = buildJsonObject {
+            put("name", koName)
+            put("lat", at.lat)
+            put("lng", at.lng)
+        }.toString()
+        val result = client.post(listOf("v1", "places", "kakao-page"), body) as? ApiResult.Ok ?: return null
+        return result.body.string("url")?.takeIf { PAGE.matches(it) }
+    }
+
+    private companion object {
+        val PAGE = Regex("""https://place\.map\.kakao\.com/\d+""")
     }
 }
 

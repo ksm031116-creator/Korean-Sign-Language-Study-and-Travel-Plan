@@ -290,7 +290,8 @@
     <string name="reviews_language_unavailable">English reviews unavailable.</string>
     <string name="reviews_mismatch">We couldn\'t match this place with the review service, so no reviews are shown.</string>
     <string name="reviews_network">Couldn\'t load reviews.</string>
-    <string name="reviews_not_connected">Reviews aren\'t available in this version yet.</string>
+    <string name="reviews_not_connected">Reviews can\'t be shown in the app. You can read them on Kakao Map.</string>
+    <string name="reviews_open_kakao">View reviews on Kakao Map</string>
     <string name="reviews_open_source">Open the original page</string>
     <string name="reviews_provider_unknown">the review provider</string>
     <string name="reviews_rating_spoken">Rated %1$d out of 5</string>

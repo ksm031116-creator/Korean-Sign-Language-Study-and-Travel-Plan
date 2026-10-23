@@ -131,6 +131,10 @@ val placeModule = module {
     single { DayRoutePlanner(get(), get()) }
     single<LocationProvider> { AndroidLocationProvider(androidContext()) }
     factory { LoadReviews(get()) }
+    single<app.signkorean.domain.review.PlacePageLookup> {
+        if (BuildConfig.API_BASE_URL.isBlank()) app.signkorean.domain.review.NoPlacePageLookup else app.signkorean.adapter.net.HttpPlacePageLookup(get())
+    }
+    factory { app.signkorean.domain.review.KakaoReviewLink(get()) }
 }
 
 /** 언어 (Phase 3). 앱 언어 저장은 AppCompat 하나만 한다 (설계서 §8.2). */
@@ -189,7 +193,7 @@ val uiModule = module {
     // 디버그 빌드의 모의 결제에만 다시 잠그기가 있다(variantModules). 릴리스는 null.
     viewModel { PlanGateViewModel(get(), getOrNull()) }
     viewModel { params -> PlacesViewModel(params.get(), get(), get(), get(), get(), get()) }
-    viewModel { params -> ReviewsViewModel(params.get(), get(), get(), get()) }
+    viewModel { params -> ReviewsViewModel(params.get(), get(), get(), get(), get()) }
     viewModelOf(::TripListViewModel)
     viewModel { params -> TripFormViewModel(params.getOrNull(), get(), get(), get()) }
     viewModel { params -> AddToPlanViewModel(params.get(), get(), get()) }

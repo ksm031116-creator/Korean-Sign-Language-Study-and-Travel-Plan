@@ -21,6 +21,9 @@ object ExternalMapLink {
 
     fun place(name: String, at: Coordinate): String = "$BASE/map/${point(name, at)}"
 
+    /** 이름으로 카카오맵 검색. 같은 장소를 찾지 못했을 때 사용자가 결과에서 고른다("카카오맵에서 리뷰 보기"). */
+    fun search(name: String): String = "$BASE/search/${encode(name)}"
+
     private fun point(name: String, c: Coordinate): String =
         encode(name) + "," + String.format(Locale.ROOT, "%.6f,%.6f", c.lat, c.lng)
 

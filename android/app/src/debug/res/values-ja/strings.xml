@@ -261,7 +261,8 @@
     <string name="reviews_language_unavailable">日本語と英語のレビューはありません。</string>
     <string name="reviews_mismatch">レビューサービスでこの場所を特定できなかったため、レビューは表示していません。</string>
     <string name="reviews_network">レビューを読み込めませんでした。</string>
-    <string name="reviews_not_connected">このバージョンでは、まだレビューを表示できません。</string>
+    <string name="reviews_not_connected">アプリ内ではレビューを表示できません。カカオマップで読めます。</string>
+    <string name="reviews_open_kakao">カカオマップでレビューを見る</string>
     <string name="reviews_open_source">元のページを開く</string>
     <string name="reviews_provider_unknown">レビュー提供元</string>
     <string name="reviews_rating_spoken">5 段階中 %1$d</string>

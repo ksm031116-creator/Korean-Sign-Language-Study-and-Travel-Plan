@@ -11,11 +11,12 @@ _Draft for the Phase 21 release preparation. The publisher name and contact addr
 
 - The app reads your location **only when you tap "Use my current location"** while choosing a day's start point, after an explanation and the system permission prompt.
 - It reads the location once. It does not track you and does not use background location.
-- The location is used on the device to offer a start point. It is **saved only if you apply it as the day's start**, and then only inside that trip on your device. If you do, that start point is sent to the relay server as the start of the walking route whenever routes for that day are calculated. It is never written to logs.
+- The location is used on the device to offer a start point. It is **saved only if you apply it as the day's start**, and then only inside that trip on your device. If you do, that start point is sent to the relay server as the start of the route whenever routes for that day are calculated. It is never written to logs.
 
 ## Network requests
 
-- **Reviews, ratings and walking routes** come from the Sign Korean relay server, which forwards requests to the review and route providers. Requests contain the place or card being viewed, the app language, and for routes the start and end coordinates of that walk. They do not contain your name, an account or a device identifier; like any web request, they reveal your IP address to the relay server. The relay server must not keep route coordinates after answering (requirement for the server, which is not built yet — confirm before publishing this sentence).
+- **Walking and transit routes** come from the Sign Korean relay server, which asks Kakao Map. Route requests contain the start and end coordinates of that leg and the travel mode. They do not contain your name, an account or a device identifier; like any web request, they reveal your IP address to the relay server. The relay server does not store request contents: it logs only the request path and result code.
+- **Reviews** are not shown inside the app. "View reviews on Kakao Map" sends the place's Korean name and the place's coordinates (not yours) to the relay server to find that place's Kakao Map page, then opens Kakao Map in your browser or the Kakao Map app. Kakao's own privacy policy applies there.
 - **Place photos** are downloaded from the Korea Tourism Organization (TourAPI) and Wikimedia Commons. These services receive normal web requests (IP address, user agent) under their own privacy policies.
 - Provider secret keys are kept on the relay server, not in the app.
 

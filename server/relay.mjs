@@ -1,5 +1,6 @@
 // Sign Korean 중계 서버 (PRD §10.3). 공급자 비밀키는 이 서버에만 두고 앱에는 넣지 않는다(설계서 원칙 13).
 // 카카오맵 도보·대중교통 경로(POST /v1/routes)를 묻는다. 리뷰·평점은 공급자가 없어 UNSUPPORTED 다.
+// 대신 "카카오맵에서 리뷰 보기"용으로 이름이 같은 카카오 장소 페이지를 찾는다(POST /v1/places/kakao-page).
 // 실행: node server/relay.mjs  (키는 저장소 루트 .env 또는 server/.env 의 KAKAO_REST_API_KEY — git 에 올리지 않는다)
 import { createServer } from 'node:http';
 import { readFileSync, existsSync } from 'node:fs';
@@ -8,6 +9,10 @@ import { dirname, join } from 'node:path';
 
 const KAKAO_WALK = 'https://dapi.kakao.com/v2/routing/walk';
 const KAKAO_TRANSIT = 'https://dapi.kakao.com/v2/routing/publictraffic';
+const KAKAO_KEYWORD = 'https://dapi.kakao.com/v2/local/search/keyword.json';
+// 앱의 장소 좌표는 근사치라 조금 넓게 찾는다. 같은 이름이 멀리 있으면 다른 장소다.
+const PAGE_RADIUS_M = 1000;
+const MAX_NAME = 60;
 const NO_ROUTE = new Set([
   // 도보
   'ROUTE_RESULT_NOT_FOUND', 'START_LINK_NOT_FOUND', 'END_LINK_NOT_FOUND', 'TOO_FAR_AWAY', 'SAME_POINT', 'TOO_MANY_SEARCH_LINK',
@@ -92,6 +97,35 @@ export function createHandler({ kakaoKey, fetch = globalThis.fetch, timeoutMs = 
     }
   }
 
+  // 이름이 정확히 같은(공백 무시) 장소만. 비슷한 이름("Apple 가로수길")으로 대신하면 엉뚱한 리뷰를 보게 된다.
+  async function kakaoPage(rawBody) {
+    let req;
+    try {
+      req = JSON.parse(rawBody ?? '');
+    } catch {
+      return error(400, 'INVALID_INPUT', false);
+    }
+    const name = typeof req?.name === 'string' ? req.name.trim() : '';
+    if (!name || name.length > MAX_NAME || !isCoord(req)) return error(400, 'INVALID_INPUT', false);
+    if (!kakaoKey) return error(501, 'UNSUPPORTED', false);
+
+    const url = new URL(KAKAO_KEYWORD);
+    url.searchParams.set('query', name);
+    url.searchParams.set('x', String(req.lng));
+    url.searchParams.set('y', String(req.lat));
+    url.searchParams.set('radius', String(PAGE_RADIUS_M));
+    url.searchParams.set('sort', 'accuracy');
+    url.searchParams.set('size', '15');
+    const { body, fail } = await askKakao(url);
+    if (fail) return fail;
+    if (!Array.isArray(body?.documents)) return error(502, 'UPSTREAM_ERROR', true);
+    const want = name.replace(/\s+/g, '');
+    // id 가 숫자인 것만 — 받은 place_url 을 그대로 쓰지 않고 https 주소를 직접 만든다.
+    const hit = body.documents.find((d) => typeof d?.place_name === 'string' && d.place_name.replace(/\s+/g, '') === want && /^\d+$/.test(String(d.id)));
+    if (!hit) return error(404, 'NOT_FOUND', false);
+    return json(200, { url: `https://place.map.kakao.com/${hit.id}` });
+  }
+
   // 카카오의 [x(경도), y(위도)] 를 앱의 [위도, 경도] 로. 단계가 이어지는 같은 점은 한 번만 넣는다.
   // 점이 없으면 빈 경로선이다 — 출발·도착을 직선으로 잇지 않는다(FR15).
   function toPath(steps) {
@@ -146,6 +180,7 @@ export function createHandler({ kakaoKey, fetch = globalThis.fetch, timeoutMs = 
     if (body !== undefined && Buffer.byteLength(body) > MAX_BODY) return error(413, 'INVALID_INPUT', false);
     const pathname = path.split('?')[0];
     if (method === 'POST' && pathname === '/v1/routes') return routes(body);
+    if (method === 'POST' && pathname === '/v1/places/kakao-page') return kakaoPage(body);
     // 리뷰·평점 공급자는 아직 연결하지 않았다. 앱은 "연결되지 않음"으로 보인다.
     if (method === 'GET' && (/^\/v1\/places\/[^/]+\/reviews$/.test(pathname) || /^\/v1\/cards\/[^/]+\/places$/.test(pathname))) {
       return error(501, 'UNSUPPORTED', false);

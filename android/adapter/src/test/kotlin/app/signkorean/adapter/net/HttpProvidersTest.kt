@@ -62,7 +62,16 @@ class HttpProvidersTest {
         val target = requestLine.getOrNull(1) ?: return
         val headers = generateSequence { reader.readLine()?.takeIf { it.isNotEmpty() } }.toList()
         val length = headers.firstOrNull { it.startsWith("Content-Length:", ignoreCase = true) }?.substringAfter(":")?.trim()?.toIntOrNull() ?: 0
-        lastBody = if (length > 0) CharArray(length).also { buf -> var read = 0; while (read < length) { val n = reader.read(buf, read, length - read); if (n < 0) break; read += n } }.let(::String) else ""
+        // Content-Length 는 바이트 수다. 한글은 한 글자가 3바이트라 글자 수로 읽으면 끝나지 않는다.
+        lastBody = buildString {
+            var bytes = 0
+            while (bytes < length) {
+                val c = reader.read()
+                if (c < 0) break
+                append(c.toChar())
+                bytes += c.toChar().toString().toByteArray(Charsets.UTF_8).size
+            }
+        }
         val uri = URI(target)
         lastPath = uri.path
         lastRawPath = uri.rawPath

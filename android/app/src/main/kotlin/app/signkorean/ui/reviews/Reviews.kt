@@ -36,6 +36,7 @@ import app.signkorean.domain.content.Place
 import app.signkorean.domain.content.PlaceId
 import app.signkorean.domain.locale.ResolveAppLanguage
 import app.signkorean.domain.review.ExternalLinks
+import app.signkorean.domain.review.KakaoReviewLink
 import app.signkorean.domain.review.LoadReviews
 import app.signkorean.domain.review.Review
 import app.signkorean.domain.review.ReviewState
@@ -71,6 +72,10 @@ data class ReviewsUiState(
     /** 원문을 보고 있는 리뷰(목록 순번). 공급자 번역만 원문이 있다 (FR10). */
     val showingOriginal: Set<Int> = emptySet(),
     val expanded: Set<Int> = emptySet(),
+    /** "카카오맵에서 리뷰 보기"를 보일 수 있다. 예시 장소는 실제 장소가 아니라 없다. */
+    val kakaoAvailable: Boolean = false,
+    /** 카카오 장소 페이지를 찾는 중. 두 번 눌러 두 번 열지 않게. */
+    val openingKakao: Boolean = false,
 )
 
 sealed interface ReviewsAction {
@@ -78,6 +83,9 @@ sealed interface ReviewsAction {
     data object Opened : ReviewsAction
     data object Retry : ReviewsAction
     data class OpenLink(val url: String) : ReviewsAction
+
+    /** 카카오맵의 이 장소 페이지(없으면 카카오맵 검색)를 연다. */
+    data object OpenKakao : ReviewsAction
     data class ToggleOriginal(val index: Int) : ReviewsAction
     data class ToggleExpand(val index: Int) : ReviewsAction
 }
@@ -92,6 +100,7 @@ class ReviewsViewModel(
     private val content: ContentRepository,
     private val load: LoadReviews,
     private val language: ResolveAppLanguage,
+    private val kakaoLink: KakaoReviewLink,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(ReviewsUiState())
@@ -119,7 +128,7 @@ class ReviewsViewModel(
                 return@launch
             }
             val place = pack.places.firstOrNull { it.id == placeId }
-            _state.update { it.copy(loading = false, place = place) }
+            _state.update { it.copy(loading = false, place = place, kakaoAvailable = place != null && !place.isExample) }
             val result = load(placeId, language(pack.locales.keys.toList()))
             _state.update { it.copy(reviews = result) }
         }
@@ -131,8 +140,24 @@ class ReviewsViewModel(
             ReviewsAction.Opened -> if (_state.value.reviews == ReviewState.NetworkFailure) fetch()
             // 허용 목록의 주소만 연다 (UX08, U-16).
             is ReviewsAction.OpenLink -> if (ExternalLinks.isAllowed(action.url)) viewModelScope.launch { _effects.send(ReviewsEffect.OpenUrl(action.url)) }
+            ReviewsAction.OpenKakao -> openKakao()
             is ReviewsAction.ToggleOriginal -> _state.update { it.copy(showingOriginal = it.showingOriginal.toggle(action.index)) }
             is ReviewsAction.ToggleExpand -> _state.update { it.copy(expanded = it.expanded.toggle(action.index)) }
+        }
+    }
+
+    private fun openKakao() {
+        val s = _state.value
+        val place = s.place ?: return
+        if (!s.kakaoAvailable || s.openingKakao) return
+        _state.update { it.copy(openingKakao = true) }
+        viewModelScope.launch {
+            try {
+                // 허용 목록의 주소만 연다 (UX08, U-16).
+                kakaoLink(place)?.takeIf(ExternalLinks::isAllowed)?.let { _effects.send(ReviewsEffect.OpenUrl(it)) }
+            } finally {
+                _state.update { it.copy(openingKakao = false) }
+            }
         }
     }
 
@@ -168,6 +193,13 @@ fun ReviewsContent(state: ReviewsUiState, onAction: (ReviewsAction) -> Unit) {
             KoreanText(place.koName, style = MaterialTheme.typography.labelMedium.copy(color = t.muted))
             Text(place.address.text(), style = MaterialTheme.typography.bodySmall, color = t.muted)
         }
+        // 원문 페이지 링크가 이미 있으면(그것도 카카오맵이다) 카카오맵 버튼을 따로 보이지 않는다.
+        val sourceShown = when (val r = state.reviews) {
+            is ReviewState.Shown -> r.page.sourceUrl
+            is ReviewState.NoReviews -> r.sourceUrl
+            is ReviewState.LanguageUnavailable -> r.sourceUrl
+            else -> null
+        }?.let(ExternalLinks::isAllowed) == true
         when (val r = state.reviews) {
             null -> LoadingSkeleton(rows = 4)
             is ReviewState.Shown -> {
@@ -197,6 +229,10 @@ fun ReviewsContent(state: ReviewsUiState, onAction: (ReviewsAction) -> Unit) {
             ReviewState.PlaceMismatch -> Notice(stringResource(R.string.reviews_mismatch))
             ReviewState.NetworkFailure -> ErrorState(stringResource(R.string.reviews_network), onRetry = { onAction(ReviewsAction.Retry) })
             ReviewState.NotConnected -> Notice(stringResource(R.string.reviews_not_connected))
+        }
+        // 카카오·네이버 모두 리뷰 공식 API 가 없다. 앱 안에 리뷰를 가져오지 않고 카카오맵으로 보낸다.
+        if (state.kakaoAvailable && state.reviews != null && !sourceShown) {
+            SecondaryButton(stringResource(R.string.reviews_open_kakao), onClick = { onAction(ReviewsAction.OpenKakao) }, enabled = !state.openingKakao)
         }
     }
 }
