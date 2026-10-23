@@ -6,9 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -175,8 +173,11 @@ class ReviewsViewModel(
 
 /** 리뷰 바닥 시트. SC07·SC08 의 Reviews 버튼이 연다. */
 @Composable
-fun ReviewsSheet(place: PlaceId, onDismiss: () -> Unit) {
-    val viewModel: ReviewsViewModel = koinViewModel(key = "reviews-${place.value}") { parametersOf(place) }
+fun ReviewsSheet(
+    place: PlaceId,
+    onDismiss: () -> Unit,
+    viewModel: ReviewsViewModel = koinViewModel(key = "reviews-${place.value}") { parametersOf(place) },
+) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val uri = LocalUriHandler.current
     LaunchedEffect(Unit) { viewModel.onAction(ReviewsAction.Opened) }
@@ -190,7 +191,8 @@ fun ReviewsSheet(place: PlaceId, onDismiss: () -> Unit) {
         }
     }
     AppBottomSheet(title = stringResource(R.string.reviews_title), onDismiss = onDismiss) {
-        Column(Modifier.verticalScroll(rememberScrollState())) { ReviewsContent(state, viewModel::onAction) }
+        // 바닥 시트가 이미 세로로 스크롤한다. 안에서 또 스크롤하면 높이가 무한대로 재져 앱이 죽는다.
+        ReviewsContent(state, viewModel::onAction)
     }
 }
 
