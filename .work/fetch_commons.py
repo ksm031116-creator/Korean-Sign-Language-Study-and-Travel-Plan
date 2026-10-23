@@ -18,8 +18,9 @@ UA = {'User-Agent': 'SignKoreanCoursework/0.1 (student project; ksm031116-creato
 WIDTH = 1280
 
 # 장소 id → Commons 파일 이름. 확인 근거(제목·설명·좌표·사진 내용)는 커밋 본문에 남긴다.
-# 을지로 인쇄골목·연남동 카페거리는 허용 라이선스로 그 장소를 보여 주는 사진을 찾지 못해 비워 둔다.
-# (근처의 다른 장소 사진 — 경의선숲길 등 — 을 대신 붙이지 않는다.)
+# 연남동 카페거리는 허용 라이선스로 그 장소를 보여 주는 사진을 찾지 못해 비워 둔다.
+# (근처의 다른 장소 사진 — 경의선숲길, TourAPI 의 연남동 공방거리(도자기 공방) 등 — 을 대신 붙이지 않는다.)
+# 을지로 인쇄골목은 2026-10-23 다시 찾아 CC0 사진을 붙였다(업로더 설명 "을지로 인쇄골목", 좁은 골목의 작은 가게들).
 PICKS = {
     'samcheong': 'Seoul-Samcheong.dong-01.jpg',
     'shinsegae': '新世界百貨店 - panoramio.jpg',
@@ -36,6 +37,7 @@ PICKS = {
     'coex': 'Starfield Library COEX 20240218.jpg',
     'gangnam-station': 'Gangnam Station sign.jpg',
     'garosugil': 'Garosu-gil at night.jpg',
+    'euljiro': '20150514최광모DSC00447.JPG',
 }
 
 

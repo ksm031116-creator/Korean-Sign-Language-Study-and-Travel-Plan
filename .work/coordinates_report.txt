@@ -1,0 +1,51 @@
+등록 장소 좌표 출처 (.work/fetch_coordinates.py 가 만든다)
+
+gyeongbokgung          37.579884,126.976800  Wikidata Q482485 (CC0)  (이전 좌표에서 36m)
+changdeokgung          37.579444,126.991667  Wikidata Q477157 (CC0)  (이전 좌표에서 59m)
+jongmyo                37.574722,126.993611  Wikidata Q490497 (CC0)  (이전 좌표에서 42m)
+folkmuseum             37.581625,126.979090  Wikidata Q486449 (CC0)  (이전 좌표에서 31m)
+mmca                   37.579167,126.980556  Wikidata Q27207690 (CC0)  (이전 좌표에서 89m)
+bukchon                37.583056,126.983611  Wikidata Q490981 (CC0)  (이전 좌표에서 74m)
+samcheong              37.584000,126.982000  근사치 — 한 점으로 정한 공개 출처 없음
+tongin                 37.580653,126.970053  Wikidata Q54858471 (CC0)  (이전 좌표에서 73m)
+insadong               37.573308,126.985575  Wikidata Q61097753 (CC0)  (이전 좌표에서 92m)
+gwanghwamun            37.572778,126.976667  Wikidata Q5623300 (CC0)  (이전 좌표에서 89m)
+seochon-ph             37.579000,126.970000  예시 장소(실제 상호 아님)
+myeongdong-cathedral   37.563333,126.987222  Wikidata Q487036 (CC0)  (이전 좌표에서 4m)
+namdaemun              37.559444,126.977417  Wikidata Q494687 (CC0)  (이전 좌표에서 43m)
+shinsegae              37.561000,126.981000  근사치 — 한 점으로 정한 공개 출처 없음
+lotte-main             37.564683,126.981699  TourAPI 132668 (공공누리 제1유형)  (이전 좌표에서 44m)
+deoksugung             37.566111,126.975000  Wikidata Q482631 (CC0)  (이전 좌표에서 36m)
+seoulstation           37.554722,126.970833  Wikidata Q20415 (CC0)  (이전 좌표에서 12m)
+namsan-tower           37.551216,126.988276  Wikidata Q69134 (CC0)  (이전 좌표에서 7m)
+myeongdong-bank        37.564000,126.986000  예시 장소(실제 상호 아님)
+myeongdong-food        37.563600,126.985000  근사치 — 한 점으로 정한 공개 출처 없음
+ddp                    37.566900,127.009400  Wikidata Q5295847 (CC0)  (이전 좌표에서 0m)
+gwangjang              37.570000,126.999000  Wikidata Q12585067 (CC0)  (이전 좌표에서 54m)
+cheonggyecheon         37.569020,126.977710  Wikidata Q495437 (CC0)  (이전 좌표에서 64m)
+euljiro                37.566000,126.991000  근사치 — 한 점으로 정한 공개 출처 없음
+ikseon                 37.574279,126.989835  Wikidata Q16188499 (CC0)  (이전 좌표에서 34m)
+changgyeonggung        37.578431,126.995981  Wikidata Q482852 (CC0)  (이전 좌표에서 88m)
+seoulmuseum            37.570475,126.970658  Wikidata Q484862 (CC0)  (이전 좌표에서 59m)
+seoulforest            37.544625,127.039844  Wikidata Q483014 (CC0)  (이전 좌표에서 217m)
+seongsu-cafe           37.543198,127.056598  TourAPI 2930901 (공공누리 제1유형)  (이전 좌표에서 165m)
+seongsu-ph             37.545000,127.050000  예시 장소(실제 상호 아님)
+ttukseom               37.547222,127.047500  Wikidata Q488263 (CC0)  (이전 좌표에서 16m)
+hongdae-station        37.556667,126.923611  Wikidata Q54267 (CC0)  (이전 좌표에서 168m)
+yeonnam                37.560000,126.925000  근사치 — 한 점으로 정한 공개 출처 없음
+gyeongui-park          37.559397,126.924869  Wikidata Q24861751 (CC0)  (이전 좌표에서 259m)
+mangwon                37.556022,126.906452  TourAPI 2499807 (공공누리 제1유형)  (이전 좌표에서 128m)
+hongdae-street         37.554000,126.923000  근사치 — 한 점으로 정한 공개 출처 없음
+nmk                    37.523889,126.980278  Wikidata Q494407 (CC0)  (이전 좌표에서 13m)
+warmemorial            37.536500,126.977100  Wikidata Q489764 (CC0)  (이전 좌표에서 9m)
+itaewon                37.534500,126.994600  근사치 — 한 점으로 정한 공개 출처 없음
+namsan-park            37.549900,126.989000  Wikidata Q27307220 (CC0)  (이전 좌표에서 228m)
+itaewon-bank           37.534000,126.995000  예시 장소(실제 상호 아님)
+yeouido-park           37.526400,126.933610  TourAPI 1059479 (공공누리 제1유형)  (이전 좌표에서 236m)
+thehyundai             37.527097,126.927301  TourAPI 2708109 (공공누리 제1유형)  (이전 좌표에서 170m)
+yeouinaru              37.527056,126.932806  Wikidata Q490655 (CC0)  (이전 좌표에서 28m)
+coex                   37.511944,127.058889  Wikidata Q490387 (CC0)  (이전 좌표에서 73m)
+lotteworldtower        37.512500,127.102500  Wikidata Q494895 (CC0)  (이전 좌표에서 0m)
+olympicpark            37.520278,127.122500  Wikidata Q486694 (CC0)  (이전 좌표에서 80m)
+gangnam-station        37.497928,127.027583  Wikidata Q17469 (CC0)  (이전 좌표에서 3m)
+garosugil              37.520500,127.023000  근사치 — 한 점으로 정한 공개 출처 없음

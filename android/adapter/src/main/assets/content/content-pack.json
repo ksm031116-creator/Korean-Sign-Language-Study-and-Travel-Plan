@@ -1,6 +1,6 @@
 {
  "schemaVersion": 1,
- "version": "6549fff4440e",
+ "version": "39484bfa124a",
  "locales": {
   "en": "reviewed",
   "ja": "draft"
@@ -3439,8 +3439,8 @@
     "en": "161 Sajik-ro, Jongno-gu, Seoul",
     "ja": "ソウル特別市 鍾路区 社稷路161"
    },
-   "lat": 37.5796,
-   "lng": 126.977,
+   "lat": 37.579884,
+   "lng": 126.9768,
    "signWords": null,
    "photo": {
     "url": "asset://content/photos/gyeongbokgung.jpg",
@@ -3465,8 +3465,8 @@
     "en": "99 Yulgok-ro, Jongno-gu, Seoul",
     "ja": "ソウル特別市 鍾路区 栗谷路99"
    },
-   "lat": 37.5794,
-   "lng": 126.991,
+   "lat": 37.579444,
+   "lng": 126.991667,
    "signWords": null,
    "photo": {
     "url": "https://tong.visitkorea.or.kr/cms/resource/78/3384878_image2_1.JPG",
@@ -3491,8 +3491,8 @@
     "en": "157 Jong-ro, Jongno-gu, Seoul",
     "ja": "ソウル特別市 鍾路区 鍾路157"
    },
-   "lat": 37.5745,
-   "lng": 126.994,
+   "lat": 37.574722,
+   "lng": 126.993611,
    "signWords": null,
    "photo": {
     "url": "https://tong.visitkorea.or.kr/cms/resource_photo/57/4063057_image2_1.jpg",
@@ -3517,8 +3517,8 @@
     "en": "37 Samcheong-ro, Jongno-gu, Seoul",
     "ja": "ソウル特別市 鍾路区 三清路37"
    },
-   "lat": 37.5814,
-   "lng": 126.9793,
+   "lat": 37.581625,
+   "lng": 126.97909,
    "signWords": null,
    "photo": {
     "url": "https://tong.visitkorea.or.kr/cms/resource/93/3512693_image2_1.jpg",
@@ -3543,8 +3543,8 @@
     "en": "30 Samcheong-ro, Jongno-gu, Seoul",
     "ja": "ソウル特別市 鍾路区 三清路30"
    },
-   "lat": 37.5785,
-   "lng": 126.98,
+   "lat": 37.579167,
+   "lng": 126.980556,
    "signWords": null,
    "photo": {
     "url": "https://tong.visitkorea.or.kr/cms/resource/02/2991502_image2_1.jpg",
@@ -3569,8 +3569,8 @@
     "en": "37 Gyedong-gil, Jongno-gu, Seoul",
     "ja": "ソウル特別市 鍾路区 桂洞キル37"
    },
-   "lat": 37.5826,
-   "lng": 126.983,
+   "lat": 37.583056,
+   "lng": 126.983611,
    "signWords": null,
    "photo": {
     "url": "https://tong.visitkorea.or.kr/cms/resource/04/3304404_image2_1.jpg",
@@ -3623,8 +3623,8 @@
     "en": "18 Jahamun-ro 15-gil, Jongno-gu, Seoul",
     "ja": "ソウル特別市 鍾路区 紫霞門路15キル18"
    },
-   "lat": 37.58,
-   "lng": 126.97,
+   "lat": 37.580653,
+   "lng": 126.970053,
    "signWords": null,
    "photo": {
     "url": "https://tong.visitkorea.or.kr/cms/resource/39/3300739_image2_1.jpg",
@@ -3649,8 +3649,8 @@
     "en": "Insadong-gil, Jongno-gu, Seoul",
     "ja": "ソウル特別市 鍾路区 仁寺洞キル"
    },
-   "lat": 37.574,
-   "lng": 126.985,
+   "lat": 37.573308,
+   "lng": 126.985575,
    "signWords": null,
    "photo": {
     "url": "https://tong.visitkorea.or.kr/cms/resource/03/3412103_image2_1.JPG",
@@ -3675,8 +3675,8 @@
     "en": "172 Sejong-daero, Jongno-gu, Seoul",
     "ja": "ソウル特別市 鍾路区 世宗大路172"
    },
-   "lat": 37.572,
-   "lng": 126.9769,
+   "lat": 37.572778,
+   "lng": 126.976667,
    "signWords": null,
    "photo": {
     "url": "https://tong.visitkorea.or.kr/cms/resource/02/4080502_image2_1.jpg",
@@ -3722,8 +3722,8 @@
     "en": "74 Myeongdong-gil, Jung-gu, Seoul",
     "ja": "ソウル特別市 中区 明洞キル74"
    },
-   "lat": 37.5633,
-   "lng": 126.9872,
+   "lat": 37.563333,
+   "lng": 126.987222,
    "signWords": null,
    "photo": {
     "url": "asset://content/photos/myeongdong.jpg",
@@ -3750,8 +3750,8 @@
     "en": "21 Namdaemunsijang 4-gil, Jung-gu, Seoul",
     "ja": "ソウル特別市 中区 南大門市場4キル21"
    },
-   "lat": 37.5591,
-   "lng": 126.9772,
+   "lat": 37.559444,
+   "lng": 126.977417,
    "signWords": null,
    "photo": {
     "url": "https://tong.visitkorea.or.kr/cms/resource/67/2612867_image2_1.jpg",
@@ -3804,8 +3804,8 @@
     "en": "81 Namdaemun-ro, Jung-gu, Seoul",
     "ja": "ソウル特別市 中区 南大門路81"
    },
-   "lat": 37.565,
-   "lng": 126.982,
+   "lat": 37.564683,
+   "lng": 126.981699,
    "signWords": null,
    "photo": {
     "url": "https://tong.visitkorea.or.kr/cms/resource/24/2997124_image2_1.jpg",
@@ -3830,8 +3830,8 @@
     "en": "99 Sejong-daero, Jung-gu, Seoul",
     "ja": "ソウル特別市 中区 世宗大路99"
    },
-   "lat": 37.5658,
-   "lng": 126.9751,
+   "lat": 37.566111,
+   "lng": 126.975,
    "signWords": null,
    "photo": {
     "url": "https://tong.visitkorea.or.kr/cms/resource/44/3584644_image2_1.jpg",
@@ -3856,8 +3856,8 @@
     "en": "405 Hangang-daero, Yongsan-gu, Seoul",
     "ja": "ソウル特別市 龍山区 漢江大路405"
    },
-   "lat": 37.5547,
-   "lng": 126.9707,
+   "lat": 37.554722,
+   "lng": 126.970833,
    "signWords": null,
    "photo": {
     "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f2/Seoul_Station_%28145738821%29.jpeg/1280px-Seoul_Station_%28145738821%29.jpeg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
@@ -3884,8 +3884,8 @@
     "en": "105 Namsangongwon-gil, Yongsan-gu, Seoul",
     "ja": "ソウル特別市 龍山区 南山公園キル105"
    },
-   "lat": 37.5512,
-   "lng": 126.9882,
+   "lat": 37.551216,
+   "lng": 126.988276,
    "signWords": null,
    "photo": {
     "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/cc/N_Seoul_Tower_%2813952097192%29.jpg/1280px-N_Seoul_Tower_%2813952097192%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
@@ -3987,8 +3987,8 @@
     "en": "88 Changgyeonggung-ro, Jongno-gu, Seoul",
     "ja": "ソウル特別市 鍾路区 昌慶宮路88"
    },
-   "lat": 37.5701,
-   "lng": 126.9996,
+   "lat": 37.57,
+   "lng": 126.999,
    "signWords": null,
    "photo": {
     "url": "https://tong.visitkorea.or.kr/cms/resource/81/2668981_image2_1.jpg",
@@ -4013,8 +4013,8 @@
     "en": "Cheonggyecheon-ro, Jung-gu, Seoul",
     "ja": "ソウル特別市 中区 清渓川路"
    },
-   "lat": 37.5692,
-   "lng": 126.9784,
+   "lat": 37.56902,
+   "lng": 126.97771,
    "signWords": null,
    "photo": {
     "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/41/Seoul_%2853853383087%29.jpg/1280px-Seoul_%2853853383087%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
@@ -4044,7 +4044,14 @@
    "lat": 37.566,
    "lng": 126.991,
    "signWords": null,
-   "photo": null,
+   "photo": {
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/ed/20150514%EC%B5%9C%EA%B4%91%EB%AA%A8DSC00447.JPG/1280px-20150514%EC%B5%9C%EA%B4%91%EB%AA%A8DSC00447.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    "license": {
+     "type": "CC0"
+    },
+    "source": "Wikimedia Commons",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:20150514%EC%B5%9C%EA%B4%91%EB%AA%A8DSC00447.JPG"
+   },
    "isExample": false
   },
   {
@@ -4060,8 +4067,8 @@
     "en": "Ikseon-dong, Jongno-gu, Seoul",
     "ja": "ソウル特別市 鍾路区 益善洞"
    },
-   "lat": 37.574,
-   "lng": 126.99,
+   "lat": 37.574279,
+   "lng": 126.989835,
    "signWords": null,
    "photo": {
     "url": "https://tong.visitkorea.or.kr/cms/resource/22/2947522_image2_1.jpg",
@@ -4086,8 +4093,8 @@
     "en": "185 Changgyeonggung-ro, Jongno-gu, Seoul",
     "ja": "ソウル特別市 鍾路区 昌慶宮路185"
    },
-   "lat": 37.5783,
-   "lng": 126.995,
+   "lat": 37.578431,
+   "lng": 126.995981,
    "signWords": null,
    "photo": {
     "url": "https://tong.visitkorea.or.kr/cms/resource/94/3536794_image2_1.jpg",
@@ -4112,8 +4119,8 @@
     "en": "55 Saemunan-ro, Jongno-gu, Seoul",
     "ja": "ソウル特別市 鍾路区 セムナン路55"
    },
-   "lat": 37.5704,
-   "lng": 126.97,
+   "lat": 37.570475,
+   "lng": 126.970658,
    "signWords": null,
    "photo": {
     "url": "https://tong.visitkorea.or.kr/cms/resource/87/2661487_image2_1.JPG",
@@ -4138,8 +4145,8 @@
     "en": "273 Ttukseom-ro, Seongdong-gu, Seoul",
     "ja": "ソウル特別市 城東区 纛島路273"
    },
-   "lat": 37.5444,
-   "lng": 127.0374,
+   "lat": 37.544625,
+   "lng": 127.039844,
    "signWords": null,
    "photo": {
     "url": "https://tong.visitkorea.or.kr/cms/resource_photo/99/3580599_image2_1.jpg",
@@ -4164,8 +4171,8 @@
     "en": "Seongsui-ro, Seongdong-gu, Seoul",
     "ja": "ソウル特別市 城東区 聖水二路"
    },
-   "lat": 37.5445,
-   "lng": 127.0557,
+   "lat": 37.543198,
+   "lng": 127.056598,
    "signWords": null,
    "photo": {
     "url": "https://tong.visitkorea.or.kr/cms/resource/06/4095806_image2_1.jpg",
@@ -4211,8 +4218,8 @@
     "en": "Seongsui-ro, Seongdong-gu, Seoul",
     "ja": "ソウル特別市 城東区 聖水二路"
    },
-   "lat": 37.5471,
-   "lng": 127.0474,
+   "lat": 37.547222,
+   "lng": 127.0475,
    "signWords": null,
    "photo": {
     "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/04/20260501_%EB%9A%9D%EC%84%AC%EC%97%AD_%EC%97%AD%EB%AA%85%ED%8C%90.jpg/1280px-20260501_%EB%9A%9D%EC%84%AC%EC%97%AD_%EC%97%AD%EB%AA%85%ED%8C%90.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
@@ -4237,8 +4244,8 @@
     "en": "Yanghwa-ro, Mapo-gu, Seoul",
     "ja": "ソウル特別市 麻浦区 楊花路"
    },
-   "lat": 37.5572,
-   "lng": 126.9254,
+   "lat": 37.556667,
+   "lng": 126.923611,
    "signWords": null,
    "photo": {
     "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/ac/20250510_%ED%99%8D%EB%8C%80%EC%9E%85%EA%B5%AC%EC%97%AD_3%EB%B2%88%EC%B6%9C%EA%B5%AC.jpg/1280px-20250510_%ED%99%8D%EB%8C%80%EC%9E%85%EA%B5%AC%EC%97%AD_3%EB%B2%88%EC%B6%9C%EA%B5%AC.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
@@ -4282,8 +4289,8 @@
     "en": "Yeonnam-dong, Mapo-gu, Seoul",
     "ja": "ソウル特別市 麻浦区 延南洞"
    },
-   "lat": 37.561,
-   "lng": 126.927,
+   "lat": 37.559397,
+   "lng": 126.924869,
    "signWords": null,
    "photo": {
     "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5c/20250510_%EA%B2%BD%EC%9D%98%EC%84%A0%EC%88%B2%EA%B8%B8_1.jpg/1280px-20250510_%EA%B2%BD%EC%9D%98%EC%84%A0%EC%88%B2%EA%B8%B8_1.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
@@ -4308,8 +4315,8 @@
     "en": "14 Poeun-ro 8-gil, Mapo-gu, Seoul",
     "ja": "ソウル特別市 麻浦区 圃隠路8キル14"
    },
-   "lat": 37.556,
-   "lng": 126.905,
+   "lat": 37.556022,
+   "lng": 126.906452,
    "signWords": null,
    "photo": {
     "url": "https://tong.visitkorea.or.kr/cms/resource/10/3509910_image2_1.jpg",
@@ -4360,8 +4367,8 @@
     "en": "137 Seobinggo-ro, Yongsan-gu, Seoul",
     "ja": "ソウル特別市 龍山区 西氷庫路137"
    },
-   "lat": 37.524,
-   "lng": 126.9803,
+   "lat": 37.523889,
+   "lng": 126.980278,
    "signWords": null,
    "photo": {
     "url": "https://tong.visitkorea.or.kr/cms/resource/12/3495012_image2_1.jpg",
@@ -4387,7 +4394,7 @@
     "ja": "ソウル特別市 龍山区 梨泰院路29"
    },
    "lat": 37.5365,
-   "lng": 126.977,
+   "lng": 126.9771,
    "signWords": null,
    "photo": {
     "url": "https://tong.visitkorea.or.kr/cms/resource/29/3465929_image2_1.JPG",
@@ -4440,8 +4447,8 @@
     "en": "Samil-daero, Jung-gu, Seoul",
     "ja": "ソウル特別市 中区 三一大路"
    },
-   "lat": 37.5512,
-   "lng": 126.991,
+   "lat": 37.5499,
+   "lng": 126.989,
    "signWords": null,
    "photo": {
     "url": "https://tong.visitkorea.or.kr/cms/resource/56/3539656_image2_1.jpg",
@@ -4488,8 +4495,8 @@
     "en": "330 Yeouidong-ro, Yeongdeungpo-gu, Seoul",
     "ja": "ソウル特別市 永登浦区 汝矣東路330"
    },
-   "lat": 37.5285,
-   "lng": 126.934,
+   "lat": 37.5264,
+   "lng": 126.93361,
    "signWords": null,
    "photo": {
     "url": "https://tong.visitkorea.or.kr/cms/resource/89/3544389_image2_1.jpg",
@@ -4514,8 +4521,8 @@
     "en": "108 Yeoui-daero, Yeongdeungpo-gu, Seoul",
     "ja": "ソウル特別市 永登浦区 汝矣大路108"
    },
-   "lat": 37.5259,
-   "lng": 126.9285,
+   "lat": 37.527097,
+   "lng": 126.927301,
    "signWords": null,
    "photo": {
     "url": "https://tong.visitkorea.or.kr/cms/resource/71/4097071_image2_1.png",
@@ -4540,8 +4547,8 @@
     "en": "Yeouidong-ro, Yeongdeungpo-gu, Seoul",
     "ja": "ソウル特別市 永登浦区 汝矣東路"
    },
-   "lat": 37.527,
-   "lng": 126.9325,
+   "lat": 37.527056,
+   "lng": 126.932806,
    "signWords": null,
    "photo": {
     "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/13/20250727_%EC%97%AC%EC%9D%98%EB%82%98%EB%A3%A8%EC%97%AD_1%EB%B2%88%EC%B6%9C%EA%B5%AC.jpg/1280px-20250727_%EC%97%AC%EC%9D%98%EB%82%98%EB%A3%A8%EC%97%AD_1%EB%B2%88%EC%B6%9C%EA%B5%AC.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
@@ -4566,8 +4573,8 @@
     "en": "513 Yeongdong-daero, Gangnam-gu, Seoul",
     "ja": "ソウル特別市 江南区 永東大路513"
    },
-   "lat": 37.5126,
-   "lng": 127.0589,
+   "lat": 37.511944,
+   "lng": 127.058889,
    "signWords": null,
    "photo": {
     "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/fe/Starfield_Library_COEX_20240218.jpg/1280px-Starfield_Library_COEX_20240218.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
@@ -4620,8 +4627,8 @@
     "en": "424 Olympic-ro, Songpa-gu, Seoul",
     "ja": "ソウル特別市 松坡区 オリンピック路424"
    },
-   "lat": 37.5202,
-   "lng": 127.1216,
+   "lat": 37.520278,
+   "lng": 127.1225,
    "signWords": null,
    "photo": {
     "url": "https://tong.visitkorea.or.kr/cms/resource/59/3527359_image2_1.jpg",
@@ -4646,8 +4653,8 @@
     "en": "Gangnam-daero, Gangnam-gu, Seoul",
     "ja": "ソウル特別市 江南区 江南大路"
    },
-   "lat": 37.4979,
-   "lng": 127.0276,
+   "lat": 37.497928,
+   "lng": 127.027583,
    "signWords": null,
    "photo": {
     "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e0/Gangnam_Station_sign.jpg/1280px-Gangnam_Station_sign.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",

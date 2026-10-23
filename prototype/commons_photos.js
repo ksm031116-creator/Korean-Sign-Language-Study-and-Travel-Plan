@@ -1,5 +1,5 @@
 /* 자동 생성 파일 — .work/fetch_commons.py 로 다시 만든다. 직접 고치지 않는다.
- * 출처: Wikimedia Commons · 생성일 2026-10-19
+ * 출처: Wikimedia Commons · 생성일 2026-10-23
  * 허용 라이선스: CC0 · Public domain · CC BY (저작자·라이선스 표시)
  */
 window.COMMONS_PHOTOS = {
@@ -122,5 +122,13 @@ window.COMMONS_PHOTOS = {
   "author": "sellyourseoul",
   "license": "CC BY 2.0",
   "licenseUrl": "https://creativecommons.org/licenses/by/2.0"
+ },
+ "euljiro": {
+  "file": "20150514최광모DSC00447.JPG",
+  "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/ed/20150514%EC%B5%9C%EA%B4%91%EB%AA%A8DSC00447.JPG/1280px-20150514%EC%B5%9C%EA%B4%91%EB%AA%A8DSC00447.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+  "source": "https://commons.wikimedia.org/wiki/File:20150514%EC%B5%9C%EA%B4%91%EB%AA%A8DSC00447.JPG",
+  "author": "최광모",
+  "license": "CC0",
+  "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en"
  }
 };
