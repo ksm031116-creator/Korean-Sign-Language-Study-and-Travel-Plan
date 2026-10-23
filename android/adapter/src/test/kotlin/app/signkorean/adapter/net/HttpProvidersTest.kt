@@ -269,4 +269,32 @@ class HttpProvidersTest {
         body = """{"distance_m":1,"duration_s":1,"path":[[37.57,126.99],[37.575,126.985]],"attribution":"Kakao Map","transit":{"transfers":0,"steps":[{"kind":"ferry","lines":[],"time_s":1,"distance_m":1}]}}"""
         assertEquals(RouteResult.Failed(RouteFailure.Unsupported), HttpRouteProvider(client).route(RouteRequest(Coordinate(37.57, 126.99), Coordinate(37.575, 126.985), TravelMode.Transit)))
     }
+
+    @Test
+    fun `KRL 카카오 장소 페이지 - 이름·좌표를 본문으로 보내고 주소를 읽는다`() = runBlocking {
+        body = """{"url":"https://place.map.kakao.com/18619553"}"""
+        val url = HttpPlacePageLookup(client).kakaoPlacePage("경복궁", Coordinate(37.5796, 126.977))
+        assertEquals("https://place.map.kakao.com/18619553", url)
+        assertEquals("POST", lastMethod)
+        assertEquals("/v1/places/kakao-page", lastPath)
+        // 이름은 주소줄이 아니라 본문으로(로그·주소에 남지 않게).
+        assertEquals(null, lastQuery)
+        assertTrue(lastBody.contains("\"name\":\"경복궁\"") && lastBody.contains("\"lat\":37.5796") && lastBody.contains("\"lng\":126.977"))
+    }
+
+    @Test
+    fun `KRL 못 찾음·오류·카카오 장소 페이지가 아닌 주소는 null`() = runBlocking {
+        val lookup = HttpPlacePageLookup(client)
+        val at = Coordinate(37.5796, 126.977)
+        status = 404
+        body = """{"error":{"code":"NOT_FOUND","retryable":false}}"""
+        assertEquals(null, lookup.kakaoPlacePage("x", at))
+        status = 200
+        body = """{"url":"https://map.kakao.com/link/search/x"}"""
+        assertEquals(null, lookup.kakaoPlacePage("x", at))
+        body = """{"url":"https://place.map.kakao.com/1/../../evil"}"""
+        assertEquals(null, lookup.kakaoPlacePage("x", at))
+        body = """{"nope":1}"""
+        assertEquals(null, lookup.kakaoPlacePage("x", at))
+    }
 }

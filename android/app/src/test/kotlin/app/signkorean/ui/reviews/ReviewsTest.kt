@@ -7,7 +7,9 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import app.signkorean.domain.common.LocaleTag
 import app.signkorean.domain.content.PlaceId
+import app.signkorean.domain.review.KakaoReviewLink
 import app.signkorean.domain.review.LoadReviews
+import app.signkorean.domain.review.PlacePageLookup
 import app.signkorean.domain.review.Review
 import app.signkorean.domain.review.ReviewError
 import app.signkorean.domain.review.ReviewPage
@@ -56,8 +58,14 @@ class ReviewsTest {
     @After
     fun tearDown() = Dispatchers.resetMain()
 
-    private fun vm() = ReviewsViewModel(
-        PlaceId("gwangjang"), InMemoryContentRepository(pack), LoadReviews(provider), ResolveAppLanguage(FakeCurrentLocale(selected = en)),
+    // 카카오 장소 페이지 찾기. null 이면 카카오맵 검색으로 간다.
+    private var kakaoPage: String? = "https://place.map.kakao.com/10"
+    private val lookup = object : PlacePageLookup {
+        override suspend fun kakaoPlacePage(koName: String, at: app.signkorean.domain.location.Coordinate): String? = kakaoPage
+    }
+
+    private fun vm(placeId: String = "gwangjang", content: app.signkorean.domain.content.ContentPack = pack) = ReviewsViewModel(
+        PlaceId(placeId), InMemoryContentRepository(content), LoadReviews(provider), ResolveAppLanguage(FakeCurrentLocale(selected = en)), KakaoReviewLink(lookup),
     )
 
     private fun show(state: ReviewsUiState, onAction: (ReviewsAction) -> Unit = {}) =
@@ -147,6 +155,45 @@ class ReviewsTest {
     @Test
     fun `서비스 미연결 안내`() {
         show(loaded(ReviewState.NotConnected))
-        rule.onNodeWithText("Reviews aren't available in this version yet.").assertIsDisplayed()
+        rule.onNodeWithText("Reviews can't be shown in the app. You can read them on Kakao Map.").assertIsDisplayed()
+    }
+
+    @Test
+    fun `KRL 카카오맵에서 리뷰 보기 - 이름이 같은 장소 페이지, 없으면 검색`() = runTest {
+        val vm = vm()
+        vm.onAction(ReviewsAction.OpenKakao)
+        assertEquals(ReviewsEffect.OpenUrl("https://place.map.kakao.com/10"), vm.effects.tryReceive().getOrNull())
+        kakaoPage = null
+        vm.onAction(ReviewsAction.OpenKakao)
+        val search = (vm.effects.tryReceive().getOrNull() as ReviewsEffect.OpenUrl).url
+        assertTrue(search, search.startsWith("https://map.kakao.com/link/search/"))
+    }
+
+    @Test
+    fun `KRL 예시 장소는 카카오맵 버튼이 없고 눌러도 아무 일도 없다`() = runTest {
+        val example = ContentFixtures.pack(places = listOf(ContentFixtures.place("ex", name = "Example pharmacy", isExample = true)))
+        val vm = vm("ex", example)
+        assertEquals(false, vm.state.value.kakaoAvailable)
+        vm.onAction(ReviewsAction.OpenKakao)
+        assertEquals(null, vm.effects.tryReceive().getOrNull())
+        show(ReviewsUiState(loading = false, place = example.places.first(), reviews = ReviewState.NotConnected))
+        rule.onNodeWithText("View reviews on Kakao Map").assertDoesNotExist()
+    }
+
+    @Test
+    fun `KRL 리뷰를 못 보일 때 카카오맵 버튼을 보인다, 원문 링크가 있으면 겹쳐 보이지 않는다`() {
+        var actions = listOf<ReviewsAction>()
+        val base = loaded(ReviewState.NotConnected).copy(kakaoAvailable = true)
+        show(base) { actions = actions + it }
+        rule.onNodeWithText("Reviews can't be shown in the app. You can read them on Kakao Map.").assertIsDisplayed()
+        rule.onNodeWithText("View reviews on Kakao Map").performClick()
+        assertEquals(listOf<ReviewsAction>(ReviewsAction.OpenKakao), actions)
+    }
+
+    @Test
+    fun `KRL 원문 링크가 있으면 카카오맵 버튼을 따로 보이지 않는다`() {
+        show(loaded(ReviewState.NoReviews("https://place.map.kakao.com/1")).copy(kakaoAvailable = true))
+        rule.onNodeWithText("Open the original page").assertIsDisplayed()
+        rule.onNodeWithText("View reviews on Kakao Map").assertDoesNotExist()
     }
 }

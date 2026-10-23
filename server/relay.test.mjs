@@ -279,3 +279,59 @@ test('RLY-M1 서버: 상한 안의 요청은 그대로 처리한다', async () =
     assert.equal((await ok.json()).distance_m, 1234);
   });
 });
+
+// 카카오맵 장소 페이지 찾기 ("카카오맵에서 리뷰 보기"). 이름이 정확히 같은(공백 무시) 장소만 돌려준다.
+const KEYWORD_OK = {
+  documents: [
+    { id: '17577343', place_name: '경복궁 주차장', place_url: 'http://place.map.kakao.com/17577343' },
+    { id: '18619553', place_name: '경복궁', place_url: 'http://place.map.kakao.com/18619553' },
+  ],
+};
+const PAGE = { name: '경복궁', lat: 37.5796, lng: 126.977 };
+
+test('KRL 이름이 같은 장소의 https 페이지를 돌려준다(키워드 검색, 좌표 근처, 정확도순)', async () => {
+  const fetch = fakeFetch(() => ({ body: KEYWORD_OK }));
+  const res = await call(createHandler({ kakaoKey: 'k', fetch }), 'POST', '/v1/places/kakao-page', PAGE);
+  assert.equal(res.status, 200);
+  assert.deepEqual(res.body, { url: 'https://place.map.kakao.com/18619553' });
+  const url = new URL(fetch.calls[0].url);
+  assert.equal(url.origin + url.pathname, 'https://dapi.kakao.com/v2/local/search/keyword.json');
+  assert.equal(url.searchParams.get('query'), '경복궁');
+  assert.equal(url.searchParams.get('x'), '126.977');
+  assert.equal(url.searchParams.get('y'), '37.5796');
+  assert.equal(url.searchParams.get('sort'), 'accuracy');
+  assert.ok(Number(url.searchParams.get('radius')) <= 2000);
+});
+
+test('KRL 공백만 다른 이름도 같은 장소로 본다', async () => {
+  const fetch = fakeFetch(() => ({ body: { documents: [{ id: '5', place_name: '을지로인쇄골목' }] } }));
+  const res = await call(createHandler({ kakaoKey: 'k', fetch }), 'POST', '/v1/places/kakao-page', { ...PAGE, name: '을지로 인쇄골목' });
+  assert.deepEqual(res.body, { url: 'https://place.map.kakao.com/5' });
+});
+
+test('KRL 이름이 같은 장소가 없으면 404 NOT_FOUND (비슷한 장소로 대신하지 않는다)', async () => {
+  const fetch = fakeFetch(() => ({ body: { documents: [{ id: '9', place_name: 'Apple 가로수길' }] } }));
+  const res = await call(createHandler({ kakaoKey: 'k', fetch }), 'POST', '/v1/places/kakao-page', { ...PAGE, name: '가로수길' });
+  assert.equal(res.status, 404);
+  assert.equal(res.body.error.code, 'NOT_FOUND');
+});
+
+test('KRL id 가 숫자가 아니면 그 장소는 건너뛴다(주소를 만들지 않는다)', async () => {
+  const fetch = fakeFetch(() => ({ body: { documents: [{ id: '../evil', place_name: '경복궁' }] } }));
+  const res = await call(createHandler({ kakaoKey: 'k', fetch }), 'POST', '/v1/places/kakao-page', PAGE);
+  assert.equal(res.status, 404);
+});
+
+test('KRL 잘못된 입력은 400, 키가 없으면 501, 한도 초과는 503', async () => {
+  const handler = createHandler({ kakaoKey: 'k', fetch: fakeFetch(() => ({ status: 429, body: {} })) });
+  for (const bad of [{ ...PAGE, name: '' }, { ...PAGE, name: 'x'.repeat(61) }, { ...PAGE, lat: 'a' }, { name: 1, lat: 1, lng: 1 }]) {
+    assert.equal((await call(handler, 'POST', '/v1/places/kakao-page', bad)).status, 400);
+  }
+  assert.equal((await call(handler, 'POST', '/v1/places/kakao-page', PAGE)).status, 503);
+  assert.equal((await call(createHandler({ kakaoKey: '' }), 'POST', '/v1/places/kakao-page', PAGE)).status, 501);
+});
+
+test('KRL 응답 모양이 깨지면 502', async () => {
+  const handler = createHandler({ kakaoKey: 'k', fetch: fakeFetch(() => ({ body: { documents: 'x' } })) });
+  assert.equal((await call(handler, 'POST', '/v1/places/kakao-page', PAGE)).status, 502);
+});
