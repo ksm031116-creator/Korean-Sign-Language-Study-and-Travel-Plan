@@ -1,6 +1,6 @@
 // Sign Korean 중계 서버 (PRD §10.3). 공급자 비밀키는 이 서버에만 두고 앱에는 넣지 않는다(설계서 원칙 13).
 // 지금은 카카오맵 도보 경로(POST /v1/routes)만 실제로 묻는다. 리뷰·평점은 공급자가 없어 UNSUPPORTED 다.
-// 실행: node server/relay.mjs  (키는 server/.env 의 KAKAO_REST_API_KEY — git 에 올리지 않는다)
+// 실행: node server/relay.mjs  (키는 저장소 루트 .env 또는 server/.env 의 KAKAO_REST_API_KEY — git 에 올리지 않는다)
 import { createServer } from 'node:http';
 import { readFileSync, existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
@@ -96,7 +96,12 @@ function loadEnv(file) {
 }
 
 if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
-  const env = { ...loadEnv(join(dirname(fileURLToPath(import.meta.url)), '.env')), ...process.env };
+  // 키는 저장소 루트의 .env(TourAPI·Gemini 키와 같은 곳) 또는 server/.env 에 둔다. 빈 값은 무시한다. 둘 다 git 에 올리지 않는다.
+  const here = dirname(fileURLToPath(import.meta.url));
+  const env = {};
+  for (const source of [loadEnv(join(here, '..', '.env')), loadEnv(join(here, '.env')), process.env]) {
+    for (const [k, v] of Object.entries(source)) if (v) env[k] = v;
+  }
   const port = Number(env.PORT || 8787);
   const handle = createHandler({ kakaoKey: env.KAKAO_REST_API_KEY ?? '' });
   createServer((req, res) => {
