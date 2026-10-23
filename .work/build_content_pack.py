@@ -121,7 +121,7 @@ def place_photo(place: dict, tour: dict, commons: dict, bundled: dict) -> dict |
         return {
             'url': c['image'],
             'license': commons_license(c['license'], strip_html(c.get('author', ''))),
-            'source': 'Wikimedia Commons',
+            'source': c.get('provider', 'Wikimedia Commons'),
             'sourceUrl': c.get('source'),
         }
     return None

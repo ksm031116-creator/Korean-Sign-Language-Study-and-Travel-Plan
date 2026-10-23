@@ -1,4 +1,4 @@
-"""TourAPI에 맞는 항목이 없는 장소의 사진을 Wikimedia Commons에서 받아온다.
+"""TourAPI에 맞는 항목이 없는 장소의 사진을 Wikimedia Commons(와 Flickr 의 CC 사진)에서 받아온다.
 
 실행:  py -X utf8 .work/fetch_commons.py
 결과:  prototype/commons_photos.js — 사진 주소·저작자·라이선스만 담는다.
@@ -18,8 +18,7 @@ UA = {'User-Agent': 'SignKoreanCoursework/0.1 (student project; ksm031116-creato
 WIDTH = 1280
 
 # 장소 id → Commons 파일 이름. 확인 근거(제목·설명·좌표·사진 내용)는 커밋 본문에 남긴다.
-# 연남동 카페거리는 허용 라이선스로 그 장소를 보여 주는 사진을 찾지 못해 비워 둔다.
-# (근처의 다른 장소 사진 — 경의선숲길, TourAPI 의 연남동 공방거리(도자기 공방) 등 — 을 대신 붙이지 않는다.)
+# 근처의 다른 장소 사진 — 경의선숲길, TourAPI 의 연남동 공방거리(도자기 공방) 등 — 을 대신 붙이지 않는다.
 # 을지로 인쇄골목은 2026-10-23 다시 찾아 CC0 사진을 붙였다(업로더 설명 "을지로 인쇄골목", 좁은 골목의 작은 가게들).
 PICKS = {
     'samcheong': 'Seoul-Samcheong.dong-01.jpg',
@@ -38,6 +37,17 @@ PICKS = {
     'gangnam-station': 'Gangnam Station sign.jpg',
     'garosugil': 'Garosu-gil at night.jpg',
     'euljiro': '20150514최광모DSC00447.JPG',
+}
+
+# Commons 에 없어 Flickr 에서 고른 CC 사진. Flickr API 는 키가 필요해 사람이 원본 페이지에서 라이선스를 확인하고
+# 적는다(확인일과 함께). 블로그 등 라이선스가 없는 사진은 쓰지 않는다 — 저장소가 공개라 재배포가 된다.
+FLICKR = {
+    # 2026-10-23 확인: 원본 페이지 라이선스 CC BY 2.0, 2021-09-25 촬영, 태그 yeonnam. 연남동의 카페 외관.
+    'yeonnam': {
+        'file': 'yeonnamdong 202109', 'image': 'https://live.staticflickr.com/65535/52129031509_143827875b_b.jpg',
+        'source': 'https://www.flickr.com/photos/73479994@N00/52129031509', 'author': 'lazy fri13th',
+        'license': 'CC BY 2.0', 'licenseUrl': 'https://creativecommons.org/licenses/by/2.0/', 'provider': 'Flickr',
+    },
 }
 
 
@@ -75,12 +85,18 @@ def main():
             raise SystemExit(f'{pid}: 허용하지 않는 라이선스 {lic!r} — {name}')
         artist = re.sub(r'<[^>]+>', '', m.get('Artist', {}).get('value', '')).strip() or 'Unknown'
         photos[pid] = {'file': name, 'image': ii['thumburl'], 'source': ii['descriptionurl'],
-                       'author': artist, 'license': lic, 'licenseUrl': m.get('LicenseUrl', {}).get('value', '')}
+                       'author': artist, 'license': lic, 'licenseUrl': m.get('LicenseUrl', {}).get('value', ''),
+                       'provider': 'Wikimedia Commons'}
         print(f'OK  {pid:<16} {lic:<12} {artist[:30]:<30} {name}')
+    for pid, f in FLICKR.items():
+        if not allowed(f['license']):
+            raise SystemExit(f'{pid}: 허용하지 않는 라이선스 {f["license"]!r}')
+        photos[pid] = f
+        print(f'OK  {pid:<16} {f["license"]:<12} {f["author"][:30]:<30} {f["file"]} (Flickr)')
     out = ROOT / 'prototype' / 'commons_photos.js'
     out.write_text(
         '/* 자동 생성 파일 — .work/fetch_commons.py 로 다시 만든다. 직접 고치지 않는다.\n'
-        f' * 출처: Wikimedia Commons · 생성일 {date.today()}\n'
+        f' * 출처: Wikimedia Commons, Flickr(FLICKR 목록) — 사진마다 provider · 생성일 {date.today()}\n'
         ' * 허용 라이선스: CC0 · Public domain · CC BY (저작자·라이선스 표시)\n */\n'
         'window.COMMONS_PHOTOS = ' + json.dumps(photos, ensure_ascii=False, indent=1) + ';\n', encoding='utf-8')
     print(f'\n사진 {len(photos)}곳 → {out.relative_to(ROOT)}')

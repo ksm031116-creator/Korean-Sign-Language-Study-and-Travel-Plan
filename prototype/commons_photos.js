@@ -1,5 +1,5 @@
 /* 자동 생성 파일 — .work/fetch_commons.py 로 다시 만든다. 직접 고치지 않는다.
- * 출처: Wikimedia Commons · 생성일 2026-10-23
+ * 출처: Wikimedia Commons, Flickr(FLICKR 목록) — 사진마다 provider · 생성일 2026-10-23
  * 허용 라이선스: CC0 · Public domain · CC BY (저작자·라이선스 표시)
  */
 window.COMMONS_PHOTOS = {
@@ -9,7 +9,8 @@ window.COMMONS_PHOTOS = {
   "source": "https://commons.wikimedia.org/wiki/File:Seoul-Samcheong.dong-01.jpg",
   "author": "alice park",
   "license": "CC BY 2.0",
-  "licenseUrl": "https://creativecommons.org/licenses/by/2.0"
+  "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
+  "provider": "Wikimedia Commons"
  },
  "shinsegae": {
   "file": "新世界百貨店 - panoramio.jpg",
@@ -17,7 +18,8 @@ window.COMMONS_PHOTOS = {
   "source": "https://commons.wikimedia.org/wiki/File:%E6%96%B0%E4%B8%96%E7%95%8C%E7%99%BE%E8%B2%A8%E5%BA%97_-_panoramio.jpg",
   "author": "米田賢一",
   "license": "CC BY 3.0",
-  "licenseUrl": "https://creativecommons.org/licenses/by/3.0"
+  "licenseUrl": "https://creativecommons.org/licenses/by/3.0",
+  "provider": "Wikimedia Commons"
  },
  "seoulstation": {
   "file": "Seoul Station (145738821).jpeg",
@@ -25,7 +27,8 @@ window.COMMONS_PHOTOS = {
   "source": "https://commons.wikimedia.org/wiki/File:Seoul_Station_(145738821).jpeg",
   "author": "Dongil Kim",
   "license": "CC BY 3.0",
-  "licenseUrl": "https://creativecommons.org/licenses/by/3.0"
+  "licenseUrl": "https://creativecommons.org/licenses/by/3.0",
+  "provider": "Wikimedia Commons"
  },
  "namsan-tower": {
   "file": "N Seoul Tower (13952097192).jpg",
@@ -33,7 +36,8 @@ window.COMMONS_PHOTOS = {
   "source": "https://commons.wikimedia.org/wiki/File:N_Seoul_Tower_(13952097192).jpg",
   "author": "Eugene Lim from Hong Kong",
   "license": "CC BY 2.0",
-  "licenseUrl": "https://creativecommons.org/licenses/by/2.0"
+  "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
+  "provider": "Wikimedia Commons"
  },
  "myeongdong-food": {
   "file": "Seoul-Myeongdong-03.jpg",
@@ -41,7 +45,8 @@ window.COMMONS_PHOTOS = {
   "source": "https://commons.wikimedia.org/wiki/File:Seoul-Myeongdong-03.jpg",
   "author": "by thelearnr",
   "license": "CC BY 2.0",
-  "licenseUrl": "https://creativecommons.org/licenses/by/2.0"
+  "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
+  "provider": "Wikimedia Commons"
  },
  "cheonggyecheon": {
   "file": "Seoul (53853383087).jpg",
@@ -49,7 +54,8 @@ window.COMMONS_PHOTOS = {
   "source": "https://commons.wikimedia.org/wiki/File:Seoul_(53853383087).jpg",
   "author": "David Lee from Redmond, WA, USA",
   "license": "CC BY 2.0",
-  "licenseUrl": "https://creativecommons.org/licenses/by/2.0"
+  "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
+  "provider": "Wikimedia Commons"
  },
  "ttukseom": {
   "file": "20260501 뚝섬역 역명판.jpg",
@@ -57,7 +63,8 @@ window.COMMONS_PHOTOS = {
   "source": "https://commons.wikimedia.org/wiki/File:20260501_%EB%9A%9D%EC%84%AC%EC%97%AD_%EC%97%AD%EB%AA%85%ED%8C%90.jpg",
   "author": "Striker9498",
   "license": "CC0",
-  "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en"
+  "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+  "provider": "Wikimedia Commons"
  },
  "hongdae-station": {
   "file": "20250510 홍대입구역 3번출구.jpg",
@@ -65,7 +72,8 @@ window.COMMONS_PHOTOS = {
   "source": "https://commons.wikimedia.org/wiki/File:20250510_%ED%99%8D%EB%8C%80%EC%9E%85%EA%B5%AC%EC%97%AD_3%EB%B2%88%EC%B6%9C%EA%B5%AC.jpg",
   "author": "Striker9498",
   "license": "CC0",
-  "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en"
+  "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+  "provider": "Wikimedia Commons"
  },
  "gyeongui-park": {
   "file": "20250510 경의선숲길 1.jpg",
@@ -73,7 +81,8 @@ window.COMMONS_PHOTOS = {
   "source": "https://commons.wikimedia.org/wiki/File:20250510_%EA%B2%BD%EC%9D%98%EC%84%A0%EC%88%B2%EA%B8%B8_1.jpg",
   "author": "Striker9498",
   "license": "CC0",
-  "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en"
+  "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+  "provider": "Wikimedia Commons"
  },
  "hongdae-street": {
   "file": "Hongdae, Seoul- Part II - Hongdae2237.jpg",
@@ -81,7 +90,8 @@ window.COMMONS_PHOTOS = {
   "source": "https://commons.wikimedia.org/wiki/File:Hongdae,_Seoul-_Part_II_-_Hongdae2237.jpg",
   "author": "lumoplank",
   "license": "CC0",
-  "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en"
+  "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+  "provider": "Wikimedia Commons"
  },
  "itaewon": {
   "file": "Itaewon Street (230036983).jpeg",
@@ -89,7 +99,8 @@ window.COMMONS_PHOTOS = {
   "source": "https://commons.wikimedia.org/wiki/File:Itaewon_Street_(230036983).jpeg",
   "author": "Jongsu Pyeon",
   "license": "CC BY 3.0",
-  "licenseUrl": "https://creativecommons.org/licenses/by/3.0"
+  "licenseUrl": "https://creativecommons.org/licenses/by/3.0",
+  "provider": "Wikimedia Commons"
  },
  "yeouinaru": {
   "file": "20250727 여의나루역 1번출구.jpg",
@@ -97,7 +108,8 @@ window.COMMONS_PHOTOS = {
   "source": "https://commons.wikimedia.org/wiki/File:20250727_%EC%97%AC%EC%9D%98%EB%82%98%EB%A3%A8%EC%97%AD_1%EB%B2%88%EC%B6%9C%EA%B5%AC.jpg",
   "author": "Striker9498",
   "license": "CC0",
-  "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en"
+  "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+  "provider": "Wikimedia Commons"
  },
  "coex": {
   "file": "Starfield Library COEX 20240218.jpg",
@@ -105,7 +117,8 @@ window.COMMONS_PHOTOS = {
   "source": "https://commons.wikimedia.org/wiki/File:Starfield_Library_COEX_20240218.jpg",
   "author": "Sean Young (@assanges)",
   "license": "CC BY 4.0",
-  "licenseUrl": "https://creativecommons.org/licenses/by/4.0"
+  "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
+  "provider": "Wikimedia Commons"
  },
  "gangnam-station": {
   "file": "Gangnam Station sign.jpg",
@@ -113,7 +126,8 @@ window.COMMONS_PHOTOS = {
   "source": "https://commons.wikimedia.org/wiki/File:Gangnam_Station_sign.jpg",
   "author": "Aspere",
   "license": "CC0",
-  "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en"
+  "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+  "provider": "Wikimedia Commons"
  },
  "garosugil": {
   "file": "Garosu-gil at night.jpg",
@@ -121,7 +135,8 @@ window.COMMONS_PHOTOS = {
   "source": "https://commons.wikimedia.org/wiki/File:Garosu-gil_at_night.jpg",
   "author": "sellyourseoul",
   "license": "CC BY 2.0",
-  "licenseUrl": "https://creativecommons.org/licenses/by/2.0"
+  "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
+  "provider": "Wikimedia Commons"
  },
  "euljiro": {
   "file": "20150514최광모DSC00447.JPG",
@@ -129,6 +144,16 @@ window.COMMONS_PHOTOS = {
   "source": "https://commons.wikimedia.org/wiki/File:20150514%EC%B5%9C%EA%B4%91%EB%AA%A8DSC00447.JPG",
   "author": "최광모",
   "license": "CC0",
-  "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en"
+  "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+  "provider": "Wikimedia Commons"
+ },
+ "yeonnam": {
+  "file": "yeonnamdong 202109",
+  "image": "https://live.staticflickr.com/65535/52129031509_143827875b_b.jpg",
+  "source": "https://www.flickr.com/photos/73479994@N00/52129031509",
+  "author": "lazy fri13th",
+  "license": "CC BY 2.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by/2.0/",
+  "provider": "Flickr"
  }
 };

@@ -1,6 +1,6 @@
 {
  "schemaVersion": 1,
- "version": "39484bfa124a",
+ "version": "ba9ae99d8584",
  "locales": {
   "en": "reviewed",
   "ja": "draft"
@@ -4273,7 +4273,16 @@
    "lat": 37.56,
    "lng": 126.925,
    "signWords": null,
-   "photo": null,
+   "photo": {
+    "url": "https://live.staticflickr.com/65535/52129031509_143827875b_b.jpg",
+    "license": {
+     "type": "CC_BY",
+     "version": "2.0",
+     "author": "lazy fri13th"
+    },
+    "source": "Flickr",
+    "sourceUrl": "https://www.flickr.com/photos/73479994@N00/52129031509"
+   },
    "isExample": false
   },
   {

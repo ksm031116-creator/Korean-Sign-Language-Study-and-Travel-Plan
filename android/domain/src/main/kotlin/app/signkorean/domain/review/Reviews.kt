@@ -128,6 +128,8 @@ object ExternalLinks {
         "visitkorea.or.kr",
         "wikimedia.org",
         "wikipedia.org",
+        // CC BY 사진의 원본 페이지 (연남동 카페거리).
+        "flickr.com",
     )
 
     fun isAllowed(url: String): Boolean {
