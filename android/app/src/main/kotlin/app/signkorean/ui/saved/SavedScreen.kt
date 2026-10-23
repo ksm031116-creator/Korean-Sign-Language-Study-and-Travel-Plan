@@ -24,6 +24,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.LifecycleResumeEffect
@@ -88,7 +89,11 @@ fun SavedContent(state: SavedUiState, onUpgrade: () -> Unit = {}, onOpenPlaces: 
         verticalArrangement = Arrangement.spacedBy(14.dp),
     ) {
         Text(stringResource(R.string.saved_title), style = MaterialTheme.typography.headlineSmall, modifier = Modifier.semantics { heading() })
-        if (state.failed) ErrorState(stringResource(R.string.explore_load_failed), onRetry = { onAction(SavedAction.Refresh) })
+        if (state.failed) {
+            ErrorState(stringResource(R.string.explore_load_failed), onRetry = { onAction(SavedAction.Refresh) })
+            // 읽지 못했는데 "저장한 간판 없음"·"0/5"를 같이 보이면 북마크가 사라진 것처럼 보인다.
+            if (state.all.isEmpty()) return@Column
+        }
         state.freeLimit?.let { limit ->
             Quota(state.all.size, limit)
             // 유료 기능은 숨기지 않고 자물쇠 + 기능명으로 보인다 (UX09). 누르면 SC21.
@@ -113,7 +118,11 @@ fun SavedContent(state: SavedUiState, onUpgrade: () -> Unit = {}, onOpenPlaces: 
 private fun Quota(count: Int, limit: Int) {
     val t = SignKoreanTheme.tokens
     Column(Modifier.fillMaxWidth().testTag(SavedTags.QUOTA).semantics(mergeDescendants = true) {}, verticalArrangement = Arrangement.spacedBy(6.dp)) {
-        Text(stringResource(R.string.saved_quota, count.coerceAtMost(limit), limit), style = MaterialTheme.typography.labelLarge)
+        // 무료로 돌아가 한도보다 많이 갖고 있으면(E-12) 실제 개수를 보인다. 5로 잘라 보이지 않는다.
+        Text(
+            if (count > limit) stringResource(R.string.saved_quota_over, count, limit) else stringResource(R.string.saved_quota, count, limit),
+            style = MaterialTheme.typography.labelLarge,
+        )
         Box(Modifier.fillMaxWidth().height(6.dp).background(t.line, RoundedCornerShape(3.dp))) {
             Box(Modifier.fillMaxWidth((count.toFloat() / limit).coerceIn(0f, 1f)).height(6.dp).background(t.primary, RoundedCornerShape(3.dp)))
         }
@@ -128,6 +137,9 @@ private fun Filters(state: SavedUiState, onAction: (SavedAction) -> Unit) {
         AppChip(stringResource(R.string.collection_known), selected = state.filters.status == CardStatus.Known, onClick = { onAction(SavedAction.FilterStatus(if (state.filters.status == CardStatus.Known) null else CardStatus.Known)) })
         state.groups.forEach { g ->
             AppChip(g.label.text(), selected = state.filters.group == g.id, onClick = { onAction(SavedAction.FilterGroup(if (state.filters.group == g.id) null else g.id)) })
+        }
+        state.areaNames.forEach { (area, name) ->
+            AppChip(name.text(), selected = state.filters.area == area, onClick = { onAction(SavedAction.FilterArea(if (state.filters.area == area) null else area)) })
         }
         if (state.filters.active) QuietButton(stringResource(R.string.saved_clear_filters), onClick = { onAction(SavedAction.ClearFilters) })
     }
@@ -171,12 +183,19 @@ private fun SavedRow(item: SavedItem, playing: Boolean, onAction: (SavedAction) 
                 }
             }
         }
+        // 줄마다 같은 "Listen·Practise·Remove" 가 반복되므로, 스크린리더 이름에는 그 카드를 넣는다.
+        val name = card?.koText
         Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
             if (card?.audio != null) {
-                QuietButton(stringResource(if (playing) R.string.audio_playing else R.string.audio_listen), onClick = { onAction(SavedAction.Play(item.id)) })
+                val listen = stringResource(R.string.saved_a11y_listen, card.koText)
+                QuietButton(stringResource(if (playing) R.string.audio_playing else R.string.audio_listen), onClick = { onAction(SavedAction.Play(item.id)) }, modifier = Modifier.semantics { contentDescription = listen })
             }
-            if (card != null) QuietButton(stringResource(R.string.saved_practice_this), onClick = { onAction(SavedAction.StartFrom(item.id)) })
-            QuietButton(stringResource(R.string.saved_unsave), onClick = { onAction(SavedAction.Unsave(item.id)) })
+            if (card != null) {
+                val practise = stringResource(R.string.saved_a11y_practise, card.koText)
+                QuietButton(stringResource(R.string.saved_practice_this), onClick = { onAction(SavedAction.StartFrom(item.id)) }, modifier = Modifier.semantics { contentDescription = practise })
+            }
+            val remove = if (name != null) stringResource(R.string.saved_a11y_remove, name) else stringResource(R.string.saved_a11y_remove_unavailable)
+            QuietButton(stringResource(R.string.saved_unsave), onClick = { onAction(SavedAction.Unsave(item.id)) }, modifier = Modifier.semantics { contentDescription = remove })
         }
     }
 }

@@ -532,7 +532,8 @@ private fun BookmarkButton(saved: Boolean, modifier: Modifier, onClick: () -> Un
     val label = stringResource(if (saved) R.string.bookmark_remove else R.string.bookmark_save)
     androidx.compose.material3.IconButton(
         onClick = onClick,
-        modifier = modifier.testTag(LearnTags.BOOKMARK).semantics { stateDescription = if (saved) "saved" else "" },
+        // 이름("Save sign"/"Remove from saved")이 이미 상태를 말한다. 따로 상태 문구를 붙이지 않는다.
+        modifier = modifier.testTag(LearnTags.BOOKMARK),
     ) {
         // 채운 별 = 저장됨, 빈 별 = 저장 안 함. 글자 대신 이름은 스크린리더용 설명으로 준다.
         Text(if (saved) "★" else "☆", fontSize = 26.sp, color = if (saved) t.primary else t.muted, modifier = Modifier.semantics { contentDescription = label })

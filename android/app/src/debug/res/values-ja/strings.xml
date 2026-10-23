@@ -462,4 +462,9 @@
     <string name="map_step_walk_untimed">徒歩</string>
     <string name="map_step_bus_untimed">バス %1$s</string>
     <string name="map_step_subway_untimed">地下鉄 %1$s</string>
+    <string name="saved_quota_over">%1$d 枚を保存中。無料プランは %2$d 枚までです。減らすか、アンロックすると追加できます。</string>
+    <string name="saved_a11y_listen">%1$s を聞く</string>
+    <string name="saved_a11y_practise">%1$s を練習する</string>
+    <string name="saved_a11y_remove">%1$s を保存から外す</string>
+    <string name="saved_a11y_remove_unavailable">表示できない看板を保存から外す</string>
 </resources>

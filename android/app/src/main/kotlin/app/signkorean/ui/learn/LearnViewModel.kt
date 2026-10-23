@@ -183,6 +183,9 @@ class LearnViewModel(
         }
     }
 
+    /** 북마크 저장 중. 저장이 끝나기 전에 다시 누르면 무시한다. */
+    private var bookmarkSaving = false
+
     fun onAction(action: LearnAction) {
         val s = _state.value
         if (action == LearnAction.Retry && s.loadFailed) {
@@ -203,25 +206,34 @@ class LearnViewModel(
         }
         if (action == LearnAction.ToggleBookmark) {
             val card = s.card ?: return
+            if (bookmarkSaving) return
             val target = !s.bookmarked
-            _state.update { it.copy(bookmarked = target, notice = null) } // 바로 보이고, 실패하면 되돌린다
+            // 저장에 성공한 뒤에만 별을 바꾼다(설계 원칙 8, UX02). 한도·실패에서 별이 잠깐 채워지지 않게.
+            bookmarkSaving = true
+            _state.update { it.copy(notice = null) }
             viewModelScope.launch {
-                when (val o = setBookmark(card.id, target)) {
-                    BookmarkOutcome.Saved, BookmarkOutcome.Removed, BookmarkOutcome.Unchanged ->
-                        savedIds = if (target) savedIds + card.id else savedIds - card.id
-                    is BookmarkOutcome.NeedsUpgrade -> {
-                        // SC21 을 열기 전에 보류해 둔다. 결제 중 프로세스가 끝나도 복귀 후 이어서 저장된다(B-07).
-                        try {
-                            pendingActions.save(PendingAction.SaveBookmark(card.id))
-                        } catch (e: CancellationException) {
-                            throw e
-                        } catch (_: Exception) {
+                try {
+                    when (val o = setBookmark(card.id, target)) {
+                        BookmarkOutcome.Saved, BookmarkOutcome.Removed, BookmarkOutcome.Unchanged -> {
+                            savedIds = if (target) savedIds + card.id else savedIds - card.id
+                            _state.update { if (it.card?.id == card.id) it.copy(bookmarked = target) else it }
                         }
-                        _state.update { if (it.card?.id == card.id) it.copy(bookmarked = false, notice = UiText.Res(R.string.bookmark_limit, listOf(o.count, o.limit))) else it }
-                        _effects.send(LearnEffect.BookmarkLimit(o.count, o.limit))
+                        is BookmarkOutcome.NeedsUpgrade -> {
+                            // SC21 을 열기 전에 보류해 둔다. 결제 중 프로세스가 끝나도 복귀 후 이어서 저장된다(B-07).
+                            try {
+                                pendingActions.save(PendingAction.SaveBookmark(card.id))
+                            } catch (e: CancellationException) {
+                                throw e
+                            } catch (_: Exception) {
+                            }
+                            _state.update { if (it.card?.id == card.id) it.copy(bookmarked = false, notice = UiText.Res(R.string.bookmark_limit, listOf(o.count, o.limit))) else it }
+                            _effects.send(LearnEffect.BookmarkLimit(o.count, o.limit))
+                        }
+                        BookmarkOutcome.SaveFailed ->
+                            _state.update { if (it.card?.id == card.id) it.copy(notice = UiText.Res(R.string.common_save_failed)) else it }
                     }
-                    BookmarkOutcome.SaveFailed ->
-                        _state.update { if (it.card?.id == card.id) it.copy(bookmarked = !target, notice = UiText.Res(R.string.common_save_failed)) else it }
+                } finally {
+                    bookmarkSaving = false
                 }
             }
             return

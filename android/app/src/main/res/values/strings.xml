@@ -190,7 +190,7 @@
 
     <string name="bookmark_save">Save sign</string>
     <string name="bookmark_remove">Remove from saved</string>
-    <string name="bookmark_limit">The free plan keeps %1$d of %2$d saved signs. Unlock trip planning to save more.</string>
+    <string name="bookmark_limit">You have %1$d saved signs. The free plan keeps up to %2$d — unlock trip planning to save more.</string>
 
     <!-- SC09 Saved -->
     <string name="saved_title">Saved signs</string>
@@ -503,4 +503,9 @@
     <string name="map_step_walk_untimed">Walk</string>
     <string name="map_step_bus_untimed">Bus %1$s</string>
     <string name="map_step_subway_untimed">Subway %1$s</string>
+    <string name="saved_quota_over">%1$d saved. The free plan keeps %2$d — remove some or unlock to save more.</string>
+    <string name="saved_a11y_listen">Listen to %1$s</string>
+    <string name="saved_a11y_practise">Practise %1$s</string>
+    <string name="saved_a11y_remove">Remove %1$s from saved</string>
+    <string name="saved_a11y_remove_unavailable">Remove the unavailable sign from saved</string>
 </resources>

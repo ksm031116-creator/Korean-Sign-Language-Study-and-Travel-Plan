@@ -62,6 +62,8 @@ data class SavedUiState(
     val busy: Boolean = false,
     val confirmReplace: Boolean = false,
     val message: UiText? = null,
+    /** 지역 필터 칩의 이름(콘텐츠 팩의 지역 이름). */
+    val areaNames: Map<AreaId, app.signkorean.domain.common.LocalizedText> = emptyMap(),
 ) {
     val items: List<SavedItem>
         get() = all.filter { item ->
@@ -115,6 +117,8 @@ class SavedViewModel(
     private var loadJob: Job? = null
     private var pendingFrom: CardId? = null
     private var pending = false
+    /** 묻는 중인 세션이 같은 Saved 세션이면, "이어 하기"가 그 세션을 연다. */
+    private var pendingResumable = false
 
     init {
         load()
@@ -142,7 +146,8 @@ class SavedViewModel(
                     )
                 }
                 val paid = entitlement.current() == Entitlement.Paid
-                _state.update { it.copy(loading = false, failed = false, all = items, freeLimit = if (paid) null else BookmarkPolicy.FREE_LIMIT) }
+                val areaNames = pack.areas.filter { a -> items.any { a.id in it.areas } }.associate { it.id to it.name }
+                _state.update { it.copy(loading = false, failed = false, all = items, areaNames = areaNames, freeLimit = if (paid) null else BookmarkPolicy.FREE_LIMIT) }
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
@@ -157,7 +162,11 @@ class SavedViewModel(
             SavedAction.Refresh -> load()
             is SavedAction.Unsave -> viewModelScope.launch {
                 when (setBookmark(action.id, saved = false)) {
-                    BookmarkOutcome.Removed, BookmarkOutcome.Unchanged -> _state.update { st -> st.copy(all = st.all.filterNot { it.id == action.id }) }
+                    BookmarkOutcome.Removed, BookmarkOutcome.Unchanged -> {
+                        _state.update { st -> st.copy(all = st.all.filterNot { it.id == action.id }, message = null) }
+                        // 해제 전에 시작한 새로고침이 지운 줄을 되살리지 않게 다시 읽는다.
+                        load()
+                    }
                     else -> _state.update { it.copy(message = UiText.Res(R.string.common_save_failed)) }
                 }
             }
@@ -170,8 +179,11 @@ class SavedViewModel(
             is SavedAction.StartFrom -> begin(action.id, replace = false)
             SavedAction.ConfirmReplace -> if (pending) begin(pendingFrom, replace = true)
             SavedAction.KeepSession -> {
+                val resume = pending && pendingResumable
                 pending = false
                 _state.update { it.copy(confirmReplace = false) }
+                // 진행 중인 Saved 세션을 이어 한다. 다른 곳의 세션이면 대화상자만 닫는다.
+                if (resume) viewModelScope.launch { _effects.send(SavedEffect.OpenLearn) }
             }
         }
     }
@@ -195,6 +207,7 @@ class SavedViewModel(
                 is StartOutcome.Resumed, is StartOutcome.NeedsConfirmation -> {
                     pending = true
                     pendingFrom = from
+                    pendingResumable = outcome is StartOutcome.Resumed
                     _state.update { it.copy(busy = false, confirmReplace = true) }
                 }
                 StartOutcome.NoCards, StartOutcome.NothingToReview -> _state.update { it.copy(busy = false, message = UiText.Res(R.string.result_no_cards)) }

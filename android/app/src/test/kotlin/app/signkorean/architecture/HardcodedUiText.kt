@@ -10,6 +10,7 @@ package app.signkorean.architecture
  * 위반: 글자(라틴·한글·한글 자모·가나·한자)가 든 문자열 리터럴이
  *  - `Text(` / `BasicText(` 의 첫 번째 위치 인자나 `text =` 인자에 있을 때
  *  - `label =`, `contentDescription =`, `placeholder =` 에 바로 올 때
+ *  - 스크린리더가 읽는 `stateDescription =`·`contentDescription =` 값(조건식 포함, 그 줄 끝까지)에 있을 때
  *  - `makeText(` 의 두 번째 인자(토스트 문구)에 있을 때
  * 템플릿(`$count`, `${item.price}`)만 있는 문자열은 값이므로 통과한다.
  * 상표명처럼 의도한 예외는 그 줄에 `// i18n-ignore` 를 붙인다.
@@ -20,6 +21,7 @@ object HardcodedUiText {
     private val template = Regex("""\$\{[^}]*\}|\$[A-Za-z_]\w*""")
     private const val LITERAL = "(\"\"\"[\\s\\S]*?\"\"\"|\"(?:[^\"\\\\]|\\\\.)*\")"
     private val namedUiArgument = Regex("""\b(?:label|contentDescription|placeholder)\s*=\s*$LITERAL""")
+    private val spokenProperty = Regex("""\b(?:stateDescription|contentDescription)\s*=(?!=)\s*([^\n]*)""")
     private val textCall = Regex("""\b(?:BasicText|Text)\(""")
     private val toastCall = Regex("""\bmakeText\(""")
     private val namedArgument = Regex("""^([A-Za-z_]\w*)\s*=(?!=)""")
@@ -48,6 +50,9 @@ object HardcodedUiText {
         }
         namedUiArgument.findAll(code).forEach { match ->
             if (literalHasWording(match.groupValues[1])) hits[match.range.first] = snippet(code, lineStart(code, match.range.first))
+        }
+        spokenProperty.findAll(code).forEach { match ->
+            if (hasWording(match.groupValues[1])) hits[match.range.first] = snippet(code, lineStart(code, match.range.first))
         }
         return hits.values.toList()
     }
