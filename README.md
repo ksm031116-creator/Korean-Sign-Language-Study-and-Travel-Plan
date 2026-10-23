@@ -109,7 +109,7 @@ Git 이력만 읽어도 **요구사항 → 설계 → 구현 → 검증**의 흐
 | 장소 사진 3곳 (경복궁·명동성당·DDP) | Wikimedia Commons (앱에 내장) | CC0 · CC BY 4.0 ([credits.json](prototype/assets/credits.json)) |
 | 장소 사진 15곳 (역·거리·쇼핑몰 등) | Wikimedia Commons ([commons_photos.js](prototype/commons_photos.js)) | CC0 6 · CC BY 9 |
 | 간판·표지판 이미지 | 앱이 SVG로 직접 그림 | 해당 없음 |
-| 장소 이름·주소·좌표 | 공개된 사실 정보 | 좌표는 근사치 |
+| 장소 이름·주소·좌표 | 공개된 사실 정보. 좌표는 Wikidata(CC0)·TourAPI(공공누리 제1유형) | 거리·골목 8곳은 근사치(`.work/coordinates_report.txt`) |
 | 리뷰 | **샘플 데이터** | 실제 리뷰 아님 |
 
 - 사진마다 화면에 출처를 표시합니다. CC BY 사진은 저작자와 라이선스도 함께 표시합니다.
@@ -160,7 +160,7 @@ py -X utf8 .work/fetch_commons.py
 
 | 항목 | 현재 |
 |---|---|
-| 장소 사진 | 실존 45곳 중 43곳. 을지로 인쇄골목·연남동 카페거리는 쓸 수 있는 사진이 없음 |
+| 장소 사진 | 실존 45곳 중 44곳. 연남동 카페거리는 쓸 수 있는 사진이 없음 |
 | 리뷰·지도·경로 | 샘플 리뷰와 개략도. 실제 공급자 연동 전 |
 | 발음 음성 | 브라우저 음성합성으로 대체. 명세는 사전 생성 TTS 파일 |
 
