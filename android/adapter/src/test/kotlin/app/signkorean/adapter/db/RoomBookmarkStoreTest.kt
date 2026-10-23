@@ -1,5 +1,6 @@
 package app.signkorean.adapter.db
 
+import kotlinx.coroutines.async
 import androidx.room.Room
 import androidx.room.testing.MigrationTestHelper
 import androidx.test.platform.app.InstrumentationRegistry
@@ -59,6 +60,37 @@ class RoomBookmarkStoreTest {
                 c.moveToFirst()
                 assertEquals(0, c.getInt(0))
             }
+        }
+    }
+
+    @Test
+    fun `B-06 실제 DB 트랜잭션에서 동시에 저장해도 무료 한도를 넘지 않고, 다시 열어도 중복 없이 남는다`() = runBlocking {
+        val name = "b06-${System.nanoTime()}.db"
+        val file = Room.databaseBuilder(context, AppDatabase::class.java, name).build()
+        val t = Instant.parse("2026-10-21T09:00:00Z")
+        val clock = app.signkorean.domain.common.Clock { t }
+        val set = app.signkorean.domain.bookmark.SetBookmark(
+            RoomBookmarkStore(file.bookmarkDao()), RoomTransactionRunner(file), { app.signkorean.domain.entitlement.Entitlement.Free }, clock,
+        )
+        (1..3).forEach { set(CardId("old$it"), saved = true) }
+        // 남은 자리는 2개. 8개를 동시에 저장하면 2개만 들어가야 한다.
+        val outcomes = kotlinx.coroutines.coroutineScope {
+            (1..8).map { i -> async(kotlinx.coroutines.Dispatchers.IO) { set(CardId("new$i"), saved = true) } }.map { it.await() }
+        }
+        assertEquals(2, outcomes.count { it == app.signkorean.domain.bookmark.BookmarkOutcome.Saved })
+        // 같은 카드를 여러 번 저장해도 한 줄(프로세스가 저장 도중 끝나 다시 저장하는 경우와 같다).
+        set(CardId("old1"), saved = true)
+        assertEquals(5, RoomBookmarkStore(file.bookmarkDao()).count())
+        val before = RoomBookmarkStore(file.bookmarkDao()).all().map { it.card }
+        file.close()
+        val reopened = Room.databaseBuilder(context, AppDatabase::class.java, name).build()
+        try {
+            val after = RoomBookmarkStore(reopened.bookmarkDao()).all().map { it.card }
+            assertEquals(before, after)
+            assertEquals(after.size, after.toSet().size)
+        } finally {
+            reopened.close()
+            context.deleteDatabase(name)
         }
     }
 }

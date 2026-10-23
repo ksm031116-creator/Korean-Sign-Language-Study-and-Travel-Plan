@@ -1,5 +1,6 @@
 package app.signkorean.ui.learn
 
+import kotlinx.coroutines.launch
 import app.signkorean.domain.content.CardId
 import app.signkorean.domain.content.CardKind
 import app.signkorean.domain.learning.CardStatus
@@ -317,5 +318,21 @@ class LearnViewModelTest {
     fun `저장된 카드로 돌아오면 저장 표시가 켜져 있다`() = runTest {
         bookmarkStore.add(app.signkorean.domain.bookmark.Bookmark(CardId("t-market-1"), clock.now()))
         assertTrue(viewModel().state.value.bookmarked)
+    }
+
+    @Test
+    fun `P11 북마크 별은 저장에 성공한 뒤에만 채운다 (한도·실패에서 잠깐 채워지지 않는다)`() = runTest {
+        (1..5).forEach { bookmarkStore.add(app.signkorean.domain.bookmark.Bookmark(CardId("x$it"), clock.now())) }
+        val vm = viewModel()
+        val seen = mutableListOf<Boolean>()
+        backgroundScope.launch(kotlinx.coroutines.test.UnconfinedTestDispatcher(testScheduler)) { vm.state.collect { seen += it.bookmarked } }
+        vm.onAction(LearnAction.ToggleBookmark)
+        assertFalse("한도에서 별이 잠깐 채워졌다: $seen", seen.any { it })
+        bookmarkStore.clear()
+        bookmarkStore.failNextWrite = true
+        vm.onAction(LearnAction.ToggleBookmark)
+        assertFalse("실패에서 별이 잠깐 채워졌다: $seen", seen.any { it })
+        vm.onAction(LearnAction.ToggleBookmark)
+        assertTrue(vm.state.value.bookmarked)
     }
 }

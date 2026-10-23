@@ -106,4 +106,9 @@ class HardcodedUiTextTest {
         """.trimIndent()
         assertEquals(listOf("""Text("Oops")"""), violations(source))
     }
+
+    @Test
+    fun `stateDescription 에 직접 쓴 문구도 잡는다 - 스크린리더가 읽는다`() {
+        assertEquals(1, violations("""Modifier.semantics { stateDescription = if (saved) "saved" else "" }""").size)
+    }
 }

@@ -1,5 +1,6 @@
 package app.signkorean.ui.saved
 
+import org.junit.Assert.assertNotNull
 import app.signkorean.domain.bookmark.Bookmark
 import app.signkorean.domain.bookmark.SetBookmark
 import app.signkorean.domain.content.AreaId
@@ -136,5 +137,36 @@ class SavedViewModelTest {
         vm.onAction(SavedAction.Play(CardId("t-market-1")))
         assertEquals(listOf(gukbap.audio), player.played)
         assertEquals(CardId("t-market-1"), vm.state.value.playing)
+    }
+
+    @Test
+    fun `P11 지역 이름을 콘텐츠에서 가져온다`() = runTest {
+        save("t-market-1")
+        assertEquals(setOf(AreaId("myeongdong")), vm().state.value.areaNames.keys)
+    }
+
+    @Test
+    fun `P11 해제에 실패했다가 성공하면 오류 문구를 지운다`() = runTest {
+        save("b01", "b02")
+        val vm = vm()
+        store.failNextWrite = true
+        vm.onAction(SavedAction.Unsave(CardId("b01")))
+        assertNotNull(vm.state.value.message)
+        vm.onAction(SavedAction.Unsave(CardId("b01")))
+        assertNull(vm.state.value.message)
+        assertEquals(listOf("b02"), vm.state.value.all.map { it.id.value })
+    }
+
+    @Test
+    fun `P11 진행 중인 Saved 학습이 있으면 이어 하기를 고를 수 있다`() = runTest {
+        save("b01", "b02")
+        val vm = vm()
+        vm.onAction(SavedAction.StartAll)
+        assertEquals(SavedEffect.OpenLearn, vm.effects.tryReceive().getOrNull())
+        vm.onAction(SavedAction.StartAll)
+        assertTrue(vm.state.value.confirmReplace)
+        // "이어 하기": 지금 세션으로 학습을 연다(대화상자만 닫히고 아무 일도 없지 않게).
+        vm.onAction(SavedAction.KeepSession)
+        assertEquals(SavedEffect.OpenLearn, vm.effects.tryReceive().getOrNull())
     }
 }

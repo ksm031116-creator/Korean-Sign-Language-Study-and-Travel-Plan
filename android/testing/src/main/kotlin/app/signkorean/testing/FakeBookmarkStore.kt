@@ -42,6 +42,10 @@ class FakeBookmarkStore(
 
     override suspend fun remove(card: CardId) {
         pause()
+        if (failNextWrite) {
+            failNextWrite = false
+            throw FakeStorageException("bookmark remove")
+        }
         items.remove(card)
     }
 

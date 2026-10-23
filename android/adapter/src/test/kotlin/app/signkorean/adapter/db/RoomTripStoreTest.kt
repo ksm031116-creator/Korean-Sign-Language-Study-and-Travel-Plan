@@ -104,4 +104,15 @@ class RoomTripStoreTest {
         assertTrue(runCatching { store.save(broken) }.isFailure)
         assertEquals(before, store.get(TripId("t")))
     }
+
+    @Test
+    fun `B-08 북마크를 해제해도 그 장소가 든 일정은 그대로다`() = runBlocking {
+        val bookmarks = RoomBookmarkStore(db.bookmarkDao())
+        bookmarks.add(Bookmark(CardId("t-market-1"), Instant.EPOCH))
+        val d = LocalDate.of(2026, 11, 3)
+        val trip = Trip(TripId("t"), "A", d, d, listOf(TripDay(d, stops = listOf(TripStop(StopId("s"), PlaceId("gwangjang"))))), Instant.EPOCH)
+        store.save(trip)
+        bookmarks.remove(CardId("t-market-1"))
+        assertEquals(listOf(PlaceId("gwangjang")), store.get(TripId("t"))!!.days.single().stops.map { it.place })
+    }
 }
