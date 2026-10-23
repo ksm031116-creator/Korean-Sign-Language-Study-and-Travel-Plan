@@ -19,3 +19,6 @@ desktop.ini
 .env
 *.env
 *.env.txt
+
+# 기기 확인용 화면 캡처 (저장소에 올리지 않는다)
+QA_*/
