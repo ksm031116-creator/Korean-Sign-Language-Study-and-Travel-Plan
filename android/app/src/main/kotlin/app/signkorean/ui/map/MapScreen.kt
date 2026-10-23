@@ -262,7 +262,7 @@ private fun TransitDetail(transit: app.signkorean.domain.route.TransitSummary, t
     Text(listOfNotNull(transfers, fare).joinToString(" · "), style = MaterialTheme.typography.bodyMedium)
     transit.steps.forEach { step ->
         // 공급자가 시간을 주지 않은 단계는 시간 없이 쓴다(0분으로 지어내지 않는다).
-        val time = step.seconds?.let { formats.duration(roundUpMinutes(it)) }
+        val time = step.seconds?.let { formats.duration(stepMinutes(it)) }
         val lines = step.lines.joinToString(", ")
         Text(
             when (step.kind) {
@@ -277,13 +277,16 @@ private fun TransitDetail(transit: app.signkorean.domain.route.TransitSummary, t
             color = t.muted,
         )
     }
-    // 공급자가 단계로 주지 않는 시간(정류장까지 걷기·기다리기). 총 초와 단계 초의 차이라 지어낸 값이 아니다.
-    // 시간을 모르는 단계가 있으면 차이를 알 수 없으므로 쓰지 않는다. 1분이 안 되는 차이도 쓰지 않는다.
+    // 공급자가 단계로 주지 않는 시간(정류장까지 걷기·기다리기). 보이는 총 분에서 보이는 단계 분을 뺀다 — 화면의 분을
+    // 더하면 총 분과 맞는다(리뷰 후속 L2). 시간을 모르는 단계가 있으면 차이를 알 수 없으므로 쓰지 않는다.
     if (transit.steps.all { it.seconds != null }) {
-        val rest = totalSeconds - transit.steps.sumOf { it.seconds!! }
-        if (rest >= 60) Text(stringResource(R.string.map_step_other, formats.duration(roundUpMinutes(rest))), style = MaterialTheme.typography.labelMedium, color = t.muted)
+        val rest = roundUpMinutes(totalSeconds) - transit.steps.sumOf { stepMinutes(it.seconds!!) }
+        if (rest > 0) Text(stringResource(R.string.map_step_other, formats.duration(rest)), style = MaterialTheme.typography.labelMedium, color = t.muted)
     }
 }
+
+/** 단계 시간은 가장 가까운 분으로(최소 1분). 단계마다 올림하면 합이 총 분을 넘는다. */
+private fun stepMinutes(seconds: Long): Int = ((seconds + 30) / 60).toInt().coerceAtLeast(1)
 
 /** 공급자 초를 분으로 올림한다. 일정(SC13)과 같은 규칙이다. */
 private fun roundUpMinutes(seconds: Long): Int = ((seconds + 59) / 60).toInt()

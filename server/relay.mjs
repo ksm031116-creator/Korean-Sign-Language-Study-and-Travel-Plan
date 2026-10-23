@@ -17,6 +17,7 @@ const NO_ROUTE = new Set([
 // 앱이 그릴 줄 아는 탈것. 그 밖의 것(기차·고속버스 등)이 섞인 경로는 건너뛴다 — 걷기로 바꿔 보이지 않게.
 const STEP_KIND = { WALKING: 'walk', BUS: 'bus', SUBWAY: 'subway' };
 const MAX_BODY = 16 * 1024;
+// 지금은 USB(adb reverse)로 붙는 루프백 전용이다. https 로 따로 배포하면 그 도메인을 여기에 더해야 한다.
 const ALLOWED_HOST = /^(127\.0\.0\.1|localhost)(:\d+)?$/;
 
 const json = (status, body) => ({ status, body: JSON.stringify(body) });
@@ -42,12 +43,16 @@ export function createHandler({ kakaoKey, fetch = globalThis.fetch, timeoutMs = 
       return await Promise.race([
         (async () => {
           const res = await fetch(url, { headers: { Authorization: `KakaoAK ${kakaoKey}` }, signal: ac.signal });
-          // 원시 오류 본문은 앱에 넘기지 않는다(키가 들어 있을 수 있다).
-          if (res.status === 429) return { fail: error(503, 'RATE_LIMITED', true) };
-          if (res.status === 401 || res.status === 403) return { fail: error(502, 'UNSUPPORTED', false) };
+          // 원시 오류 본문은 앱에 넘기지 않는다(키가 들어 있을 수 있다). 읽지 않는 본문은 닫아 연결을 돌려준다.
+          const failWith = (fail) => {
+            res.body?.cancel?.().catch(() => {});
+            return { fail };
+          };
+          if (res.status === 429) return failWith(error(503, 'RATE_LIMITED', true));
+          if (res.status === 401 || res.status === 403) return failWith(error(502, 'UNSUPPORTED', false));
           // 400 은 좌표가 지원 범위 밖인 경우 등 — 다시 해도 같다.
-          if (res.status === 400) return { fail: error(422, 'NO_DATA', false) };
-          if (!res.ok) return { fail: error(502, 'UPSTREAM_ERROR', res.status >= 500) };
+          if (res.status === 400) return failWith(error(422, 'NO_DATA', false));
+          if (!res.ok) return failWith(error(502, 'UPSTREAM_ERROR', res.status >= 500));
           return { body: await res.json() };
         })(),
         deadline,
@@ -160,6 +165,53 @@ function loadEnv(file) {
   return env;
 }
 
+/**
+ * HTTP 서버. 본문이 [MAX_BODY] 를 넘으면 그 자리에서 413 으로 끝내고 더 읽지 않는다 — 넘친 조각을 버리고
+ * 앞부분만 처리하지 않는다(리뷰 후속 M1). 어떤 요청도 서버를 죽이지 않는다.
+ */
+export function createRelayServer(handle) {
+  return createServer((req, res) => {
+    const chunks = [];
+    let size = 0;
+    let done = false;
+    const reply = (out) => {
+      if (done) return;
+      done = true;
+      // 413 은 본문을 다 받기 전에 보내므로 연결을 닫는다(남은 업로드를 끝까지 받지 않게).
+      const headers = { 'Content-Type': 'application/json; charset=utf-8' };
+      if (out.status === 413) headers.Connection = 'close';
+      res.writeHead(out.status, headers);
+      res.end(out.body);
+      // 좌표·키는 로그에 남기지 않는다(NFR05). 경로와 상태만.
+      console.log(`${req.method} ${(req.url ?? '').split('?')[0]} -> ${out.status}`);
+    };
+    // 업로드 중 끊긴 연결 등. 처리하지 않으면 프로세스가 죽는다.
+    req.on('error', () => {
+      done = true;
+    });
+    req.on('data', (c) => {
+      if (done) return;
+      size += c.length;
+      if (size > MAX_BODY) {
+        reply(error(413, 'INVALID_INPUT', false));
+        // 남은 업로드는 읽어 버리기만 한다(쌓지 않는다).
+        return;
+      }
+      chunks.push(c);
+    });
+    req.on('end', async () => {
+      if (done) return;
+      let out;
+      try {
+        out = await handle({ method: req.method, path: req.url, body: Buffer.concat(chunks).toString('utf8'), host: req.headers.host ?? '' });
+      } catch {
+        out = error(500, 'UPSTREAM_ERROR', true);
+      }
+      reply(out);
+    });
+  });
+}
+
 if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
   // 키는 저장소 루트의 .env(TourAPI·Gemini 키와 같은 곳) 또는 server/.env 에 둔다. 빈 값은 무시한다. 둘 다 git 에 올리지 않는다.
   const here = dirname(fileURLToPath(import.meta.url));
@@ -169,27 +221,7 @@ if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
   }
   const port = Number(env.PORT || 8787);
   const handle = createHandler({ kakaoKey: env.KAKAO_REST_API_KEY ?? '' });
-  createServer((req, res) => {
-    const chunks = [];
-    let size = 0;
-    req.on('data', (c) => {
-      size += c.length;
-      if (size <= MAX_BODY + 1) chunks.push(c);
-    });
-    req.on('end', async () => {
-      let out;
-      try {
-        out = await handle({ method: req.method, path: req.url, body: Buffer.concat(chunks).toString('utf8'), host: req.headers.host ?? '' });
-      } catch {
-        // 어떤 요청도 서버를 죽이지 않는다.
-        out = error(500, 'UPSTREAM_ERROR', true);
-      }
-      res.writeHead(out.status, { 'Content-Type': 'application/json; charset=utf-8' });
-      res.end(out.body);
-      // 좌표·키는 로그에 남기지 않는다(NFR05). 경로와 상태만.
-      console.log(`${req.method} ${req.url.split('?')[0]} -> ${out.status}`);
-    });
-  }).listen(port, '127.0.0.1', () => {
+  createRelayServer(handle).listen(port, '127.0.0.1', () => {
     console.log(`Sign Korean relay on http://127.0.0.1:${port} (Kakao key ${env.KAKAO_REST_API_KEY ? 'set' : 'MISSING'})`);
   });
 }

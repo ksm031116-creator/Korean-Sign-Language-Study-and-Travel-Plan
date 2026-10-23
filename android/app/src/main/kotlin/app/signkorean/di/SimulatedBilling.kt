@@ -5,6 +5,7 @@ import app.signkorean.domain.entitlement.PurchaseResult
 import app.signkorean.domain.entitlement.StorePurchase
 import app.signkorean.domain.entitlement.StoreQuery
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -41,11 +42,12 @@ class SimulatedBillingGateway(context: android.content.Context) : EntitlementGat
 
     private suspend fun change(transform: (List<StorePurchase>) -> List<StorePurchase>) = lock.withLock {
         val next = transform(owned)
-        // commit() 은 디스크에 쓸 때까지 막으므로 메인 스레드가 아닌 IO 에서.
-        withContext(Dispatchers.IO) {
+        // commit() 은 디스크에 쓸 때까지 막으므로 메인 스레드가 아닌 IO 에서. 쓰기 시작했으면 부른 쪽이 취소돼도
+        // 끝까지 쓰고 메모리도 맞춘다 — 디스크에만 있고 화면에는 없는 구매가 생기지 않게(리뷰 후속 M2).
+        withContext(NonCancellable + Dispatchers.IO) {
             prefs.edit().putStringSet(KEY, next.map { it.token + "|" + (if (it.acknowledged) "1" else "0") }.toSet()).commit()
+            owned = next
         }
-        owned = next
     }
 
     override suspend fun queryPurchases(): StoreQuery = StoreQuery.Success(owned)
