@@ -42,4 +42,11 @@ class ExternalMapLinkTest {
             Locale.setDefault(before)
         }
     }
+
+    @Test
+    fun `TRN 대중교통 길찾기 링크는 카카오맵 by traffic 이고 허용 목록을 통과한다`() {
+        val url = ExternalMapLink.transit("Seoul Station", from, "Gyeongbokgung", to)
+        assertTrue(url.startsWith("https://map.kakao.com/link/by/traffic/"), url)
+        assertTrue(ExternalLinks.isAllowed(url))
+    }
 }

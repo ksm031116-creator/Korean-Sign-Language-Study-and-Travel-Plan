@@ -117,3 +117,59 @@ test('모르는 주소는 NOT_FOUND', async () => {
   assert.equal(res.status, 404);
   assert.equal(res.body.error.code, 'NOT_FOUND');
 });
+
+// ---------- 대중교통 (TRN) ----------
+
+const KAKAO_TRANSIT = {
+  status: 'OK',
+  properties: { total: 2 },
+  routes: [
+    {
+      properties: { type: 'BUS', totalDistance: 6000, totalTime: 2700, transfers: 0, fare: { value: 1500 } },
+      steps: [{ properties: { type: 'BUS', distance: 6000, time: 2700, vehicles: [{ name: '7212', type: '간선' }] }, path: { points: [[126.99, 37.57], [126.985, 37.575]] } }],
+    },
+    {
+      properties: { type: 'BUS_AND_SUBWAY', totalDistance: 5013, totalTime: 2115, transfers: 1, fare: { value: 1550 } },
+      steps: [
+        { properties: { type: 'WALKING', distance: 300, time: 240 }, path: { points: [[126.99, 37.57], [126.991, 37.571]] } },
+        { properties: { type: 'SUBWAY', distance: 4000, time: 1200, vehicles: [{ name: '3호선', type: '일반' }] }, path: { points: [[126.991, 37.571], [126.988, 37.574]] } },
+        { properties: { type: 'BUS', distance: 713, time: 675, vehicles: [{ name: '7212' }, { name: '1020' }] }, path: { points: [[126.988, 37.574], [126.985, 37.575]] } },
+      ],
+    },
+  ],
+};
+
+const transitReq = { ...walk, mode: 'transit' };
+
+test('TRN 대중교통 - 카카오 대중교통 경로 중 가장 빠른 것을 고르고 환승·요금·단계를 넘긴다', async () => {
+  const fetch = fakeFetch(async () => ({ body: KAKAO_TRANSIT }));
+  const res = await call(createHandler({ kakaoKey: 'k', fetch }), 'POST', '/v1/routes', transitReq);
+  assertEqual200(res);
+  const url = new URL(fetch.calls[0].url);
+  assert.equal(url.origin + url.pathname, 'https://dapi.kakao.com/v2/routing/publictraffic');
+  assert.equal(res.body.duration_s, 2115);
+  assert.equal(res.body.distance_m, 5013);
+  assert.deepEqual(res.body.path, [[37.57, 126.99], [37.571, 126.991], [37.574, 126.988], [37.575, 126.985]]);
+  assert.deepEqual(res.body.transit, {
+    transfers: 1,
+    fare_won: 1550,
+    steps: [
+      { kind: 'walk', lines: [], minutes: 4, distance_m: 300 },
+      { kind: 'subway', lines: ['3호선'], minutes: 20, distance_m: 4000 },
+      { kind: 'bus', lines: ['7212', '1020'], minutes: 12, distance_m: 713 },
+    ],
+  });
+});
+
+test('TRN 대중교통 경로가 없으면 NO_DATA', async () => {
+  for (const status of ['NO_RESULTS', 'STARTNODES_NULL', 'ENDNODES_NULL', 'EQUAL_POINTS']) {
+    const fetch = fakeFetch(async () => ({ body: { status } }));
+    const res = await call(createHandler({ kakaoKey: 'k', fetch }), 'POST', '/v1/routes', transitReq);
+    assert.equal(res.status, 422, status);
+    assert.deepEqual(res.body.error, { code: 'NO_DATA', retryable: false }, status);
+  }
+});
+
+function assertEqual200(res) {
+  assert.equal(res.status, 200, JSON.stringify(res.body));
+}

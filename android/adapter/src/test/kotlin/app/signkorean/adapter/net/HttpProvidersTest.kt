@@ -11,6 +11,8 @@ import app.signkorean.domain.location.Coordinate
 import app.signkorean.domain.route.RouteFailure
 import app.signkorean.domain.route.RouteRequest
 import app.signkorean.domain.route.RouteResult
+import app.signkorean.domain.route.TransitKind
+import app.signkorean.domain.route.TravelMode
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -243,5 +245,25 @@ class HttpProvidersTest {
     fun `RTE-L 출처 표기가 없는 경로는 보이지 않는다`() = runBlocking {
         body = """{"distance_m":1200,"duration_s":900,"path":[[37.57,126.99],[37.575,126.985]]}"""
         assertEquals(RouteResult.Failed(RouteFailure.Unsupported), HttpRouteProvider(client).route(RouteRequest(Coordinate(37.57, 126.99), Coordinate(37.575, 126.985))))
+    }
+
+    @Test
+    fun `TRN 대중교통 - mode transit 으로 보내고 환승·요금·단계(탈것 노선)를 읽는다`() = runBlocking {
+        body = """{"distance_m":5013,"duration_s":2115,"path":[[37.57,126.99],[37.575,126.985]],"attribution":"Kakao Map",
+            "transit":{"transfers":1,"fare_won":1550,"steps":[{"kind":"walk","lines":[],"minutes":4,"distance_m":300},
+            {"kind":"subway","lines":["3호선"],"minutes":20,"distance_m":4000},{"kind":"bus","lines":["7212","1020"],"minutes":9,"distance_m":700}]}}"""
+        val r = HttpRouteProvider(client).route(RouteRequest(Coordinate(37.57, 126.99), Coordinate(37.575, 126.985), TravelMode.Transit)) as RouteResult.Found
+        assertTrue(lastBody.contains("\"mode\":\"transit\""))
+        val t = r.route.transit!!
+        assertEquals(1, t.transfers)
+        assertEquals(1550, t.fareWon)
+        assertEquals(listOf(TransitKind.Walk, TransitKind.Subway, TransitKind.Bus), t.steps.map { it.kind })
+        assertEquals(listOf("7212", "1020"), t.steps[2].lines)
+    }
+
+    @Test
+    fun `TRN 대중교통 단계에 모르는 탈것이 오면 그 단계만 걷기로 두지 않고 응답 전체를 미지원으로`() = runBlocking {
+        body = """{"distance_m":1,"duration_s":1,"path":[[37.57,126.99],[37.575,126.985]],"attribution":"Kakao Map","transit":{"transfers":0,"steps":[{"kind":"ferry","lines":[],"minutes":1,"distance_m":1}]}}"""
+        assertEquals(RouteResult.Failed(RouteFailure.Unsupported), HttpRouteProvider(client).route(RouteRequest(Coordinate(37.57, 126.99), Coordinate(37.575, 126.985), TravelMode.Transit)))
     }
 }

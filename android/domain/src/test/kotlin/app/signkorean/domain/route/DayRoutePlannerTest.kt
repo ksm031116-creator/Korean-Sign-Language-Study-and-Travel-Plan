@@ -170,4 +170,29 @@ class DayRoutePlannerTest {
         assertEquals(listOf(provider.seconds(a.coordinate, b.coordinate)), times.legs)
         assertEquals(listOf("Fake routes"), times.attributions)
     }
+
+    // ---------- 대중교통 (TRN) ----------
+
+    @Test
+    fun `TRN-01 대중교통으로 물으면 대중교통 수단으로 묻고 환승·요금 요약을 돌려준다`() = runTest {
+        val plan = planner.plan(trip, day("a", "b"), TravelMode.Transit)
+        assertEquals(TravelMode.Transit, provider.requests.single().mode)
+        assertEquals(provider.seconds(a.coordinate, b.coordinate, TravelMode.Transit), plan.legs.single())
+        assertTrue(plan.routes.single()!!.transit != null)
+    }
+
+    @Test
+    fun `TRN-02 같은 구간이라도 도보 결과를 대중교통으로 쓰지 않는다(수단별로 따로 기억)`() = runTest {
+        planner.legs(trip, day("a", "b"))
+        planner.plan(trip, day("a", "b"), TravelMode.Transit)
+        assertEquals(listOf(TravelMode.Walk, TravelMode.Transit), provider.requests.map { it.mode })
+        planner.plan(trip, day("a", "b"), TravelMode.Transit)
+        assertEquals(2, provider.requests.size, "대중교통 결과도 기억한다")
+    }
+
+    @Test
+    fun `TRN-03 일정 시각 계산(legs·known)은 늘 도보다`() = runTest {
+        planner.plan(trip, day("a", "b"), TravelMode.Transit)
+        assertEquals(listOf<Long?>(null), planner.known(trip, day("a", "b")))
+    }
 }

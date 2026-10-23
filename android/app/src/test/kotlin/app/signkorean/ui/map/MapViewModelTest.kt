@@ -9,6 +9,7 @@ import app.signkorean.domain.route.RouteFailure
 import app.signkorean.domain.route.RouteProvider
 import app.signkorean.domain.route.RouteRequest
 import app.signkorean.domain.route.RouteResult
+import app.signkorean.domain.route.TravelMode
 import app.signkorean.domain.trip.Origin
 import app.signkorean.domain.trip.Trip
 import app.signkorean.domain.trip.TripEditor
@@ -238,5 +239,42 @@ class MapViewModelTest {
         val vm = vm(MapTarget.ToPlace(PlaceId("p2")))
         vm.onAction(MapAction.OriginChosen(Origin.AtPlace(PlaceId("p1"))))
         assertEquals(RouteFailure.NoRoute, vm.state.value.legs.single().failure)
+    }
+
+    // ---------- 대중교통 (TRN) ----------
+
+    @Test
+    fun `TRN-04 대중교통을 고르면 대중교통으로 다시 묻고, 도보로 돌아오면 도보 결과(기억)를 쓴다`() = runTest {
+        val t = trip("p1", "p2")
+        val vm = vm(MapTarget.Day(t.id, d1))
+        assertEquals(TravelMode.Walk, vm.state.value.mode)
+        vm.onAction(MapAction.SetMode(TravelMode.Transit))
+        assertEquals(TravelMode.Transit, vm.state.value.mode)
+        assertEquals(TravelMode.Transit, provider.requests.last().mode)
+        assertNotNull(vm.state.value.legs.single().route!!.transit)
+        val asked = provider.requests.size
+        vm.onAction(MapAction.SetMode(TravelMode.Walk))
+        assertEquals(asked, provider.requests.size)
+        assertNull(vm.state.value.legs.single().route!!.transit)
+    }
+
+    @Test
+    fun `TRN-05 대중교통으로 보고 있으면 외부 지도도 대중교통 길찾기로 연다`() = runTest {
+        val t = trip("p1", "p2")
+        val vm = vm(MapTarget.Day(t.id, d1))
+        vm.onAction(MapAction.SetMode(TravelMode.Transit))
+        vm.effects.drain()
+        vm.onAction(MapAction.OpenExternal("Place 1", "Place 2"))
+        val url = (vm.effects.drain().single() as MapEffect.OpenUrl).url
+        assertTrue(url, url.startsWith("https://map.kakao.com/link/by/traffic/"))
+    }
+
+    @Test
+    fun `TRN-06 대중교통 경로는 일정의 다시 계산 표시를 끄지 않는다(일정은 도보 기준)`() = runTest {
+        val t = trip("p1", "p2")
+        val vm = vm(MapTarget.Day(t.id, d1))
+        vm.onAction(MapAction.SetMode(TravelMode.Transit))
+        // 도보로 이미 다 계산했으므로 꺼져 있다. 대중교통 전환이 다시 켜거나 다른 revision 으로 끄지 않는다.
+        assertFalse(store.get(t.id)!!.day(d1).needsRecalculation)
     }
 }
