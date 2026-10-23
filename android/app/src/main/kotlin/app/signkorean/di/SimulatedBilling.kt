@@ -4,7 +4,11 @@ import app.signkorean.domain.entitlement.EntitlementGateway
 import app.signkorean.domain.entitlement.PurchaseResult
 import app.signkorean.domain.entitlement.StorePurchase
 import app.signkorean.domain.entitlement.StoreQuery
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.Module
 import org.koin.dsl.module
@@ -26,15 +30,23 @@ val simulatedBillingModule: Module get() = module {
 class SimulatedBillingGateway(context: android.content.Context) : EntitlementGateway {
     private val prefs = context.applicationContext.getSharedPreferences("simulated_billing", android.content.Context.MODE_PRIVATE)
 
-    // "토큰|acknowledged" 를 한 줄씩 저장한다.
+    // 읽고-고치고-저장하기를 한 번에 하나씩. 결제와 확인이 겹쳐도 한쪽이 다른 쪽을 덮어 구매가 사라지지 않는다(리뷰 L11).
+    private val lock = Mutex()
+
+    // "토큰|acknowledged" 를 한 줄씩 저장한다. 구분자는 마지막 '|' 다 — 토큰에 '|' 가 있어도 버리지 않는다.
     @Volatile private var owned: List<StorePurchase> = prefs.getStringSet(KEY, emptySet()).orEmpty().sorted().mapNotNull { line ->
-        val parts = line.split('|')
-        if (parts.size == 2) StorePurchase(parts[0], StorePurchase.State.Purchased, acknowledged = parts[1] == "1") else null
+        val token = line.substringBeforeLast('|', missingDelimiterValue = "")
+        if (token.isEmpty()) null else StorePurchase(token, StorePurchase.State.Purchased, acknowledged = line.substringAfterLast('|') == "1")
     }
-        set(value) {
-            field = value
-            prefs.edit().putStringSet(KEY, value.map { it.token + "|" + (if (it.acknowledged) "1" else "0") }.toSet()).commit()
+
+    private suspend fun change(transform: (List<StorePurchase>) -> List<StorePurchase>) = lock.withLock {
+        val next = transform(owned)
+        // commit() 은 디스크에 쓸 때까지 막으므로 메인 스레드가 아닌 IO 에서.
+        withContext(Dispatchers.IO) {
+            prefs.edit().putStringSet(KEY, next.map { it.token + "|" + (if (it.acknowledged) "1" else "0") }.toSet()).commit()
         }
+        owned = next
+    }
 
     override suspend fun queryPurchases(): StoreQuery = StoreQuery.Success(owned)
 
@@ -44,17 +56,17 @@ class SimulatedBillingGateway(context: android.content.Context) : EntitlementGat
     override suspend fun purchase(): PurchaseResult {
         delay(800)
         val bought = StorePurchase("simulated-" + UUID.randomUUID(), StorePurchase.State.Purchased, acknowledged = false)
-        owned = owned + bought
+        change { it + bought }
         return PurchaseResult.Purchased(bought)
     }
 
     override suspend fun acknowledge(token: String): Boolean {
-        owned = owned.map { if (it.token == token) it.copy(acknowledged = true) else it }
+        change { list -> list.map { if (it.token == token) it.copy(acknowledged = true) else it } }
         return true
     }
 
-    fun relock() {
-        owned = emptyList()
+    suspend fun relock() {
+        change { emptyList() }
     }
 
     private companion object {

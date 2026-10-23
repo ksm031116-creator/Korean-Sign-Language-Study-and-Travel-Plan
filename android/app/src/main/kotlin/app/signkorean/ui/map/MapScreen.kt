@@ -7,11 +7,14 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -34,6 +37,7 @@ import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.liveRegion
+import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
@@ -72,7 +76,7 @@ fun MapScreen(
     // SC21 에서 결제하고 돌아오면 잠금을 다시 확인한다. 처음 열 때는 뷰모델이 이미 읽는다.
     var resumedOnce by rememberSaveable { mutableStateOf(false) }
     LifecycleResumeEffect(viewModel) {
-        if (resumedOnce) viewModel.onAction(MapAction.Refresh) else resumedOnce = true
+        if (resumedOnce) viewModel.onAction(MapAction.Resume) else resumedOnce = true
         onPauseOrDispose { }
     }
     LaunchedEffect(viewModel) {
@@ -94,6 +98,7 @@ fun MapScreen(
 private fun MapPoint.name(): String =
     place?.name?.text() ?: label ?: if (number == null) stringResource(R.string.map_origin) else number.toString()
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun MapContent(
     state: MapUiState,
@@ -114,16 +119,20 @@ fun MapContent(
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         IconButton(onClick = onClose) { Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.action_back)) }
-        Text(stringResource(if (state.mode == TravelMode.Transit) R.string.map_title_transit else R.string.map_title), style = MaterialTheme.typography.headlineSmall, modifier = Modifier.semantics { heading() })
+        // 문구는 고른 수단을 따른다. 대중교통인데 "도보"라고 읽히지 않게(리뷰 M4).
+        val transit = state.mode == TravelMode.Transit
+        val calculating = stringResource(if (transit) R.string.map_calculating_transit else R.string.map_calculating)
+        Text(stringResource(if (transit) R.string.map_title_transit else R.string.map_title), style = MaterialTheme.typography.headlineSmall, modifier = Modifier.semantics { heading() })
         val subtitle = when {
             state.tripTitle != null && state.date != null -> state.tripTitle + " · " + formats.date(state.date)
-            state.points.lastOrNull()?.place != null -> stringResource(R.string.map_route_to, state.points.last().name())
+            state.points.lastOrNull()?.place != null ->
+                stringResource(if (transit) R.string.map_route_to_transit else R.string.map_route_to, state.points.last().name())
             else -> null
         }
         subtitle?.let { Text(it, style = MaterialTheme.typography.bodyMedium, color = t.muted) }
         when {
             state.loading -> {
-                Text(stringResource(R.string.map_calculating), style = MaterialTheme.typography.bodyMedium, color = t.muted, modifier = Modifier.semantics { liveRegion = LiveRegionMode.Polite })
+                Text(calculating, style = MaterialTheme.typography.bodyMedium, color = t.muted, modifier = Modifier.semantics { liveRegion = LiveRegionMode.Polite })
                 return@Column
             }
             state.locked -> {
@@ -140,19 +149,26 @@ fun MapContent(
             }
         }
         // 이동 수단. 도보가 기본이고, 대중교통은 이 지도에서만 본다(일정 시각은 도보 기준).
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            AppChip(stringResource(R.string.map_mode_walk), selected = state.mode == TravelMode.Walk, onClick = { onAction(MapAction.SetMode(TravelMode.Walk)) })
-            AppChip(stringResource(R.string.map_mode_transit), selected = state.mode == TravelMode.Transit, onClick = { onAction(MapAction.SetMode(TravelMode.Transit)) })
+        // 둘 중 하나만 고르므로 라디오 묶음으로 읽힌다. 큰 글씨에서는 다음 줄로 넘어간다.
+        FlowRow(Modifier.selectableGroup(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            listOf(TravelMode.Walk to R.string.map_mode_walk, TravelMode.Transit to R.string.map_mode_transit).forEach { (mode, label) ->
+                AppChip(
+                    stringResource(label),
+                    selected = state.mode == mode,
+                    onClick = { onAction(MapAction.SetMode(mode)) },
+                    modifier = Modifier.semantics { role = Role.RadioButton },
+                )
+            }
         }
         renderer.Render(state.points, state.legs, state.selected, { onAction(MapAction.SelectLeg(it)) }, Modifier)
-        if (state.busy) Text(stringResource(R.string.map_calculating), style = MaterialTheme.typography.labelMedium, color = t.muted, modifier = Modifier.semantics { liveRegion = LiveRegionMode.Polite })
+        if (state.busy) Text(calculating, style = MaterialTheme.typography.labelMedium, color = t.muted, modifier = Modifier.semantics { liveRegion = LiveRegionMode.Polite })
         Text(stringResource(R.string.map_schematic), style = MaterialTheme.typography.labelMedium, color = t.muted)
         // 경로 공급자 출처 표기 (구현 계획 Phase 19 D2).
         if (state.attributions.isNotEmpty()) {
             Text(stringResource(R.string.map_attribution, state.attributions.joinToString(", ")), style = MaterialTheme.typography.labelMedium, color = t.muted)
         }
         if (state.needsOrigin) {
-            Text(stringResource(R.string.map_needs_origin), style = MaterialTheme.typography.bodyMedium)
+            Text(stringResource(if (transit) R.string.map_needs_origin_transit else R.string.map_needs_origin), style = MaterialTheme.typography.bodyMedium)
             PrimaryButton(stringResource(R.string.map_choose_origin), onClick = { onAction(MapAction.OpenOriginPicker) }, modifier = Modifier.fillMaxWidth())
             return@Column
         }
@@ -168,13 +184,11 @@ fun MapContent(
                 Text(stringResource(R.string.map_leg_from_to, fromName, toName), style = MaterialTheme.typography.titleSmall)
                 val route = leg.route
                 if (route != null) {
-                    // 공급자 초를 분으로 올림한다. 일정(SC13)의 반올림과 같은 규칙이다.
-                    val minutes = ((route.durationSeconds + 59) / 60).toInt()
                     Text(legDetail(route, formats), style = MaterialTheme.typography.bodyLarge)
-                    route.transit?.let { TransitDetail(it, ((route.durationSeconds + 59) / 60).toInt(), formats) }
+                    route.transit?.let { TransitDetail(it, route.durationSeconds, formats) }
                 } else {
                     Text(
-                        failureText(leg.failure),
+                        failureText(leg.failure, transit),
                         style = MaterialTheme.typography.bodyMedium,
                         color = t.danger,
                         modifier = Modifier.semantics { liveRegion = LiveRegionMode.Polite },
@@ -209,7 +223,7 @@ fun MapContent(
                     val route = leg.route
                     Text(
                         if (route != null) legDetail(route, formats)
-                        else failureText(leg.failure),
+                        else failureText(leg.failure, transit),
                         style = MaterialTheme.typography.labelMedium,
                         color = if (route != null) t.muted else t.danger,
                     )
@@ -220,10 +234,10 @@ fun MapContent(
 }
 
 @Composable
-private fun failureText(failure: RouteFailure?): String = stringResource(
+private fun failureText(failure: RouteFailure?, transit: Boolean): String = stringResource(
     when (failure) {
-        RouteFailure.NoRoute -> R.string.map_failure_no_route
-        RouteFailure.Unsupported -> R.string.map_failure_unsupported
+        RouteFailure.NoRoute -> if (transit) R.string.map_failure_no_route_transit else R.string.map_failure_no_route
+        RouteFailure.Unsupported -> if (transit) R.string.map_failure_unsupported_transit else R.string.map_failure_unsupported
         RouteFailure.Timeout -> R.string.map_failure_timeout
         RouteFailure.Network -> R.string.map_failure_network
         null -> R.string.map_leg_unknown
@@ -233,7 +247,7 @@ private fun failureText(failure: RouteFailure?): String = stringResource(
 /** 거리·시간 한 줄. 대중교통이면 "대중교통", 아니면 "도보"로 읽힌다. 공급자 초를 분으로 올림한다(일정과 같은 규칙). */
 @Composable
 private fun legDetail(route: app.signkorean.domain.route.Route, formats: app.signkorean.ui.format.AppFormats): String {
-    val minutes = formats.duration(((route.durationSeconds + 59) / 60).toInt())
+    val minutes = formats.duration(roundUpMinutes(route.durationSeconds))
     val distance = formats.distance(route.distanceMeters)
     return if (route.transit != null) stringResource(R.string.map_leg_detail_transit, distance, minutes)
     else stringResource(R.string.map_leg_detail, distance, minutes)
@@ -241,26 +255,35 @@ private fun legDetail(route: app.signkorean.domain.route.Route, formats: app.sig
 
 /** 대중교통 단계: 환승·요금, 그리고 "걷기 4분 → 지하철 3호선 20분 → 버스 7212 12분". 요금이 없으면 쓰지 않는다. */
 @Composable
-private fun TransitDetail(transit: app.signkorean.domain.route.TransitSummary, totalMinutes: Int, formats: app.signkorean.ui.format.AppFormats) {
+private fun TransitDetail(transit: app.signkorean.domain.route.TransitSummary, totalSeconds: Long, formats: app.signkorean.ui.format.AppFormats) {
     val t = SignKoreanTheme.tokens
     val transfers = if (transit.transfers == 0) stringResource(R.string.map_no_transfers) else pluralStringResource(R.plurals.map_transfers, transit.transfers, transit.transfers)
     val fare = transit.fareWon?.let { stringResource(R.string.map_fare, java.text.NumberFormat.getIntegerInstance().format(it)) }
     Text(listOfNotNull(transfers, fare).joinToString(" · "), style = MaterialTheme.typography.bodyMedium)
     transit.steps.forEach { step ->
-        val time = formats.duration(step.minutes)
+        // 공급자가 시간을 주지 않은 단계는 시간 없이 쓴다(0분으로 지어내지 않는다).
+        val time = step.seconds?.let { formats.duration(roundUpMinutes(it)) }
         val lines = step.lines.joinToString(", ")
         Text(
             when (step.kind) {
-                app.signkorean.domain.route.TransitKind.Walk -> stringResource(R.string.map_step_walk, time)
-                app.signkorean.domain.route.TransitKind.Bus -> stringResource(R.string.map_step_bus, lines, time)
-                app.signkorean.domain.route.TransitKind.Subway -> stringResource(R.string.map_step_subway, lines, time)
+                app.signkorean.domain.route.TransitKind.Walk ->
+                    if (time != null) stringResource(R.string.map_step_walk, time) else stringResource(R.string.map_step_walk_untimed)
+                app.signkorean.domain.route.TransitKind.Bus ->
+                    if (time != null) stringResource(R.string.map_step_bus, lines, time) else stringResource(R.string.map_step_bus_untimed, lines)
+                app.signkorean.domain.route.TransitKind.Subway ->
+                    if (time != null) stringResource(R.string.map_step_subway, lines, time) else stringResource(R.string.map_step_subway_untimed, lines)
             },
             style = MaterialTheme.typography.labelMedium,
             color = t.muted,
         )
     }
-    // 공급자가 단계로 주지 않는 시간(정류장까지 걷기·기다리기). 총 시간과 단계 시간의 차이라 지어낸 값이 아니다.
-    val stepMinutes = transit.steps.sumOf { it.minutes }
-    val rest = totalMinutes - stepMinutes
-    if (rest > 0) Text(stringResource(R.string.map_step_other, formats.duration(rest)), style = MaterialTheme.typography.labelMedium, color = t.muted)
+    // 공급자가 단계로 주지 않는 시간(정류장까지 걷기·기다리기). 총 초와 단계 초의 차이라 지어낸 값이 아니다.
+    // 시간을 모르는 단계가 있으면 차이를 알 수 없으므로 쓰지 않는다. 1분이 안 되는 차이도 쓰지 않는다.
+    if (transit.steps.all { it.seconds != null }) {
+        val rest = totalSeconds - transit.steps.sumOf { it.seconds!! }
+        if (rest >= 60) Text(stringResource(R.string.map_step_other, formats.duration(roundUpMinutes(rest))), style = MaterialTheme.typography.labelMedium, color = t.muted)
+    }
 }
+
+/** 공급자 초를 분으로 올림한다. 일정(SC13)과 같은 규칙이다. */
+private fun roundUpMinutes(seconds: Long): Int = ((seconds + 59) / 60).toInt()

@@ -25,8 +25,11 @@ enum class TravelMode { Walk, Transit }
 
 enum class TransitKind { Walk, Bus, Subway }
 
-/** 대중교통 경로의 한 단계. [lines] 는 탈 노선 이름("3호선", "7212") — 걷기는 비어 있다. */
-data class TransitStep(val kind: TransitKind, val lines: List<String>, val minutes: Int, val distanceMeters: Int)
+/**
+ * 대중교통 경로의 한 단계. [lines] 는 탈 노선 이름("3호선", "7212") — 걷기는 비어 있다.
+ * 시간·거리는 공급자 값 그대로이고, 주지 않으면 null 이다(지어내지 않는다).
+ */
+data class TransitStep(val kind: TransitKind, val lines: List<String>, val seconds: Long?, val distanceMeters: Int?)
 
 /** 대중교통 경로 요약. 요금은 공급자가 주지 않으면 null 이다(지어내지 않는다). */
 data class TransitSummary(val transfers: Int, val fareWon: Int?, val steps: List<TransitStep>)
@@ -103,6 +106,11 @@ class DayRoutePlanner(
         return lock.withLock {
             points.zipWithNext { from, to -> if (from == null || to == null) null else cache[RouteRequest(from, to)]?.durationSeconds }
         }
+    }
+
+    /** [mode] 로 기억한 결과를 모두 버린다. 대중교통은 시간대마다 달라서 "다시 계산"이 실제로 다시 묻게 한다(TRN-08). */
+    suspend fun forget(mode: TravelMode) {
+        lock.withLock { cache.keys.removeAll { it.mode == mode } }
     }
 
     suspend fun plan(trip: TripId, day: TripDay, mode: TravelMode = TravelMode.Walk): DayRoutePlan {

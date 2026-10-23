@@ -493,4 +493,12 @@
     <string name="map_step_subway">Subway %1$s · %2$s</string>
     <string name="map_no_transfers">No transfers</string>
     <string name="map_step_other">Walking to stops and waiting · %1$s</string>
+    <string name="map_calculating_transit">Calculating the transit route…</string>
+    <string name="map_needs_origin_transit">Choose where you\'ll start to see the transit route.</string>
+    <string name="map_route_to_transit">Transit route to %1$s</string>
+    <string name="map_failure_no_route_transit">No transit route was found between these places.</string>
+    <string name="map_failure_unsupported_transit">Transit routes aren\'t available yet.</string>
+    <string name="map_step_walk_untimed">Walk</string>
+    <string name="map_step_bus_untimed">Bus %1$s</string>
+    <string name="map_step_subway_untimed">Subway %1$s</string>
 </resources>

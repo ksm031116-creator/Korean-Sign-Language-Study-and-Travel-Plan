@@ -75,7 +75,11 @@ data class MapUiState(
 }
 
 sealed interface MapAction {
+    /** 사용자가 "다시 계산"을 눌렀다. 대중교통은 기억한 결과를 버리고 다시 묻는다(시간대마다 다르다, TRN-08). */
     data object Refresh : MapAction
+
+    /** 화면으로 돌아왔다(SC21 결제 뒤 등). 잠금만 다시 확인하고 기억한 경로는 그대로 쓴다 — 공급자 쿼터를 아낀다. */
+    data object Resume : MapAction
     data class SetMode(val mode: TravelMode) : MapAction
     data class SelectLeg(val index: Int) : MapAction
     data object OpenOriginPicker : MapAction
@@ -120,9 +124,11 @@ class MapViewModel(
     fun onAction(action: MapAction) {
         val s = _state.value
         when (action) {
-            MapAction.Refresh -> reload()
+            MapAction.Refresh -> reload(forget = s.mode == TravelMode.Transit)
+            MapAction.Resume -> reload()
             is MapAction.SetMode -> if (action.mode != s.mode && !s.locked) {
-                _state.update { it.copy(mode = action.mode, selected = 0) }
+                // 이전 수단의 구간을 바로 지운다. 새 수단이 계산되는 동안 도보 시간이 "대중교통"으로 읽히지 않게(TRN-07).
+                _state.update { it.copy(mode = action.mode, selected = 0, legs = emptyList(), calculatedAt = null) }
                 reload()
             }
             is MapAction.SelectLeg -> if (action.index in s.legs.indices) _state.update { it.copy(selected = action.index) }
@@ -152,14 +158,16 @@ class MapViewModel(
     }
 
     /**
+     * [forget]: 대중교통 기억을 버리고 다시 묻는다(TRN-08).
      * [announceLock]: 잠겨 있으면 SC21 을 연다. 처음 열 때만 그렇다 — SC21 에서 돌아와 다시 읽을 때마다 열면
      * 뒤로 가기로 빠져나갈 수 없다(MAP-M3).
      */
-    private fun reload(announceLock: Boolean = false) {
+    private fun reload(announceLock: Boolean = false, forget: Boolean = false) {
         job?.cancel()
         job = viewModelScope.launch {
             _state.update { it.copy(busy = true) }
             try {
+                if (forget) planner.forget(TravelMode.Transit)
                 if (!paid()) {
                     _state.update { it.copy(loading = false, locked = true, busy = false) }
                     if (announceLock) _effects.send(MapEffect.Upgrade(UpgradeFeature.Route))

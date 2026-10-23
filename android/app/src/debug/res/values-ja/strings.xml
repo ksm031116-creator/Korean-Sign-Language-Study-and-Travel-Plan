@@ -452,4 +452,12 @@
     <string name="map_step_subway">地下鉄 %1$s · %2$s</string>
     <string name="map_no_transfers">乗り換えなし</string>
     <string name="map_step_other">乗り場までの徒歩・待ち時間 · %1$s</string>
+    <string name="map_calculating_transit">公共交通ルートを計算しています…</string>
+    <string name="map_needs_origin_transit">出発地を選ぶと公共交通ルートが表示されます。</string>
+    <string name="map_route_to_transit">%1$s までの公共交通ルート</string>
+    <string name="map_failure_no_route_transit">この区間の公共交通ルートが見つかりませんでした。</string>
+    <string name="map_failure_unsupported_transit">公共交通ルートはまだ利用できません。</string>
+    <string name="map_step_walk_untimed">徒歩</string>
+    <string name="map_step_bus_untimed">バス %1$s</string>
+    <string name="map_step_subway_untimed">地下鉄 %1$s</string>
 </resources>

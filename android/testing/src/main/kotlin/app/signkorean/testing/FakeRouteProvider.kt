@@ -37,9 +37,9 @@ class FakeRouteProvider : RouteProvider {
                 transfers = 1,
                 fareWon = 1_550,
                 steps = listOf(
-                    TransitStep(TransitKind.Walk, emptyList(), 3, 200),
-                    TransitStep(TransitKind.Subway, listOf("3"), ((s / 60) - 5).toInt().coerceAtLeast(1), 2_000),
-                    TransitStep(TransitKind.Walk, emptyList(), 2, 150),
+                    TransitStep(TransitKind.Walk, emptyList(), 180, 200),
+                    TransitStep(TransitKind.Subway, listOf("3"), (s - 300).coerceAtLeast(60), 2_000),
+                    TransitStep(TransitKind.Walk, emptyList(), 120, 150),
                 ),
             )
         } else {

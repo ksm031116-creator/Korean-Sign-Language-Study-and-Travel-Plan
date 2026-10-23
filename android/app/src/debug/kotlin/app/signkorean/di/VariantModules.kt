@@ -19,7 +19,6 @@ import app.signkorean.domain.review.ReviewProvider
 import app.signkorean.domain.review.ReviewResponse
 import kotlin.math.abs
 import org.koin.dsl.module
-import org.koin.android.ext.koin.androidContext
 
 /**
  * 디버그 빌드 전용 조립 (설계서 §5.5 DebugOverrides). 이 소스 세트는 릴리스 APK 에 들어가지 않는다.
@@ -104,8 +103,25 @@ object SampleRoutes : app.signkorean.domain.route.RouteProvider {
         val h = Math.sin(dLat / 2).let { it * it } + Math.cos(Math.toRadians(a.lat)) * Math.cos(Math.toRadians(b.lat)) * Math.sin(dLng / 2).let { it * it }
         val meters = (2 * r * Math.asin(Math.sqrt(h)) * 1.3).toInt().coerceAtLeast(1)
         val bend = app.signkorean.domain.location.Coordinate((a.lat + b.lat) / 2 + (b.lng - a.lng) * 0.15, (a.lng + b.lng) / 2 - (b.lat - a.lat) * 0.15)
+        val walkSeconds = (meters / 1.2).toLong()
+        if (request.mode == app.signkorean.domain.route.TravelMode.Transit) {
+            // 표본 대중교통(리뷰 L9): 걷기 → 지하철 → 걷기. 도보 표본을 대중교통으로 보이지 않게 단계와 출처를 따로 둔다.
+            val ride = (walkSeconds / 3).coerceAtLeast(120)
+            val transit = app.signkorean.domain.route.TransitSummary(
+                transfers = 0,
+                fareWon = 1_550,
+                steps = listOf(
+                    app.signkorean.domain.route.TransitStep(app.signkorean.domain.route.TransitKind.Walk, emptyList(), 240, 250),
+                    app.signkorean.domain.route.TransitStep(app.signkorean.domain.route.TransitKind.Subway, listOf("Sample line"), ride, meters),
+                    app.signkorean.domain.route.TransitStep(app.signkorean.domain.route.TransitKind.Walk, emptyList(), 180, 200),
+                ),
+            )
+            return app.signkorean.domain.route.RouteResult.Found(
+                app.signkorean.domain.route.Route(meters + 450, ride + 420 + 300, listOf(a, bend, b), attribution = "Sample routes (debug build), not real transit directions", transit = transit),
+            )
+        }
         return app.signkorean.domain.route.RouteResult.Found(
-            app.signkorean.domain.route.Route(meters, (meters / 1.2).toLong(), listOf(a, bend, b), attribution = "Sample routes (debug build), not real walking directions"),
+            app.signkorean.domain.route.Route(meters, walkSeconds, listOf(a, bend, b), attribution = "Sample routes (debug build), not real walking directions"),
         )
     }
 }

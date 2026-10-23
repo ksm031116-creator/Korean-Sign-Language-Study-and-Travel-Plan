@@ -40,7 +40,7 @@ class SignKoreanApplication : Application(), ImageLoaderFactory {
         super.onCreate()
         val koin = startKoin {
             androidContext(this@SignKoreanApplication)
-            // 디버그 빌드는 모의 결제 등으로 덮어쓴다. 릴리스의 variantModules 는 비어 있다.
+            // 빌드 종류별 모듈로 덮어쓴다: 모의 결제(기본, 디버그·릴리스 모두), 디버그는 표본 데이터·다시 잠그기도.
             modules(appModules + variantModules)
         }.koin
 

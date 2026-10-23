@@ -264,11 +264,16 @@ class HttpRouteProvider(private val client: ApiClient) : RouteProvider {
                     else -> error("unknown transit kind")
                 },
                 lines = step["lines"]?.jsonArray?.mapNotNull { it.jsonPrimitive.content.takeIf(String::isNotBlank) }.orEmpty(),
-                minutes = Math.round(step["minutes"]!!.jsonPrimitive.doubleOrNull!!).toInt(),
-                distanceMeters = Math.round(step["distance_m"]!!.jsonPrimitive.doubleOrNull!!).toInt(),
+                // 공급자 초·미터 그대로. 없으면 null — 0 이나 추정값으로 채우지 않는다.
+                seconds = step.number("time_s")?.let(Math::round),
+                distanceMeters = step.number("distance_m")?.let { Math.round(it).toInt() },
             )
         },
     )
+
+    /** 값이 없거나 null 이면 null. 숫자가 아닌 값은 응답이 깨진 것이므로 던진다(미지원으로 처리된다). */
+    private fun JsonObject.number(key: String): Double? =
+        this[key]?.takeUnless { it is JsonNull }?.let { requireNotNull(it.jsonPrimitive.doubleOrNull) { key } }
 
     private fun point(c: Coordinate) = buildJsonObject {
         put("lat", c.lat)
