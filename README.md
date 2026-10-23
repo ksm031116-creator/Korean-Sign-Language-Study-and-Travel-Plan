@@ -107,7 +107,7 @@ Git 이력만 읽어도 **요구사항 → 설계 → 구현 → 검증**의 흐
 |---|---|---|
 | 장소 사진 25곳 | 한국관광공사 TourAPI (`KorService2`) | 공공누리 제1유형 14 · 제3유형 11 |
 | 장소 사진 3곳 (경복궁·명동성당·DDP) | Wikimedia Commons (앱에 내장) | CC0 · CC BY 4.0 ([credits.json](prototype/assets/credits.json)) |
-| 장소 사진 15곳 (역·거리·쇼핑몰 등) | Wikimedia Commons ([commons_photos.js](prototype/commons_photos.js)) | CC0 6 · CC BY 9 |
+| 장소 사진 16곳 (역·거리·쇼핑몰 등) | Wikimedia Commons ([commons_photos.js](prototype/commons_photos.js)) | CC0 6 · CC BY 9 |
 | 간판·표지판 이미지 | 앱이 SVG로 직접 그림 | 해당 없음 |
 | 장소 이름·주소·좌표 | 공개된 사실 정보. 좌표는 Wikidata(CC0)·TourAPI(공공누리 제1유형) | 거리·골목 8곳은 근사치(`.work/coordinates_report.txt`) |
 | 리뷰 | **샘플 데이터** | 실제 리뷰 아님 |
