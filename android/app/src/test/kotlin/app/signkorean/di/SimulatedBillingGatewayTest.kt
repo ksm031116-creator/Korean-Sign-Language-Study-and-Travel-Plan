@@ -15,7 +15,7 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.RuntimeEnvironment
 
 /**
- * 디버그 빌드의 모의 결제 (BIL-01). 실결제를 확인할 수 없는 동안 시연·채점에 쓰이므로, 앱을 껐다 켜도(새 인스턴스)
+ * 모의 결제 (BIL-01). 스토어에 올리지 않아 디버그·릴리스 모두 이 결제를 쓰므로, 앱을 껐다 켜도(새 인스턴스)
  * 구매가 남아야 한다. 다시 잠그기는 저장된 구매도 지운다.
  */
 @RunWith(RobolectricTestRunner::class)

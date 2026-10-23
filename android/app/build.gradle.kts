@@ -24,17 +24,19 @@ android {
             "apiBaseUrl 은 https:// 로 시작하는 주소여야 한다: $apiBaseUrl"
         }
         buildConfigField("String", "API_BASE_URL", "\"$apiBaseUrl\"")
+        // 결제 방식. Play 스토어에 올리지 않으므로 기본은 모의 결제다(디버그·릴리스 모두). 실제 Play 결제: -PrealBilling=true
+        buildConfigField("boolean", "SIMULATED_BILLING", (project.findProperty("realBilling") != "true").toString())
     }
 
     buildTypes {
         debug {
             // 의사 언어 en-XA(긴 문구)·ar-XB(오른쪽→왼쪽)로 레이아웃을 검사한다 (설계서 §8.7, L10N-09).
             isPseudoLocalesEnabled = true
-            // 디버그는 모의 결제가 기본이다(에뮬레이터에 Play 가 없다). 실기기 Play 결제: -PrealBilling=true
-            buildConfigField("boolean", "SIMULATED_BILLING", (project.findProperty("realBilling") != "true").toString())
         }
         release {
             isMinifyEnabled = false
+            // 스토어에 올리지 않고 APK 로 나눠 주므로 디버그 키로 서명해 바로 설치할 수 있게 한다.
+            signingConfig = signingConfigs.getByName("debug")
         }
     }
 
@@ -82,8 +84,10 @@ val checkStoreRelease by tasks.registering {
     group = "verification"
     description = "스토어 번들에 중계 서버 주소가 들어가는지 확인한다 (RVW-07)."
     val url = storeApiBaseUrl
+    val realBilling = project.findProperty("realBilling") == "true"
     doLast {
         check(url.isNotEmpty()) { "-PapiBaseUrl=https://... is required for store bundles (RVW-07). 스토어 번들에는 -PapiBaseUrl=https://... 이 필요하다. 서버 없이 출시하면 리뷰·경로가 모두 비어 있다 (RVW-07)." }
+        check(realBilling) { "Store bundles need real billing: -PrealBilling=true. 스토어 번들은 모의 결제로 만들지 않는다." }
     }
 }
 // bundleRelease 와 그 하위 작업(packageReleaseBundle·signReleaseBundle)을 직접 불러도 걸리게 한다.

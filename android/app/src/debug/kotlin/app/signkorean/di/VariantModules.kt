@@ -2,12 +2,7 @@ package app.signkorean.di
 
 import app.signkorean.BuildConfig
 import app.signkorean.R
-import app.signkorean.domain.entitlement.EntitlementGateway
-import app.signkorean.domain.entitlement.PurchaseResult
-import app.signkorean.domain.entitlement.StorePurchase
-import app.signkorean.domain.entitlement.StoreQuery
 import app.signkorean.ui.plan.DebugRelock
-import kotlinx.coroutines.delay
 import org.koin.core.module.Module
 import app.signkorean.domain.common.LocaleTag
 import app.signkorean.domain.content.CardId
@@ -25,7 +20,6 @@ import app.signkorean.domain.review.ReviewResponse
 import kotlin.math.abs
 import org.koin.dsl.module
 import org.koin.android.ext.koin.androidContext
-import java.util.UUID
 
 /**
  * 디버그 빌드 전용 조립 (설계서 §5.5 DebugOverrides). 이 소스 세트는 릴리스 APK 에 들어가지 않는다.
@@ -36,9 +30,9 @@ import java.util.UUID
 // 중계 서버 주소를 넣은 디버그 빌드는 실제 서버를 쓴다(표본으로 덮지 않는다).
 val variantModules: List<Module> = (if (BuildConfig.API_BASE_URL.isBlank()) listOf(sampleDataModule) else emptyList()) + if (BuildConfig.SIMULATED_BILLING) {
     listOf(
+        simulatedBillingModule,
+        // 다시 잠그기는 디버그 빌드에만 있다(설정 화면의 확인용 버튼).
         module {
-            single { SimulatedBillingGateway(androidContext()) }
-            single<EntitlementGateway> { get<SimulatedBillingGateway>() }
             single<DebugRelock> {
                 val gateway = get<SimulatedBillingGateway>()
                 object : DebugRelock {
@@ -95,52 +89,6 @@ class SamplePlaceSummaries(private val content: ContentRepository) : PlaceSummar
     }
 }
 
-/**
- * 모의 결제. 결제는 잠깐 기다린 뒤 성공하고, 구매는 프로세스가 살아 있는 동안만 기억한다(다시 켜면 캐시의 권한을 쓰고,
- * 시작 확인에서 구매가 없으니 Free 로 돌아간다 — 실제 환불과 같은 경로라 E-11 도 눈으로 볼 수 있다).
- */
-/**
- * 디버그 빌드의 모의 결제. 결제 버튼을 누르면 0.8초 뒤 구매 완료가 된다(실제 돈은 오가지 않는다).
- * 구매 기록은 기기에 저장해 앱을 껐다 켜도 남는다 — 메모리에만 두면 다시 켤 때 무료로 돌아갔다(BIL-01).
- */
-class SimulatedBillingGateway(context: android.content.Context) : EntitlementGateway {
-    private val prefs = context.applicationContext.getSharedPreferences("simulated_billing", android.content.Context.MODE_PRIVATE)
-
-    // "토큰|acknowledged" 를 한 줄씩 저장한다.
-    @Volatile private var owned: List<StorePurchase> = prefs.getStringSet(KEY, emptySet()).orEmpty().sorted().mapNotNull { line ->
-        val parts = line.split('|')
-        if (parts.size == 2) StorePurchase(parts[0], StorePurchase.State.Purchased, acknowledged = parts[1] == "1") else null
-    }
-        set(value) {
-            field = value
-            prefs.edit().putStringSet(KEY, value.map { it.token + "|" + (if (it.acknowledged) "1" else "0") }.toSet()).commit()
-        }
-
-    override suspend fun queryPurchases(): StoreQuery = StoreQuery.Success(owned)
-
-    // 스토어가 주는 문자열 자리. 실제 앱은 이 값을 Play 에서 받는다 (L10N-11).
-    override suspend fun localizedPrice(): String = "US$0.99"
-
-    override suspend fun purchase(): PurchaseResult {
-        delay(800)
-        val bought = StorePurchase("simulated-" + UUID.randomUUID(), StorePurchase.State.Purchased, acknowledged = false)
-        owned = owned + bought
-        return PurchaseResult.Purchased(bought)
-    }
-
-    override suspend fun acknowledge(token: String): Boolean {
-        owned = owned.map { if (it.token == token) it.copy(acknowledged = true) else it }
-        return true
-    }
-
-    fun relock() {
-        owned = emptyList()
-    }
-
-    private companion object {
-        const val KEY = "owned"
-    }
-}
 
 /**
  * 표본 경로(디버그 빌드 전용). 중계 서버 없이 SC18·SC13 화면을 확인하려고 쓴다. 출처 표기에 "Sample" 을 넣어 실제 도보
