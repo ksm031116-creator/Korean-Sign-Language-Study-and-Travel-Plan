@@ -6,6 +6,7 @@ import app.signkorean.domain.entitlement.PurchaseResult
 import app.signkorean.domain.entitlement.StoreQuery
 import app.signkorean.testing.FakeEntitlementCache
 import app.signkorean.testing.FakeNetworkMonitor
+import kotlinx.coroutines.async
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -46,5 +47,26 @@ class SimulatedBillingGatewayTest {
         first.relock()
         val owned = (SimulatedBillingGateway(context).queryPurchases() as StoreQuery.Success).purchases
         assertTrue(owned.isEmpty())
+    }
+
+    @Test
+    fun `토큰에 구분자가 들어 있어도 구매를 버리지 않는다`() = runTest {
+        val context = RuntimeEnvironment.getApplication()
+        context.getSharedPreferences("simulated_billing", android.content.Context.MODE_PRIVATE).edit()
+            .putStringSet("owned", setOf("odd|token|1")).commit()
+        val owned = (SimulatedBillingGateway(context).queryPurchases() as StoreQuery.Success).purchases
+        assertEquals(listOf("odd|token"), owned.map { it.token })
+        assertTrue(owned.single().acknowledged)
+    }
+
+    @Test
+    fun `동시에 결제·확인해도 구매가 사라지지 않는다`() = runTest {
+        val gateway = SimulatedBillingGateway(context)
+        gateway.relock()
+        val tokens = kotlinx.coroutines.coroutineScope {
+            (1..20).map { async(kotlinx.coroutines.Dispatchers.Default) { (gateway.purchase() as PurchaseResult.Purchased).purchase.token } }.map { it.await() }
+        }
+        val owned = (SimulatedBillingGateway(context).queryPurchases() as StoreQuery.Success).purchases.map { it.token }.toSet()
+        assertEquals(tokens.toSet(), owned)
     }
 }

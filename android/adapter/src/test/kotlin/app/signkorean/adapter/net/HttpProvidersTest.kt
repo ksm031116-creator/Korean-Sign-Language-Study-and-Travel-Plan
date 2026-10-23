@@ -250,8 +250,8 @@ class HttpProvidersTest {
     @Test
     fun `TRN 대중교통 - mode transit 으로 보내고 환승·요금·단계(탈것 노선)를 읽는다`() = runBlocking {
         body = """{"distance_m":5013,"duration_s":2115,"path":[[37.57,126.99],[37.575,126.985]],"attribution":"Kakao Map",
-            "transit":{"transfers":1,"fare_won":1550,"steps":[{"kind":"walk","lines":[],"minutes":4,"distance_m":300},
-            {"kind":"subway","lines":["3호선"],"minutes":20,"distance_m":4000},{"kind":"bus","lines":["7212","1020"],"minutes":9,"distance_m":700}]}}"""
+            "transit":{"transfers":1,"fare_won":1550,"steps":[{"kind":"walk","lines":[],"time_s":240,"distance_m":300},
+            {"kind":"subway","lines":["3호선"],"time_s":1200,"distance_m":4000},{"kind":"bus","lines":["7212","1020"],"time_s":null,"distance_m":null}]}}"""
         val r = HttpRouteProvider(client).route(RouteRequest(Coordinate(37.57, 126.99), Coordinate(37.575, 126.985), TravelMode.Transit)) as RouteResult.Found
         assertTrue(lastBody.contains("\"mode\":\"transit\""))
         val t = r.route.transit!!
@@ -259,11 +259,14 @@ class HttpProvidersTest {
         assertEquals(1550, t.fareWon)
         assertEquals(listOf(TransitKind.Walk, TransitKind.Subway, TransitKind.Bus), t.steps.map { it.kind })
         assertEquals(listOf("7212", "1020"), t.steps[2].lines)
+        // 공급자 초를 그대로 받는다. 시간이 없는 단계는 null(지어내지 않는다).
+        assertEquals(listOf<Long?>(240, 1200, null), t.steps.map { it.seconds })
+        assertEquals(null, t.steps[2].distanceMeters)
     }
 
     @Test
     fun `TRN 대중교통 단계에 모르는 탈것이 오면 그 단계만 걷기로 두지 않고 응답 전체를 미지원으로`() = runBlocking {
-        body = """{"distance_m":1,"duration_s":1,"path":[[37.57,126.99],[37.575,126.985]],"attribution":"Kakao Map","transit":{"transfers":0,"steps":[{"kind":"ferry","lines":[],"minutes":1,"distance_m":1}]}}"""
+        body = """{"distance_m":1,"duration_s":1,"path":[[37.57,126.99],[37.575,126.985]],"attribution":"Kakao Map","transit":{"transfers":0,"steps":[{"kind":"ferry","lines":[],"time_s":1,"distance_m":1}]}}"""
         assertEquals(RouteResult.Failed(RouteFailure.Unsupported), HttpRouteProvider(client).route(RouteRequest(Coordinate(37.57, 126.99), Coordinate(37.575, 126.985), TravelMode.Transit)))
     }
 }

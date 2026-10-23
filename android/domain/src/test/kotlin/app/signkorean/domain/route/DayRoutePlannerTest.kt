@@ -195,4 +195,14 @@ class DayRoutePlannerTest {
         planner.plan(trip, day("a", "b"), TravelMode.Transit)
         assertEquals(listOf<Long?>(null), planner.known(trip, day("a", "b")))
     }
+
+    @Test
+    fun `TRN-08 forget 은 그 수단의 기억만 지운다`() = runTest {
+        planner.legs(trip, day("a", "b"))
+        planner.plan(trip, day("a", "b"), TravelMode.Transit)
+        planner.forget(TravelMode.Transit)
+        planner.plan(trip, day("a", "b"), TravelMode.Transit)
+        planner.legs(trip, day("a", "b"))
+        assertEquals(listOf(TravelMode.Walk, TravelMode.Transit, TravelMode.Transit), provider.requests.map { it.mode })
+    }
 }

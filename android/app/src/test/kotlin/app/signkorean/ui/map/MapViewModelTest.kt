@@ -272,9 +272,42 @@ class MapViewModelTest {
     @Test
     fun `TRN-06 대중교통 경로는 일정의 다시 계산 표시를 끄지 않는다(일정은 도보 기준)`() = runTest {
         val t = trip("p1", "p2")
+        // 도보는 실패해 표시가 켜진 채로 시작한다.
+        val walkFails = object : RouteProvider {
+            override suspend fun route(request: RouteRequest): RouteResult =
+                if (request.mode == TravelMode.Walk) RouteResult.Failed(RouteFailure.Network) else provider.route(request)
+        }
+        val vm = vm(MapTarget.Day(t.id, d1), walkFails)
+        assertTrue(store.get(t.id)!!.day(d1).needsRecalculation)
+        vm.onAction(MapAction.SetMode(TravelMode.Transit))
+        assertNotNull(vm.state.value.legs.single().route)
+        assertTrue(store.get(t.id)!!.day(d1).needsRecalculation)
+    }
+
+    @Test
+    fun `TRN-07 수단을 바꾸면 이전 수단의 결과를 바로 지운다(잠깐 섞여 보이지 않게)`() = runTest {
+        val t = trip("p1", "p2")
+        val gate = kotlinx.coroutines.CompletableDeferred<Unit>()
+        val slowTransit = object : RouteProvider {
+            override suspend fun route(request: RouteRequest): RouteResult {
+                if (request.mode == TravelMode.Transit) gate.await()
+                return provider.route(request)
+            }
+        }
+        val vm = vm(MapTarget.Day(t.id, d1), slowTransit)
+        vm.onAction(MapAction.SetMode(TravelMode.Transit))
+        assertTrue(vm.state.value.legs.isEmpty())
+        gate.complete(Unit)
+        assertNotNull(vm.state.value.legs.single().route!!.transit)
+    }
+
+    @Test
+    fun `TRN-08 대중교통에서 다시 계산하면 기억한 결과를 버리고 다시 묻는다(시간대마다 다르다)`() = runTest {
+        val t = trip("p1", "p2")
         val vm = vm(MapTarget.Day(t.id, d1))
         vm.onAction(MapAction.SetMode(TravelMode.Transit))
-        // 도보로 이미 다 계산했으므로 꺼져 있다. 대중교통 전환이 다시 켜거나 다른 revision 으로 끄지 않는다.
-        assertFalse(store.get(t.id)!!.day(d1).needsRecalculation)
+        val asked = provider.requests.count { it.mode == TravelMode.Transit }
+        vm.onAction(MapAction.Refresh)
+        assertEquals(asked + 1, provider.requests.count { it.mode == TravelMode.Transit })
     }
 }
