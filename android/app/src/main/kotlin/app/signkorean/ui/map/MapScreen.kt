@@ -28,6 +28,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.Role
@@ -40,7 +41,9 @@ import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import app.signkorean.R
 import app.signkorean.domain.route.RouteFailure
+import app.signkorean.domain.route.TravelMode
 import app.signkorean.ui.designsystem.AppBottomSheet
+import app.signkorean.ui.designsystem.AppChip
 import app.signkorean.ui.designsystem.EmptyState
 import app.signkorean.ui.designsystem.ErrorState
 import app.signkorean.ui.designsystem.LockBadge
@@ -111,7 +114,7 @@ fun MapContent(
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         IconButton(onClick = onClose) { Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.action_back)) }
-        Text(stringResource(R.string.map_title), style = MaterialTheme.typography.headlineSmall, modifier = Modifier.semantics { heading() })
+        Text(stringResource(if (state.mode == TravelMode.Transit) R.string.map_title_transit else R.string.map_title), style = MaterialTheme.typography.headlineSmall, modifier = Modifier.semantics { heading() })
         val subtitle = when {
             state.tripTitle != null && state.date != null -> state.tripTitle + " · " + formats.date(state.date)
             state.points.lastOrNull()?.place != null -> stringResource(R.string.map_route_to, state.points.last().name())
@@ -135,6 +138,11 @@ fun MapContent(
                 EmptyState(title = stringResource(R.string.map_missing), body = "")
                 return@Column
             }
+        }
+        // 이동 수단. 도보가 기본이고, 대중교통은 이 지도에서만 본다(일정 시각은 도보 기준).
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            AppChip(stringResource(R.string.map_mode_walk), selected = state.mode == TravelMode.Walk, onClick = { onAction(MapAction.SetMode(TravelMode.Walk)) })
+            AppChip(stringResource(R.string.map_mode_transit), selected = state.mode == TravelMode.Transit, onClick = { onAction(MapAction.SetMode(TravelMode.Transit)) })
         }
         renderer.Render(state.points, state.legs, state.selected, { onAction(MapAction.SelectLeg(it)) }, Modifier)
         if (state.busy) Text(stringResource(R.string.map_calculating), style = MaterialTheme.typography.labelMedium, color = t.muted, modifier = Modifier.semantics { liveRegion = LiveRegionMode.Polite })
@@ -162,7 +170,8 @@ fun MapContent(
                 if (route != null) {
                     // 공급자 초를 분으로 올림한다. 일정(SC13)의 반올림과 같은 규칙이다.
                     val minutes = ((route.durationSeconds + 59) / 60).toInt()
-                    Text(stringResource(R.string.map_leg_detail, formats.distance(route.distanceMeters), formats.duration(minutes)), style = MaterialTheme.typography.bodyLarge)
+                    Text(legDetail(route, formats), style = MaterialTheme.typography.bodyLarge)
+                    route.transit?.let { TransitDetail(it, ((route.durationSeconds + 59) / 60).toInt(), formats) }
                 } else {
                     Text(
                         failureText(leg.failure),
@@ -199,7 +208,7 @@ fun MapContent(
                     Text(label, style = MaterialTheme.typography.bodyMedium)
                     val route = leg.route
                     Text(
-                        if (route != null) stringResource(R.string.map_leg_detail, formats.distance(route.distanceMeters), formats.duration(((route.durationSeconds + 59) / 60).toInt()))
+                        if (route != null) legDetail(route, formats)
                         else failureText(leg.failure),
                         style = MaterialTheme.typography.labelMedium,
                         color = if (route != null) t.muted else t.danger,
@@ -220,3 +229,38 @@ private fun failureText(failure: RouteFailure?): String = stringResource(
         null -> R.string.map_leg_unknown
     },
 )
+
+/** 거리·시간 한 줄. 대중교통이면 "대중교통", 아니면 "도보"로 읽힌다. 공급자 초를 분으로 올림한다(일정과 같은 규칙). */
+@Composable
+private fun legDetail(route: app.signkorean.domain.route.Route, formats: app.signkorean.ui.format.AppFormats): String {
+    val minutes = formats.duration(((route.durationSeconds + 59) / 60).toInt())
+    val distance = formats.distance(route.distanceMeters)
+    return if (route.transit != null) stringResource(R.string.map_leg_detail_transit, distance, minutes)
+    else stringResource(R.string.map_leg_detail, distance, minutes)
+}
+
+/** 대중교통 단계: 환승·요금, 그리고 "걷기 4분 → 지하철 3호선 20분 → 버스 7212 12분". 요금이 없으면 쓰지 않는다. */
+@Composable
+private fun TransitDetail(transit: app.signkorean.domain.route.TransitSummary, totalMinutes: Int, formats: app.signkorean.ui.format.AppFormats) {
+    val t = SignKoreanTheme.tokens
+    val transfers = if (transit.transfers == 0) stringResource(R.string.map_no_transfers) else pluralStringResource(R.plurals.map_transfers, transit.transfers, transit.transfers)
+    val fare = transit.fareWon?.let { stringResource(R.string.map_fare, java.text.NumberFormat.getIntegerInstance().format(it)) }
+    Text(listOfNotNull(transfers, fare).joinToString(" · "), style = MaterialTheme.typography.bodyMedium)
+    transit.steps.forEach { step ->
+        val time = formats.duration(step.minutes)
+        val lines = step.lines.joinToString(", ")
+        Text(
+            when (step.kind) {
+                app.signkorean.domain.route.TransitKind.Walk -> stringResource(R.string.map_step_walk, time)
+                app.signkorean.domain.route.TransitKind.Bus -> stringResource(R.string.map_step_bus, lines, time)
+                app.signkorean.domain.route.TransitKind.Subway -> stringResource(R.string.map_step_subway, lines, time)
+            },
+            style = MaterialTheme.typography.labelMedium,
+            color = t.muted,
+        )
+    }
+    // 공급자가 단계로 주지 않는 시간(정류장까지 걷기·기다리기). 총 시간과 단계 시간의 차이라 지어낸 값이 아니다.
+    val stepMinutes = transit.steps.sumOf { it.minutes }
+    val rest = totalMinutes - stepMinutes
+    if (rest > 0) Text(stringResource(R.string.map_step_other, formats.duration(rest)), style = MaterialTheme.typography.labelMedium, color = t.muted)
+}

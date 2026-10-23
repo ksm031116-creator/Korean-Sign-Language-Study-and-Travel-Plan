@@ -439,4 +439,17 @@
     <string name="map_calculating">徒歩ルートを計算しています…</string>
     <string name="day_routing">徒歩時間を更新しています…</string>
     <string name="day_route_source">徒歩時間: %1$s</string>
+    <string name="map_title_transit">公共交通ルート</string>
+    <string name="map_mode_walk">徒歩</string>
+    <string name="map_mode_transit">公共交通</string>
+    <string name="map_leg_detail_transit">%1$s · 公共交通 %2$s</string>
+    <plurals name="map_transfers">
+        <item quantity="other">乗り換え %d 回</item>
+    </plurals>
+    <string name="map_fare">運賃 ₩%1$s</string>
+    <string name="map_step_walk">徒歩 %1$s</string>
+    <string name="map_step_bus">バス %1$s · %2$s</string>
+    <string name="map_step_subway">地下鉄 %1$s · %2$s</string>
+    <string name="map_no_transfers">乗り換えなし</string>
+    <string name="map_step_other">乗り場までの徒歩・待ち時間 · %1$s</string>
 </resources>

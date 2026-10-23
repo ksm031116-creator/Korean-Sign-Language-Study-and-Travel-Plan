@@ -173,3 +173,10 @@ test('TRN 대중교통 경로가 없으면 NO_DATA', async () => {
 function assertEqual200(res) {
   assert.equal(res.status, 200, JSON.stringify(res.body));
 }
+
+test('TRN 같은 노선의 열차가 여러 번 와도 노선 이름은 한 번만', async () => {
+  const body = structuredClone(KAKAO_TRANSIT);
+  body.routes[1].steps[1].properties.vehicles = [{ name: '1호선' }, { name: '1호선' }, { name: '4호선' }, { name: '1호선' }];
+  const res = await call(createHandler({ kakaoKey: 'k', fetch: fakeFetch(async () => ({ body })) }), 'POST', '/v1/routes', transitReq);
+  assert.deepEqual(res.body.transit.steps[1].lines, ['1호선', '4호선']);
+});

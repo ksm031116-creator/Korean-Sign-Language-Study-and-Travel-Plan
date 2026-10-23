@@ -17,6 +17,7 @@ import app.signkorean.domain.route.ExternalMapLink
 import app.signkorean.domain.route.Route
 import app.signkorean.domain.route.RouteFailure
 import app.signkorean.domain.route.RouteResult
+import app.signkorean.domain.route.TravelMode
 import app.signkorean.domain.trip.Origin
 import app.signkorean.domain.trip.TripDay
 import app.signkorean.domain.trip.TripEditor
@@ -66,6 +67,8 @@ data class MapUiState(
     val origin: Origin? = null,
     val pickingOrigin: Boolean = false,
     val busy: Boolean = false,
+    /** 지도에서 보는 이동 수단. 도보가 기본이다(FR14). 일정(SC13) 시각은 이 선택과 상관없이 도보로 계산한다. */
+    val mode: TravelMode = TravelMode.Walk,
 ) {
     val selectedLeg: MapLegUi? get() = legs.getOrNull(selected)
     val attributions: List<String> get() = legs.mapNotNull { it.route?.attribution }.distinct()
@@ -73,6 +76,7 @@ data class MapUiState(
 
 sealed interface MapAction {
     data object Refresh : MapAction
+    data class SetMode(val mode: TravelMode) : MapAction
     data class SelectLeg(val index: Int) : MapAction
     data object OpenOriginPicker : MapAction
     data object CloseOriginPicker : MapAction
@@ -117,6 +121,10 @@ class MapViewModel(
         val s = _state.value
         when (action) {
             MapAction.Refresh -> reload()
+            is MapAction.SetMode -> if (action.mode != s.mode && !s.locked) {
+                _state.update { it.copy(mode = action.mode, selected = 0) }
+                reload()
+            }
             is MapAction.SelectLeg -> if (action.index in s.legs.indices) _state.update { it.copy(selected = action.index) }
             MapAction.OpenOriginPicker -> if (!s.locked) _state.update { it.copy(pickingOrigin = true) }
             MapAction.CloseOriginPicker -> _state.update { it.copy(pickingOrigin = false) }
@@ -134,7 +142,8 @@ class MapViewModel(
         val url = if (leg != null) {
             val from = s.points.getOrNull(leg.from)?.coordinate ?: return null
             val to = s.points.getOrNull(leg.to)?.coordinate ?: return null
-            ExternalMapLink.walk(action.fromName, from, action.toName, to)
+            if (s.mode == TravelMode.Transit) ExternalMapLink.transit(action.fromName, from, action.toName, to)
+            else ExternalMapLink.walk(action.fromName, from, action.toName, to)
         } else {
             val only = s.points.singleOrNull()?.coordinate ?: return null
             ExternalMapLink.place(action.toName, only)
@@ -190,11 +199,13 @@ class MapViewModel(
                 _state.update { MapUiState(loading = false, missing = true) }
                 return
             }
-            val plan = planner.plan(trip.id, day)
+            val mode = _state.value.mode
+            val plan = planner.plan(trip.id, day, mode)
             val now = store.get(t.trip)?.days?.firstOrNull { it.date == t.date }
             if (now != null && now.revision == plan.revision) {
                 showDay(trip.title, day, plan, places)
-                if (plan.complete) editor.markRoutesCalculated(t.trip, t.date, plan.revision)
+                // 일정의 "다시 계산" 표시는 도보 경로로만 끈다(일정 시각이 도보 기준이다).
+                if (plan.complete && mode == TravelMode.Walk) editor.markRoutesCalculated(t.trip, t.date, plan.revision)
                 return
             }
         }
@@ -238,7 +249,7 @@ class MapViewModel(
             is Origin.AtCoordinate -> MapPoint(origin.coordinate, null, null, origin.label)
         }
         val from = start.coordinate
-        val result = if (from == null) null else planner.single(from, destination.coordinate)
+        val result = if (from == null) null else planner.single(from, destination.coordinate, _state.value.mode)
         val leg = MapLegUi(0, 1, (result as? RouteResult.Found)?.route, (result as? RouteResult.Failed)?.reason)
         _state.update {
             it.copy(

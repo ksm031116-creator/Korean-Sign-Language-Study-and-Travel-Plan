@@ -15,6 +15,10 @@ object ExternalMapLink {
     fun walk(fromName: String, from: Coordinate, toName: String, to: Coordinate): String =
         "$BASE/by/walk/${point(fromName, from)}/${point(toName, to)}"
 
+    /** 대중교통 길찾기. */
+    fun transit(fromName: String, from: Coordinate, toName: String, to: Coordinate): String =
+        "$BASE/by/traffic/${point(fromName, from)}/${point(toName, to)}"
+
     fun place(name: String, at: Coordinate): String = "$BASE/map/${point(name, at)}"
 
     private fun point(name: String, c: Coordinate): String =

@@ -20,13 +20,28 @@ import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
-/** 이동 수단. 도보가 기본이고 지금은 도보뿐이다(FR14, M-01). 대중교통은 공급자 검증 뒤. */
-enum class TravelMode { Walk }
+/** 이동 수단. 도보가 기본이다(FR14, M-01). 대중교통은 지도 화면(SC18)에서 고른다 — 일정 시각 계산은 늘 도보다. */
+enum class TravelMode { Walk, Transit }
+
+enum class TransitKind { Walk, Bus, Subway }
+
+/** 대중교통 경로의 한 단계. [lines] 는 탈 노선 이름("3호선", "7212") — 걷기는 비어 있다. */
+data class TransitStep(val kind: TransitKind, val lines: List<String>, val minutes: Int, val distanceMeters: Int)
+
+/** 대중교통 경로 요약. 요금은 공급자가 주지 않으면 null 이다(지어내지 않는다). */
+data class TransitSummary(val transfers: Int, val fareWon: Int?, val steps: List<TransitStep>)
 
 data class RouteRequest(val origin: Coordinate, val destination: Coordinate, val mode: TravelMode = TravelMode.Walk)
 
 /** 공급자가 계산한 경로. 거리·시간은 공급자 값 그대로다. [attribution] 은 지도·경로 출처 표기. */
-data class Route(val distanceMeters: Int, val durationSeconds: Long, val path: List<Coordinate>, val attribution: String)
+data class Route(
+    val distanceMeters: Int,
+    val durationSeconds: Long,
+    val path: List<Coordinate>,
+    val attribution: String,
+    /** 대중교통일 때만 있다. */
+    val transit: TransitSummary? = null,
+)
 
 enum class RouteFailure {
     /** 걸어서 갈 길이 없다. */
@@ -90,18 +105,18 @@ class DayRoutePlanner(
         }
     }
 
-    suspend fun plan(trip: TripId, day: TripDay): DayRoutePlan {
+    suspend fun plan(trip: TripId, day: TripDay, mode: TravelMode = TravelMode.Walk): DayRoutePlan {
         val points = endpoints(day)
         val results = coroutineScope {
-            points.zipWithNext { from, to -> async { if (from == null || to == null) null else single(from, to) } }.awaitAll()
+            points.zipWithNext { from, to -> async { if (from == null || to == null) null else single(from, to, mode) } }.awaitAll()
         }
         val routes = results.map { (it as? RouteResult.Found)?.route }
         return DayRoutePlan(day.revision, routes.map { it?.durationSeconds }, routes, results.map { (it as? RouteResult.Failed)?.reason })
     }
 
     /** 한 장소까지의 경로(SC18 단일 경로). 실패하면 이유를 그대로 돌려준다(FR15). */
-    suspend fun single(origin: Coordinate, destination: Coordinate): RouteResult {
-        val request = RouteRequest(origin, destination)
+    suspend fun single(origin: Coordinate, destination: Coordinate, mode: TravelMode = TravelMode.Walk): RouteResult {
+        val request = RouteRequest(origin, destination, mode)
         var owner = false
         val pending = lock.withLock {
             cache[request]?.let { return RouteResult.Found(it) }
@@ -116,7 +131,7 @@ class DayRoutePlanner(
             } catch (e: CancellationException) {
                 // 먼저 물은 쪽이 취소됐다. 내가 살아 있으면 직접 묻는다.
                 currentCoroutineContext().ensureActive()
-                single(origin, destination)
+                single(origin, destination, mode)
             }
         }
         try {

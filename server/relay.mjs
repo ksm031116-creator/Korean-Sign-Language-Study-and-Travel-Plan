@@ -7,7 +7,14 @@ import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 
 const KAKAO_WALK = 'https://dapi.kakao.com/v2/routing/walk';
-const NO_ROUTE = new Set(['ROUTE_RESULT_NOT_FOUND', 'START_LINK_NOT_FOUND', 'END_LINK_NOT_FOUND', 'TOO_FAR_AWAY', 'SAME_POINT', 'TOO_MANY_SEARCH_LINK']);
+const KAKAO_TRANSIT = 'https://dapi.kakao.com/v2/routing/publictraffic';
+const NO_ROUTE = new Set([
+  // 도보
+  'ROUTE_RESULT_NOT_FOUND', 'START_LINK_NOT_FOUND', 'END_LINK_NOT_FOUND', 'TOO_FAR_AWAY', 'SAME_POINT', 'TOO_MANY_SEARCH_LINK',
+  // 대중교통
+  'NO_RESULTS', 'STARTNODES_NULL', 'ENDNODES_NULL', 'EQUAL_POINTS',
+]);
+const STEP_KIND = { WALKING: 'walk', BUS: 'bus', SUBWAY: 'subway' };
 
 const json = (status, body) => ({ status, body: JSON.stringify(body) });
 const error = (status, code, retryable) => json(status, { error: { code, retryable } });
@@ -22,10 +29,11 @@ export function createHandler({ kakaoKey, fetch = globalThis.fetch, timeoutMs = 
     } catch {
       return error(400, 'INVALID_INPUT', false);
     }
-    if (!isCoord(req?.origin) || !isCoord(req?.destination) || req.mode !== 'walk') return error(400, 'INVALID_INPUT', false);
+    if (!isCoord(req?.origin) || !isCoord(req?.destination) || (req.mode !== 'walk' && req.mode !== 'transit')) return error(400, 'INVALID_INPUT', false);
     if (!kakaoKey) return error(501, 'UNSUPPORTED', false);
 
-    const url = new URL(KAKAO_WALK);
+    const transit = req.mode === 'transit';
+    const url = new URL(transit ? KAKAO_TRANSIT : KAKAO_WALK);
     url.searchParams.set('start_x', String(req.origin.lng));
     url.searchParams.set('start_y', String(req.origin.lat));
     url.searchParams.set('end_x', String(req.destination.lng));
@@ -57,20 +65,54 @@ export function createHandler({ kakaoKey, fetch = globalThis.fetch, timeoutMs = 
     }
     if (body?.status !== 'OK') return NO_ROUTE.has(body?.status) ? error(422, 'NO_DATA', false) : error(502, 'UPSTREAM_ERROR', true);
 
-    const props = body.route?.properties;
-    if (!Number.isFinite(props?.totalDistance) || !Number.isFinite(props?.totalTime)) return error(502, 'UPSTREAM_ERROR', true);
-    // 카카오의 [x(경도), y(위도)] 를 앱의 [위도, 경도] 로. 단계가 이어지는 같은 점은 한 번만 넣는다.
+    return transit ? transitRoute(body, req) : walkRoute(body, req);
+  }
+
+  // 카카오의 [x(경도), y(위도)] 를 앱의 [위도, 경도] 로. 단계가 이어지는 같은 점은 한 번만 넣는다.
+  function toPath(steps, req) {
     const path = [];
-    for (const leg of body.route.legs ?? []) {
-      for (const step of leg.steps ?? []) {
-        for (const [x, y] of step.path?.points ?? []) {
-          const last = path[path.length - 1];
-          if (!last || last[0] !== y || last[1] !== x) path.push([y, x]);
-        }
+    for (const step of steps) {
+      for (const [x, y] of step.path?.points ?? []) {
+        const last = path[path.length - 1];
+        if (!last || last[0] !== y || last[1] !== x) path.push([y, x]);
       }
     }
-    if (path.length < 2) path.splice(0, path.length, [req.origin.lat, req.origin.lng], [req.destination.lat, req.destination.lng]);
-    return json(200, { distance_m: props.totalDistance, duration_s: props.totalTime, path, attribution: 'Kakao Map' });
+    if (path.length < 2) return [[req.origin.lat, req.origin.lng], [req.destination.lat, req.destination.lng]];
+    return path;
+  }
+
+  function walkRoute(body, req) {
+    const props = body.route?.properties;
+    if (!Number.isFinite(props?.totalDistance) || !Number.isFinite(props?.totalTime)) return error(502, 'UPSTREAM_ERROR', true);
+    const steps = (body.route.legs ?? []).flatMap((leg) => leg.steps ?? []);
+    return json(200, { distance_m: props.totalDistance, duration_s: props.totalTime, path: toPath(steps, req), attribution: 'Kakao Map' });
+  }
+
+  // 대중교통은 카카오가 준 경로 중 가장 빨리 도착하는 것을 고른다. 단계마다 탈것(걷기·버스·지하철)과 노선 이름을 넘긴다.
+  function transitRoute(body, req) {
+    const candidates = (body.routes ?? []).filter((r) => Number.isFinite(r.properties?.totalTime) && Number.isFinite(r.properties?.totalDistance));
+    if (candidates.length === 0) return error(422, 'NO_DATA', false);
+    const best = candidates.reduce((a, b) => (b.properties.totalTime < a.properties.totalTime ? b : a));
+    const steps = [];
+    for (const step of best.steps ?? []) {
+      const kind = STEP_KIND[step.properties?.type];
+      if (!kind) return error(502, 'UPSTREAM_ERROR', true);
+      steps.push({
+        kind,
+        // 같은 노선의 열차가 여러 대 오므로 이름은 한 번씩만(순서 유지).
+        lines: [...new Set((step.properties.vehicles ?? []).map((v) => v.name).filter(Boolean))],
+        minutes: Math.ceil((step.properties.time ?? 0) / 60),
+        distance_m: step.properties.distance ?? 0,
+      });
+    }
+    const p = best.properties;
+    return json(200, {
+      distance_m: p.totalDistance,
+      duration_s: p.totalTime,
+      path: toPath(best.steps ?? [], req),
+      attribution: 'Kakao Map',
+      transit: { transfers: p.transfers ?? 0, fare_won: p.fare?.value ?? null, steps },
+    });
   }
 
   return async function handle({ method, path, body }) {

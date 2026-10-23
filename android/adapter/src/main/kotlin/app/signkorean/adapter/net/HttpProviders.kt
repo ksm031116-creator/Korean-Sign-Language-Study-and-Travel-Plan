@@ -17,6 +17,10 @@ import app.signkorean.domain.route.RouteFailure
 import app.signkorean.domain.route.RouteProvider
 import app.signkorean.domain.route.RouteRequest
 import app.signkorean.domain.route.RouteResult
+import app.signkorean.domain.route.TransitKind
+import app.signkorean.domain.route.TransitStep
+import app.signkorean.domain.route.TransitSummary
+import app.signkorean.domain.route.TravelMode
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 import kotlinx.serialization.json.longOrNull
@@ -215,7 +219,7 @@ class HttpRouteProvider(private val client: ApiClient) : RouteProvider {
         val body = buildJsonObject {
             put("origin", point(request.origin))
             put("destination", point(request.destination))
-            put("mode", "walk")
+            put("mode", if (request.mode == TravelMode.Transit) "transit" else "walk")
         }.toString()
         return when (val r = client.post(listOf("v1", "routes"), body)) {
             // 형식이 계약과 다르면 연결 문제가 아니다. 다시 해도 같으므로 미지원으로 본다. 출처 표기가 없는 경로는 보이지 않는다.
@@ -228,6 +232,7 @@ class HttpRouteProvider(private val client: ApiClient) : RouteProvider {
                         durationSeconds = Math.round(o["duration_s"]!!.jsonPrimitive.doubleOrNull!!),
                         path = o["path"]!!.jsonArray.map { p -> p.jsonArray.let { Coordinate(it[0].jsonPrimitive.doubleOrNull!!, it[1].jsonPrimitive.doubleOrNull!!) } },
                         attribution = attribution,
+                        transit = if (request.mode == TravelMode.Transit) transit(o["transit"]!!.jsonObject) else null,
                     ),
                 )
             }.getOrElse { RouteResult.Failed(RouteFailure.Unsupported) }
@@ -244,6 +249,26 @@ class HttpRouteProvider(private val client: ApiClient) : RouteProvider {
             )
         }
     }
+
+    /** 대중교통 요약. 모르는 탈것이 오면 실패시킨다 — 버스를 걷기로 바꿔 보이지 않게. */
+    private fun transit(o: JsonObject) = TransitSummary(
+        transfers = o["transfers"]!!.jsonPrimitive.intOrNull!!,
+        fareWon = o["fare_won"]?.takeUnless { it is JsonNull }?.jsonPrimitive?.doubleOrNull?.let { Math.round(it).toInt() },
+        steps = o["steps"]!!.jsonArray.map { s ->
+            val step = s.jsonObject
+            TransitStep(
+                kind = when (step.string("kind")) {
+                    "walk" -> TransitKind.Walk
+                    "bus" -> TransitKind.Bus
+                    "subway" -> TransitKind.Subway
+                    else -> error("unknown transit kind")
+                },
+                lines = step["lines"]?.jsonArray?.mapNotNull { it.jsonPrimitive.content.takeIf(String::isNotBlank) }.orEmpty(),
+                minutes = Math.round(step["minutes"]!!.jsonPrimitive.doubleOrNull!!).toInt(),
+                distanceMeters = Math.round(step["distance_m"]!!.jsonPrimitive.doubleOrNull!!).toInt(),
+            )
+        },
+    )
 
     private fun point(c: Coordinate) = buildJsonObject {
         put("lat", c.lat)

@@ -479,4 +479,18 @@
     <string name="map_calculating">Calculating the walking route…</string>
     <string name="day_routing">Updating walking times…</string>
     <string name="day_route_source">Walking times: %1$s</string>
+    <string name="map_title_transit">Transit route</string>
+    <string name="map_mode_walk">Walk</string>
+    <string name="map_mode_transit">Transit</string>
+    <string name="map_leg_detail_transit">%1$s · %2$s by transit</string>
+    <plurals name="map_transfers">
+        <item quantity="one">%d transfer</item>
+        <item quantity="other">%d transfers</item>
+    </plurals>
+    <string name="map_fare">Fare ₩%1$s</string>
+    <string name="map_step_walk">Walk %1$s</string>
+    <string name="map_step_bus">Bus %1$s · %2$s</string>
+    <string name="map_step_subway">Subway %1$s · %2$s</string>
+    <string name="map_no_transfers">No transfers</string>
+    <string name="map_step_other">Walking to stops and waiting · %1$s</string>
 </resources>
