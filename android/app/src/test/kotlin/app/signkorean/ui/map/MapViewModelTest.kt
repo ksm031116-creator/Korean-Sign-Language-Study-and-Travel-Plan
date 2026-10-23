@@ -310,4 +310,24 @@ class MapViewModelTest {
         vm.onAction(MapAction.Refresh)
         assertEquals(asked + 1, provider.requests.count { it.mode == TravelMode.Transit })
     }
+
+    @Test
+    fun `TRN-08 화면으로 돌아오기(Resume)는 기억한 대중교통 경로를 그대로 쓴다(쿼터)`() = runTest {
+        val t = trip("p1", "p2")
+        val vm = vm(MapTarget.Day(t.id, d1))
+        vm.onAction(MapAction.SetMode(TravelMode.Transit))
+        val asked = provider.requests.size
+        vm.onAction(MapAction.Resume)
+        assertEquals(asked, provider.requests.size)
+        assertNotNull(vm.state.value.legs.single().route!!.transit)
+    }
+
+    @Test
+    fun `TRN-08 도보에서 다시 계산은 성공한 도보 구간을 다시 묻지 않는다`() = runTest {
+        val t = trip("p1", "p2")
+        val vm = vm(MapTarget.Day(t.id, d1))
+        val asked = provider.requests.size
+        vm.onAction(MapAction.Refresh)
+        assertEquals(asked, provider.requests.size)
+    }
 }

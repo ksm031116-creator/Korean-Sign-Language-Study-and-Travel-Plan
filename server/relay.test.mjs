@@ -2,7 +2,7 @@
 // 실행: node --test server/
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { createHandler } from './relay.mjs';
+import { createHandler, createRelayServer } from './relay.mjs';
 
 const KAKAO_OK = {
   status: 'OK',
@@ -246,4 +246,36 @@ test('RLY-L3 본문이 16KB 를 넘으면 413, 다른 Host 로 온 요청은 403
   assert.equal(rebinding.status, 403);
   const ok = await handler({ method: 'POST', path: '/v1/routes', body: JSON.stringify(walk), host: '127.0.0.1:8787' });
   assert.equal(ok.status, 200);
+});
+
+// 실제 HTTP 서버 경로(리뷰 후속 M1). handler 를 직접 부르면 data 이벤트의 크기 제한을 지나치지 않는다.
+async function withServer(run) {
+  const handle = createHandler({ kakaoKey: 'k', fetch: fakeFetch(() => ({ body: KAKAO_OK })) });
+  const server = createRelayServer(handle);
+  await new Promise((r) => server.listen(0, '127.0.0.1', r));
+  try {
+    await run(`http://127.0.0.1:${server.address().port}`);
+  } finally {
+    await new Promise((r) => server.close(r));
+  }
+}
+
+const VALID = JSON.stringify({ origin: { lat: 37.57, lng: 126.99 }, destination: { lat: 37.575, lng: 126.985 }, mode: 'walk' });
+
+test('RLY-M1 서버: 16KB 를 넘는 본문은 413 이다(잘라서 처리하지 않는다)', async () => {
+  await withServer(async (base) => {
+    const big = await fetch(`${base}/v1/routes`, { method: 'POST', body: 'x'.repeat(64 * 1024) });
+    assert.equal(big.status, 413);
+    // 유효한 JSON 뒤에 공백을 붙여 상한을 넘겨도 처리하지 않는다.
+    const padded = await fetch(`${base}/v1/routes`, { method: 'POST', body: VALID + ' '.repeat(20 * 1024) });
+    assert.equal(padded.status, 413);
+  });
+});
+
+test('RLY-M1 서버: 상한 안의 요청은 그대로 처리한다', async () => {
+  await withServer(async (base) => {
+    const ok = await fetch(`${base}/v1/routes`, { method: 'POST', body: VALID });
+    assert.equal(ok.status, 200);
+    assert.equal((await ok.json()).distance_m, 1234);
+  });
 });
