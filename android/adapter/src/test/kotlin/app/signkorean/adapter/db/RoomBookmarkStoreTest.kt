@@ -66,6 +66,15 @@ class RoomBookmarkStoreTest {
     @Test
     fun `B-06 실제 DB 트랜잭션에서 동시에 저장해도 무료 한도를 넘지 않고, 다시 열어도 중복 없이 남는다`() = runBlocking {
         val name = "b06-${System.nanoTime()}.db"
+        // 단언이 중간에 실패해도 DB 파일을 지운다.
+        try {
+            b06(name)
+        } finally {
+            context.deleteDatabase(name)
+        }
+    }
+
+    private suspend fun b06(name: String) {
         val file = Room.databaseBuilder(context, AppDatabase::class.java, name).build()
         val t = Instant.parse("2026-10-21T09:00:00Z")
         val clock = app.signkorean.domain.common.Clock { t }
@@ -90,7 +99,6 @@ class RoomBookmarkStoreTest {
             assertEquals(after.size, after.toSet().size)
         } finally {
             reopened.close()
-            context.deleteDatabase(name)
         }
     }
 }

@@ -335,4 +335,28 @@ class LearnViewModelTest {
         vm.onAction(LearnAction.ToggleBookmark)
         assertTrue(vm.state.value.bookmarked)
     }
+
+    @Test
+    fun `P11 저장 중에 별을 또 누르면 무시한다 (한 번만 저장, 결과는 저장됨)`() = runTest {
+        val gate = kotlinx.coroutines.CompletableDeferred<Unit>()
+        var runs = 0
+        val slowTx = object : app.signkorean.domain.learning.TransactionRunner {
+            override suspend fun <T> run(block: suspend () -> T): T {
+                runs++
+                gate.await()
+                return block()
+            }
+        }
+        val started = StartSession(sessions, states, tx, SequentialIdGenerator())(SessionSource.Basics, Mode.All, cards, false)
+        assertTrue(started is StartOutcome.Started)
+        val slowSet = app.signkorean.domain.bookmark.SetBookmark(bookmarkStore, slowTx, { entitlement }, clock)
+        val vm = LearnViewModel(InMemoryContentRepository(pack), sessions, JudgeCard(sessions, states, tx, clock), UndoJudgement(sessions, states, tx), onboarding, player, bookmarkStore, slowSet, pendingStore)
+        vm.onAction(LearnAction.ToggleBookmark)
+        vm.onAction(LearnAction.ToggleBookmark)
+        assertFalse("저장이 끝나기 전에는 별이 그대로", vm.state.value.bookmarked)
+        gate.complete(Unit)
+        assertEquals(1, runs)
+        assertTrue(vm.state.value.bookmarked)
+        assertTrue(bookmarkStore.contains(CardId("t-market-1")))
+    }
 }
