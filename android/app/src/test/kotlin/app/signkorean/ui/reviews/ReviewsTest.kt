@@ -1,6 +1,7 @@
 package app.signkorean.ui.reviews
 
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithText
@@ -195,5 +196,43 @@ class ReviewsTest {
         show(loaded(ReviewState.NoReviews("https://place.map.kakao.com/1")).copy(kakaoAvailable = true))
         rule.onNodeWithText("Open the original page").assertIsDisplayed()
         rule.onNodeWithText("View reviews on Kakao Map").assertDoesNotExist()
+    }
+
+    @Test
+    fun `KRL 찾는 중에 시트를 닫으면 나중에 다시 열어도 카카오맵이 저절로 열리지 않는다`() = runTest {
+        val gate = kotlinx.coroutines.CompletableDeferred<String?>()
+        val slow = object : PlacePageLookup {
+            override suspend fun kakaoPlacePage(koName: String, at: app.signkorean.domain.location.Coordinate): String? = gate.await()
+        }
+        val vm = ReviewsViewModel(PlaceId("gwangjang"), InMemoryContentRepository(pack), LoadReviews(provider), ResolveAppLanguage(FakeCurrentLocale(selected = en)), KakaoReviewLink(slow))
+        vm.onAction(ReviewsAction.OpenKakao)
+        assertTrue(vm.state.value.openingKakao)
+        // 찾는 중 두 번 눌러도 한 번만.
+        vm.onAction(ReviewsAction.OpenKakao)
+        vm.onAction(ReviewsAction.Closed)
+        assertEquals(false, vm.state.value.openingKakao)
+        gate.complete("https://place.map.kakao.com/10")
+        vm.onAction(ReviewsAction.Opened)
+        assertEquals(null, vm.effects.tryReceive().getOrNull())
+    }
+
+    @Test
+    fun `KRL 공급자가 다른 장소라고 하면 카카오맵 버튼도 보이지 않는다`() {
+        show(loaded(ReviewState.PlaceMismatch).copy(kakaoAvailable = true))
+        rule.onNodeWithText("View reviews on Kakao Map").assertDoesNotExist()
+    }
+
+    @Test
+    fun `KRL 연결 실패에서도 카카오맵 버튼을 보인다, 찾는 중에는 누를 수 없다`() {
+        show(loaded(ReviewState.NetworkFailure).copy(kakaoAvailable = true, openingKakao = true))
+        rule.onNodeWithText("View reviews on Kakao Map").assertIsNotEnabled()
+    }
+
+    @Test
+    fun `KRL 예시 장소에는 카카오맵을 가리키는 안내 대신 예시라고 알린다`() {
+        val example = ContentFixtures.place("ex", name = "Example pharmacy", isExample = true)
+        show(ReviewsUiState(loading = false, place = example, reviews = ReviewState.NotConnected, kakaoAvailable = false))
+        rule.onNodeWithText("This is an example place, so it has no reviews.").assertIsDisplayed()
+        rule.onNodeWithText("You can read them on Kakao Map", substring = true).assertDoesNotExist()
     }
 }

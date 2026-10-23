@@ -335,3 +335,15 @@ test('KRL 응답 모양이 깨지면 502', async () => {
   const handler = createHandler({ kakaoKey: 'k', fetch: fakeFetch(() => ({ body: { documents: 'x' } })) });
   assert.equal((await call(handler, 'POST', '/v1/places/kakao-page', PAGE)).status, 502);
 });
+
+test('KRL 같은 이름이 여럿이면 가장 가까운 장소, 대소문자·유니코드 정규형은 무시한다', async () => {
+  const docs = [
+    { id: '1', place_name: 'CGV 용산', distance: '900' },
+    { id: '2', place_name: 'cgv 용산', distance: '120' },
+  ];
+  const fetch = fakeFetch(() => ({ body: { documents: docs } }));
+  const res = await call(createHandler({ kakaoKey: 'k', fetch }), 'POST', '/v1/places/kakao-page', { ...PAGE, name: 'CGV용산' });
+  assert.deepEqual(res.body, { url: 'https://place.map.kakao.com/2' });
+  const nfd = fakeFetch(() => ({ body: { documents: [{ id: '3', place_name: '경복궁'.normalize('NFD') }] } }));
+  assert.equal((await call(createHandler({ kakaoKey: 'k', fetch: nfd }), 'POST', '/v1/places/kakao-page', PAGE)).status, 200);
+});
