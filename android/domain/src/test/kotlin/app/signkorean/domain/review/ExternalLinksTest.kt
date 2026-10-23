@@ -13,6 +13,9 @@ class ExternalLinksTest {
         assertTrue(ExternalLinks.isAllowed("https://map.kakao.com/link/to/x,37.5,127.0"))
         assertTrue(ExternalLinks.isAllowed("https://korean.visitkorea.or.kr/detail/ms_detail.do?cotid=1"))
         assertTrue(ExternalLinks.isAllowed("https://commons.wikimedia.org/wiki/File:A.jpg"))
+        // CC BY 사진의 원본 페이지(연남동 카페거리, Flickr). 사진 출처 링크가 숨지 않게.
+        assertTrue(ExternalLinks.isAllowed("https://www.flickr.com/photos/73479994@N00/52129031509"))
+        assertFalse(ExternalLinks.isAllowed("https://flickr.com.evil.io/photos/1"))
     }
 
     @Test
