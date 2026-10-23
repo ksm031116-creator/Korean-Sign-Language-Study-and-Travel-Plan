@@ -19,9 +19,11 @@ android {
         // 중계 서버(PRD §10.3) 주소. 서버가 준비되면 -PapiBaseUrl=https://... 로 넣는다. 비어 있으면 리뷰·평점은
         // "연결되지 않음"이다(릴리스) 또는 표본(디버그). 공급자 비밀키는 서버에 있고 앱에는 없다(설계서 원칙 13).
         val apiBaseUrl = (project.findProperty("apiBaseUrl") as String?).orEmpty().trim()
-        // https 만 받는다(NFR05). 따옴표·역슬래시가 들어가면 BuildConfig 가 깨지므로 그것도 막는다(Phase 15 리뷰 RVW-05).
-        require(apiBaseUrl.isEmpty() || Regex("""https://[^"\\\s]+""").matches(apiBaseUrl)) {
-            "apiBaseUrl 은 https:// 로 시작하는 주소여야 한다: $apiBaseUrl"
+        // https 만 받는다(NFR05). 예외는 USB 로 연결한 기기가 PC 의 중계 서버를 쓰는 http://127.0.0.1:포트 하나다
+        // (adb reverse. 평문은 그 주소에만 허용 — res/xml/network_security_config.xml).
+        // 따옴표·역슬래시가 들어가면 BuildConfig 가 깨지므로 그것도 막는다(Phase 15 리뷰 RVW-05).
+        require(apiBaseUrl.isEmpty() || Regex("""https://[^"\\\s]+""").matches(apiBaseUrl) || Regex("""http://127\.0\.0\.1:\d+/?""").matches(apiBaseUrl)) {
+            "apiBaseUrl 은 https:// 주소 또는 http://127.0.0.1:포트 여야 한다: $apiBaseUrl"
         }
         buildConfigField("String", "API_BASE_URL", "\"$apiBaseUrl\"")
         // 결제 방식. Play 스토어에 올리지 않으므로 기본은 모의 결제다(디버그·릴리스 모두). 실제 Play 결제: -PrealBilling=true
@@ -87,6 +89,7 @@ val checkStoreRelease by tasks.registering {
     val realBilling = project.findProperty("realBilling") == "true"
     doLast {
         check(url.isNotEmpty()) { "-PapiBaseUrl=https://... is required for store bundles (RVW-07). 스토어 번들에는 -PapiBaseUrl=https://... 이 필요하다. 서버 없이 출시하면 리뷰·경로가 모두 비어 있다 (RVW-07)." }
+        check(url.startsWith("https://")) { "Store bundles need an https relay server (RVW-07). 스토어 번들은 https 서버 주소로만 만든다." }
         check(realBilling) { "Store bundles need real billing: -PrealBilling=true. 스토어 번들은 모의 결제로 만들지 않는다." }
     }
 }
